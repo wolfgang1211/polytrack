@@ -1,0 +1,65 @@
+
+> polymarket-project@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.2.67:3000
+✓ Ready in 372ms
+
+[browser] In HTML, <a> cannot be a descendant of <a>.
+This will cause a hydration error.
+
+  ...
+    <RedirectErrorBoundary router={{...}}>
+      <InnerLayoutRouter url="/" tree={[...]} params={{}} cacheNode={{rsc:Promise, ...}} segmentPath={[...]} ...>
+        <SegmentViewNode type="page" pagePath="page.tsx">
+          <SegmentTrieNode>
+          <ClientPageRoot Component={function LeaderboardPage} serverProvidedParams={{...}}>
+            <LeaderboardPage params={Promise} searchParams={Promise}>
+              <div className="flex flex-...">
+                <div>
+                <LeaderboardTable data={[...]} loading={false} error={null} window="allTime" ...>
+                  <div className="animate-fa..." style={{...}}>
+                    <div>
+                    <div className="rounded-2x..." style={{border:"1p..."}}>
+                      <div>
+                      <div>
+                        <LinkComponent href="/wallet/0x..." className="group block" style={{...}}>
+>                         <a
+>                           className="group block"
+>                           style={{animationDelay:"0ms"}}
+>                           ref={function}
+>                           onClick={function onClick}
+>                           onMouseEnter={function onMouseEnter}
+>                           onTouchStart={function onTouchStart}
+>                           href="/wallet/0x9495425feeb0c250accb89275c97587011b19a27"
+>                         >
+                            <div className="grid grid-..." style={{...}}>
+                              <div>
+                              <div>
+                              <div>
+                              <div>
+                              <div className="flex items..." onClick={function onClick}>
+>                               <a
+>                                 href="https://polymarket.com/profile/0x9495425feeb0c250accb89275c97587011b19a27?ref=..."
+>                                 target="_blank"
+>                                 rel="noopener noreferrer"
+>                                 title={"Polymarket'ta Aç"}
+>                                 className="flex h-7 w-7 items-center justify-center rounded-lg opacity-0 group-hover..."
+>                                 style={{background:"rgba(139,9...",border:"1px solid ..."}}
+>                               >
+                        ...
+                      ...
+        ...
+      ...
+ 
+    at Set.forEach (<anonymous>) (<anonymous>)
+[browser] <a> cannot contain a nested <a>.
+See this log for the ancestor stack trace. 
+    at Set.forEach (<anonymous>) (<anonymous>)
+ GET / 200 in 361ms (next.js: 139ms, application-code: 223ms)
+ GET /wallet/0x9495425feeb0c250accb89275c97587011b19a27 200 in 471ms (next.js: 422ms, application-code: 49ms)
+ GET /api/leaderboard?window=allTime&limit=100 200 in 240ms (next.js: 73ms, application-code: 166ms)
+ GET /api/leaderboard?window=allTime&limit=100 200 in 23ms (next.js: 1991µs, application-code: 21ms)
+ GET /api/wallet/0x9495425feeb0c250accb89275c97587011b19a27 200 in 2.1s (next.js: 519ms, application-code: 1546ms)
