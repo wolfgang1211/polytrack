@@ -50,13 +50,13 @@ export default function PositionCard({ position, delay = 0 }: Props) {
             {isClosed && (
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white/35"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                Kapandı
+                Closed
               </span>
             )}
             {position.redeemable && !isClosed && (
               <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold"
                 style={{ background: 'rgba(16,185,129,0.12)', color:'#34d399', border:'1px solid rgba(52,211,153,0.2)' }}>
-                Çekilebilir ✓
+                Redeemable ✓
               </span>
             )}
             {endDate && <span className="text-[10px] text-white/25">{endDate}</span>}
@@ -78,17 +78,17 @@ export default function PositionCard({ position, delay = 0 }: Props) {
       <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5"
         style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.04)' }}>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Adet</p>
+          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Size</p>
           <p className="text-xs font-bold text-white/70">
             {position.size.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}
           </p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Ort. Fiyat</p>
+          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Avg Price</p>
           <p className="text-xs font-bold text-white/70">${position.avgPrice.toFixed(3)}</p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Anlık</p>
+          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Current</p>
           <p className="text-xs font-bold text-white/70">
             {position.curPrice > 0 ? `$${position.curPrice.toFixed(3)}` : '—'}
           </p>
@@ -112,7 +112,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
               d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
           </svg>
-          Polymarket&apos;ta İşlem Yap
+          Trade on Polymarket
           <svg className="h-2.5 w-2.5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

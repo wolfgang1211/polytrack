@@ -7,8 +7,8 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'PolyTrack — Polymarket Leaderboard & Cüzdan Takip',
-  description: 'Polymarket trader sıralamalarını ve cüzdan performansını takip edin.',
+  title: 'PolyTrack — Polymarket Leaderboard & Wallet Tracker',
+  description: 'Track top Polymarket traders and monitor wallet performance in real time.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

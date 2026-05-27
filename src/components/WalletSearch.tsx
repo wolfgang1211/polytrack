@@ -18,7 +18,7 @@ export default function WalletSearch({ compact }: Props) {
     e.preventDefault();
     const addr = value.trim();
     if (!addr) return;
-    if (!isValidAddress(addr)) { setError('Geçersiz Ethereum adresi'); return; }
+    if (!isValidAddress(addr)) { setError('Invalid Ethereum address'); return; }
     setError('');
     setValue('');
     router.push(`/wallet/${addr.toLowerCase()}`);
@@ -42,7 +42,7 @@ export default function WalletSearch({ compact }: Props) {
             onChange={e => { setValue(e.target.value); setError(''); }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            placeholder="0x… cüzdan adresi girin"
+            placeholder="Enter wallet address (0x…)"
             className="w-full bg-transparent py-2.5 pl-9 pr-3 text-xs text-white/75 placeholder-white/20 outline-none"
           />
         </div>
@@ -60,7 +60,7 @@ export default function WalletSearch({ compact }: Props) {
           className="relative w-full overflow-hidden rounded-xl py-2.5 text-xs font-bold text-white transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
           style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
         >
-          <span className="relative">Cüzdanı Takip Et →</span>
+          <span className="relative">Track Wallet →</span>
         </button>
       )}
     </form>

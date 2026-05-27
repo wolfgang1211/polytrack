@@ -41,7 +41,7 @@ function SearchBar() {
           onChange={e => { setValue(e.target.value); setError(false); }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholder="0x… cüzdan ara"
+          placeholder="0x… search wallet"
           className="w-52 bg-transparent py-2 pl-8 pr-3 text-xs text-white/80 placeholder-white/25 outline-none sm:w-64"
         />
       </div>

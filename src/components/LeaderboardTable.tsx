@@ -8,10 +8,10 @@ import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
 
 const TIME_WINDOWS: { label: string; value: TimeWindow }[] = [
-  { label: 'Tüm Zamanlar', value: 'allTime' },
-  { label: '1 Ay',         value: '1m' },
-  { label: '1 Hafta',      value: '1w' },
-  { label: '24 Saat',      value: '1d' },
+  { label: 'All Time', value: 'allTime' },
+  { label: '1 Month',  value: '1m' },
+  { label: '1 Week',   value: '1w' },
+  { label: '24 Hours', value: '1d' },
 ];
 
 const RANK_STYLES: Record<number, { text: string; bg: string; ring: string; badge: string }> = {
@@ -92,7 +92,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="İsim veya adres…"
+            placeholder="Name or address…"
             className="glass rounded-xl pl-8 pr-3 py-2 text-xs text-white/70 placeholder-white/20 outline-none w-full sm:w-52 focus:border-violet-500/40 transition-colors"
           />
         </div>
@@ -104,14 +104,14 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         <div className="grid grid-cols-[60px_1fr_140px_140px_36px] glass-strong px-4 py-3"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
-            Sıra<SortArrow active={sortField==='rank'} order={sortOrder} />
+            Rank<SortArrow active={sortField==='rank'} order={sortOrder} />
           </button>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Trader</span>
           <button onClick={() => handleSort('pnl')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
-            K/Z<SortArrow active={sortField==='pnl'} order={sortOrder} />
+            P&amp;L<SortArrow active={sortField==='pnl'} order={sortOrder} />
           </button>
           <button onClick={() => handleSort('vol')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
-            Hacim<SortArrow active={sortField==='vol'} order={sortOrder} />
+            Volume<SortArrow active={sortField==='vol'} order={sortOrder} />
           </button>
           <span />
         </div>
@@ -133,7 +133,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
           {!loading && !error && sorted.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-sm text-white/30">Sonuç bulunamadı</p>
+              <p className="text-sm text-white/30">No results found</p>
             </div>
           )}
 
@@ -216,7 +216,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       href={profileUrl(entry.proxyWallet)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      title="Polymarket'ta Aç"
+                      title="Open on Polymarket"
                       className="flex h-7 w-7 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                       style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
                     >
@@ -236,7 +236,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         {!loading && sorted.length > 0 && (
           <div className="px-4 py-3 flex items-center justify-between glass-strong"
             style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <span className="text-[10px] text-white/20">{sorted.length} trader</span>
+            <span className="text-[10px] text-white/20">{sorted.length} traders</span>
             <span className="text-[10px] text-white/15">data-api.polymarket.com</span>
           </div>
         )}

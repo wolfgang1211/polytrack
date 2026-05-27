@@ -25,7 +25,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
     fetch(`/api/wallet/${address}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
       .then((d: WalletData) => setData(d))
-      .catch(e => setError(e instanceof Error ? e.message : 'Yüklenemedi'))
+      .catch(e => setError(e instanceof Error ? e.message : 'Failed to load'))
       .finally(() => setLoading(false));
   }, [address]);
 
@@ -48,17 +48,17 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Leaderboard&apos;a Dön
+        Back to Leaderboard
       </Link>
 
-      {loading && <LoadingSpinner text="Cüzdan verisi yükleniyor…" />}
+      {loading && <LoadingSpinner text="Loading wallet data…" />}
 
       {error && (
         <div className="animate-scale-in rounded-2xl p-8 text-center"
           style={{ background: 'rgba(244,63,94,0.07)', border: '1px solid rgba(244,63,94,0.2)' }}>
           <p className="text-sm text-rose-400">{error}</p>
           <Link href="/" className="mt-4 inline-block text-xs text-white/40 hover:text-white/70">
-            ← Geri dön
+            ← Go back
           </Link>
         </div>
       )}
@@ -92,7 +92,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Cüzdan</span>
+                    <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Wallet</span>
                   </div>
                   <h1 className="text-xl font-black text-white sm:text-2xl">{short}</h1>
                   <p className="font-mono text-[11px] text-white/25 mt-0.5 break-all max-w-xs">{address}</p>
@@ -110,7 +110,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
-                Polymarket&apos;ta Aç
+                Open on Polymarket
               </a>
             </div>
           </div>
@@ -118,29 +118,29 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Stats ── */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatsCard
-              label="Toplam K/Z"
+              label="Total P&L"
               value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
               valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-white/50'}
               icon="📊"
               delay={0}
             />
             <StatsCard
-              label="Açık Değer"
+              label="Open Value"
               value={formatCurrency(openVal, true)}
               icon="💼"
               delay={60}
             />
             <StatsCard
-              label="Açık Poz."
+              label="Open Pos."
               value={String(open.length)}
-              sub={`${closed.length} kapalı`}
+              sub={`${closed.length} closed`}
               icon="⚡"
               delay={120}
             />
             <StatsCard
-              label="Toplam Poz."
+              label="Total Pos."
               value={String(all.length)}
-              sub="tüm zamanlar"
+              sub="all time"
               icon="🎯"
               delay={180}
             />
@@ -163,7 +163,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                         style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(37,99,235,0.55))', border:'1px solid rgba(139,92,246,0.4)' }} />
                     )}
                     <span className="relative">
-                      {t === 'open' ? `Açık (${open.length})` : `Kapalı (${closed.length})`}
+                      {t === 'open' ? `Open (${open.length})` : `Closed (${closed.length})`}
                     </span>
                   </button>
                 ))}
@@ -171,7 +171,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
               {shown.length > 0 && (
                 <div className="text-right">
-                  <p className="text-[10px] text-white/25 uppercase tracking-wider">Bu sekme K/Z</p>
+                  <p className="text-[10px] text-white/25 uppercase tracking-wider">Tab P&L</p>
                   <p className={`text-sm font-black ${shownPnl > 0 ? 'text-grad-profit' : shownPnl < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
                     {shownPnl >= 0 ? '+' : ''}{formatCurrency(shownPnl, true)}
                   </p>
@@ -184,7 +184,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               <div className="glass rounded-2xl py-20 text-center">
                 <p className="text-3xl mb-3">{tab === 'open' ? '📭' : '📂'}</p>
                 <p className="text-sm text-white/25">
-                  {tab === 'open' ? 'Açık pozisyon yok' : 'Kapalı pozisyon yok'}
+                  {tab === 'open' ? 'No open positions' : 'No closed positions'}
                 </p>
               </div>
             ) : (

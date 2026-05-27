@@ -1,4 +1,4 @@
-export default function LoadingSpinner({ text = 'Yükleniyor…' }: { text?: string }) {
+export default function LoadingSpinner({ text = 'Loading…' }: { text?: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 py-24">
       <div className="relative h-12 w-12">

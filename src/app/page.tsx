@@ -28,10 +28,10 @@ export default function LeaderboardPage() {
       const res = await fetch(`/api/leaderboard?window=${w}&limit=100`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      if (!Array.isArray(json)) throw new Error('Beklenmedik yanıt');
+      if (!Array.isArray(json)) throw new Error('Unexpected response format');
       setData(json);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Yüklenemedi');
+      setError(e instanceof Error ? e.message : 'Failed to load');
       setData([]);
     } finally {
       setLoading(false);
@@ -61,7 +61,7 @@ export default function LeaderboardPage() {
             <span className="text-grad">Leaderboard</span>
           </h1>
           <p className="mt-2 text-sm text-white/35 max-w-xl">
-            Polymarket'ın en başarılı tahmin piyasası trader'larını gerçek zamanlı takip edin
+            Track the top prediction market traders on Polymarket in real time
           </p>
         </div>
 
@@ -70,16 +70,16 @@ export default function LeaderboardPage() {
           {/* Stats */}
           {!loading && data.length > 0 && (
             <div className="glass rounded-2xl px-6 py-4 flex flex-wrap items-center gap-6 divide-x divide-white/[0.06]">
-              <HeroStat label="Toplam Trader" value={data.length.toString()} delay={150} />
+              <HeroStat label="Total Traders" value={data.length.toString()} delay={150} />
               <div className="pl-6">
-                <HeroStat label="Toplam Hacim" value={formatCurrency(totalVol, true)} delay={200} />
+                <HeroStat label="Total Volume" value={formatCurrency(totalVol, true)} delay={200} />
               </div>
               <div className="pl-6">
-                <HeroStat label="Toplam K/Z" value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)} delay={250} />
+                <HeroStat label="Total P&L" value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)} delay={250} />
               </div>
               {topTrader && (
                 <div className="pl-6">
-                  <HeroStat label="Top Trader K/Z" value={'+' + formatCurrency(topTrader.pnl, true)} delay={300} />
+                  <HeroStat label="Top Trader P&L" value={'+' + formatCurrency(topTrader.pnl, true)} delay={300} />
                 </div>
               )}
             </div>
@@ -92,7 +92,7 @@ export default function LeaderboardPage() {
                 style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.4),rgba(37,99,235,0.4))', border:'1px solid rgba(139,92,246,0.3)' }}>
                 🔍
               </div>
-              <p className="text-xs font-semibold text-white/60">Cüzdan Takip Et</p>
+              <p className="text-xs font-semibold text-white/60">Track a Wallet</p>
             </div>
             <WalletSearch />
           </div>
