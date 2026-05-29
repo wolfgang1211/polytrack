@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import LeaderboardTable from '@/components/LeaderboardTable';
 import WalletSearch from '@/components/WalletSearch';
+import TopMarkets from '@/components/TopMarkets';
+import RecentBigTrades from '@/components/RecentBigTrades';
+import RisingTraders from '@/components/RisingTraders';
 import type { LeaderboardEntry, TimeWindow } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 
@@ -97,6 +100,15 @@ export default function LeaderboardPage() {
             <WalletSearch />
           </div>
         </div>
+      </div>
+
+      {/* ── Top Markets ── */}
+      <TopMarkets />
+
+      {/* ── Trades + Rising Traders ── */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+        <RecentBigTrades />
+        <RisingTraders />
       </div>
 
       {/* ── Table ── */}
