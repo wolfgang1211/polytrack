@@ -15,7 +15,9 @@ export async function GET(
   try {
     const [positionsRes, valueRes] = await Promise.allSettled([
       fetch(
-        `https://data-api.polymarket.com/positions?user=${address}&limit=500`,
+        // sizeThreshold=0 so closed/redeemed positions (which carry realizedPnl) are
+        // included — otherwise lifetime P&L reads $0 for wallets with no open positions.
+        `https://data-api.polymarket.com/positions?user=${address}&limit=500&sizeThreshold=0`,
         { headers: HEADERS }
       ),
       fetch(

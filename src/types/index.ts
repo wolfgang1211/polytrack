@@ -68,10 +68,12 @@ export interface RecentTrade {
   proxyWallet?: string;
   side?: string;
   outcome?: string;
+  outcomeIndex?: number;
   title?: string;
   slug?: string;
   eventSlug?: string;
   asset?: string;
+  icon?: string;
   size?: number;
   price?: number;
   usdcSize?: number;
