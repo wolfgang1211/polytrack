@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import TelegramModal from '@/components/TelegramModal';
+import Logo from '@/components/Logo';
 import { isValidAddress, formatAddress } from '@/lib/utils';
 
 function SearchBar() {
@@ -64,11 +65,8 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="group flex items-center gap-2.5">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden"
-              style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)' }}>
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ background: 'linear-gradient(135deg, #6d28d9, #1d4ed8, #0891b2)' }} />
-              <span className="relative text-sm font-black text-white">P</span>
+            <div className="relative transition-transform duration-300 group-hover:scale-105">
+              <Logo size={36} className="relative drop-shadow-[0_0_12px_rgba(139,92,246,0.35)]" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-sm font-bold text-grad">PolyTrack</span>

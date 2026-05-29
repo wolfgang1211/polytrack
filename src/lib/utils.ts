@@ -37,3 +37,55 @@ export function rankBadge(rank: number): string {
   if (rank === 3) return '🥉';
   return `#${rank}`;
 }
+
+export const CATEGORY_PATTERNS: [string, RegExp][] = [
+  ['Crypto',        /bitcoin|btc|eth(?:ereum)?|crypto|solana|sol\b|doge|token|defi|nft|web3|blockchain|binance|xrp|avax|chainlink|usdc|stablecoin/i],
+  ['Politics',      /trump|biden|harris|election|president|congress|senate|democrat|republican|ballot|vote|poll|minister|prime\s+minister|parliament|white\s+house|nato|geopolit|campaign/i],
+  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics/i],
+  ['Entertainment', /oscar|grammy|emmy|movie|film|show|tv\b|music|celebrity|award|actor|actress|box\s+office|netflix|album|billboard|spotify/i],
+  ['Tech',          /\bai\b|gpt|openai|spacex|nasa|rocket|apple|google|microsoft|meta\b|amazon|tesla|nvidia|startup|ipo|antitrust/i],
+  ['World',         /war|conflict|ceasefire|sanction|nato|invasion|russia|ukraine|israel|china|taiwan|climate|hurricane|earthquake/i],
+];
+
+export function detectCategory(title: string): string {
+  for (const [cat, re] of CATEGORY_PATTERNS) {
+    if (re.test(title)) return cat;
+  }
+  return 'Other';
+}
+
+/** Risk-adjusted "Smart Score" (0–100) computed relative to a dataset.
+ *  Blends P&L efficiency (ROI = pnl/vol) with absolute P&L magnitude via
+ *  percentile ranking, so a consistent earner outranks a lucky high-volume punt. */
+export function computeSmartScores<T extends { pnl: number; vol: number }>(
+  rows: T[]
+): Map<T, number> {
+  const result = new Map<T, number>();
+  if (rows.length === 0) return result;
+
+  const roi = (r: T) => (r.vol > 0 ? r.pnl / r.vol : 0);
+  const percentile = (sortedVals: number[], v: number) => {
+    if (sortedVals.length <= 1) return 1;
+    let lo = 0;
+    for (let i = 0; i < sortedVals.length; i++) if (sortedVals[i] < v) lo = i + 1;
+    return lo / (sortedVals.length - 1);
+  };
+
+  const roiVals = rows.map(roi).sort((a, b) => a - b);
+  const pnlVals = rows.map(r => r.pnl).sort((a, b) => a - b);
+
+  for (const r of rows) {
+    const roiP = percentile(roiVals, roi(r));
+    const pnlP = percentile(pnlVals, r.pnl);
+    const score = Math.round((0.6 * roiP + 0.4 * pnlP) * 100);
+    result.set(r, Math.max(0, Math.min(100, score)));
+  }
+  return result;
+}
+
+export function scoreTier(score: number): { label: string; color: string; badge: string } {
+  if (score >= 85) return { label: 'Elite',  color: '#fbbf24', badge: '🔥' };
+  if (score >= 65) return { label: 'Sharp',  color: '#34d399', badge: '⚡' };
+  if (score >= 40) return { label: 'Solid',  color: '#38bdf8', badge: '•' };
+  return { label: 'Risky', color: '#fb7185', badge: '•' };
+}

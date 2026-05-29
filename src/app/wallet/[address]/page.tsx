@@ -3,30 +3,15 @@
 import { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
 import type { WalletData, Position } from '@/types';
-import { formatCurrency, formatAddress } from '@/lib/utils';
+import { formatCurrency, formatAddress, detectCategory } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import StatsCard from '@/components/StatsCard';
 import PositionCard from '@/components/PositionCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import TelegramModal from '@/components/TelegramModal';
+import WalletCharts from '@/components/WalletCharts';
 
 type Tab = 'open' | 'closed';
-
-const CATEGORY_PATTERNS: [string, RegExp][] = [
-  ['Crypto',        /bitcoin|btc|eth(?:ereum)?|crypto|solana|sol\b|doge|token|defi|nft|web3|blockchain|binance|xrp|avax|chainlink|usdc|stablecoin/i],
-  ['Politics',      /trump|biden|harris|election|president|congress|senate|democrat|republican|ballot|vote|poll|minister|prime\s+minister|parliament|white\s+house|nato|geopolit|campaign/i],
-  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics/i],
-  ['Entertainment', /oscar|grammy|emmy|movie|film|show|tv\b|music|celebrity|award|actor|actress|box\s+office|netflix|album|billboard|spotify/i],
-  ['Tech',          /\bai\b|gpt|openai|spacex|nasa|rocket|apple|google|microsoft|meta\b|amazon|tesla|nvidia|startup|ipo|antitrust/i],
-  ['World',         /war|conflict|ceasefire|sanction|nato|invasion|russia|ukraine|israel|china|taiwan|climate|hurricane|earthquake/i],
-];
-
-function detectCategory(title: string): string {
-  for (const [cat, re] of CATEGORY_PATTERNS) {
-    if (re.test(title)) return cat;
-  }
-  return 'Other';
-}
 
 interface Insights {
   winRate: number;
@@ -286,6 +271,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               </div>
             </div>
           )}
+
+          {/* ── Performance charts ── */}
+          <WalletCharts positions={all} />
 
           {/* ── Positions ── */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>

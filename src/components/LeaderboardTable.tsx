@@ -2,10 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
-import type { LeaderboardEntry, SortField, SortOrder, TimeWindow } from '@/types';
-import { formatCurrency, formatAddress } from '@/lib/utils';
+import type { LeaderboardEntry, SortOrder, TimeWindow } from '@/types';
+import { formatCurrency, formatAddress, computeSmartScores, scoreTier } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
+
+type LbSortField = 'pnl' | 'vol' | 'rank' | 'score';
 
 const TIME_WINDOWS: { label: string; value: TimeWindow }[] = [
   { label: 'All Time', value: 'allTime' },
@@ -37,29 +39,36 @@ function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
 }
 
 export default function LeaderboardTable({ data, loading, error, window, onWindowChange }: Props) {
-  const [sortField, setSortField] = useState<SortField>('pnl');
+  const [sortField, setSortField] = useState<LbSortField>('pnl');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [search, setSearch] = useState('');
+  const [profitableOnly, setProfitableOnly] = useState(false);
+  const [verifiedOnly, setVerifiedOnly] = useState(false);
 
-  function handleSort(field: SortField) {
+  function handleSort(field: LbSortField) {
     if (sortField === field) setSortOrder(o => o === 'desc' ? 'asc' : 'desc');
     else { setSortField(field); setSortOrder('desc'); }
   }
 
+  // Smart Score computed across the full dataset (percentile-based)
+  const scores = useMemo(() => computeSmartScores(data), [data]);
+
   const sorted = useMemo(() => {
     const q = search.toLowerCase();
-    const filtered = data.filter(e =>
-      !q ||
-      e.proxyWallet.toLowerCase().includes(q) ||
-      (e.userName || '').toLowerCase().includes(q)
-    );
+    const filtered = data.filter(e => {
+      if (q && !e.proxyWallet.toLowerCase().includes(q) && !(e.userName || '').toLowerCase().includes(q)) return false;
+      if (profitableOnly && e.pnl <= 0) return false;
+      if (verifiedOnly && !e.verifiedBadge) return false;
+      return true;
+    });
     return [...filtered].sort((a, b) => {
-      const diff = sortField === 'rank'
-        ? parseInt(a.rank) - parseInt(b.rank)
-        : (a[sortField] ?? 0) - (b[sortField] ?? 0);
+      let diff: number;
+      if (sortField === 'rank') diff = parseInt(a.rank) - parseInt(b.rank);
+      else if (sortField === 'score') diff = (scores.get(a) ?? 0) - (scores.get(b) ?? 0);
+      else diff = (a[sortField] ?? 0) - (b[sortField] ?? 0);
       return sortOrder === 'desc' ? -diff : diff;
     });
-  }, [data, search, sortField, sortOrder]);
+  }, [data, search, sortField, sortOrder, profitableOnly, verifiedOnly, scores]);
 
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
@@ -84,24 +93,47 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           ))}
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Name or address…"
-            className="glass rounded-xl pl-8 pr-3 py-2 text-xs text-white/70 placeholder-white/20 outline-none w-full sm:w-52 focus:border-violet-500/40 transition-colors"
-          />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Filter chips */}
+          <button
+            onClick={() => setProfitableOnly(v => !v)}
+            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${profitableOnly ? 'text-emerald-300' : 'text-white/35 hover:text-white/60'}`}
+            style={profitableOnly
+              ? { background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.35)' }
+              : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            Profitable
+          </button>
+          <button
+            onClick={() => setVerifiedOnly(v => !v)}
+            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-violet-300' : 'text-white/35 hover:text-white/60'}`}
+            style={verifiedOnly
+              ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+              : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+          >
+            ✓ Verified
+          </button>
+
+          {/* Search */}
+          <div className="relative">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Name or address…"
+              className="glass rounded-xl pl-8 pr-3 py-2 text-xs text-white/70 placeholder-white/20 outline-none w-full sm:w-52 focus:border-violet-500/40 transition-colors"
+            />
+          </div>
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="rounded-2xl overflow-x-auto" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="min-w-[660px]">
         {/* Header */}
-        <div className="grid grid-cols-[60px_1fr_140px_140px_36px] glass-strong px-4 py-3"
+        <div className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] glass-strong px-4 py-3"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
             Rank<SortArrow active={sortField==='rank'} order={sortOrder} />
@@ -113,15 +145,18 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           <button onClick={() => handleSort('vol')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
             Volume<SortArrow active={sortField==='vol'} order={sortOrder} />
           </button>
+          <button onClick={() => handleSort('score')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors" title="Risk-adjusted smart score (0–100)">
+            Smart<SortArrow active={sortField==='score'} order={sortOrder} />
+          </button>
           <span />
         </div>
 
         {/* Rows */}
         <div>
           {loading && Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="grid grid-cols-[60px_1fr_140px_140px_36px] px-4 py-3.5"
+            <div key={i} className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] px-4 py-3.5"
               style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <SkeletonRow cols={5} />
+              <SkeletonRow cols={6} />
             </div>
           ))}
 
@@ -142,6 +177,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             const rs = RANK_STYLES[rank];
             const displayName = entry.userName || formatAddress(entry.proxyWallet);
             const isTop3 = rank <= 3;
+            const score = scores.get(entry) ?? 0;
+            const tier = scoreTier(score);
 
             return (
               <Link
@@ -151,7 +188,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                 style={{ animationDelay: `${idx * 25}ms` }}
               >
                 <div
-                  className="grid grid-cols-[60px_1fr_140px_140px_36px] px-4 py-3.5 transition-all duration-200
+                  className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] px-4 py-3.5 transition-all duration-200
                     hover:bg-white/[0.03] cursor-pointer"
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -210,6 +247,12 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     </span>
                   </div>
 
+                  {/* Smart Score */}
+                  <div className="flex items-center justify-end gap-1.5" title={`${tier.label} · score ${score}/100`}>
+                    <span className="text-sm font-black tabular-nums" style={{ color: tier.color }}>{score}</span>
+                    <span className="text-[11px] leading-none">{tier.badge}</span>
+                  </div>
+
                   {/* Polymarket link — builder code dahil */}
                   <div className="flex items-center justify-center" onClick={e => e.preventDefault()}>
                     <a
@@ -240,6 +283,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             <span className="text-[10px] text-white/15">data-api.polymarket.com</span>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
