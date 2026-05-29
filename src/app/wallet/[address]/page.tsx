@@ -9,6 +9,7 @@ import StatsCard from '@/components/StatsCard';
 import PositionCard from '@/components/PositionCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import TelegramModal from '@/components/TelegramModal';
+import { useWatchlist } from '@/lib/useWatchlist';
 import WalletCharts from '@/components/WalletCharts';
 import LatestMoves from '@/components/LatestMoves';
 
@@ -68,6 +69,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('open');
   const [showTelegram, setShowTelegram] = useState(false);
+  const { isWatched, toggle } = useWatchlist();
 
   useEffect(() => {
     if (!address) return;
@@ -167,6 +169,18 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   </svg>
                   Open on Polymarket
                 </a>
+                {/* Watchlist */}
+                <button
+                  onClick={() => toggle(address)}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all hover:scale-[1.02]"
+                  style={isWatched(address)
+                    ? { background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.35)', color:'#fbbf24' }
+                    : { background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.55)' }}
+                >
+                  <span className="text-sm leading-none">{isWatched(address) ? '⭐' : '☆'}</span>
+                  {isWatched(address) ? 'Watching' : 'Add to Watchlist'}
+                </button>
+
                 <button
                   onClick={() => setShowTelegram(true)}
                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"

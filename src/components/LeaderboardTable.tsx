@@ -6,6 +6,7 @@ import type { LeaderboardEntry, SortOrder, TimeWindow } from '@/types';
 import { formatCurrency, formatAddress, computeSmartScores, scoreTier } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
+import { useWatchlist } from '@/lib/useWatchlist';
 
 type LbSortField = 'pnl' | 'vol' | 'rank' | 'score';
 
@@ -45,6 +46,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
   const [profitableOnly, setProfitableOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const { isWatched, toggle } = useWatchlist();
 
   function handleSort(field: LbSortField) {
     if (sortField === field) setSortOrder(o => o === 'desc' ? 'asc' : 'desc');
@@ -134,7 +136,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
       <div className="rounded-2xl overflow-x-auto" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="min-w-[660px]">
         {/* Header */}
-        <div className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] glass-strong px-4 py-3"
+        <div className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] glass-strong px-4 py-3"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
             Rank<SortArrow active={sortField==='rank'} order={sortOrder} />
@@ -185,7 +187,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         {/* Rows */}
         <div>
           {loading && Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] px-4 py-3.5"
+            <div key={i} className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] px-4 py-3.5"
               style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
               <SkeletonRow cols={6} />
             </div>
@@ -219,7 +221,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                 style={{ animationDelay: `${idx * 25}ms` }}
               >
                 <div
-                  className="grid grid-cols-[56px_1fr_120px_120px_104px_36px] px-4 py-3.5 transition-all duration-200
+                  className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] px-4 py-3.5 transition-all duration-200
                     hover:bg-white/[0.03] cursor-pointer"
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.04)',
@@ -284,8 +286,26 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     <span className="text-[11px] leading-none">{tier.badge}</span>
                   </div>
 
-                  {/* Polymarket link — builder code dahil */}
-                  <div className="flex items-center justify-center" onClick={e => e.preventDefault()}>
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-1" onClick={e => e.preventDefault()}>
+                    {/* Watchlist star */}
+                    <button
+                      onClick={e => { e.preventDefault(); toggle(entry.proxyWallet, entry.userName || undefined); }}
+                      title={isWatched(entry.proxyWallet) ? 'Remove from Watchlist' : 'Add to Watchlist'}
+                      className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 hover:scale-110
+                        ${isWatched(entry.proxyWallet)
+                          ? 'opacity-100'
+                          : 'opacity-0 group-hover:opacity-100'}`}
+                      style={isWatched(entry.proxyWallet)
+                        ? { background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.35)' }
+                        : { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    >
+                      <span className="text-xs leading-none">
+                        {isWatched(entry.proxyWallet) ? '⭐' : '☆'}
+                      </span>
+                    </button>
+
+                    {/* Polymarket link */}
                     <a
                       href={profileUrl(entry.proxyWallet)}
                       target="_blank"
