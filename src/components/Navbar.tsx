@@ -5,13 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import TelegramModal from '@/components/TelegramModal';
-import ConnectWalletModal from '@/components/ConnectWalletModal';
 import { isValidAddress } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/',         label: 'Leaderboard' },
-  { href: '/markets',  label: 'Markets'     },
-  { href: '/insights', label: 'Insights'    },
+  { href: '/',          label: 'Leaderboard' },
+  { href: '/markets',   label: 'Markets'     },
+  { href: '/insights',  label: 'Insights'    },
+  { href: '/watchlist', label: 'Watchlist'   },
 ];
 
 function SearchBar() {
@@ -56,12 +56,10 @@ function SearchBar() {
 export default function Navbar() {
   const pathname = usePathname();
   const [showTelegram, setShowTelegram] = useState(false);
-  const [showConnect, setShowConnect] = useState(false);
 
   return (
     <>
       {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
-      {showConnect  && <ConnectWalletModal onClose={() => setShowConnect(false)} />}
 
       <header className="sticky top-0 z-50">
         <div className="glass" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)' }}>
@@ -116,18 +114,15 @@ export default function Navbar() {
                 Get Alerts
               </button>
 
-              {/* Connect Wallet */}
-              <button
-                onClick={() => setShowConnect(true)}
-                className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white transition-all hover:scale-[1.02] hover:brightness-110"
-                style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.5),rgba(37,99,235,0.5))', border: '1px solid rgba(139,92,246,0.4)' }}
+              {/* Watchlist */}
+              <Link
+                href="/watchlist"
+                className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
+                style={{ background: 'rgba(251,191,36,0.10)', border: '1px solid rgba(251,191,36,0.25)' }}
               >
-                <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
-                <span className="hidden sm:inline">Connect</span>
-              </button>
+                <span className="text-amber-400">⭐</span>
+                <span className="hidden sm:inline">Watchlist</span>
+              </Link>
 
               {/* Search */}
               <SearchBar />
