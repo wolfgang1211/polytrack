@@ -9,9 +9,9 @@ import Logo from '@/components/Logo';
 import { isValidAddress } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/',         label: 'Leaderboard' },
-  { href: '/markets',  label: 'Markets'     },
-  { href: '/insights', label: 'Insights'    },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/markets',     label: 'Markets'     },
+  { href: '/insights',    label: 'Insights'    },
 ];
 
 function SearchBar() {
