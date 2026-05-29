@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
 import type { WalletData, Position } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
@@ -11,6 +11,69 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import TelegramModal from '@/components/TelegramModal';
 
 type Tab = 'open' | 'closed';
+
+const CATEGORY_PATTERNS: [string, RegExp][] = [
+  ['Crypto',        /bitcoin|btc|eth(?:ereum)?|crypto|solana|sol\b|doge|token|defi|nft|web3|blockchain|binance|xrp|avax|chainlink|usdc|stablecoin/i],
+  ['Politics',      /trump|biden|harris|election|president|congress|senate|democrat|republican|ballot|vote|poll|minister|prime\s+minister|parliament|white\s+house|nato|geopolit|campaign/i],
+  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics/i],
+  ['Entertainment', /oscar|grammy|emmy|movie|film|show|tv\b|music|celebrity|award|actor|actress|box\s+office|netflix|album|billboard|spotify/i],
+  ['Tech',          /\bai\b|gpt|openai|spacex|nasa|rocket|apple|google|microsoft|meta\b|amazon|tesla|nvidia|startup|ipo|antitrust/i],
+  ['World',         /war|conflict|ceasefire|sanction|nato|invasion|russia|ukraine|israel|china|taiwan|climate|hurricane|earthquake/i],
+];
+
+function detectCategory(title: string): string {
+  for (const [cat, re] of CATEGORY_PATTERNS) {
+    if (re.test(title)) return cat;
+  }
+  return 'Other';
+}
+
+interface Insights {
+  winRate: number;
+  winCount: number;
+  totalTrades: number;
+  bestCategory: string;
+  bestCategoryWinRate: number;
+  avgPositionSize: number;
+  biggestWin: Position;
+  biggestLoss: Position;
+}
+
+function computeInsights(positions: Position[]): Insights | null {
+  if (positions.length < 2) return null;
+
+  const winCount = positions.filter(p => p.cashPnl > 0).length;
+
+  const catMap: Record<string, { wins: number; total: number }> = {};
+  for (const p of positions) {
+    const cat = detectCategory(p.title);
+    if (!catMap[cat]) catMap[cat] = { wins: 0, total: 0 };
+    catMap[cat].total++;
+    if (p.cashPnl > 0) catMap[cat].wins++;
+  }
+
+  let bestCategory = 'N/A';
+  let bestCategoryWinRate = 0;
+  let bestWr = -1;
+  for (const [cat, s] of Object.entries(catMap)) {
+    if (s.total < 2) continue;
+    const wr = s.wins / s.total;
+    if (wr > bestWr) { bestWr = wr; bestCategory = cat; bestCategoryWinRate = Math.round(wr * 100); }
+  }
+  if (bestCategory === 'N/A' && Object.keys(catMap).length > 0) {
+    const [cat, s] = Object.entries(catMap).sort((a, b) => b[1].total - a[1].total)[0];
+    bestCategory = cat;
+    bestCategoryWinRate = Math.round((s.wins / s.total) * 100);
+  }
+
+  const avgPositionSize = positions.reduce((s, p) => s + p.initialValue, 0) / positions.length;
+
+  const sorted = [...positions].sort((a, b) => b.cashPnl - a.cashPnl);
+  const biggestWin  = sorted[0];
+  const biggestLoss = sorted[sorted.length - 1];
+
+  return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, avgPositionSize, biggestWin, biggestLoss };
+}
 
 export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
@@ -39,6 +102,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const totalPnl   = all.reduce((s, p) => s + p.cashPnl, 0);
   const openVal    = data?.totalValue ?? 0;
   const shownPnl   = shown.reduce((s, p) => s + p.cashPnl, 0);
+  const insights   = useMemo(() => computeInsights(all), [all]);
 
   const short = formatAddress(address, 8);
 
@@ -161,6 +225,67 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               delay={180}
             />
           </div>
+
+          {/* ── Trading Insights ── */}
+          {insights && (
+            <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/25">Trading Insights</p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+
+                {/* Win Rate */}
+                <StatsCard
+                  label="Win Rate"
+                  value={`${insights.winRate.toFixed(0)}%`}
+                  sub={`${insights.winCount} wins / ${insights.totalTrades} trades`}
+                  valueClass={insights.winRate >= 50 ? 'text-grad-profit' : 'text-grad-loss'}
+                  icon="🎯"
+                  delay={0}
+                />
+
+                {/* Best Category */}
+                <StatsCard
+                  label="Best Category"
+                  value={insights.bestCategory}
+                  sub={insights.bestCategory !== 'N/A' ? `${insights.bestCategoryWinRate}% win rate` : 'Not enough data'}
+                  icon="🏆"
+                  delay={60}
+                />
+
+                {/* Avg Position Size */}
+                <StatsCard
+                  label="Avg Position"
+                  value={formatCurrency(insights.avgPositionSize, true)}
+                  sub="per trade"
+                  icon="📐"
+                  delay={120}
+                />
+
+                {/* Best / Worst trade */}
+                <div
+                  className="glass glass-hover gradient-border rounded-2xl p-5 animate-fade-in-up"
+                  style={{ animationDelay: '180ms' }}
+                >
+                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/35">Best / Worst</p>
+                  <div className="flex flex-col gap-2.5">
+                    <div>
+                      <p className={`text-base font-black leading-none ${insights.biggestWin.cashPnl > 0 ? 'text-grad-profit' : 'text-white/40'}`}>
+                        {insights.biggestWin.cashPnl >= 0 ? '+' : ''}{formatCurrency(insights.biggestWin.cashPnl, true)}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestWin.title}</p>
+                    </div>
+                    <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div>
+                      <p className={`text-base font-black leading-none ${insights.biggestLoss.cashPnl < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
+                        {insights.biggestLoss.cashPnl >= 0 ? '+' : ''}{formatCurrency(insights.biggestLoss.cashPnl, true)}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestLoss.title}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          )}
 
           {/* ── Positions ── */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
