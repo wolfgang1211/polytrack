@@ -66,29 +66,42 @@ export default function LeaderboardPage() {
       <LiveTicker />
 
       {/* ── Hero ── */}
-      <div className="relative animate-fade-in-up">
+      <div className="relative animate-fade-in-up overflow-hidden rounded-3xl px-6 py-7 sm:px-8 sm:py-9"
+        style={{
+          background: 'linear-gradient(135deg, rgba(124,58,237,0.10) 0%, rgba(37,99,235,0.06) 40%, rgba(6,182,212,0.05) 100%)',
+          border: '1px solid rgba(255,255,255,0.06)',
+        }}>
 
-        {/* Hero glow */}
-        <div className="absolute -top-10 left-0 w-[420px] h-28 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center,rgba(124,58,237,0.14) 0%,transparent 70%)', filter: 'blur(40px)' }} />
+        {/* Aurora orbs */}
+        <div className="pointer-events-none absolute -top-24 -left-16 h-64 w-64 rounded-full animate-orb"
+          style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.30) 0%, transparent 70%)', filter: 'blur(50px)' }} />
+        <div className="pointer-events-none absolute -bottom-28 right-10 h-72 w-72 rounded-full animate-orb"
+          style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.22) 0%, transparent 70%)', filter: 'blur(55px)', animationDelay: '6s' }} />
+        <div className="pointer-events-none absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at 70% 0%, rgba(37,99,235,0.10) 0%, transparent 60%)' }} />
 
         {/* Title row */}
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="relative mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <div className="mb-2 flex items-center gap-2">
+            <div className="mb-2.5 flex items-center gap-2">
               <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                 style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
                 Live
               </span>
-              <span className="text-[10px] uppercase tracking-widest text-white/25">Polymarket · updated every 60s</span>
+              <span className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest"
+                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)', color: 'rgba(196,181,253,0.85)' }}>
+                PolyTrack Intelligence
+              </span>
             </div>
-            <h1 className="text-2xl font-black leading-tight tracking-tight sm:text-3xl">
-              <span className="text-white">Trader </span>
-              <span className="text-grad">Leaderboard</span>
+            <h1 className="text-3xl font-black leading-[1.05] tracking-tight sm:text-[2.6rem]">
+              <span className="animate-gradient bg-clip-text text-transparent"
+                style={{ backgroundImage: 'linear-gradient(110deg,#fff 10%,#c4b5fd 40%,#38bdf8 70%,#fff 95%)' }}>
+                Alpha Board
+              </span>
             </h1>
-            <p className="mt-1.5 max-w-lg text-sm text-white/40">
-              Top Polymarket traders — positions, P&amp;L, and win rates in real time.
+            <p className="mt-2 max-w-lg text-sm text-white/45">
+              Where Polymarket&apos;s sharpest money moves — live P&amp;L, positions &amp; win rates, ranked in real time.
             </p>
           </div>
         </div>
