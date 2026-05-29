@@ -7,12 +7,13 @@ export async function GET(request: NextRequest) {
 
   try {
     const res = await fetch(
-      `https://data-api.polymarket.com/v1/leaderboard?window=${timeWindow}&limit=${limit}`,
+      `https://data-api.polymarket.com/v1/leaderboard?timePeriod=${timeWindow}&limit=${limit}`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
           Accept: 'application/json',
         },
+        cache: 'no-store',
       }
     );
 
