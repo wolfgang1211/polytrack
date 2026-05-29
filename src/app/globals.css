@@ -57,6 +57,11 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 /* ─── Utilities ─────────────────────────────────────────── */
 
 @utility animate-shimmer {
@@ -100,6 +105,19 @@
 
 @utility animate-number-pop {
   animation: number-pop 0.3s ease;
+}
+
+/* Seamless horizontal ticker — the track holds two identical copies, so
+   translating by -50% loops perfectly. Pauses on hover. */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 60s linear infinite;
+}
+.marquee-mask:hover .marquee-track { animation-play-state: paused; }
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
 }
 
 /* ─── Glass morphism base ────────────────────────────────── */

@@ -6,6 +6,7 @@ import WalletSearch from '@/components/WalletSearch';
 import TopMarkets from '@/components/TopMarkets';
 import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
+import LiveTicker from '@/components/LiveTicker';
 import type { LeaderboardEntry, TimeWindow } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 
@@ -59,37 +60,37 @@ export default function LeaderboardPage() {
   const topTrader = data[0];
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8">
+
+      {/* ── Live trade ticker ── */}
+      <LiveTicker />
 
       {/* ── Hero ── */}
       <div className="relative animate-fade-in-up">
 
         {/* Hero glow */}
-        <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-[600px] h-40 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at center,rgba(124,58,237,0.18) 0%,transparent 70%)', filter: 'blur(40px)' }} />
+        <div className="absolute -top-10 left-0 w-[420px] h-28 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at center,rgba(124,58,237,0.14) 0%,transparent 70%)', filter: 'blur(40px)' }} />
 
-        {/* Live badge */}
-        <div className="flex items-center gap-2 mb-5">
-          <span className="flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider"
-            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            Live · Polymarket Data
-          </span>
-          <span className="hidden sm:inline text-[10px] text-white/20 uppercase tracking-widest">
-            Updated every 60s
-          </span>
-        </div>
-
-        {/* Title */}
-        <div className="mb-8">
-          <h1 className="font-black leading-[0.9] tracking-tight text-5xl sm:text-6xl lg:text-7xl">
-            <span className="text-white">Trader</span>
-            <br />
-            <span className="text-grad">Leaderboard</span>
-          </h1>
-          <p className="mt-4 text-sm text-white/40 max-w-lg leading-relaxed">
-            Track the top prediction market traders on Polymarket — positions, P&amp;L, and win rates, all in real time.
-          </p>
+        {/* Title row */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="mb-2 flex items-center gap-2">
+              <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+                Live
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-white/25">Polymarket · updated every 60s</span>
+            </div>
+            <h1 className="text-2xl font-black leading-tight tracking-tight sm:text-3xl">
+              <span className="text-white">Trader </span>
+              <span className="text-grad">Leaderboard</span>
+            </h1>
+            <p className="mt-1.5 max-w-lg text-sm text-white/40">
+              Top Polymarket traders — positions, P&amp;L, and win rates in real time.
+            </p>
+          </div>
         </div>
 
         {/* Stats bar + search */}
