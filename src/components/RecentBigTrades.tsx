@@ -17,8 +17,8 @@ function timeAgo(ts: number | undefined): string {
 
 function usdcSize(t: RecentTrade): number {
   if (t.usdcSize != null) return Number(t.usdcSize);
-  if (t.amount   != null) return Number(t.amount);
   if (t.size != null && t.price != null) return Number(t.size) * Number(t.price);
+  if (t.amount   != null) return Number(t.amount);
   return 0;
 }
 
@@ -94,7 +94,7 @@ export default function RecentBigTrades() {
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
             style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Recent Big Trades</h2>
+          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Recent Trades <span className="normal-case text-white/30 font-normal">$1K+</span></h2>
           <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -118,7 +118,7 @@ export default function RecentBigTrades() {
         ) : trades.length === 0 ? (
           <div className="py-10 text-center">
             <p className="text-2xl mb-2">📭</p>
-            <p className="text-xs text-white/25">No $10K+ trades in the last 24h</p>
+            <p className="text-xs text-white/25">No $1K+ trades found</p>
           </div>
         ) : (
           <div className="max-h-80 overflow-y-auto">

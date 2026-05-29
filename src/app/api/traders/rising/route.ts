@@ -8,7 +8,7 @@ const HEADERS = {
 export async function GET() {
   try {
     const res = await fetch(
-      'https://data-api.polymarket.com/v1/leaderboard?timePeriod=1w&limit=10',
+      'https://data-api.polymarket.com/v1/leaderboard?timePeriod=WEEK&limit=10',
       { headers: HEADERS, cache: 'no-store' }
     );
     if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });

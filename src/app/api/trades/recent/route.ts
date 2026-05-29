@@ -5,29 +5,24 @@ const HEADERS = {
   Accept: 'application/json',
 };
 
-const MIN_USDC = 10_000;
+const MIN_USDC = 1_000;
 
 export async function GET() {
   try {
-    const since = Math.floor(Date.now() / 1000) - 86_400;
-
     const res = await fetch(
-      'https://data-api.polymarket.com/activity?type=TRADE&limit=500',
-      { headers: HEADERS }
+      'https://data-api.polymarket.com/trades?limit=200',
+      { headers: HEADERS, cache: 'no-store' }
     );
     if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });
 
     const json = await res.json();
     const raw: unknown[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
 
-    const trades = raw
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((t: any) => {
-        const usdc = t.usdcSize ?? t.amount ?? (t.size != null && t.price != null ? t.size * t.price : 0);
-        const ts   = t.timestamp ?? t.createdAt ?? 0;
-        return Number(usdc) >= MIN_USDC && Number(ts) >= since;
-      })
-      .slice(0, 20);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const trades = raw.filter((t: any) => {
+      const usdc = t.usdcSize ?? ((t.size ?? 0) * (t.price ?? 0));
+      return Number(usdc) >= MIN_USDC;
+    }).slice(0, 20);
 
     return NextResponse.json(trades);
   } catch {
