@@ -44,6 +44,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
   const [search, setSearch] = useState('');
   const [profitableOnly, setProfitableOnly] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
+  const [showScoreInfo, setShowScoreInfo] = useState(false);
 
   function handleSort(field: LbSortField) {
     if (sortField === field) setSortOrder(o => o === 'desc' ? 'asc' : 'desc');
@@ -145,9 +146,39 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           <button onClick={() => handleSort('vol')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
             Volume<SortArrow active={sortField==='vol'} order={sortOrder} />
           </button>
-          <button onClick={() => handleSort('score')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors" title="Risk-adjusted smart score (0–100)">
-            Smart<SortArrow active={sortField==='score'} order={sortOrder} />
-          </button>
+          <div className="relative flex items-center justify-end gap-1">
+            <button onClick={() => handleSort('score')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
+              Smart<SortArrow active={sortField==='score'} order={sortOrder} />
+            </button>
+            <button
+              onClick={() => setShowScoreInfo(v => !v)}
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-white/30 hover:text-violet-300 transition-colors"
+              style={{ border: '1px solid rgba(255,255,255,0.15)' }}
+              aria-label="What is Smart Score?"
+            >
+              i
+            </button>
+            {showScoreInfo && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowScoreInfo(false)} />
+                <div className="absolute right-0 top-6 z-50 w-64 rounded-xl glass-strong p-3.5 text-left animate-scale-in"
+                  style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
+                  <p className="mb-1.5 text-xs font-bold text-white/80">Smart Score (0–100)</p>
+                  <p className="text-[11px] leading-relaxed text-white/45 normal-case tracking-normal font-normal">
+                    Risk-adjusted ranking. Blends <span className="text-emerald-300">capital efficiency</span> (P&amp;L ÷ volume,
+                    60%) with <span className="text-violet-300">absolute P&amp;L</span> (40%), scored by percentile across the list.
+                    A consistent earner outranks a lucky high-volume punt.
+                  </p>
+                  <div className="mt-2.5 flex flex-wrap gap-2 text-[10px] normal-case tracking-normal font-normal">
+                    <span style={{ color: '#fbbf24' }}>🔥 85+ Elite</span>
+                    <span style={{ color: '#34d399' }}>⚡ 65+ Sharp</span>
+                    <span style={{ color: '#38bdf8' }}>• 40+ Solid</span>
+                    <span style={{ color: '#fb7185' }}>• &lt;40 Risky</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           <span />
         </div>
 

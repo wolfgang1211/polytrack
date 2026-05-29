@@ -10,6 +10,7 @@ import PositionCard from '@/components/PositionCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import TelegramModal from '@/components/TelegramModal';
 import WalletCharts from '@/components/WalletCharts';
+import LatestMoves from '@/components/LatestMoves';
 
 type Tab = 'open' | 'closed';
 
@@ -274,6 +275,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
           {/* ── Performance charts ── */}
           <WalletCharts positions={all} />
+
+          {/* ── Latest moves (copy-trade signal) ── */}
+          <LatestMoves address={address} />
 
           {/* ── Positions ── */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
