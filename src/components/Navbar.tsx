@@ -5,13 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import TelegramModal from '@/components/TelegramModal';
+import Logo from '@/components/Logo';
 import { isValidAddress } from '@/lib/utils';
 
 const NAV_LINKS = [
-  { href: '/',          label: 'Leaderboard' },
-  { href: '/markets',   label: 'Markets'     },
-  { href: '/insights',  label: 'Insights'    },
-  { href: '/watchlist', label: 'Watchlist'   },
+  { href: '/',         label: 'Leaderboard' },
+  { href: '/markets',  label: 'Markets'     },
+  { href: '/insights', label: 'Insights'    },
 ];
 
 function SearchBar() {
@@ -67,11 +67,10 @@ export default function Navbar() {
 
             {/* Logo */}
             <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
-              <div className="relative flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden"
-                style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)' }}>
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  style={{ background: 'linear-gradient(135deg,#6d28d9,#1d4ed8,#0891b2)' }} />
-                <span className="relative text-sm font-black text-white">P</span>
+              <div className="relative">
+                <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                  style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.5), transparent 70%)', filter: 'blur(10px)' }} />
+                <Logo size={38} className="relative transition-transform duration-300 group-hover:scale-105" />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-sm font-bold text-grad">PolyTrack</span>
@@ -117,11 +116,11 @@ export default function Navbar() {
               {/* Watchlist */}
               <Link
                 href="/watchlist"
-                className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
+                title="Watchlist"
+                className="flex h-8 w-8 items-center justify-center rounded-xl text-sm transition-all hover:scale-[1.08]"
                 style={{ background: 'rgba(251,191,36,0.10)', border: '1px solid rgba(251,191,36,0.25)' }}
               >
-                <span className="text-amber-400">⭐</span>
-                <span className="hidden sm:inline">Watchlist</span>
+                ⭐
               </Link>
 
               {/* Search */}

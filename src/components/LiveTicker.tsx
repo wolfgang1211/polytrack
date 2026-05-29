@@ -19,6 +19,9 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
   const isBuy  = (trade.side ?? '').toUpperCase() === 'BUY';
   const priceC = trade.price != null ? Math.round(Number(trade.price) * 100) : null;
   const href   = marketUrl(trade.eventSlug, trade.slug);
+  const time   = trade.timestamp
+    ? new Date(Number(trade.timestamp) * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+    : null;
 
   return (
     <a
@@ -46,6 +49,9 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
         </span>
       )}
       <span className="text-xs font-black tabular-nums text-white">{formatCurrency(amount, true)}</span>
+      {time && (
+        <span className="text-[10px] tabular-nums text-white/25">{time}</span>
+      )}
     </a>
   );
 }
