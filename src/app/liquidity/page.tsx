@@ -735,13 +735,13 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
         }
       />
 
-      <div className="glass rounded-2xl p-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Market selector */}
         {opps.length > 0 && (
           <select
             value={selected?.conditionId ?? ''}
             onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
-            className="mb-4 w-full max-w-md rounded-xl glass px-4 py-2.5 text-xs text-white/75 outline-none truncate"
+            className="mb-3 w-full max-w-sm rounded-xl glass px-3 py-2 text-xs text-white/75 outline-none truncate"
             style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
             {opps.map(o => (
@@ -754,24 +754,24 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
 
         {/* Stat row */}
         {selected && (
-          <div className="mb-4 flex flex-wrap gap-3">
+          <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {[
               { label: 'Current Mid', value: `${(selected.mid * 100).toFixed(1)}¢`, color: '#a78bfa' },
               { label: 'Current Spread', value: `${(selected.spread * 100).toFixed(1)}¢`, color: '#fbbf24' },
               { label: 'Period Change', value: hist?.changePct != null ? `${up ? '+' : ''}${(hist.changePct * 100).toFixed(1)}%` : '—', color: lineColor },
               { label: 'Range', value: hist?.min != null && hist?.max != null ? `${(hist.min * 100).toFixed(0)}–${(hist.max * 100).toFixed(0)}¢` : '—', color: '#60a5fa' },
             ].map(s => (
-              <div key={s.label} className="rounded-xl px-4 py-2"
+              <div key={s.label} className="rounded-lg px-2.5 py-1.5"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">{s.label}</p>
-                <p className="text-sm font-black" style={{ color: s.color }}>{s.value}</p>
+                <p className="text-[9px] text-white/30 uppercase tracking-wider mb-0.5">{s.label}</p>
+                <p className="text-xs font-black" style={{ color: s.color }}>{s.value}</p>
               </div>
             ))}
           </div>
         )}
 
         {/* Chart */}
-        <div className="h-64 w-full">
+        <div className="h-52 w-full">
           {loading ? (
             <div className="h-full w-full rounded-xl animate-shimmer" />
           ) : err || data.length === 0 ? (
@@ -1123,7 +1123,7 @@ export default function LiquidityPage() {
   const agoSec = updatedAt ? Math.max(0, Math.floor((now - updatedAt) / 1000)) : null;
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-8">
 
       {/* Page header */}
       <div className="animate-fade-in-up">
