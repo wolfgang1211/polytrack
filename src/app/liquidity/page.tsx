@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
-  Tooltip, CartesianGrid,
+  Tooltip, CartesianGrid, ReferenceLine,
 } from 'recharts';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
@@ -319,6 +319,19 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
     depth?.asks[depth.asks.length - 1]?.total ?? 0,
   );
 
+  // Cumulative depth curve: bid side (green) on the left, ask side (red) on the
+  // right, sorted by price ascending so the two halves meet at the mid price.
+  const depthCurve = useMemo(() => {
+    if (!depth) return [];
+    const bids = [...depth.bids]
+      .sort((a, b) => a.price - b.price)
+      .map(l => ({ price: +(l.price * 100).toFixed(1), bid: +l.total.toFixed(2), ask: null as number | null }));
+    const asks = [...depth.asks]
+      .sort((a, b) => a.price - b.price)
+      .map(l => ({ price: +(l.price * 100).toFixed(1), bid: null as number | null, ask: +l.total.toFixed(2) }));
+    return [...bids, ...asks];
+  }, [depth]);
+
   return (
     <section>
       <SectionHeader
@@ -357,6 +370,53 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
 
         {!loading && depth && (
           <div className="flex flex-col gap-6">
+            {/* Cumulative depth curve */}
+            {depthCurve.length > 1 && (
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35 mb-2">
+                  Cumulative Depth Curve
+                </p>
+                <ResponsiveContainer width="100%" height={250}>
+                  <AreaChart data={depthCurve} margin={{ top: 8, right: 12, left: -8, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="bidFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#34d399" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#34d399" stopOpacity={0.02} />
+                      </linearGradient>
+                      <linearGradient id="askFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#fb7185" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="#fb7185" stopOpacity={0.02} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                    <XAxis
+                      dataKey="price" type="number" domain={['dataMin', 'dataMax']}
+                      tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 10 }}
+                      axisLine={false} tickLine={false}
+                      tickFormatter={(v) => `${v}¢`}
+                    />
+                    <YAxis
+                      tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }}
+                      axisLine={false} tickLine={false} width={52}
+                      tickFormatter={(v) => formatCurrency(v as number, true)}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
+                      labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+                      labelFormatter={(v) => `${v}¢`}
+                      formatter={(v, n) => [formatCurrency(Number(v), true), n === 'bid' ? 'Bid depth' : 'Ask depth'] as [string, string]}
+                    />
+                    <ReferenceLine
+                      x={+(depth.midPrice * 100).toFixed(1)} stroke="#a78bfa" strokeDasharray="4 4"
+                      label={{ value: `Mid ${(depth.midPrice * 100).toFixed(1)}¢`, position: 'top', fill: '#a78bfa', fontSize: 10 }}
+                    />
+                    <Area type="stepAfter" dataKey="bid" stroke="#34d399" strokeWidth={2} fill="url(#bidFill)" connectNulls={false} isAnimationActive={false} dot={false} />
+                    <Area type="stepBefore" dataKey="ask" stroke="#fb7185" strokeWidth={2} fill="url(#askFill)" connectNulls={false} isAnimationActive={false} dot={false} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
             {/* Key metrics */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
