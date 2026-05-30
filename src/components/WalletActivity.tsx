@@ -191,7 +191,7 @@ export default function WalletActivity({ address, positions }: { address: string
                   axisLine={false} tickLine={false} interval={2} />
                 <YAxis tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} allowDecimals={false} />
                 <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                  labelFormatter={(h) => `${h}:00–${h}:59`} formatter={(v: number) => [v, 'Trades']} />
+                  labelFormatter={(h) => `${h}:00–${h}:59`} formatter={(v) => [v, 'Trades'] as [number, string]} />
                 <Bar dataKey="count" radius={[3, 3, 0, 0]}>
                   {byHour.map((b, i) => (
                     <Cell key={i} fill={peakHour && b.hour === peakHour.hour ? '#60a5fa' : 'rgba(96,165,250,0.45)'} />
@@ -217,7 +217,7 @@ export default function WalletActivity({ address, positions }: { address: string
                   <YAxis type="category" dataKey="cat" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
                     axisLine={false} tickLine={false} width={84} />
                   <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                    formatter={(v: number, _n, p) => [`${v}% (${p.payload.total} pos)`, 'Win rate']} />
+                    formatter={(v, _n, p) => [`${v}% (${p.payload.total} pos)`, 'Win rate'] as [string, string]} />
                   <Bar dataKey="winRate" radius={[0, 4, 4, 0]}>
                     {byCategory.map((c, i) => <Cell key={i} fill={CAT_COLOR[c.cat] ?? CAT_COLOR.Other} />)}
                   </Bar>
