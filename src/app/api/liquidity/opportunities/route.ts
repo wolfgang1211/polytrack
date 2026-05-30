@@ -25,6 +25,11 @@ export interface LPOpportunity {
   depthKnown: boolean;
   estDailyFee: number;   // rough maker fee potential ($/day)
   score: number;         // 0–100 opportunity score
+  scoreBreakdown: {      // point contributions that sum to `score`
+    spread: number;      // out of 35
+    volume: number;      // out of 45
+    depth: number;       // out of 20 (two-sidedness / balance)
+  };
 }
 
 interface ClobBook {
@@ -134,7 +139,11 @@ export async function GET() {
       const volScore     = Math.min(1, Math.log10(Math.max(1, vol24h)) / 7); // ~10M → 1
       const spreadScore  = Math.min(1, spread / 0.05);                       // 5¢ → 1
       const balanceScore = 1 - Math.min(1, Math.abs(mid - 0.5) * 2);         // 50/50 → 1
-      const score = Math.round(100 * (0.45 * volScore + 0.35 * spreadScore + 0.20 * balanceScore));
+      // Point contributions (sum = score, so the badge matches the tooltip).
+      const spreadPts  = Math.round(35 * spreadScore);
+      const volumePts  = Math.round(45 * volScore);
+      const depthPts   = Math.round(20 * balanceScore);
+      const score = spreadPts + volumePts + depthPts;
 
       return {
         conditionId: m.conditionId ?? m.id ?? '',
@@ -155,6 +164,7 @@ export async function GET() {
         depthKnown: parsed != null,
         estDailyFee,
         score,
+        scoreBreakdown: { spread: spreadPts, volume: volumePts, depth: depthPts },
       };
     });
 

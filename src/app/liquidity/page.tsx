@@ -107,9 +107,36 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-[10px] text-white/30 uppercase tracking-wider">LP Score</span>
-          <span className="rounded-full px-2.5 py-0.5 text-[11px] font-black"
+          <span className="group relative cursor-help rounded-full px-2.5 py-0.5 text-[11px] font-black"
             style={{ background: `${scoreColor(sc)}20`, color: scoreColor(sc), border: `1px solid ${scoreColor(sc)}40` }}>
             {sc} · {scoreLabel(sc)}
+            {/* Score breakdown tooltip */}
+            <span
+              className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded-xl p-3 text-left opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100"
+              style={{ background: 'rgba(13,13,26,0.97)', border: '1px solid rgba(255,255,255,0.12)' }}
+            >
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-white/40">
+                Score Breakdown
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Spread</span>
+                <span className="font-bold text-amber-300">{opp.scoreBreakdown.spread}/35</span>
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Volume</span>
+                <span className="font-bold text-sky-300">{opp.scoreBreakdown.volume}/45</span>
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Depth</span>
+                <span className="font-bold text-emerald-300">{opp.scoreBreakdown.depth}/20</span>
+              </span>
+              <span className="mt-1.5 flex items-center justify-between border-t border-white/10 pt-1.5 text-[11px]">
+                <span className="font-semibold text-white/60">Total</span>
+                <span className="font-black text-white">
+                  {opp.scoreBreakdown.spread}+{opp.scoreBreakdown.volume}+{opp.scoreBreakdown.depth} = {sc}/100
+                </span>
+              </span>
+            </span>
           </span>
         </div>
         <a
