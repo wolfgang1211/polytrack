@@ -12,6 +12,7 @@ import TelegramModal from '@/components/TelegramModal';
 import { useWatchlist } from '@/lib/useWatchlist';
 import WalletCharts from '@/components/WalletCharts';
 import LatestMoves from '@/components/LatestMoves';
+import WalletActivity from '@/components/WalletActivity';
 
 type Tab = 'open' | 'closed';
 
@@ -338,6 +339,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
           {/* ── Performance charts ── */}
           <WalletCharts positions={all} />
+
+          {/* ── Behaviour & activity analytics ── */}
+          <WalletActivity address={address} positions={all} />
 
           {/* ── Latest moves (copy-trade signal) ── */}
           <LatestMoves address={address} />
