@@ -50,7 +50,7 @@ export default function DashboardPage() {
               </span>
               <span className="rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase tracking-widest"
                 style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)', color: 'rgba(196,181,253,0.9)' }}>
-                PolyTrack Intelligence
+                AlphaBoard Intelligence
               </span>
             </div>
             <p className="max-w-lg text-sm leading-relaxed text-white/55">
