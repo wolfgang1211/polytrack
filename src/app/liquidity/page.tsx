@@ -684,7 +684,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
                   contentStyle={{ background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
                   labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
                   labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  formatter={(v: number) => [`${v}Â¢`, 'Price']}
+                  formatter={(v: number) => [`${v}¢`, "Price"] as [string, string]}
                 />
                 <Area type="monotone" dataKey="price" stroke={lineColor} strokeWidth={2} fill="url(#phFill)" />
               </AreaChart>
