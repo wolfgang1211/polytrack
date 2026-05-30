@@ -18,7 +18,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
   const isYes = position.outcome === 'Yes';
 
   const endDate = position.endDate
-    ? new Date(position.endDate).toLocaleDateString('tr-TR', { day:'numeric', month:'short', year:'numeric' })
+    ? new Date(position.endDate).toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' })
     : null;
 
   return (
@@ -83,7 +83,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
         <div>
           <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Size</p>
           <p className="text-xs font-bold text-white/70">
-            {position.size.toLocaleString('tr-TR', { maximumFractionDigits: 0 })}
+            {position.size.toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
         </div>
         <div>

@@ -34,7 +34,7 @@ function SmartMoneyPreview() {
         <Link href="/leaderboard"
           className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-300 transition-colors hover:text-violet-200"
           style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)' }}>
-          Tümü →
+          View all →
         </Link>
       </div>
 
@@ -113,32 +113,32 @@ export default function DashboardPage() {
             </div>
 
             <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl">
-              <span className="text-white">Polymarket&apos;in en keskin</span>
+              <span className="text-white">Track Polymarket&apos;s</span>
               <br />
               <span className="animate-gradient bg-clip-text text-transparent"
                 style={{
                   backgroundImage: 'linear-gradient(110deg,#c4b5fd 5%,#a78bfa 35%,#818cf8 65%,#60a5fa 95%)',
                   filter: 'drop-shadow(0 4px 30px rgba(124,58,237,0.45))',
                 }}>
-                parasını takip et.
+                sharpest money.
               </span>
             </h1>
 
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/50">
-              Gerçek zamanlı P&amp;L ve akıllı para takibi. Polymarket&apos;in en iyi cüzdanlarını,
-              pozisyonlarını ve kazanç oranlarını canlı olarak izle.
+              Real-time P&amp;L and smart money tracking. Follow Polymarket&apos;s top wallets,
+              positions and win rates as they move, live.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <a href="#wallet-search"
                 className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-[1.03] hover:brightness-110"
                 style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', border: '1px solid rgba(139,92,246,0.4)' }}>
-                Cüzdan Takip Et
+                Track a Wallet
               </a>
               <Link href="/liquidity"
                 className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white/75 transition-all hover:text-white hover:scale-[1.02]"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                Alert Kur
+                Set Alerts
               </Link>
             </div>
           </div>
