@@ -5,6 +5,18 @@ const HEADERS = {
   Accept: 'application/json',
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function eventSlugFrom(m: any): string | undefined {
+  return m.eventSlug
+    ?? (Array.isArray(m.events) && m.events[0]?.slug)
+    ?? undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function normalise(m: any) {
+  return { ...m, eventSlug: eventSlugFrom(m) };
+}
+
 export async function GET() {
   try {
     const res = await fetch(
@@ -14,7 +26,7 @@ export async function GET() {
     if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });
     const json = await res.json();
     const markets = Array.isArray(json) ? json : (json.value ?? json.markets ?? []);
-    return NextResponse.json(markets.slice(0, 5), {
+    return NextResponse.json(markets.slice(0, 5).map(normalise), {
       headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
     });
   } catch {

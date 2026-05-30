@@ -1,11 +1,17 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
+import {
+  ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
+  Tooltip, CartesianGrid,
+} from 'recharts';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
+import TelegramModal from '@/components/TelegramModal';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
+import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -537,6 +543,404 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   5) PRICE / SPREAD HISTORY
+════════════════════════════════════════════════════════════════ */
+
+const PH_WINDOWS = [
+  { key: '1d', label: '1D' },
+  { key: '1w', label: '1W' },
+  { key: '1m', label: '1M' },
+  { key: 'max', label: 'MAX' },
+] as const;
+type PHWindow = typeof PH_WINDOWS[number]['key'];
+
+function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
+  const [selected, setSelected] = useState<LPOpportunity | null>(null);
+  const [win, setWin]           = useState<PHWindow>('1w');
+  const [hist, setHist]         = useState<PriceHistory | null>(null);
+  const [loading, setLoading]   = useState(false);
+  const [err, setErr]           = useState(false);
+
+  useEffect(() => {
+    if (opps.length > 0 && !selected) setSelected(opps[0]);
+  }, [opps, selected]);
+
+  useEffect(() => {
+    if (!selected?.tokenId) return;
+    setLoading(true); setErr(false); setHist(null);
+    fetch(`/api/liquidity/price-history?tokenId=${selected.tokenId}&interval=${win}`)
+      .then(r => r.json())
+      .then(d => { if (d?.points) setHist(d); else setErr(true); })
+      .catch(() => setErr(true))
+      .finally(() => setLoading(false));
+  }, [selected, win]);
+
+  const data = useMemo(
+    () => (hist?.points ?? []).map(p => ({ t: p.t, price: +(p.p * 100).toFixed(2) })),
+    [hist],
+  );
+
+  const up = (hist?.changePct ?? 0) >= 0;
+  const lineColor = up ? '#34d399' : '#fb7185';
+
+  return (
+    <section>
+      <SectionHeader
+        accent="rgba(96,165,250,0.8)"
+        title="Price History"
+        sub="Historical mid-price for the selected market (Polymarket CLOB). Current spread shown alongside — only price history is published by the API."
+        icon={
+          <svg className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18M7 14l4-4 3 3 5-6" />
+          </svg>
+        }
+        controls={
+          <div className="flex gap-0.5 rounded-xl glass p-0.5">
+            {PH_WINDOWS.map(w => (
+              <button key={w.key} onClick={() => setWin(w.key)}
+                className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
+                  ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
+                {win === w.key && (
+                  <span className="absolute inset-0 rounded-lg"
+                    style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(37,99,235,0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
+                )}
+                <span className="relative">{w.label}</span>
+              </button>
+            ))}
+          </div>
+        }
+      />
+
+      <div className="glass rounded-2xl p-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        {/* Market selector */}
+        {opps.length > 0 && (
+          <select
+            value={selected?.conditionId ?? ''}
+            onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+            className="mb-4 w-full max-w-md rounded-xl glass px-4 py-2.5 text-xs text-white/75 outline-none truncate"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            {opps.map(o => (
+              <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
+                {o.question.slice(0, 60)}
+              </option>
+            ))}
+          </select>
+        )}
+
+        {/* Stat row */}
+        {selected && (
+          <div className="mb-4 flex flex-wrap gap-3">
+            {[
+              { label: 'Current Mid', value: `${(selected.mid * 100).toFixed(1)}¢`, color: '#a78bfa' },
+              { label: 'Current Spread', value: `${(selected.spread * 100).toFixed(1)}¢`, color: '#fbbf24' },
+              { label: 'Period Change', value: hist?.changePct != null ? `${up ? '+' : ''}${(hist.changePct * 100).toFixed(1)}%` : '—', color: lineColor },
+              { label: 'Range', value: hist?.min != null && hist?.max != null ? `${(hist.min * 100).toFixed(0)}–${(hist.max * 100).toFixed(0)}¢` : '—', color: '#60a5fa' },
+            ].map(s => (
+              <div key={s.label} className="rounded-xl px-4 py-2"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">{s.label}</p>
+                <p className="text-sm font-black" style={{ color: s.color }}>{s.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Chart */}
+        <div className="h-64 w-full">
+          {loading ? (
+            <div className="h-full w-full rounded-xl animate-shimmer" />
+          ) : err || data.length === 0 ? (
+            <div className="flex h-full items-center justify-center text-sm text-white/25">
+              No price history available for this market
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={data} margin={{ top: 8, right: 8, left: -8, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="phFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={lineColor} stopOpacity={0.35} />
+                    <stop offset="100%" stopColor={lineColor} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis
+                  dataKey="t"
+                  type="number"
+                  scale="time"
+                  domain={['dataMin', 'dataMax']}
+                  tickFormatter={t => new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                  tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+                  axisLine={false} tickLine={false} minTickGap={40}
+                />
+                <YAxis
+                  domain={['dataMin', 'dataMax']}
+                  tickFormatter={v => `${v}¢`}
+                  tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
+                  axisLine={false} tickLine={false} width={42}
+                />
+                <Tooltip
+                  contentStyle={{ background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
+                  labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  formatter={(v: number) => [`${v}¢`, 'Price']}
+                />
+                <Area type="monotone" dataKey="price" stroke={lineColor} strokeWidth={2} fill="url(#phFill)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6) LP CALCULATOR — compare markets for the same capital
+════════════════════════════════════════════════════════════════ */
+
+function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
+  const [amount, setAmount] = useState('1000');
+  const [picked, setPicked] = useState<string[]>([]);
+
+  // Default-select the top 3 opportunities once they load.
+  useEffect(() => {
+    if (opps.length > 0 && picked.length === 0) {
+      setPicked(opps.slice(0, 3).map(o => o.conditionId));
+    }
+  }, [opps, picked.length]);
+
+  const amt = parseFloat(amount) || 0;
+
+  const rows = useMemo(() => {
+    return opps
+      .filter(o => picked.includes(o.conditionId))
+      .map(o => {
+        const totalLiquidity = (o.liquidity || 0) || 10_000;
+        const yourShare      = amt / (totalLiquidity + amt);
+        const dailyReward    = yourShare * (o.volume24h ?? 0) * MAKER_REBATE_RATE;
+        const monthly        = dailyReward * 30;
+        const apr            = amt > 0 ? (dailyReward * 365 / amt) * 100 : 0;
+        return { o, yourShare, dailyReward, monthly, apr };
+      })
+      .sort((a, b) => b.dailyReward - a.dailyReward);
+  }, [opps, picked, amt]);
+
+  const best = rows[0];
+
+  function toggle(id: string) {
+    setPicked(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+  }
+
+  return (
+    <section>
+      <SectionHeader
+        accent="rgba(167,139,250,0.8)"
+        title="LP Calculator"
+        sub="Compare multiple markets side by side — for the same capital, which one pays the most maker reward?"
+        icon={
+          <svg className="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m4 10V11m4 6v-4M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+        }
+      />
+
+      <div className="glass rounded-2xl p-5 flex flex-col gap-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        {/* Capital input */}
+        <div className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-white/50 mb-2">Capital to deploy (USDC)</label>
+            <div className="relative w-44">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-white/30 font-bold">$</span>
+              <input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)}
+                className="w-full rounded-xl glass pl-7 pr-4 py-2.5 text-sm font-bold text-white outline-none"
+                style={{ border: '1px solid rgba(167,139,250,0.3)' }} />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {[500, 1000, 5000, 10000].map(v => (
+              <button key={v} onClick={() => setAmount(String(v))}
+                className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-white/40 transition-all hover:text-white/70"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                ${v >= 1000 ? `${v / 1000}K` : v}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Market multi-select chips */}
+        <div>
+          <p className="text-xs font-semibold text-white/50 mb-2">Markets to compare ({picked.length} selected)</p>
+          <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
+            {opps.map(o => {
+              const on = picked.includes(o.conditionId);
+              return (
+                <button key={o.conditionId} onClick={() => toggle(o.conditionId)}
+                  className="rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all max-w-[220px] truncate text-left"
+                  style={{
+                    background: on ? 'rgba(167,139,250,0.18)' : 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'rgba(255,255,255,0.07)'}`,
+                    color: on ? '#c4b5fd' : 'rgba(255,255,255,0.4)',
+                  }}>
+                  {on ? '✓ ' : ''}{o.question.slice(0, 38)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Comparison table */}
+        {rows.length > 0 ? (
+          <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="grid grid-cols-[1fr_90px_90px_100px_80px] px-4 py-2.5 glass-strong"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              {['Market', 'Pool Share', 'Daily', 'Monthly', 'APR'].map((h, i) => (
+                <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-white/30 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
+              ))}
+            </div>
+            {rows.map(({ o, yourShare, dailyReward, monthly, apr }, i) => {
+              const isBest = best && o.conditionId === best.o.conditionId;
+              return (
+                <div key={o.conditionId} className="grid grid-cols-[1fr_90px_90px_100px_80px] px-4 py-3 items-center"
+                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', background: isBest ? 'rgba(52,211,153,0.05)' : 'transparent' }}>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {isBest && <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ background: 'rgba(52,211,153,0.2)', color: '#34d399' }}>BEST</span>}
+                    <span className="text-xs font-semibold text-white/70 truncate">{o.question.slice(0, 48)}</span>
+                  </div>
+                  <span className="text-right text-xs font-bold text-white/50 tabular-nums">{pct(yourShare, 2)}</span>
+                  <span className="text-right text-xs font-black tabular-nums" style={{ color: isBest ? '#34d399' : 'rgba(255,255,255,0.8)' }}>{formatCurrency(dailyReward)}</span>
+                  <span className="text-right text-xs font-bold text-white/60 tabular-nums">{formatCurrency(monthly)}</span>
+                  <span className="text-right text-xs font-bold text-amber-300/80 tabular-nums">{apr.toFixed(1)}%</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-center text-sm text-white/25 py-6">Select markets above to compare</p>
+        )}
+
+        {best && (
+          <div className="rounded-xl px-4 py-3 flex items-center gap-2"
+            style={{ background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.2)' }}>
+            <span className="text-xs text-white/50">Best for ${amt.toLocaleString()}:</span>
+            <span className="text-xs font-black text-emerald-300 truncate">{best.o.question.slice(0, 50)}</span>
+            <span className="text-xs text-white/40 ml-auto flex-shrink-0">≈ {formatCurrency(best.dailyReward)}/day</span>
+          </div>
+        )}
+
+        <p className="text-[10px] text-white/25 leading-relaxed">
+          Estimates use your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s reward program.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7) MARKET ALERT
+════════════════════════════════════════════════════════════════ */
+
+function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
+  const [selected, setSelected] = useState<LPOpportunity | null>(null);
+  const [threshold, setThreshold] = useState('3');
+  const [showTelegram, setShowTelegram] = useState(false);
+
+  useEffect(() => {
+    if (opps.length > 0 && !selected) setSelected(opps[0]);
+  }, [opps, selected]);
+
+  const thr = parseFloat(threshold) || 0;
+  const currentSpread = selected ? selected.spread * 100 : 0;
+  const wouldFire = selected ? currentSpread >= thr : false;
+
+  return (
+    <section>
+      {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
+      <SectionHeader
+        accent="rgba(34,197,94,0.8)"
+        title="Market Alert"
+        sub="Pick a market and a spread threshold — get pinged on Telegram when the spread widens past it (great for catching LP entry windows)."
+        icon={
+          <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        }
+      />
+
+      <div className="glass rounded-2xl p-5 flex flex-col gap-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-xs font-semibold text-white/50 mb-2">Market</label>
+            <select
+              value={selected?.conditionId ?? ''}
+              onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+              className="w-full rounded-xl glass px-4 py-2.5 text-xs text-white/75 outline-none truncate"
+              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+            >
+              {opps.map(o => (
+                <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
+                  {o.question.slice(0, 60)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-semibold text-white/50 mb-2">Alert when spread ≥ (¢)</label>
+            <div className="flex gap-2">
+              <input type="number" min="0" step="0.5" value={threshold} onChange={e => setThreshold(e.target.value)}
+                className="w-24 rounded-xl glass px-4 py-2.5 text-sm font-bold text-white outline-none"
+                style={{ border: '1px solid rgba(34,197,94,0.3)' }} />
+              {[1, 2, 3, 5].map(v => (
+                <button key={v} onClick={() => setThreshold(String(v))}
+                  className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-white/40 transition-all hover:text-white/70"
+                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                  {v}¢
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Live status against threshold */}
+        {selected && (
+          <div className="rounded-xl px-4 py-3 flex items-center justify-between"
+            style={{
+              background: wouldFire ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.03)',
+              border: `1px solid ${wouldFire ? 'rgba(52,211,153,0.25)' : 'rgba(255,255,255,0.06)'}`,
+            }}>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Current spread</p>
+              <p className="text-lg font-black" style={{ color: wouldFire ? '#34d399' : '#fbbf24' }}>{currentSpread.toFixed(1)}¢</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Status</p>
+              <p className="text-xs font-bold" style={{ color: wouldFire ? '#34d399' : 'rgba(255,255,255,0.45)' }}>
+                {wouldFire ? `✓ Above ${thr}¢ — would alert now` : `Below ${thr}¢ threshold`}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* CTA */}
+        <button
+          onClick={() => setShowTelegram(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold text-white transition-all hover:scale-[1.01] hover:brightness-110"
+          style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', boxShadow: '0 4px 24px rgba(34,197,94,0.3)' }}
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
+          </svg>
+          Set up alert on Telegram
+        </button>
+        <p className="text-[10px] text-white/25 text-center leading-relaxed">
+          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out — for now you&apos;ll get whale &amp; liquidity alerts on join.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 /* ─────────────────────────── shared UI ─────────────────────────── */
 
 function SectionHeader({ accent, title, sub, icon, controls }: {
@@ -653,9 +1057,12 @@ export default function LiquidityPage() {
       </div>
 
       <LPOpportunitiesSection opps={opps} loading={oppsLoading} />
-      <LPLeaderboardSection />
+      <PriceHistorySection opps={opps} />
+      <LPCalculator opps={opps} />
       <MarketDepthSection opps={opps} />
       <RewardSimulator opps={opps} />
+      <MarketAlertSection opps={opps} />
+      <LPLeaderboardSection />
     </div>
   );
 }
