@@ -16,7 +16,7 @@ export default function DashboardPage() {
       <LiveTicker />
 
       {/* ── Hero ── */}
-      <div className="relative animate-fade-in-up overflow-hidden rounded-3xl px-6 py-7 sm:px-8 sm:py-9"
+      <div className="relative animate-fade-in-up overflow-hidden rounded-3xl px-6 py-6 sm:px-8 sm:py-7"
         style={{
           background: 'linear-gradient(135deg, rgba(124,58,237,0.10) 0%, rgba(37,99,235,0.06) 40%, rgba(6,182,212,0.05) 100%)',
           border: '1px solid rgba(255,255,255,0.06)',
@@ -40,31 +40,20 @@ export default function DashboardPage() {
           style={{ background: 'radial-gradient(ellipse at 70% 0%, rgba(37,99,235,0.10) 0%, transparent 60%)' }} />
 
         {/* Title row */}
-        <div className="relative mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-2.5 flex items-center gap-2">
               <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                 style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
                 Live
               </span>
-              <span className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest"
-                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)', color: 'rgba(196,181,253,0.85)' }}>
+              <span className="rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase tracking-widest"
+                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)', color: 'rgba(196,181,253,0.9)' }}>
                 PolyTrack Intelligence
               </span>
             </div>
-            <h1 className="flex items-baseline gap-3 text-4xl font-black leading-[1.0] tracking-tight sm:text-[3.1rem]">
-              <span className="animate-gradient bg-clip-text text-transparent"
-                style={{
-                  backgroundImage: 'linear-gradient(110deg,#fff 8%,#c4b5fd 38%,#60a5fa 60%,#38bdf8 78%,#fff 96%)',
-                  filter: 'drop-shadow(0 4px 30px rgba(124,58,237,0.45))',
-                }}>
-                Alpha&nbsp;Board
-              </span>
-            </h1>
-            <div className="mt-2 h-[3px] w-40 rounded-full animate-gradient"
-              style={{ backgroundImage: 'linear-gradient(90deg,#7c3aed,#2563eb,#06b6d4,#7c3aed)' }} />
-            <p className="mt-3 max-w-lg text-sm text-white/45">
+            <p className="max-w-lg text-sm leading-relaxed text-white/55">
               Where Polymarket&apos;s sharpest money moves — live P&amp;L, positions &amp; win rates, ranked in real time.
             </p>
           </div>
