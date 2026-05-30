@@ -33,18 +33,23 @@ export async function GET(req: NextRequest) {
 
     const MAX_LEVELS = 15;
 
-    function buildLevels(raw: { price: string; size: string }[]): DepthLevel[] {
+    // Sort so the best price is first regardless of how the venue ordered the
+    // raw book: bids descending (highest first), asks ascending (lowest first).
+    // Cumulative total accrues outward from the best level.
+    function buildLevels(raw: { price: string; size: string }[], side: 'bid' | 'ask'): DepthLevel[] {
+      const parsed = (raw ?? [])
+        .map(l => ({ price: parseFloat(l.price), size: parseFloat(l.size) }))
+        .filter(l => l.price > 0 && l.price < 1 && l.size > 0)
+        .sort((a, b) => side === 'bid' ? b.price - a.price : a.price - b.price);
       let cum = 0;
-      return raw.slice(0, MAX_LEVELS).map(l => {
-        const price = parseFloat(l.price);
-        const size  = parseFloat(l.size);
-        cum += price * size;
-        return { price, size, total: cum };
+      return parsed.slice(0, MAX_LEVELS).map(l => {
+        cum += l.price * l.size;
+        return { price: l.price, size: l.size, total: cum };
       });
     }
 
-    const bids = buildLevels(book.bids ?? []);
-    const asks = buildLevels(book.asks ?? []);
+    const bids = buildLevels(book.bids ?? [], 'bid');
+    const asks = buildLevels(book.asks ?? [], 'ask');
 
     const bestBid = bids[0]?.price ?? 0;
     const bestAsk = asks[0]?.price ?? 1;

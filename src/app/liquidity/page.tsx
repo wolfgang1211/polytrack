@@ -53,7 +53,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Spread</p>
           <p className="text-sm font-black text-white">{(opp.spread * 100).toFixed(1)}¢</p>
-          <p className="text-[10px] text-white/25">{pct(opp.spreadPct)}</p>
+          <p className="text-[10px] text-white/25">{pct(opp.spreadPct, 1)} of mid</p>
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">24h Vol</p>
@@ -62,14 +62,39 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Bid Depth</p>
-          <p className="text-sm font-black text-white/80">{formatCurrency(opp.bidDepth, true)}</p>
-          <p className="text-[10px] text-white/25">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
+          {opp.depthKnown && opp.bidDepth != null ? (
+            <>
+              <p className="text-sm font-black text-emerald-300/90">{formatCurrency(opp.bidDepth, true)}</p>
+              <p className="text-[10px] text-white/25">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-black text-white/30">—</p>
+              <p className="text-[10px] text-white/20">orderbook n/a</p>
+            </>
+          )}
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Ask Depth</p>
-          <p className="text-sm font-black text-white/80">{formatCurrency(opp.askDepth, true)}</p>
-          <p className="text-[10px] text-white/25">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
+          {opp.depthKnown && opp.askDepth != null ? (
+            <>
+              <p className="text-sm font-black text-rose-300/90">{formatCurrency(opp.askDepth, true)}</p>
+              <p className="text-[10px] text-white/25">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm font-black text-white/30">—</p>
+              <p className="text-[10px] text-white/20">orderbook n/a</p>
+            </>
+          )}
         </div>
+      </div>
+
+      {/* Fee potential */}
+      <div className="flex items-center justify-between rounded-xl px-3 py-2"
+        style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)' }}>
+        <span className="text-[10px] uppercase tracking-wider text-amber-300/70">Est. spread capture / day</span>
+        <span className="text-sm font-black text-amber-300">{formatCurrency(opp.estDailyFee, true)}</span>
       </div>
 
       {/* Score + CTA */}
@@ -78,7 +103,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           <span className="text-[10px] text-white/30 uppercase tracking-wider">LP Score</span>
           <span className="rounded-full px-2.5 py-0.5 text-[11px] font-black"
             style={{ background: `${scoreColor(sc)}20`, color: scoreColor(sc), border: `1px solid ${scoreColor(sc)}40` }}>
-            {scoreLabel(sc)}
+            {sc} · {scoreLabel(sc)}
           </span>
         </div>
         <a
@@ -542,17 +567,33 @@ function SectionHeader({ accent, title, sub, icon, controls }: {
 export default function LiquidityPage() {
   const [opps, setOpps]     = useState<LPOpportunity[]>([]);
   const [oppsLoading, setOppsLoading] = useState(true);
+  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  const [now, setNow] = useState(Date.now());
 
   const loadOpps = useCallback(() => {
     setOppsLoading(true);
     fetch('/api/liquidity/opportunities')
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setOpps(d); })
+      .then(d => {
+        // Supports both the new { opportunities, updatedAt } shape and a bare array.
+        const list: LPOpportunity[] = Array.isArray(d) ? d : (d?.opportunities ?? []);
+        setOpps(list);
+        setUpdatedAt(d?.updatedAt ?? Date.now());
+      })
       .catch(() => {})
       .finally(() => setOppsLoading(false));
   }, []);
 
   useEffect(() => { loadOpps(); }, [loadOpps]);
+
+  // Auto-refresh every 60s + tick a clock for the "updated Xs ago" label.
+  useEffect(() => {
+    const refresh = setInterval(loadOpps, 60_000);
+    const tick = setInterval(() => setNow(Date.now()), 1_000);
+    return () => { clearInterval(refresh); clearInterval(tick); };
+  }, [loadOpps]);
+
+  const agoSec = updatedAt ? Math.max(0, Math.floor((now - updatedAt) / 1000)) : null;
 
   return (
     <div className="flex flex-col gap-12">
@@ -571,6 +612,26 @@ export default function LiquidityPage() {
         <p className="mt-3 text-sm text-white/40 max-w-xl">
           Discover LP opportunities, analyze market depth, and simulate maker rewards on Polymarket.
         </p>
+
+        {/* Freshness + refresh */}
+        <div className="mt-4 flex items-center gap-3">
+          <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
+            style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+            Live
+          </span>
+          <span className="text-[11px] text-white/30">
+            {agoSec == null ? 'Loading…' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
+          </span>
+          <button onClick={loadOpps}
+            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-white/50 transition-colors hover:text-white"
+            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <svg className={`h-3 w-3 ${oppsLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Refresh
+          </button>
+        </div>
 
         {/* Quick stats */}
         {!oppsLoading && opps.length > 0 && (
