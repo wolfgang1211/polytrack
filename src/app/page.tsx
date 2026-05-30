@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import WalletSearch from '@/components/WalletSearch';
 import DashboardStats from '@/components/DashboardStats';
 import TopMarkets from '@/components/TopMarkets';
@@ -7,6 +9,62 @@ import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
 import LiveTicker from '@/components/LiveTicker';
 import HotBets from '@/components/HotBets';
+import { formatCurrency, formatAddress } from '@/lib/utils';
+
+interface LbEntry { proxyWallet: string; userName?: string | null; profileImage?: string | null; pnl: number }
+
+function SmartMoneyPreview() {
+  const [rows, setRows] = useState<LbEntry[] | null>(null);
+
+  useEffect(() => {
+    fetch('/api/leaderboard?window=1w&limit=4')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d)) setRows(d.slice(0, 4)); })
+      .catch(() => {});
+  }, []);
+
+  return (
+    <div className="relative w-full rounded-2xl p-4 glass-strong"
+      style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="mb-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+          <span className="text-xs font-bold text-white/80">Smart Money</span>
+        </div>
+        <Link href="/leaderboard"
+          className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-300 transition-colors hover:text-violet-200"
+          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)' }}>
+          Tümü →
+        </Link>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        {(rows ?? Array.from({ length: 4 })).map((e, i) => {
+          const entry = e as LbEntry | undefined;
+          if (!entry) return <div key={i} className="h-10 rounded-xl animate-shimmer" />;
+          const name = entry.userName || formatAddress(entry.proxyWallet);
+          return (
+            <Link key={entry.proxyWallet} href={`/wallet/${entry.proxyWallet.toLowerCase()}`}
+              className="flex items-center gap-2.5 rounded-xl px-2.5 py-2 transition-colors hover:bg-white/5">
+              <span className="w-4 flex-shrink-0 text-center text-[11px] font-black text-white/25">{i + 1}</span>
+              {entry.profileImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={entry.profileImage} alt="" className="h-7 w-7 flex-shrink-0 rounded-full object-cover" />
+              ) : (
+                <span className="h-7 w-7 flex-shrink-0 rounded-full"
+                  style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.5),rgba(37,99,235,0.5))' }} />
+              )}
+              <span className="flex-1 truncate text-xs font-semibold text-white/70">{name}</span>
+              <span className={`text-xs font-black ${entry.pnl >= 0 ? 'text-grad-profit' : 'text-grad-loss'}`}>
+                {entry.pnl >= 0 ? '+' : ''}{formatCurrency(entry.pnl, true)}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   return (
@@ -39,10 +97,10 @@ export default function DashboardPage() {
         <div className="pointer-events-none absolute inset-0"
           style={{ background: 'radial-gradient(ellipse at 70% 0%, rgba(37,99,235,0.10) 0%, transparent 60%)' }} />
 
-        {/* Title row */}
-        <div className="relative mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Hero content: headline + buttons (left) · smart money (right) */}
+        <div className="relative grid gap-8 lg:grid-cols-[1fr_minmax(280px,360px)] lg:items-center">
           <div>
-            <div className="mb-2.5 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2">
               <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                 style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -53,42 +111,49 @@ export default function DashboardPage() {
                 AlphaBoard Intelligence
               </span>
             </div>
-            <p className="max-w-lg text-sm leading-relaxed text-white/55">
-              Where Polymarket&apos;s sharpest money moves — live P&amp;L, positions &amp; win rates, ranked in real time.
+
+            <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl">
+              <span className="text-white">Polymarket&apos;in en keskin</span>
+              <br />
+              <span className="animate-gradient bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: 'linear-gradient(110deg,#c4b5fd 5%,#a78bfa 35%,#818cf8 65%,#60a5fa 95%)',
+                  filter: 'drop-shadow(0 4px 30px rgba(124,58,237,0.45))',
+                }}>
+                parasını takip et.
+              </span>
+            </h1>
+
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/50">
+              Gerçek zamanlı P&amp;L ve akıllı para takibi. Polymarket&apos;in en iyi cüzdanlarını,
+              pozisyonlarını ve kazanç oranlarını canlı olarak izle.
             </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <a href="#wallet-search"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-[1.03] hover:brightness-110"
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', border: '1px solid rgba(139,92,246,0.4)' }}>
+                Cüzdan Takip Et
+              </a>
+              <Link href="/liquidity"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white/75 transition-all hover:text-white hover:scale-[1.02]"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                Alert Kur
+              </Link>
+            </div>
           </div>
 
-          {/* Decorative sparkline */}
-          <div className="hidden flex-shrink-0 md:block" aria-hidden>
-            <svg width="200" height="84" viewBox="0 0 200 84" fill="none">
-              <defs>
-                <linearGradient id="heroSpark" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stopColor="#7c3aed" />
-                  <stop offset="0.5" stopColor="#38bdf8" />
-                  <stop offset="1" stopColor="#34d399" />
-                </linearGradient>
-                <linearGradient id="heroFill" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0" stopColor="rgba(56,189,248,0.25)" />
-                  <stop offset="1" stopColor="rgba(56,189,248,0)" />
-                </linearGradient>
-              </defs>
-              <path d="M0 64 L24 58 L48 62 L72 44 L96 50 L120 30 L144 36 L168 16 L200 8 L200 84 L0 84 Z" fill="url(#heroFill)" />
-              <path d="M0 64 L24 58 L48 62 L72 44 L96 50 L120 30 L144 36 L168 16 L200 8"
-                fill="none" stroke="url(#heroSpark)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="200" cy="8" r="4" fill="#34d399">
-                <animate attributeName="opacity" values="1;0.3;1" dur="1.6s" repeatCount="indefinite" />
-              </circle>
-            </svg>
-          </div>
+          {/* Smart money preview */}
+          <SmartMoneyPreview />
         </div>
 
         {/* Stats grid */}
-        <div className="relative mb-4">
+        <div className="relative mt-8">
           <DashboardStats />
         </div>
 
         {/* Wallet search */}
-        <div className="relative glass rounded-2xl p-4 sm:max-w-sm">
+        <div id="wallet-search" className="relative mt-4 glass rounded-2xl p-4 sm:max-w-sm">
           <div className="mb-2.5 flex items-center gap-2">
             <div className="h-6 w-6 rounded-lg flex items-center justify-center flex-shrink-0"
               style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.4),rgba(37,99,235,0.4))', border: '1px solid rgba(139,92,246,0.3)' }}>
