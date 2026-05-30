@@ -13,7 +13,7 @@ import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─────────────────────────── helpers ─────────────────────────── */
 
 function pct(n: number, d = 2) { return `${(n * 100).toFixed(d)}%`; }
 
@@ -31,9 +31,9 @@ function scoreLabel(s: number) {
 const LP_PERIODS = ['DAY', 'WEEK', 'MONTH'] as const;
 type LPPeriod = typeof LP_PERIODS[number];
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    1) LP OPPORTUNITIES
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
   const href = marketUrl(opp.eventSlug, opp.slug);
@@ -58,7 +58,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       <div className="grid grid-cols-2 gap-2.5">
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
           <p className="text-[10px] text-white/30 uppercase tracking-wider mb-0.5">Spread</p>
-          <p className="text-sm font-black text-white">{(opp.spread * 100).toFixed(1)}Â¢</p>
+          <p className="text-sm font-black text-white">{(opp.spread * 100).toFixed(1)}¢</p>
           <p className="text-[10px] text-white/25">{pct(opp.spreadPct, 1)} of mid</p>
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -71,11 +71,11 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           {opp.depthKnown && opp.bidDepth != null ? (
             <>
               <p className="text-sm font-black text-emerald-300/90">{formatCurrency(opp.bidDepth, true)}</p>
-              <p className="text-[10px] text-white/25">Best {(opp.bestBid * 100).toFixed(1)}Â¢</p>
+              <p className="text-[10px] text-white/25">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-black text-white/30">â€”</p>
+              <p className="text-sm font-black text-white/30">—</p>
               <p className="text-[10px] text-white/20">orderbook n/a</p>
             </>
           )}
@@ -85,11 +85,11 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           {opp.depthKnown && opp.askDepth != null ? (
             <>
               <p className="text-sm font-black text-rose-300/90">{formatCurrency(opp.askDepth, true)}</p>
-              <p className="text-[10px] text-white/25">Best {(opp.bestAsk * 100).toFixed(1)}Â¢</p>
+              <p className="text-[10px] text-white/25">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-black text-white/30">â€”</p>
+              <p className="text-sm font-black text-white/30">—</p>
               <p className="text-[10px] text-white/20">orderbook n/a</p>
             </>
           )}
@@ -109,7 +109,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           <span className="text-[10px] text-white/30 uppercase tracking-wider">LP Score</span>
           <span className="rounded-full px-2.5 py-0.5 text-[11px] font-black"
             style={{ background: `${scoreColor(sc)}20`, color: scoreColor(sc), border: `1px solid ${scoreColor(sc)}40` }}>
-            {sc} Â· {scoreLabel(sc)}
+            {sc} · {scoreLabel(sc)}
           </span>
         </div>
         <a
@@ -135,7 +135,7 @@ function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; load
       <SectionHeader
         accent="rgba(139,92,246,0.8)"
         title="LP Opportunities"
-        sub="Markets ranked by spread Ã— volume â€” wider spread + high volume = higher fee potential"
+        sub="Markets ranked by spread × volume — wider spread + high volume = higher fee potential"
         icon={
           <svg className="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -155,9 +155,9 @@ function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; load
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    2) LP LEADERBOARD
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function LPLeaderboardSection() {
@@ -187,7 +187,7 @@ function LPLeaderboardSection() {
       <SectionHeader
         accent="rgba(52,211,153,0.8)"
         title="LP Leaderboard"
-        sub="Highest-volume traders â€” market makers and liquidity providers ranked by trading volume"
+        sub="Highest-volume traders — market makers and liquidity providers ranked by trading volume"
         icon={
           <svg className="h-4 w-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -259,9 +259,9 @@ function LPLeaderboardSection() {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    3) MARKET DEPTH ANALYSIS
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 function DepthBar({ levels, best, side, maxTotal }: {
   levels: { price: number; size: number; total: number }[];
@@ -277,13 +277,13 @@ function DepthBar({ levels, best, side, maxTotal }: {
         const dist = Math.abs(l.price - best) * 100;
         return (
           <div key={i} className="flex items-center gap-2 text-[10px]">
-            <span className="w-10 text-right tabular-nums text-white/35">{(l.price * 100).toFixed(1)}Â¢</span>
+            <span className="w-10 text-right tabular-nums text-white/35">{(l.price * 100).toFixed(1)}¢</span>
             <div className="flex-1 relative h-5 rounded-sm overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)' }}>
               <div className="absolute inset-y-0 h-full rounded-sm transition-all duration-500"
                 style={{ width: `${barW}%`, background: bg, borderRight: `2px solid ${color}40`,
                   [side === 'bid' ? 'right' : 'left']: 0 }} />
               <span className="absolute inset-0 flex items-center px-2 text-white/40 tabular-nums" style={{ fontSize: 9 }}>
-                {l.size.toFixed(0)} ({dist.toFixed(1)}Â¢ away)
+                {l.size.toFixed(0)} ({dist.toFixed(1)}¢ away)
               </span>
             </div>
             <span className="w-14 tabular-nums text-white/25">${l.total.toFixed(0)}</span>
@@ -340,7 +340,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             >
               {opps.map(o => (
                 <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
-                  {o.question.slice(0, 50)}â€¦
+                  {o.question.slice(0, 50)}…
                 </option>
               ))}
             </select>
@@ -360,10 +360,10 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             {/* Key metrics */}
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: 'Best Bid', value: `${(depth.bestBid * 100).toFixed(1)}Â¢`, color: '#34d399' },
-                { label: 'Best Ask', value: `${(depth.bestAsk * 100).toFixed(1)}Â¢`, color: '#fb7185' },
-                { label: 'Spread',   value: `${(depth.spread * 100).toFixed(2)}Â¢ (${pct(depth.spreadPct)})`, color: '#fbbf24' },
-                { label: 'Mid Price',value: `${(depth.midPrice * 100).toFixed(1)}Â¢`, color: '#a78bfa' },
+                { label: 'Best Bid', value: `${(depth.bestBid * 100).toFixed(1)}¢`, color: '#34d399' },
+                { label: 'Best Ask', value: `${(depth.bestAsk * 100).toFixed(1)}¢`, color: '#fb7185' },
+                { label: 'Spread',   value: `${(depth.spread * 100).toFixed(2)}¢ (${pct(depth.spreadPct)})`, color: '#fbbf24' },
+                { label: 'Mid Price',value: `${(depth.midPrice * 100).toFixed(1)}¢`, color: '#a78bfa' },
               ].map(m => (
                 <div key={m.label} className="rounded-xl px-4 py-3"
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -379,7 +379,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
                 <span className="text-xs text-white/40">Liquidity Quality</span>
                 <span className="rounded-full px-3 py-0.5 text-sm font-black"
                   style={{ background: `${scoreColor(depth.qualityScore)}20`, color: scoreColor(depth.qualityScore), border: `1px solid ${scoreColor(depth.qualityScore)}40` }}>
-                  {depth.qualityScore}/100 â€” {scoreLabel(depth.qualityScore)}
+                  {depth.qualityScore}/100 — {scoreLabel(depth.qualityScore)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -394,13 +394,13 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             <div className="grid gap-4 lg:grid-cols-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/70 mb-2">
-                  Bids â€” Total {formatCurrency(depth.bidDepthTotal, true)}
+                  Bids — Total {formatCurrency(depth.bidDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.bids} best={depth.bestBid} side="bid" maxTotal={maxTotal} />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-rose-400/70 mb-2">
-                  Asks â€” Total {formatCurrency(depth.askDepthTotal, true)}
+                  Asks — Total {formatCurrency(depth.askDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.asks} best={depth.bestAsk} side="ask" maxTotal={maxTotal} />
               </div>
@@ -416,13 +416,13 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    4) REWARD SIMULATOR
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 // Maker rebate: ~0.1% of notional volume traded against your orders
 // Your share = amount / (total_liquidity + amount)
-// daily_reward â‰ˆ your_share Ã— daily_volume Ã— 0.001
+// daily_reward ≈ your_share × daily_volume × 0.001
 const MAKER_REBATE_RATE = 0.001;
 
 function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
@@ -474,7 +474,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
             </select>
             {selected && (
               <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-white/30">
-                <span>Spread: <span className="text-white/60">{(selected.spread * 100).toFixed(1)}Â¢</span></span>
+                <span>Spread: <span className="text-white/60">{(selected.spread * 100).toFixed(1)}¢</span></span>
                 <span>24h Vol: <span className="text-white/60">{formatCurrency(selected.volume24h, true)}</span></span>
                 <span>Total Liquidity: <span className="text-white/60">{formatCurrency(selected.liquidity, true)}</span></span>
               </div>
@@ -509,8 +509,8 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
 
           <div className="rounded-xl px-4 py-3 text-[10px] text-white/25 leading-relaxed"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <strong className="text-white/40">Formula:</strong> your_share Ã— daily_volume Ã— {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
-            Estimates only â€” actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
+            <strong className="text-white/40">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
+            Estimates only — actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
           </div>
         </div>
 
@@ -518,8 +518,8 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
         <div className="flex flex-col gap-3">
           {[
             { label: 'Daily Reward',    value: formatCurrency(dailyReward),   sub: 'estimated maker rebate',   color: '#34d399', gradient: 'rgba(52,211,153,0.15)' },
-            { label: 'Monthly Reward',  value: formatCurrency(monthlyReward), sub: '30 days Ã— daily estimate',  color: '#60a5fa', gradient: 'rgba(96,165,250,0.15)'  },
-            { label: 'Annual Reward',   value: formatCurrency(yearlyReward),  sub: '365 days Ã— daily estimate', color: '#a78bfa', gradient: 'rgba(167,139,250,0.15)' },
+            { label: 'Monthly Reward',  value: formatCurrency(monthlyReward), sub: '30 days × daily estimate',  color: '#60a5fa', gradient: 'rgba(96,165,250,0.15)'  },
+            { label: 'Annual Reward',   value: formatCurrency(yearlyReward),  sub: '365 days × daily estimate', color: '#a78bfa', gradient: 'rgba(167,139,250,0.15)' },
             { label: 'Estimated APR',   value: `${apr.toFixed(2)}%`,          sub: 'annualised return on capital', color: '#fbbf24', gradient: 'rgba(251,191,36,0.15)'  },
           ].map(r => (
             <div key={r.label} className="flex items-center gap-4 rounded-2xl px-5 py-4"
@@ -543,9 +543,9 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    5) PRICE / SPREAD HISTORY
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 const PH_WINDOWS = [
   { key: '1d', label: '1D' },
@@ -589,7 +589,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
       <SectionHeader
         accent="rgba(96,165,250,0.8)"
         title="Price History"
-        sub="Historical mid-price for the selected market (Polymarket CLOB). Current spread shown alongside â€” only price history is published by the API."
+        sub="Historical mid-price for the selected market (Polymarket CLOB). Current spread shown alongside — only price history is published by the API."
         icon={
           <svg className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18M7 14l4-4 3 3 5-6" />
@@ -633,10 +633,10 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
         {selected && (
           <div className="mb-4 flex flex-wrap gap-3">
             {[
-              { label: 'Current Mid', value: `${(selected.mid * 100).toFixed(1)}Â¢`, color: '#a78bfa' },
-              { label: 'Current Spread', value: `${(selected.spread * 100).toFixed(1)}Â¢`, color: '#fbbf24' },
-              { label: 'Period Change', value: hist?.changePct != null ? `${up ? '+' : ''}${(hist.changePct * 100).toFixed(1)}%` : 'â€”', color: lineColor },
-              { label: 'Range', value: hist?.min != null && hist?.max != null ? `${(hist.min * 100).toFixed(0)}â€“${(hist.max * 100).toFixed(0)}Â¢` : 'â€”', color: '#60a5fa' },
+              { label: 'Current Mid', value: `${(selected.mid * 100).toFixed(1)}¢`, color: '#a78bfa' },
+              { label: 'Current Spread', value: `${(selected.spread * 100).toFixed(1)}¢`, color: '#fbbf24' },
+              { label: 'Period Change', value: hist?.changePct != null ? `${up ? '+' : ''}${(hist.changePct * 100).toFixed(1)}%` : '—', color: lineColor },
+              { label: 'Range', value: hist?.min != null && hist?.max != null ? `${(hist.min * 100).toFixed(0)}–${(hist.max * 100).toFixed(0)}¢` : '—', color: '#60a5fa' },
             ].map(s => (
               <div key={s.label} className="rounded-xl px-4 py-2"
                 style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -676,7 +676,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
                 />
                 <YAxis
                   domain={['dataMin', 'dataMax']}
-                  tickFormatter={v => `${v}Â¢`}
+                  tickFormatter={v => `${v}¢`}
                   tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
                   axisLine={false} tickLine={false} width={42}
                 />
@@ -696,9 +696,9 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   6) LP CALCULATOR â€” compare markets for the same capital
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* ═══════════════════════════════════════════════════════════════
+   6) LP CALCULATOR — compare markets for the same capital
+════════════════════════════════════════════════════════════════ */
 
 function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
   const [amount, setAmount] = useState('1000');
@@ -738,7 +738,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
       <SectionHeader
         accent="rgba(167,139,250,0.8)"
         title="LP Calculator"
-        sub="Compare multiple markets side by side â€” for the same capital, which one pays the most maker reward?"
+        sub="Compare multiple markets side by side — for the same capital, which one pays the most maker reward?"
         icon={
           <svg className="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m4 10V11m4 6v-4M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -783,7 +783,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                     border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'rgba(255,255,255,0.07)'}`,
                     color: on ? '#c4b5fd' : 'rgba(255,255,255,0.4)',
                   }}>
-                  {on ? 'âœ“ ' : ''}{o.question.slice(0, 38)}
+                  {on ? '✓ ' : ''}{o.question.slice(0, 38)}
                 </button>
               );
             })}
@@ -825,21 +825,21 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
             style={{ background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.2)' }}>
             <span className="text-xs text-white/50">Best for ${amt.toLocaleString()}:</span>
             <span className="text-xs font-black text-emerald-300 truncate">{best.o.question.slice(0, 50)}</span>
-            <span className="text-xs text-white/40 ml-auto flex-shrink-0">â‰ˆ {formatCurrency(best.dailyReward)}/day</span>
+            <span className="text-xs text-white/40 ml-auto flex-shrink-0">≈ {formatCurrency(best.dailyReward)}/day</span>
           </div>
         )}
 
         <p className="text-[10px] text-white/25 leading-relaxed">
-          Estimates use your_share Ã— 24h_volume Ã— {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s reward program.
+          Estimates use your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s reward program.
         </p>
       </div>
     </section>
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    7) MARKET ALERT
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
   const [selected, setSelected] = useState<LPOpportunity | null>(null);
@@ -860,7 +860,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
       <SectionHeader
         accent="rgba(34,197,94,0.8)"
         title="Market Alert"
-        sub="Pick a market and a spread threshold â€” get pinged on Telegram when the spread widens past it (great for catching LP entry windows)."
+        sub="Pick a market and a spread threshold — get pinged on Telegram when the spread widens past it (great for catching LP entry windows)."
         icon={
           <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -886,7 +886,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-white/50 mb-2">Alert when spread â‰¥ (Â¢)</label>
+            <label className="block text-xs font-semibold text-white/50 mb-2">Alert when spread ≥ (¢)</label>
             <div className="flex gap-2">
               <input type="number" min="0" step="0.5" value={threshold} onChange={e => setThreshold(e.target.value)}
                 className="w-24 rounded-xl glass px-4 py-2.5 text-sm font-bold text-white outline-none"
@@ -895,7 +895,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
                 <button key={v} onClick={() => setThreshold(String(v))}
                   className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-white/40 transition-all hover:text-white/70"
                   style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  {v}Â¢
+                  {v}¢
                 </button>
               ))}
             </div>
@@ -911,12 +911,12 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
             }}>
             <div>
               <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Current spread</p>
-              <p className="text-lg font-black" style={{ color: wouldFire ? '#34d399' : '#fbbf24' }}>{currentSpread.toFixed(1)}Â¢</p>
+              <p className="text-lg font-black" style={{ color: wouldFire ? '#34d399' : '#fbbf24' }}>{currentSpread.toFixed(1)}¢</p>
             </div>
             <div className="text-right">
               <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Status</p>
               <p className="text-xs font-bold" style={{ color: wouldFire ? '#34d399' : 'rgba(255,255,255,0.45)' }}>
-                {wouldFire ? `âœ“ Above ${thr}Â¢ â€” would alert now` : `Below ${thr}Â¢ threshold`}
+                {wouldFire ? `✓ Above ${thr}¢ — would alert now` : `Below ${thr}¢ threshold`}
               </p>
             </div>
           </div>
@@ -934,14 +934,14 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
           Set up alert on Telegram
         </button>
         <p className="text-[10px] text-white/25 text-center leading-relaxed">
-          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out â€” for now you&apos;ll get whale &amp; liquidity alerts on join.
+          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out — for now you&apos;ll get whale &amp; liquidity alerts on join.
         </p>
       </div>
     </section>
   );
 }
 
-/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ shared UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─────────────────────────── shared UI ─────────────────────────── */
 
 function SectionHeader({ accent, title, sub, icon, controls }: {
   accent: string; title: string; sub: string;
@@ -964,9 +964,9 @@ function SectionHeader({ accent, title, sub, icon, controls }: {
   );
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+/* ═══════════════════════════════════════════════════════════════
    PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+════════════════════════════════════════════════════════════════ */
 
 export default function LiquidityPage() {
   const [opps, setOpps]     = useState<LPOpportunity[]>([]);
@@ -1025,7 +1025,7 @@ export default function LiquidityPage() {
             Live
           </span>
           <span className="text-[11px] text-white/30">
-            {agoSec == null ? 'Loadingâ€¦' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
+            {agoSec == null ? 'Loading…' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
           </span>
           <button onClick={loadOpps}
             className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-white/50 transition-colors hover:text-white"
@@ -1042,7 +1042,7 @@ export default function LiquidityPage() {
           <div className="mt-5 flex flex-wrap gap-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
             {[
               { label: 'Markets Analyzed', value: String(opps.length) },
-              { label: 'Avg Spread', value: `${(opps.reduce((s, o) => s + o.spread, 0) / opps.length * 100).toFixed(1)}Â¢` },
+              { label: 'Avg Spread', value: `${(opps.reduce((s, o) => s + o.spread, 0) / opps.length * 100).toFixed(1)}¢` },
               { label: 'Total 24h Vol', value: formatCurrency(opps.reduce((s, o) => s + o.volume24h, 0), true) },
             ].map(s => (
               <div key={s.label} className="glass rounded-xl px-4 py-2.5 flex items-center gap-2.5">
