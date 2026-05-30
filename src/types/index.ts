@@ -41,6 +41,7 @@ export interface Position {
 export interface WalletData {
   positions: Position[];
   totalValue: number;
+  truncated?: boolean;
 }
 
 export type TimeWindow = 'allTime' | '1d' | '1w' | '1m';

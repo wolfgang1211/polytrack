@@ -21,6 +21,7 @@ interface Insights {
   totalTrades: number;
   bestCategory: string;
   bestCategoryWinRate: number;
+  bestCategoryCount: number;
   avgPositionSize: number;
   biggestWin: Position;
   biggestLoss: Position;
@@ -39,18 +40,27 @@ function computeInsights(positions: Position[]): Insights | null {
     if (p.cashPnl > 0) catMap[cat].wins++;
   }
 
+  // Require a meaningful sample so a lucky 2/2 category doesn't outrank a
+  // 60%-over-200 one. Min sample scales with how many positions we have.
+  const minSample = Math.max(5, Math.floor(positions.length * 0.04));
   let bestCategory = 'N/A';
   let bestCategoryWinRate = 0;
+  let bestCategoryCount = 0;
   let bestWr = -1;
   for (const [cat, s] of Object.entries(catMap)) {
-    if (s.total < 2) continue;
+    if (s.total < minSample) continue;
     const wr = s.wins / s.total;
-    if (wr > bestWr) { bestWr = wr; bestCategory = cat; bestCategoryWinRate = Math.round(wr * 100); }
+    // tie-break toward the larger sample
+    if (wr > bestWr || (wr === bestWr && s.total > bestCategoryCount)) {
+      bestWr = wr; bestCategory = cat;
+      bestCategoryWinRate = Math.round(wr * 100); bestCategoryCount = s.total;
+    }
   }
   if (bestCategory === 'N/A' && Object.keys(catMap).length > 0) {
     const [cat, s] = Object.entries(catMap).sort((a, b) => b[1].total - a[1].total)[0];
     bestCategory = cat;
     bestCategoryWinRate = Math.round((s.wins / s.total) * 100);
+    bestCategoryCount = s.total;
   }
 
   const avgPositionSize = positions.reduce((s, p) => s + p.initialValue, 0) / positions.length;
@@ -59,7 +69,7 @@ function computeInsights(positions: Position[]): Insights | null {
   const biggestWin  = sorted[0];
   const biggestLoss = sorted[sorted.length - 1];
 
-  return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, avgPositionSize, biggestWin, biggestLoss };
+  return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, bestCategoryCount, avgPositionSize, biggestWin, biggestLoss };
 }
 
 export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
@@ -88,6 +98,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const shown  = tab === 'open' ? open : closed;
 
   const totalPnl   = all.reduce((s, p) => s + p.cashPnl, 0);
+  const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
+  const roi        = invested > 0 ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
   const shownPnl   = shown.reduce((s, p) => s + p.cashPnl, 0);
   const insights   = useMemo(() => computeInsights(all), [all]);
@@ -130,6 +142,14 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             {/* glow behind avatar */}
             <div className="absolute top-0 left-0 h-48 w-48 pointer-events-none"
               style={{ background: 'radial-gradient(circle at 40% 40%, rgba(124,58,237,0.25), transparent 70%)', filter:'blur(30px)' }} />
+            {/* grid texture */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.3]"
+              style={{
+                backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+                backgroundSize: '32px 32px',
+                maskImage: 'radial-gradient(ellipse at 80% 50%, #000 0%, transparent 70%)',
+                WebkitMaskImage: 'radial-gradient(ellipse at 80% 50%, #000 0%, transparent 70%)',
+              }} />
 
             <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-5">
@@ -152,6 +172,27 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   </div>
                   <h1 className="text-xl font-black text-white sm:text-2xl">{short}</h1>
                   <p className="font-mono text-[11px] text-white/25 mt-0.5 break-all max-w-xs">{address}</p>
+
+                  {/* at-a-glance pills */}
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                      style={totalPnl >= 0
+                        ? { background: 'rgba(52,211,153,0.12)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399' }
+                        : { background: 'rgba(251,113,133,0.12)', border: '1px solid rgba(251,113,133,0.25)', color: '#fb7185' }}>
+                      {totalPnl >= 0 ? '▲' : '▼'} {(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
+                      {roi != null && <span className="opacity-70"> · {roi >= 0 ? '+' : ''}{roi.toFixed(0)}%</span>}
+                    </span>
+                    {insights && (
+                      <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-white/55"
+                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        {insights.winRate.toFixed(0)}% win rate
+                      </span>
+                    )}
+                    <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-white/55"
+                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      {open.length} open · {formatCurrency(openVal, true)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -200,6 +241,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             <StatsCard
               label="Total P&L"
               value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
+              sub={roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI` : undefined}
               valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-white/50'}
               gradient={totalPnl >= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(251,113,133,0.15)'}
               icon={<svg style={{width:14,height:14}} className={totalPnl>=0?'text-emerald-400':'text-rose-400'} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}
@@ -223,7 +265,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             <StatsCard
               label="Total Pos."
               value={String(all.length)}
-              sub="all time"
+              sub={data?.truncated ? `${all.length}+ (capped)` : 'all time'}
               gradient="rgba(6,182,212,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
@@ -251,7 +293,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                 <StatsCard
                   label="Best Category"
                   value={insights.bestCategory}
-                  sub={insights.bestCategory !== 'N/A' ? `${insights.bestCategoryWinRate}% win rate` : 'Not enough data'}
+                  sub={insights.bestCategory !== 'N/A' ? `${insights.bestCategoryWinRate}% over ${insights.bestCategoryCount} trades` : 'Not enough data'}
                   gradient="rgba(249,115,22,0.15)"
                   icon={<svg style={{width:14,height:14}} className="text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>}
                   delay={60}

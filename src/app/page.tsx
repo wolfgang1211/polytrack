@@ -1,6 +1,7 @@
 'use client';
 
 import WalletSearch from '@/components/WalletSearch';
+import DashboardStats from '@/components/DashboardStats';
 import TopMarkets from '@/components/TopMarkets';
 import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
@@ -90,6 +91,11 @@ export default function DashboardPage() {
               </circle>
             </svg>
           </div>
+        </div>
+
+        {/* Stats grid */}
+        <div className="relative mb-4">
+          <DashboardStats />
         </div>
 
         {/* Wallet search */}
