@@ -1,4 +1,4 @@
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, positionPnl } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import type { Position } from '@/types';
 
@@ -8,10 +8,13 @@ interface Props {
 }
 
 export default function PositionCard({ position, delay = 0 }: Props) {
-  const pnl = position.cashPnl;
+  const pnl = positionPnl(position);
   const isProfit = pnl > 0;
   const isLoss = pnl < 0;
   const isClosed = position.currentValue === 0 && position.curPrice === 0;
+  // API's percentPnl reflects unrealized-only (reads -100% for redeemed winners),
+  // so derive a percent that stays consistent with the true P&L sign.
+  const pctPnl = position.initialValue > 0 ? (pnl / position.initialValue) * 100 : position.percentPnl;
   const isYes = position.outcome === 'Yes';
 
   const endDate = position.endDate
@@ -69,7 +72,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
             {pnl >= 0 ? '+' : ''}{formatCurrency(pnl)}
           </p>
           <p className={`mt-0.5 text-[11px] font-semibold ${isProfit ? 'text-emerald-500/70' : isLoss ? 'text-rose-500/70' : 'text-white/25'}`}>
-            {position.percentPnl >= 0 ? '+' : ''}{position.percentPnl.toFixed(1)}%
+            {pctPnl >= 0 ? '+' : ''}{pctPnl.toFixed(1)}%
           </p>
         </div>
       </div>

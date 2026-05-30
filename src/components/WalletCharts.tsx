@@ -6,7 +6,7 @@ import {
   PieChart, Pie,
 } from 'recharts';
 import type { Position } from '@/types';
-import { detectCategory, formatCurrency } from '@/lib/utils';
+import { detectCategory, formatCurrency, positionPnl } from '@/lib/utils';
 
 const CAT_COLORS: Record<string, string> = {
   Crypto: '#f59e0b',
@@ -54,9 +54,10 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
     let unrealized = 0;
     for (const p of positions) {
       const c = detectCategory(p.title);
-      cat[c] = (cat[c] ?? 0) + p.cashPnl;
+      cat[c] = (cat[c] ?? 0) + positionPnl(p);
+      // cashPnl = unrealized mark-to-market of held shares; realizedPnl = profit already taken.
       realized += p.realizedPnl ?? 0;
-      unrealized += p.cashPnl - (p.realizedPnl ?? 0);
+      unrealized += p.cashPnl ?? 0;
     }
     const catData = Object.entries(cat)
       .map(([name, value]) => ({ name, value }))

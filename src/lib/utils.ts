@@ -12,6 +12,16 @@ export function formatCurrency(value: number, compact = false): string {
   }).format(value);
 }
 
+// True lifetime P&L for a position. Polymarket's data-api reports `cashPnl`
+// as the UNREALIZED mark-to-market of currently-held shares only (so a
+// redeemed winner reads as -costBasis), while `realizedPnl` holds the profit
+// already taken from sells. Total = realized + unrealized. Using cashPnl alone
+// makes active traders / market-makers look like they lose almost everything.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function positionPnl(p: { cashPnl?: number; realizedPnl?: number } | any): number {
+  return (Number(p?.realizedPnl) || 0) + (Number(p?.cashPnl) || 0);
+}
+
 export function formatAddress(address: string, chars = 6): string {
   if (!address) return '';
   return `${address.slice(0, chars)}...${address.slice(-4)}`;

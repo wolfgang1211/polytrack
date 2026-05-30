@@ -3,7 +3,7 @@
 import { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
 import type { WalletData, Position } from '@/types';
-import { formatCurrency, formatAddress, detectCategory } from '@/lib/utils';
+import { formatCurrency, formatAddress, detectCategory, positionPnl } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import StatsCard from '@/components/StatsCard';
 import PositionCard from '@/components/PositionCard';
@@ -31,14 +31,14 @@ interface Insights {
 function computeInsights(positions: Position[]): Insights | null {
   if (positions.length < 2) return null;
 
-  const winCount = positions.filter(p => p.cashPnl > 0).length;
+  const winCount = positions.filter(p => positionPnl(p) > 0).length;
 
   const catMap: Record<string, { wins: number; total: number }> = {};
   for (const p of positions) {
     const cat = detectCategory(p.title);
     if (!catMap[cat]) catMap[cat] = { wins: 0, total: 0 };
     catMap[cat].total++;
-    if (p.cashPnl > 0) catMap[cat].wins++;
+    if (positionPnl(p) > 0) catMap[cat].wins++;
   }
 
   // Require a meaningful sample so a lucky 2/2 category doesn't outrank a
@@ -66,7 +66,7 @@ function computeInsights(positions: Position[]): Insights | null {
 
   const avgPositionSize = positions.reduce((s, p) => s + p.initialValue, 0) / positions.length;
 
-  const sorted = [...positions].sort((a, b) => b.cashPnl - a.cashPnl);
+  const sorted = [...positions].sort((a, b) => positionPnl(b) - positionPnl(a));
   const biggestWin  = sorted[0];
   const biggestLoss = sorted[sorted.length - 1];
 
@@ -98,11 +98,11 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const closed = all.filter(p => p.currentValue === 0 && p.curPrice === 0);
   const shown  = tab === 'open' ? open : closed;
 
-  const totalPnl   = all.reduce((s, p) => s + p.cashPnl, 0);
+  const totalPnl   = all.reduce((s, p) => s + positionPnl(p), 0);
   const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
   const roi        = invested > 0 ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
-  const shownPnl   = shown.reduce((s, p) => s + p.cashPnl, 0);
+  const shownPnl   = shown.reduce((s, p) => s + positionPnl(p), 0);
   const insights   = useMemo(() => computeInsights(all), [all]);
 
   const short = formatAddress(address, 8);
@@ -318,15 +318,15 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/35">Best / Worst</p>
                   <div className="flex flex-col gap-2.5">
                     <div>
-                      <p className={`text-base font-black leading-none ${insights.biggestWin.cashPnl > 0 ? 'text-grad-profit' : 'text-white/40'}`}>
-                        {insights.biggestWin.cashPnl >= 0 ? '+' : ''}{formatCurrency(insights.biggestWin.cashPnl, true)}
+                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestWin) > 0 ? 'text-grad-profit' : 'text-white/40'}`}>
+                        {positionPnl(insights.biggestWin) >= 0 ? '+' : ''}{formatCurrency(positionPnl(insights.biggestWin), true)}
                       </p>
                       <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestWin.title}</p>
                     </div>
                     <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
                     <div>
-                      <p className={`text-base font-black leading-none ${insights.biggestLoss.cashPnl < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
-                        {insights.biggestLoss.cashPnl >= 0 ? '+' : ''}{formatCurrency(insights.biggestLoss.cashPnl, true)}
+                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestLoss) < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
+                        {positionPnl(insights.biggestLoss) >= 0 ? '+' : ''}{formatCurrency(positionPnl(insights.biggestLoss), true)}
                       </p>
                       <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestLoss.title}</p>
                     </div>

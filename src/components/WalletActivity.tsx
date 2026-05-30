@@ -5,7 +5,7 @@ import {
   ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell, CartesianGrid,
 } from 'recharts';
 import type { RecentTrade, Position } from '@/types';
-import { detectCategory, formatCurrency } from '@/lib/utils';
+import { detectCategory, formatCurrency, positionPnl } from '@/lib/utils';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -104,7 +104,7 @@ export default function WalletActivity({ address, positions }: { address: string
       const cat = detectCategory(p.title);
       if (!map[cat]) map[cat] = { wins: 0, total: 0 };
       map[cat].total++;
-      if (p.cashPnl > 0) map[cat].wins++;
+      if (positionPnl(p) > 0) map[cat].wins++;
     }
     return Object.entries(map)
       .filter(([, s]) => s.total >= 3)
