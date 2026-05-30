@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { formatCurrency, formatAddress } from '@/lib/utils';
-import { marketUrl, withBuilderCode } from '@/lib/builder';
+import { marketUrl } from '@/lib/builder';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 
@@ -30,7 +30,7 @@ type LPPeriod = typeof LP_PERIODS[number];
 ════════════════════════════════════════════════════════════════ */
 
 function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
-  const href = withBuilderCode(`https://polymarket.com/event/${opp.eventSlug ?? opp.slug}`);
+  const href = marketUrl(opp.eventSlug, opp.slug);
   const sc   = opp.score;
 
   return (

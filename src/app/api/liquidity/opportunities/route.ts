@@ -91,6 +91,9 @@ export async function GET() {
       const vol24h    = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
       const liquidity = m.liquidityNum ?? Number(m.liquidity ?? 0);
       const tokenId   = parseJson(m.clobTokenIds)[0] ?? '';
+      // Polymarket pages live at /event/{eventSlug}; gamma nests it under events[].
+      const eventSlug = m.eventSlug
+        ?? (Array.isArray(m.events) && m.events[0] ? m.events[0].slug : undefined);
 
       // Prefer gamma's published top-of-book; clamp to a sane [0,1].
       let bestBid = clamp01(Number(m.bestBid ?? NaN));
@@ -137,7 +140,7 @@ export async function GET() {
         conditionId: m.conditionId ?? m.id ?? '',
         question: m.question ?? 'Unknown',
         slug: m.slug ?? '',
-        eventSlug: m.eventSlug,
+        eventSlug,
         image: m.image,
         volume24h: vol24h,
         liquidity,
