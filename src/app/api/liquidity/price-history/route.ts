@@ -13,20 +13,27 @@ export interface PriceHistory {
   changePct: number | null;   // (last - first) / first
 }
 
-// Map our UI windows to the CLOB prices-history intervals.
-const INTERVALS: Record<string, string> = {
-  '1d': '1d', '1w': '1w', '1m': '1m', max: 'max',
+// Map our UI windows to the CLOB prices-history interval + a sensible fidelity
+// (resolution in minutes). The CLOB API returns an EMPTY history if fidelity is
+// too fine for the requested window (e.g. fidelity=1 over 1w/1m/max), so each
+// window needs a fidelity coarse enough to keep the point count reasonable.
+const WINDOWS: Record<string, { interval: string; fidelity: number }> = {
+  '1d': { interval: '1d', fidelity: 5 },
+  '1w': { interval: '1w', fidelity: 60 },
+  '1m': { interval: '1m', fidelity: 180 },
+  max:  { interval: 'max', fidelity: 1440 },
 };
 
 export async function GET(req: NextRequest) {
   const tokenId  = req.nextUrl.searchParams.get('tokenId');
   const intervalQ = req.nextUrl.searchParams.get('interval') ?? '1w';
-  const interval = INTERVALS[intervalQ] ?? '1w';
+  const win = WINDOWS[intervalQ] ?? WINDOWS['1w'];
+  const interval = win.interval;
   if (!tokenId) return NextResponse.json({ error: 'tokenId required' }, { status: 400 });
 
   try {
     const res = await fetch(
-      `${CLOB_BASE}/prices-history?market=${tokenId}&interval=${interval}&fidelity=1`,
+      `${CLOB_BASE}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${win.fidelity}`,
       { headers: { Accept: 'application/json' }, next: { revalidate: 120 } }
     );
     if (!res.ok) return NextResponse.json({ error: `CLOB ${res.status}` }, { status: res.status });
