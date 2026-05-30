@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'PolyTrack — Polymarket Leaderboard & Wallet Tracker',
+  title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
   description: 'Track top Polymarket traders and monitor wallet performance in real time.',
 };
 
