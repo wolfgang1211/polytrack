@@ -103,6 +103,42 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
         <span className="text-sm font-black text-amber-300">{formatCurrency(opp.estDailyFee, true)}</span>
       </div>
 
+      {/* Risk metrics */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-3">
+          {/* Days to resolve */}
+          <div>
+            <p className="text-[9px] uppercase tracking-wider text-white/30 mb-0.5">Resolves in</p>
+            {opp.daysToResolve != null ? (
+              <p className={`text-xs font-bold ${opp.daysToResolve < 5 ? 'text-rose-400' : 'text-white/70'}`}>
+                {opp.daysToResolve === 0 ? '<1d' : `${opp.daysToResolve}d`}
+                {opp.daysToResolve < 5 && <span className="ml-1 text-[10px]">⚠</span>}
+              </p>
+            ) : (
+              <p className="text-xs font-bold text-white/30">—</p>
+            )}
+          </div>
+          {/* Spread volatility */}
+          <div>
+            <p className="text-[9px] uppercase tracking-wider text-white/30 mb-0.5">Spread vol 24h</p>
+            <p className={`text-xs font-bold ${opp.spreadVol > 30 ? 'text-rose-400' : opp.spreadVol > 10 ? 'text-amber-300' : 'text-white/70'}`}>
+              {opp.spreadVol.toFixed(1)}%
+            </p>
+          </div>
+        </div>
+        {/* Risk badge */}
+        <span className="rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider"
+          style={
+            opp.risk === 'High'
+              ? { background: 'rgba(244,63,94,0.15)', color: '#fb7185', border: '1px solid rgba(251,113,133,0.3)' }
+              : opp.risk === 'Medium'
+              ? { background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }
+              : { background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)' }
+          }>
+          {opp.risk} Risk
+        </span>
+      </div>
+
       {/* Score + CTA */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

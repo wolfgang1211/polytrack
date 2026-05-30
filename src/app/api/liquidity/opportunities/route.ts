@@ -30,6 +30,10 @@ export interface LPOpportunity {
     volume: number;      // out of 45
     depth: number;       // out of 20 (two-sidedness / balance)
   };
+  endDate?: string;
+  daysToResolve: number | null;  // days until market resolves
+  spreadVol: number;             // 24h spread/price volatility proxy (%)
+  risk: 'Low' | 'Medium' | 'High';
 }
 
 interface ClobBook {
@@ -145,6 +149,25 @@ export async function GET() {
       const depthPts   = Math.round(20 * balanceScore);
       const score = spreadPts + volumePts + depthPts;
 
+      // Risk metrics ─────────────────────────────────────────────
+      const endDate = m.endDate ?? m.endDateIso ?? undefined;
+      const daysToResolve = endDate
+        ? Math.max(0, Math.ceil((new Date(endDate).getTime() - Date.now()) / 86_400_000))
+        : null;
+      // No historical spread is published, so approximate spread volatility from
+      // the 24h price move relative to the mid — bigger swings ⇒ less stable book.
+      const odc = Math.abs(Number(m.oneDayPriceChange ?? 0));
+      const spreadVol = mid > 0 ? Math.min(100, (odc / mid) * 100) : 0;
+
+      let riskPts = 0;
+      if (daysToResolve != null) {
+        if (daysToResolve < 5) riskPts += 2;
+        else if (daysToResolve < 14) riskPts += 1;
+      }
+      if (spreadVol > 30) riskPts += 2;
+      else if (spreadVol > 10) riskPts += 1;
+      const risk: 'Low' | 'Medium' | 'High' = riskPts >= 3 ? 'High' : riskPts >= 1 ? 'Medium' : 'Low';
+
       return {
         conditionId: m.conditionId ?? m.id ?? '',
         question: m.question ?? 'Unknown',
@@ -165,6 +188,10 @@ export async function GET() {
         estDailyFee,
         score,
         scoreBreakdown: { spread: spreadPts, volume: volumePts, depth: depthPts },
+        endDate,
+        daysToResolve,
+        spreadVol,
+        risk,
       };
     });
 
