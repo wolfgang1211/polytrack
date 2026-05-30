@@ -5,7 +5,7 @@ interface LogoProps {
 }
 
 /**
- * PolyTrack mark — a glassy rounded tile holding three rising candlestick bars
+ * AlphaBoard mark — a glassy rounded tile holding three rising candlestick bars
  * with an upward arrow accent. Reads as "markets + momentum" at any size.
  * Inline SVG so it stays crisp and needs no network request.
  */
@@ -18,7 +18,7 @@ export default function Logo({ size = 36, className }: LogoProps) {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
-      aria-label="PolyTrack"
+      aria-label="AlphaBoard"
     >
       <defs>
         <linearGradient id="ptTile" x1="0" y1="0" x2="1" y2="1">
