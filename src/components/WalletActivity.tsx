@@ -46,12 +46,12 @@ function Panel({ accent, title, sub, children }: {
   accent: string; title: string; sub: string; children: React.ReactNode;
 }) {
   return (
-    <div className="glass rounded-2xl p-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-      <div className="mb-4 flex items-start gap-2.5">
-        <span className="mt-1 h-2 w-2 flex-shrink-0 rounded-full" style={{ background: accent }} />
+    <div className="glass rounded-2xl p-3.5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="mb-2.5 flex items-start gap-2">
+        <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: accent }} />
         <div>
-          <h3 className="text-sm font-black text-white">{title}</h3>
-          <p className="text-[11px] text-white/35 mt-0.5 leading-relaxed">{sub}</p>
+          <h3 className="text-xs font-black text-white">{title}</h3>
+          <p className="text-[10px] text-white/35 mt-0.5 leading-snug">{sub}</p>
         </div>
       </div>
       {children}
@@ -171,19 +171,19 @@ export default function WalletActivity({ address, positions }: { address: string
   if (trades.length === 0) return null;
 
   return (
-    <div className="animate-fade-in-up flex flex-col gap-4" style={{ animationDelay: '180ms' }}>
+    <div className="animate-fade-in-up flex flex-col gap-2.5" style={{ animationDelay: '180ms' }}>
       <div className="flex items-center gap-2">
         <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
         <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Behaviour &amp; Activity</h2>
         <span className="text-[10px] text-white/25">{trades.length} trades analyzed</span>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-2.5 lg:grid-cols-2">
 
         {/* 1 — Trades by hour */}
         <Panel accent="#60a5fa" title="Trades by Hour"
           sub={peakHour ? `Most active around ${peakHour.label} (local time)` : 'Trade count per hour of day'}>
-          <div className="h-52">
+          <div className="h-44">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byHour} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -206,9 +206,9 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#34d399" title="Win Rate by Category"
           sub="Profitable position share per market category (min 3 positions)">
           {byCategory.length === 0 ? (
-            <p className="flex h-52 items-center justify-center text-sm text-white/25">Not enough data per category</p>
+            <p className="flex h-44 items-center justify-center text-sm text-white/25">Not enough data per category</p>
           ) : (
-            <div className="h-52">
+            <div className="h-44">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCategory} layout="vertical" margin={{ top: 4, right: 28, left: 8, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
@@ -231,23 +231,23 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#a78bfa" title="Avg Hold Time"
           sub="How long positions are held from first buy to last sell (closed round-trips)">
           {!holdStats ? (
-            <p className="flex h-52 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
+            <p className="flex h-44 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
           ) : (
-            <div className="flex h-52 flex-col justify-center gap-4">
+            <div className="flex h-44 flex-col justify-center gap-3">
               <div className="text-center">
-                <p className="text-5xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
-                <p className="mt-1 text-[11px] text-white/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
+                <p className="text-3xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
+                <p className="mt-0.5 text-[10px] text-white/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 {[
                   { label: 'Median', value: fmtDuration(holdStats.median), color: '#a78bfa' },
                   { label: 'Shortest', value: fmtDuration(holdStats.shortest), color: '#34d399' },
                   { label: 'Longest', value: fmtDuration(holdStats.longest), color: '#fb7185' },
                 ].map(s => (
-                  <div key={s.label} className="rounded-xl px-3 py-2 text-center"
+                  <div key={s.label} className="rounded-lg px-2 py-1.5 text-center"
                     style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                    <p className="text-sm font-black" style={{ color: s.color }}>{s.value}</p>
-                    <p className="text-[9px] text-white/30 uppercase tracking-wider mt-0.5">{s.label}</p>
+                    <p className="text-xs font-black" style={{ color: s.color }}>{s.value}</p>
+                    <p className="text-[8px] text-white/30 uppercase tracking-wider mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -259,30 +259,30 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#fbbf24" title="Outcome Bias"
           sub="Yes vs No share of buy orders — does this wallet lean optimistic or contrarian?">
           {bias.totalN === 0 ? (
-            <p className="flex h-52 items-center justify-center text-sm text-white/25">No buy orders found</p>
+            <p className="flex h-44 items-center justify-center text-sm text-white/25">No buy orders found</p>
           ) : (
-            <div className="flex h-52 flex-col justify-center gap-5">
+            <div className="flex h-44 flex-col justify-center gap-3.5">
               {/* split bar */}
               <div>
-                <div className="mb-2 flex justify-between text-xs font-black">
+                <div className="mb-1.5 flex justify-between text-[11px] font-black">
                   <span className="text-emerald-400">YES {bias.yesPct.toFixed(0)}%</span>
                   <span className="text-rose-400">NO {(100 - bias.yesPct).toFixed(0)}%</span>
                 </div>
-                <div className="flex h-6 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div className="flex h-5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
                   <div style={{ width: `${bias.yesPct}%`, background: 'linear-gradient(90deg,#10b981,#34d399)' }} />
                   <div style={{ width: `${100 - bias.yesPct}%`, background: 'linear-gradient(90deg,#fb7185,#f43f5e)' }} />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
-                  <p className="text-[10px] uppercase tracking-wider text-emerald-300/70">Yes buys</p>
-                  <p className="text-lg font-black text-emerald-300">{bias.yesN}</p>
-                  <p className="text-[10px] text-white/30">{formatCurrency(bias.yesUsd, true)}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                  <p className="text-[9px] uppercase tracking-wider text-emerald-300/70">Yes buys</p>
+                  <p className="text-base font-black text-emerald-300">{bias.yesN}</p>
+                  <p className="text-[9px] text-white/30">{formatCurrency(bias.yesUsd, true)}</p>
                 </div>
-                <div className="rounded-xl px-4 py-3" style={{ background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
-                  <p className="text-[10px] uppercase tracking-wider text-rose-300/70">No buys</p>
-                  <p className="text-lg font-black text-rose-300">{bias.noN}</p>
-                  <p className="text-[10px] text-white/30">{formatCurrency(bias.noUsd, true)}</p>
+                <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
+                  <p className="text-[9px] uppercase tracking-wider text-rose-300/70">No buys</p>
+                  <p className="text-base font-black text-rose-300">{bias.noN}</p>
+                  <p className="text-[9px] text-white/30">{formatCurrency(bias.noUsd, true)}</p>
                 </div>
               </div>
             </div>
@@ -294,17 +294,17 @@ export default function WalletActivity({ address, positions }: { address: string
       <Panel accent="#f472b6" title="Activity Heatmap"
         sub="Weekly trading rhythm — darker cells mean more trades in that day/hour slot (local time)">
         <div className="overflow-x-auto">
-          <div className="min-w-[640px]">
+          <div className="min-w-[480px]">
             {/* hour axis */}
-            <div className="mb-1 flex pl-9">
+            <div className="mb-1 flex pl-7">
               {HOURS.map(h => (
                 <div key={h} className="flex-1 text-center text-[8px] text-white/25">{h % 3 === 0 ? h : ''}</div>
               ))}
             </div>
             {heat.grid.map((row, ri) => (
               <div key={ri} className="mb-0.5 flex items-center">
-                <span className="w-9 text-[9px] font-semibold uppercase text-white/35">{DAY_LABELS[ri]}</span>
-                <div className="flex flex-1 gap-0.5">
+                <span className="w-7 text-[8px] font-semibold uppercase text-white/35">{DAY_LABELS[ri]}</span>
+                <div className="flex flex-1 gap-px">
                   {row.map((c, ci) => {
                     const intensity = heat.max > 0 ? c / heat.max : 0;
                     return (

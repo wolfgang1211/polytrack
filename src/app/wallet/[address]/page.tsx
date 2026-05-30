@@ -110,7 +110,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   return (
     <>
     {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5">
 
       {/* Back */}
       <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors w-fit animate-fade-in">
