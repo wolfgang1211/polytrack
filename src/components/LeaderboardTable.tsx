@@ -7,6 +7,7 @@ import { formatCurrency, formatAddress, computeSmartScores, scoreTier } from '@/
 import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
 import { useWatchlist } from '@/lib/useWatchlist';
+import Sparkline from './Sparkline';
 
 type LbSortField = 'pnl' | 'vol' | 'rank' | 'score';
 
@@ -29,7 +30,11 @@ interface Props {
   error: string | null;
   window: TimeWindow;
   onWindowChange: (w: TimeWindow) => void;
+  sparklines?: Record<string, number[]>;
+  flashKeys?: Set<string>;
 }
+
+const GRID = 'grid-cols-[40px_1fr_96px_104px_92px_84px_56px]';
 
 function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
   return (
@@ -39,7 +44,7 @@ function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
   );
 }
 
-export default function LeaderboardTable({ data, loading, error, window, onWindowChange }: Props) {
+export default function LeaderboardTable({ data, loading, error, window, onWindowChange, sparklines, flashKeys }: Props) {
   const [sortField, setSortField] = useState<LbSortField>('pnl');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [search, setSearch] = useState('');
@@ -134,14 +139,15 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
       {/* Table */}
       <div className="rounded-2xl overflow-x-auto" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="min-w-[660px]">
+        <div className="min-w-[720px]">
         {/* Header */}
-        <div className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] glass-strong px-4 py-3"
+        <div className={`grid ${GRID} glass-strong px-4 py-2.5`}
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
-            Rank<SortArrow active={sortField==='rank'} order={sortOrder} />
+            #<SortArrow active={sortField==='rank'} order={sortOrder} />
           </button>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Trader</span>
+          <span className="text-center text-[10px] font-semibold uppercase tracking-widest text-white/30">7d</span>
           <button onClick={() => handleSort('pnl')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30 hover:text-white/60 transition-colors">
             P&amp;L<SortArrow active={sortField==='pnl'} order={sortOrder} />
           </button>
@@ -187,9 +193,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         {/* Rows */}
         <div>
           {loading && Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] px-4 py-3.5"
+            <div key={i} className={`grid ${GRID} px-4 py-2.5`}
               style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-              <SkeletonRow cols={6} />
+              <SkeletonRow cols={7} />
             </div>
           ))}
 
@@ -212,6 +218,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             const isTop3 = rank <= 3;
             const score = scores.get(entry) ?? 0;
             const tier = scoreTier(score);
+            const spark = sparklines?.[entry.proxyWallet.toLowerCase()] ?? sparklines?.[entry.proxyWallet];
+            const flashing = flashKeys?.has(entry.proxyWallet.toLowerCase());
 
             return (
               <Link
@@ -221,8 +229,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                 style={{ animationDelay: `${idx * 25}ms` }}
               >
                 <div
-                  className="grid grid-cols-[56px_1fr_120px_120px_104px_72px] px-4 py-3.5 transition-all duration-200
-                    hover:bg-white/[0.03] cursor-pointer"
+                  className={`grid ${GRID} px-4 py-2 items-center transition-all duration-200
+                    hover:bg-white/[0.03] cursor-pointer ${flashing ? 'animate-flash' : ''}`}
                   style={{
                     borderBottom: '1px solid rgba(255,255,255,0.04)',
                     borderLeft: isTop3 ? `2px solid ${rs.ring}` : '2px solid transparent',
@@ -243,9 +251,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     <div className="relative flex-shrink-0">
                       {entry.profileImage ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={entry.profileImage} alt="" className="h-9 w-9 rounded-full object-cover" style={{ boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.1)' }} />
+                        <img src={entry.profileImage} alt="" className="h-8 w-8 rounded-full object-cover" style={{ boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.1)' }} />
                       ) : (
-                        <div className="h-9 w-9 rounded-full flex items-center justify-center text-xs font-black text-white"
+                        <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black text-white"
                           style={{ background: `linear-gradient(135deg, #7c3aed, #2563eb)`, boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}, 0 0 16px ${rs.bg}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
                           {displayName[0]?.toUpperCase()}
                         </div>
@@ -266,16 +274,22 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     </div>
                   </div>
 
+                  {/* 7d sparkline */}
+                  <div className="flex items-center justify-center">
+                    <Sparkline data={spark} width={88} height={26} />
+                  </div>
+
                   {/* PnL */}
                   <div className="flex items-center justify-end">
-                    <span className={`text-sm font-black ${entry.pnl >= 0 ? 'text-grad-profit' : 'text-grad-loss'}`}>
+                    <span className={`rounded-md px-1.5 py-0.5 text-xs font-black tabular-nums ${entry.pnl >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}
+                      style={{ background: entry.pnl >= 0 ? 'rgba(16,185,129,0.10)' : 'rgba(244,63,94,0.10)' }}>
                       {entry.pnl >= 0 ? '+' : ''}{formatCurrency(entry.pnl, true)}
                     </span>
                   </div>
 
                   {/* Volume */}
                   <div className="flex items-center justify-end">
-                    <span className="text-sm font-semibold text-white/40">
+                    <span className="text-xs font-semibold text-white/40 tabular-nums">
                       {formatCurrency(entry.vol, true)}
                     </span>
                   </div>
@@ -292,7 +306,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     <button
                       onClick={e => { e.preventDefault(); toggle(entry.proxyWallet, entry.userName || undefined); }}
                       title={isWatched(entry.proxyWallet) ? 'Remove from Watchlist' : 'Add to Watchlist'}
-                      className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 hover:scale-110
+                      className={`flex h-6 w-6 items-center justify-center rounded-lg transition-all duration-200 hover:scale-110
                         ${isWatched(entry.proxyWallet)
                           ? 'opacity-100'
                           : 'opacity-0 group-hover:opacity-100'}`}
@@ -311,7 +325,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       target="_blank"
                       rel="noopener noreferrer"
                       title="Open on Polymarket"
-                      className="flex h-7 w-7 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                      className="flex h-6 w-6 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                       style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
                     >
                       <svg className="h-3 w-3 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
