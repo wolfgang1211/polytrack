@@ -27,6 +27,17 @@ function vol24h(m: TopMarket): number {
   return isNaN(v) ? 0 : v;
 }
 
+/** Drop resolved/closed markets: YES price pinned at 0¢ or 100¢, or end date past. */
+function isLive(m: TopMarket): boolean {
+  const p = yesPrice(m);
+  if (p != null && (p <= 0.005 || p >= 0.995)) return false;
+  if (m.endDate) {
+    const end = new Date(m.endDate).getTime();
+    if (!isNaN(end) && end < Date.now()) return false;
+  }
+  return true;
+}
+
 function MarketCard({ market, index }: { market: TopMarket; index: number }) {
   const price = yesPrice(market);
   const volume = vol24h(market);
@@ -95,7 +106,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarket
   useEffect(() => {
     fetch('/api/markets/top')
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setMarkets(d); })
+      .then(d => { if (Array.isArray(d)) setMarkets(d.filter(isLive)); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
