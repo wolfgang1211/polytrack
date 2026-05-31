@@ -12,7 +12,8 @@ export default function SmartMoneyCard() {
   const [rows, setRows] = useState<LbEntry[] | null>(null);
 
   useEffect(() => {
-    fetch('/api/leaderboard?window=1w&limit=4')
+    // All-time elite — distinct from "Rising Traders" (this week's movers)
+    fetch('/api/leaderboard?window=allTime&limit=4')
       .then(r => r.json())
       .then(d => { if (Array.isArray(d)) setRows(d.slice(0, 4)); })
       .catch(() => {});
@@ -25,6 +26,8 @@ export default function SmartMoneyCard() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           <span className="text-xs font-bold text-white/80">Smart Money</span>
+          <span className="rounded px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-white/40"
+            style={{ background: 'rgba(255,255,255,0.06)' }}>All-Time</span>
         </div>
         <Link href="/leaderboard"
           className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-300 transition-colors hover:text-violet-200"
