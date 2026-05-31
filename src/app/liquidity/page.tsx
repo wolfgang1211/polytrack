@@ -180,7 +180,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all hover:scale-[1.03] hover:brightness-110"
-          style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.6),rgba(37,99,235,0.6))', border: '1px solid rgba(139,92,246,0.4)' }}
+          style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.6),rgba(147,51,234,0.6))', border: '1px solid rgba(139,92,246,0.4)' }}
         >
           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -298,7 +298,7 @@ function LPLeaderboardSection() {
               <span className="font-mono text-xs text-white/25">#{i + 1}</span>
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-black text-white flex-shrink-0"
-                  style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)' }}>
+                  style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)' }}>
                   {(t.userName || t.proxyWallet)?.[0]?.toUpperCase()}
                 </div>
                 <div className="min-w-0">
@@ -726,7 +726,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
                   ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
                 {win === w.key && (
                   <span className="absolute inset-0 rounded-lg"
-                    style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(37,99,235,0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
+                    style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(147,51,234,0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
                 )}
                 <span className="relative">{w.label}</span>
               </button>
@@ -1129,7 +1129,7 @@ export default function LiquidityPage() {
       <div className="animate-fade-in-up">
         <div className="flex items-center gap-2 mb-4">
           <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Market Making</span>
         </div>
         <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl">

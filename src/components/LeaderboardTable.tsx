@@ -94,7 +94,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             >
               {window === tw.value && (
                 <span className="absolute inset-0 rounded-xl"
-                  style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.6), rgba(37,99,235,0.6))', border: '1px solid rgba(139,92,246,0.4)' }} />
+                  style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.6), rgba(147,51,234,0.6))', border: '1px solid rgba(139,92,246,0.4)' }} />
               )}
               <span className="relative">{tw.label}</span>
             </button>
@@ -254,13 +254,13 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                         <img src={entry.profileImage} alt="" className="h-8 w-8 rounded-full object-cover" style={{ boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.1)' }} />
                       ) : (
                         <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black text-white"
-                          style={{ background: `linear-gradient(135deg, #7c3aed, #2563eb)`, boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}, 0 0 16px ${rs.bg}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
+                          style={{ background: `linear-gradient(135deg, #7c3aed, #9333ea)`, boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}, 0 0 16px ${rs.bg}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
                           {displayName[0]?.toUpperCase()}
                         </div>
                       )}
                       {entry.verifiedBadge && (
                         <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[7px]"
-                          style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
+                          style={{ background: 'linear-gradient(135deg, #9333ea, #7c3aed)' }}>
                           ✓
                         </span>
                       )}
@@ -329,27 +329,4 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
                     >
                       <svg className="h-3 w-3 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Footer */}
-        {!loading && sorted.length > 0 && (
-          <div className="px-4 py-3 flex items-center justify-between glass-strong"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <span className="text-[10px] text-white/20">{sorted.length} traders</span>
-            <span className="text-[10px] text-white/15">data-api.polymarket.com</span>
-          </div>
-        )}
-        </div>
-      </div>
-    </div>
-  );
-}
+                        <path strokeL

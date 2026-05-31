@@ -50,7 +50,7 @@ export default function LeaderboardPage() {
       <div className="animate-fade-in-up">
         <div className="flex items-center gap-2 mb-4">
           <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket</span>
         </div>
 

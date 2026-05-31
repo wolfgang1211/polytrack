@@ -5,7 +5,7 @@ export default function LoadingSpinner({ text = 'Loading…' }: { text?: string 
         <div className="absolute inset-0 rounded-full animate-spin"
           style={{ border: '2px solid transparent', borderTopColor: '#7c3aed', borderRightColor: 'rgba(124,58,237,0.3)' }} />
         <div className="absolute inset-2 rounded-full animate-spin"
-          style={{ border: '2px solid transparent', borderTopColor: '#2563eb', animationDirection: 'reverse', animationDuration: '0.7s' }} />
+          style={{ border: '2px solid transparent', borderTopColor: '#9333ea', animationDirection: 'reverse', animationDuration: '0.7s' }} />
       </div>
       <p className="text-sm text-white/30 tracking-wide">{text}</p>
     </div>

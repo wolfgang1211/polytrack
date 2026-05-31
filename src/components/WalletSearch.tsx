@@ -29,7 +29,7 @@ export default function WalletSearch({ compact }: Props) {
       <div className="relative">
         {focused && (
           <div className="absolute inset-0 rounded-xl pointer-events-none"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(37,99,235,0.3))', filter:'blur(8px)', transform:'scale(1.03)' }} />
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(147,51,234,0.3))', filter:'blur(8px)', transform:'scale(1.03)' }} />
         )}
         <div className={`relative flex items-center rounded-xl transition-all duration-200 glass ${error ? '' : ''}`}
           style={{ border: `1px solid ${error ? 'rgba(244,63,94,0.4)' : focused ? 'rgba(139,92,246,0.4)' : 'rgba(255,255,255,0.07)'}` }}>
@@ -58,7 +58,7 @@ export default function WalletSearch({ compact }: Props) {
         <button
           type="submit"
           className="relative w-full overflow-hidden rounded-xl py-2.5 text-xs font-bold text-white transition-all duration-200 hover:scale-[1.01] active:scale-[0.99]"
-          style={{ background: 'linear-gradient(135deg, #7c3aed, #2563eb)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
+          style={{ background: 'linear-gradient(135deg, #7c3aed, #9333ea)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}
         >
           <span className="relative">Track Wallet →</span>
         </button>

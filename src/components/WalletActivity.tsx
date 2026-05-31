@@ -173,7 +173,7 @@ export default function WalletActivity({ address, positions }: { address: string
   return (
     <div className="animate-fade-in-up flex flex-col gap-2.5" style={{ animationDelay: '180ms' }}>
       <div className="flex items-center gap-2">
-        <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+        <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
         <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Behaviour &amp; Activity</h2>
         <span className="text-[10px] text-white/25">{trades.length} trades analyzed</span>
       </div>

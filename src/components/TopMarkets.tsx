@@ -55,7 +55,7 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
           />
         ) : (
           <div className="h-9 w-9 rounded-xl flex-shrink-0 flex items-center justify-center text-sm"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(37,99,235,0.3))', border:'1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(147,51,234,0.3))', border:'1px solid rgba(139,92,246,0.2)' }}>
             📈
           </div>
         )}
@@ -99,7 +99,7 @@ export default function TopMarkets() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Top Markets</h2>
         </div>
         <span className="text-[10px] text-white/25 uppercase tracking-widest">24h Volume</span>

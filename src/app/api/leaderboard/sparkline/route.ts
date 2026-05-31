@@ -9,7 +9,7 @@ const HEADERS = {
 const TRADES_PER_WALLET = 80;
 const POINTS = 20;
 
-interface Trade { side?: string; usdcSize?: number; size?: number; price?: number; timestamp?: number; createdAt?: number }
+interface Trade { side?: string; asset?: string; usdcSize?: number; size?: number; price?: number; timestamp?: number; createdAt?: number }
 
 function tsOf(t: Trade): number { return Number(t.timestamp ?? t.createdAt ?? 0); }
 function usdOf(t: Trade): number {
@@ -17,9 +17,10 @@ function usdOf(t: Trade): number {
   return u > 0 ? u : Number(t.size ?? 0) * Number(t.price ?? 0);
 }
 
-/** Coarse cumulative-cashflow curve from a wallet's most recent fills — just
- *  enough shape for a row sparkline (sells add, buys subtract). Kept cheap:
- *  one capped request per wallet, run in parallel, short cache. */
+/** Coarse cumulative *realized P&L* curve from a wallet's most recent fills —
+ *  same per-asset cost-basis replay as the wallet timeline, so a profitable
+ *  trader's spark trends up (not just raw cashflow). Kept cheap: one capped
+ *  request per wallet, run in parallel, short cache. */
 async function sparkFor(wallet: string): Promise<number[]> {
   try {
     const res = await fetch(
@@ -32,13 +33,29 @@ async function sparkFor(wallet: string): Promise<number[]> {
     if (!trades.length) return [];
     trades.sort((a, b) => tsOf(a) - tsOf(b));
 
-    let run = 0;
+    // per-asset average cost basis; realize P&L on sells
+    const book = new Map<string, { shares: number; cost: number }>();
+    let realized = 0;
     const series: number[] = [];
     for (const t of trades) {
+      const asset = String(t.asset ?? '');
       const usd = usdOf(t);
-      run += String(t.side ?? '').toUpperCase() === 'SELL' ? usd : -usd;
-      series.push(run);
+      const shares = Number(t.size ?? 0);
+      if (!asset || shares <= 0) continue;
+      const pos = book.get(asset) ?? { shares: 0, cost: 0 };
+      if (String(t.side ?? '').toUpperCase() === 'SELL') {
+        const sell = Math.min(shares, pos.shares);
+        const avg = pos.shares > 0 ? pos.cost / pos.shares : 0;
+        realized += usd - avg * sell;
+        pos.shares -= sell; pos.cost -= avg * sell;
+        if (pos.shares < 1e-9) { pos.shares = 0; pos.cost = 0; }
+      } else {
+        pos.shares += shares; pos.cost += usd;
+      }
+      book.set(asset, pos);
+      series.push(Math.round(realized * 100) / 100);
     }
+    if (!series.length) return [];
     // downsample to POINTS
     if (series.length <= POINTS) return series;
     const step = series.length / POINTS;

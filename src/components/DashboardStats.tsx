@@ -69,7 +69,7 @@ export default function DashboardStats() {
         label="Active Markets"
         value={loading ? '—' : `${stats?.activeMarkets ?? 0}+`}
         loading={loading}
-        gradient="rgba(37,99,235,0.18)"
+        gradient="rgba(147,51,234,0.18)"
         icon={
           <svg style={{ width: 16, height: 16 }} className="text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

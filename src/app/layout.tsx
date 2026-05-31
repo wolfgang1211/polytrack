@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div
             className="absolute -bottom-[35%] -right-[15%] w-[65vw] h-[65vh] rounded-full animate-glow-pulse"
             style={{
-              background: 'radial-gradient(ellipse at center, rgba(37,99,235,0.14) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse at center, rgba(147,51,234,0.14) 0%, transparent 70%)',
               filter: 'blur(80px)',
               animationDelay: '2s',
             }}
@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div
             className="absolute top-[40%] left-[55%] w-[40vw] h-[40vh] rounded-full animate-glow-pulse"
             style={{
-              background: 'radial-gradient(ellipse at center, rgba(6,182,212,0.08) 0%, transparent 70%)',
+              background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.08) 0%, transparent 70%)',
               filter: 'blur(70px)',
               animationDelay: '1s',
             }}

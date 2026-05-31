@@ -118,7 +118,7 @@ export default function WatchlistPage() {
             >
               {/* Avatar */}
               <div className="flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center text-sm font-black text-white"
-                style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', boxShadow: '0 0 0 1px rgba(139,92,246,0.3)' }}>
+                style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)', boxShadow: '0 0 0 1px rgba(139,92,246,0.3)' }}>
                 {(w.label?.[0] ?? w.address[2])?.toUpperCase()}
               </div>
 

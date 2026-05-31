@@ -139,7 +139,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Hero header ── */}
           <div className="animate-fade-in-up relative overflow-hidden rounded-3xl p-6 sm:p-8"
             style={{
-              background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(37,99,235,0.08) 50%, rgba(6,182,212,0.06) 100%)',
+              background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(147,51,234,0.08) 50%, rgba(168,85,247,0.06) 100%)',
               border: '1px solid rgba(255,255,255,0.08)',
             }}>
             {/* glow behind avatar */}
@@ -160,13 +160,13 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                 <div className="relative flex-shrink-0">
                   <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
                     style={{
-                      background: 'linear-gradient(135deg, #7c3aed, #2563eb)',
+                      background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
                       boxShadow: '0 0 0 2px rgba(139,92,246,0.4), 0 0 40px rgba(124,58,237,0.35)',
                     }}>
                     {short[0]?.toUpperCase()}
                   </div>
                   <div className="absolute -inset-1 rounded-2xl pointer-events-none animate-glow-pulse"
-                    style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(37,99,235,0.2))', filter:'blur(8px)', zIndex:-1 }} />
+                    style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.2))', filter:'blur(8px)', zIndex:-1 }} />
                 </div>
 
                 <div>
@@ -269,7 +269,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               label="Total Pos."
               value={String(all.length)}
               sub={data?.truncated ? `${all.length}+ (capped)` : 'all time'}
-              gradient="rgba(6,182,212,0.15)"
+              gradient="rgba(168,85,247,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
             />
@@ -371,7 +371,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   >
                     {tab === t && (
                       <span className="absolute inset-0 rounded-xl"
-                        style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(37,99,235,0.55))', border:'1px solid rgba(139,92,246,0.4)' }} />
+                        style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(147,51,234,0.55))', border:'1px solid rgba(139,92,246,0.4)' }} />
                     )}
                     <span className="relative">
                       {t === 'open' ? `Open (${open.length})` : `Closed (${closed.length})`}

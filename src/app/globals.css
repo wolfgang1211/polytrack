@@ -168,7 +168,7 @@
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, #7c3aed, #2563eb, #06b6d4);
+  background: linear-gradient(135deg, #7c3aed, #9333ea, #a855f7);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -180,7 +180,7 @@
 
 /* ─── Gradient text helpers ─────────────────────────────── */
 
-.text-grad          { background: linear-gradient(135deg,#a78bfa,#38bdf8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.text-grad          { background: linear-gradient(135deg,#c4b5fd,#a855f7); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .text-grad-gold     { background: linear-gradient(135deg,#fbbf24,#f59e0b,#d97706); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .text-grad-silver   { background: linear-gradient(135deg,#e2e8f0,#94a3b8,#64748b); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .text-grad-bronze   { background: linear-gradient(135deg,#fb923c,#ea580c,#c2410c); -webkit-background-clip:text; background-clip:text; color:transparent; }

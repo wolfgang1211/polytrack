@@ -46,7 +46,7 @@ function TradeRow({ trade, fresh }: { trade: RecentTrade; fresh: boolean }) {
           style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.08)' }} />
       ) : (
         <span className="h-7 w-7 flex-shrink-0 rounded-lg"
-          style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.4),rgba(37,99,235,0.4))' }} />
+          style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.4),rgba(147,51,234,0.4))' }} />
       )}
 
       {/* BUY / SELL */}
@@ -130,42 +130,5 @@ export default function RecentBigTrades() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Live Activity <span className="normal-case text-white/30 font-normal">{belowThreshold ? 'top recent' : '$1K+'}</span></h2>
-          <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
-            style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.2)' }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            Live
-          </span>
-        </div>
-        {lastUpdate && (
-          <span className="text-[10px] text-white/20">
-            {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        )}
-      </div>
-
-      <div className="glass rounded-2xl px-2 py-1.5 flex-1">
-        {loading ? (
-          <div className="flex flex-col gap-2 py-2">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="h-9 rounded-lg animate-shimmer" />
-            ))}
-          </div>
-        ) : trades.length === 0 ? (
-          <div className="py-10 text-center">
-            <p className="text-2xl mb-2">📭</p>
-            <p className="text-xs text-white/25">No recent trades available</p>
-          </div>
-        ) : (
-          <div className="max-h-[380px] overflow-y-auto pr-0.5">
-            {trades.map((t, i) => {
-              const k = keyOf(t, i);
-              return <TradeRow key={k} trade={t} fresh={freshIds.has(k)} />;
-            })}
-          </div>
-        )}
-      </div>
-    </section>
-  );
-}
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
+          <h2 

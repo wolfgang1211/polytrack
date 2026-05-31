@@ -97,7 +97,7 @@ export default function HomeLeaderboard() {
       <div className="mb-4 flex items-end justify-between">
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Trader Leaderboard</h2>
           <span className="flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.10)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399' }}>

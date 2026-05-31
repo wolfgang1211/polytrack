@@ -83,7 +83,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
             onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         ) : (
           <div className="h-10 w-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(37,99,235,0.25))', border: '1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.25))', border: '1px solid rgba(139,92,246,0.2)' }}>
             📈
           </div>
         )}
@@ -191,7 +191,7 @@ export default function MarketsPage() {
       <div className="animate-fade-in-up">
         <div className="flex items-center gap-2 mb-3">
           <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket · Live</span>
         </div>
         <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl">

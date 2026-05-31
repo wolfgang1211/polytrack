@@ -104,7 +104,7 @@ export default function LatestMoves({ address }: { address: string }) {
     <div className="animate-fade-in-up" style={{ animationDelay: '160ms' }}>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#2563eb)' }} />
+          <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Latest Moves</h2>
           <span className="rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
             style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>

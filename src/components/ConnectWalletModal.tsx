@@ -77,7 +77,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
           <button
             type="submit"
             className="w-full rounded-xl py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#2563eb)', boxShadow: '0 4px 24px rgba(124,58,237,0.4)' }}
+            style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)', boxShadow: '0 4px 24px rgba(124,58,237,0.4)' }}
           >
             View Wallet
           </button>
