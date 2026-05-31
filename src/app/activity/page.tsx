@@ -5,7 +5,7 @@ import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 
-const REFRESH_MS = 2_000;
+const REFRESH_MS = 1_000;
 
 /* ── helpers ──────────────────────────────────────────── */
 function tsOf(t: RecentTrade): number { return Number(t.timestamp ?? t.createdAt ?? 0); }
