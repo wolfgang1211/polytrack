@@ -11,6 +11,7 @@ import { isValidAddress } from '@/lib/utils';
 const NAV_LINKS = [
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/markets',     label: 'Markets'     },
+  { href: '/activity',    label: 'Activity'    },
   { href: '/liquidity',   label: 'Liquidity'   },
   { href: '/insights',    label: 'Insights'    },
 ];
