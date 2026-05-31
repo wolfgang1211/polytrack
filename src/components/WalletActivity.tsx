@@ -183,7 +183,7 @@ export default function WalletActivity({ address, positions }: { address: string
         {/* 1 — Trades by hour */}
         <Panel accent="#60a5fa" title="Trades by Hour"
           sub={peakHour ? `Most active around ${peakHour.label} (local time)` : 'Trade count per hour of day'}>
-          <div className="h-44">
+          <div className="h-36">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byHour} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
@@ -206,9 +206,9 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#34d399" title="Win Rate by Category"
           sub="Profitable position share per market category (min 3 positions)">
           {byCategory.length === 0 ? (
-            <p className="flex h-44 items-center justify-center text-sm text-white/25">Not enough data per category</p>
+            <p className="flex h-36 items-center justify-center text-sm text-white/25">Not enough data per category</p>
           ) : (
-            <div className="h-44">
+            <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCategory} layout="vertical" margin={{ top: 4, right: 28, left: 8, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
@@ -231,11 +231,11 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#a78bfa" title="Avg Hold Time"
           sub="How long positions are held from first buy to last sell (closed round-trips)">
           {!holdStats ? (
-            <p className="flex h-44 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
           ) : (
-            <div className="flex h-44 flex-col justify-center gap-3">
+            <div className="flex h-36 flex-col justify-center gap-3">
               <div className="text-center">
-                <p className="text-3xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
+                <p className="text-2xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
                 <p className="mt-0.5 text-[10px] text-white/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
               </div>
               <div className="grid grid-cols-3 gap-1.5">
@@ -259,9 +259,9 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#fbbf24" title="Outcome Bias"
           sub="Yes vs No share of buy orders — does this wallet lean optimistic or contrarian?">
           {bias.totalN === 0 ? (
-            <p className="flex h-44 items-center justify-center text-sm text-white/25">No buy orders found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-white/25">No buy orders found</p>
           ) : (
-            <div className="flex h-44 flex-col justify-center gap-3.5">
+            <div className="flex h-36 flex-col justify-center gap-3.5">
               {/* split bar */}
               <div>
                 <div className="mb-1.5 flex justify-between text-[11px] font-black">

@@ -80,7 +80,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
 
         {/* P&L by category */}
         <ChartCard title="P&L by Category">
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={168}>
             <BarChart data={catData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
               <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} axisLine={false} tickLine={false}
@@ -98,7 +98,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
         {/* Realized vs unrealized */}
         <ChartCard title="Realized vs Unrealized">
           {splitData.length > 0 ? (
-            <ResponsiveContainer width="100%" height={200}>
+            <ResponsiveContainer width="100%" height={168}>
               <PieChart>
                 <Pie
                   data={splitData.map(d => ({ ...d, value: Math.abs(d.value) }))}
@@ -115,7 +115,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[200px] items-center justify-center text-xs text-white/25">No data</div>
+            <div className="flex h-[168px] items-center justify-center text-xs text-white/25">No data</div>
           )}
           <div className="mt-2 flex justify-center gap-4">
             {splitData.map(d => (
