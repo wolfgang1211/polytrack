@@ -34,7 +34,7 @@ export default function DashboardPage() {
               <span className="text-grad">Sharpest Money Moves</span>
             </h1>
             <p className="mt-4 max-w-lg text-base font-medium text-white/45 sm:text-lg">
-              Discover, follow and copy the most profitable traders on Polymarket — in real time.
+              Discover, follow and copy the most profitable traders on Polymarket in real time.
             </p>
           </div>
 
