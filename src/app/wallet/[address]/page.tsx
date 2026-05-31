@@ -13,6 +13,8 @@ import { useWatchlist } from '@/lib/useWatchlist';
 import WalletCharts from '@/components/WalletCharts';
 import LatestMoves from '@/components/LatestMoves';
 import WalletActivity from '@/components/WalletActivity';
+import PnlTimeline from '@/components/PnlTimeline';
+import WalletSidebar from '@/components/WalletSidebar';
 
 type Tab = 'open' | 'closed';
 
@@ -337,14 +339,29 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             </div>
           )}
 
-          {/* ── Performance charts ── */}
-          <WalletCharts positions={all} />
+          {/* ── Two-column: sidebar + main panel ── */}
+          <div className="grid gap-4 lg:grid-cols-[300px_1fr] items-start">
+            {/* Left sidebar */}
+            <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+              <WalletSidebar address={address} positions={all} openValue={openVal} />
+            </div>
 
-          {/* ── Behaviour & activity analytics ── */}
-          <WalletActivity address={address} positions={all} />
+            {/* Main panel */}
+            <div className="flex min-w-0 flex-col gap-4">
+              <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
+                <PnlTimeline address={address} />
+              </div>
 
-          {/* ── Latest moves (copy-trade signal) ── */}
-          <LatestMoves address={address} />
+              {/* Performance charts */}
+              <WalletCharts positions={all} />
+
+              {/* Behaviour & activity analytics */}
+              <WalletActivity address={address} positions={all} />
+
+              {/* Latest moves (copy-trade signal) */}
+              <LatestMoves address={address} />
+            </div>
+          </div>
 
           {/* ── Positions ── */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
