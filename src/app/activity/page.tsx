@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
@@ -8,7 +8,24 @@ import { marketUrl } from '@/lib/builder';
 const REFRESH_MS = 1_000;
 
 /* ── helpers ──────────────────────────────────────────── */
-function tsOf(t: RecentTrade): number { return Number(t.timestamp ?? t.createdAt ?? 0); }
+function tsOf(t: RecentTrade): number {
+  const n = Number(t.timestamp ?? t.createdAt ?? 0);
+  return n > 1e12 ? Math.floor(n / 1000) : n; // normalize ms → s
+}
+// Pull trade objects out of an RTDS websocket message (wrapped, array, or bare).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractTrades(msg: any): RecentTrade[] {
+  const out: RecentTrade[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const visit = (x: any) => {
+    if (!x || typeof x !== 'object') return;
+    if (Array.isArray(x)) { x.forEach(visit); return; }
+    if (x.payload) visit(x.payload);
+    if (x.asset && (x.price != null || x.size != null)) out.push(x as RecentTrade);
+  };
+  visit(msg);
+  return out;
+}
 function usd(t: RecentTrade): number {
   if (t.usdcSize != null) return Number(t.usdcSize);
   if (t.size != null && t.price != null) return Number(t.size) * Number(t.price);
@@ -79,46 +96,83 @@ export default function ActivityPage() {
   const seenRef = useRef<Map<string, RecentTrade>>(new Map());
   const firstRef = useRef(true);
 
+  const pausedRef = useRef(false);
+  useEffect(() => { pausedRef.current = paused; }, [paused]);
+
+  // Merge incoming trades into a continuously-growing, deduped feed (newest 500).
+  const mergeTrades = useCallback((incoming: RecentTrade[]) => {
+    if (!Array.isArray(incoming) || !incoming.length) return;
+    const fresh = new Set<string>();
+    for (const t of incoming) {
+      if (!t || !t.asset) continue;
+      const k = keyOf(t);
+      if (!seenRef.current.has(k)) {
+        if (!firstRef.current) fresh.add(k);
+        seenRef.current.set(k, t);
+      }
+    }
+    firstRef.current = false;
+    const merged = [...seenRef.current.values()].sort((a, b) => tsOf(b) - tsOf(a)).slice(0, 500);
+    seenRef.current = new Map(merged.map(t => [keyOf(t), t]));
+    setTrades(merged);
+    setLastUpdate(new Date());
+    if (fresh.size) {
+      setFlashKeys(prev => new Set([...prev, ...fresh]));
+      setTimeout(() => setFlashKeys(new Set()), 1500);
+    }
+  }, []);
+
+  // Initial seed + slow polling fallback (direct from data-api, no cache).
   useEffect(() => {
     let live = true;
     const load = () => {
-      // Fetch DIRECTLY from Polymarket's data-api in the browser — bypasses our
-      // Vercel route and any edge/CDN caching, so the feed is genuinely live.
-      // Falls back to our own route if the direct call is blocked (CORS).
-      const direct = `https://data-api.polymarket.com/trades?limit=500&_=${Date.now()}`;
-      fetch(direct, { cache: 'no-store' })
+      if (pausedRef.current) return;
+      fetch('https://data-api.polymarket.com/trades?limit=500', { cache: 'no-store' })
         .then(r => r.json())
         .then(d => (Array.isArray(d) ? d : (d?.trades ?? [])))
         .catch(() => fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(d => d?.trades ?? []))
-        .then((incomingRaw: RecentTrade[]) => {
-          if (!live || !Array.isArray(incomingRaw)) return;
-          const incoming = incomingRaw;
-          const fresh = new Set<string>();
-          for (const t of incoming) {
-            const k = keyOf(t);
-            if (!seenRef.current.has(k)) {
-              if (!firstRef.current) fresh.add(k);
-              seenRef.current.set(k, t);
-            }
-          }
-          firstRef.current = false;
-          // keep a continuously-growing feed: newest 500 across all polls
-          const merged = [...seenRef.current.values()].sort((a, b) => tsOf(b) - tsOf(a)).slice(0, 500);
-          seenRef.current = new Map(merged.map(t => [keyOf(t), t]));
-          setTrades(merged);
-          setLastUpdate(new Date());
-          if (fresh.size) {
-            setFlashKeys(fresh);
-            setTimeout(() => setFlashKeys(new Set()), 1500);
-          }
-        })
-        .catch(() => {})
-        .finally(() => { if (live) setLoading(false); });
+        .then((rows: RecentTrade[]) => { if (live) { mergeTrades(rows); setLoading(false); } })
+        .catch(() => { if (live) setLoading(false); });
     };
     load();
-    const id = setInterval(() => { if (!paused) load(); }, REFRESH_MS);
+    const id = setInterval(load, REFRESH_MS);
     return () => { live = false; clearInterval(id); };
-  }, [paused]);
+  }, [mergeTrades]);
+
+  // Real-time WebSocket: Polymarket RTDS pushes every trade the instant it happens.
+  useEffect(() => {
+    let ws: WebSocket | null = null;
+    let closed = false;
+    let ping: ReturnType<typeof setInterval> | null = null;
+    let reconnect: ReturnType<typeof setTimeout> | null = null;
+
+    const connect = () => {
+      try { ws = new WebSocket('wss://ws-live-data.polymarket.com'); } catch { return; }
+      ws.onopen = () => {
+        ws?.send(JSON.stringify({ action: 'subscribe', subscriptions: [{ topic: 'activity', type: 'trades' }] }));
+        ping = setInterval(() => { try { ws?.send('ping'); } catch { /* noop */ } }, 10_000);
+      };
+      ws.onmessage = (ev) => {
+        if (pausedRef.current) return;
+        let parsed: unknown;
+        try { parsed = JSON.parse(typeof ev.data === 'string' ? ev.data : ''); } catch { return; }
+        const rows = extractTrades(parsed);
+        if (rows.length) mergeTrades(rows);
+      };
+      ws.onclose = () => {
+        if (ping) clearInterval(ping);
+        if (!closed) reconnect = setTimeout(connect, 2000);
+      };
+      ws.onerror = () => { try { ws?.close(); } catch { /* noop */ } };
+    };
+    connect();
+    return () => {
+      closed = true;
+      if (ping) clearInterval(ping);
+      if (reconnect) clearTimeout(reconnect);
+      try { ws?.close(); } catch { /* noop */ }
+    };
+  }, [mergeTrades]);
 
   useEffect(() => {
     const id = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt.current) / 1000)), 1000);
