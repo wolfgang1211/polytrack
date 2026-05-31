@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import type { TopMarket } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
@@ -80,7 +81,14 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
   );
 }
 
-export default function TopMarkets() {
+interface TopMarketsProps {
+  /** how many cards to render */
+  limit?: number;
+  /** show a "View All Markets →" button under the grid */
+  showViewAll?: boolean;
+}
+
+export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarketsProps) {
   const [markets, setMarkets] = useState<TopMarket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -94,6 +102,11 @@ export default function TopMarkets() {
 
   if (!loading && markets.length === 0) return null;
 
+  const shown = markets.slice(0, limit);
+  const gridCols = limit > 6
+    ? 'sm:grid-cols-3 lg:grid-cols-4'
+    : 'sm:grid-cols-5';
+
   return (
     <section className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
       <div className="flex items-center justify-between mb-4">
@@ -106,14 +119,24 @@ export default function TopMarkets() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className={`grid grid-cols-2 gap-3 ${gridCols}`}>
+          {Array.from({ length: limit }).map((_, i) => (
             <div key={i} className="glass rounded-2xl p-4 h-28 animate-shimmer" />
           ))}
         </div>
       ) : (
-        <div className="flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-5 sm:overflow-visible scrollbar-hide">
-          {markets.map((m, i) => <MarketCard key={m.id ?? i} market={m} index={i} />)}
+        <div className={`grid grid-cols-2 gap-3 ${gridCols}`}>
+          {shown.map((m, i) => <MarketCard key={m.id ?? i} market={m} index={i} />)}
+        </div>
+      )}
+
+      {showViewAll && !loading && (
+        <div className="mt-4 flex justify-center">
+          <Link href="/markets"
+            className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
+            style={{ background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.3)' }}>
+            View All Markets →
+          </Link>
         </div>
       )}
     </section>
