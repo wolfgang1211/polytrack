@@ -6,6 +6,8 @@ export const revalidate = 0;
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
   Accept: 'application/json',
+  'Cache-Control': 'no-cache',
+  Pragma: 'no-cache',
 };
 
 // Global live trade feed for the Activity page — a large recent batch the

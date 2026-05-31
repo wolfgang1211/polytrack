@@ -16,6 +16,11 @@ function usd(t: RecentTrade): number {
   return 0;
 }
 function isBuy(t: RecentTrade): boolean { return (t.side ?? '').toUpperCase() === 'BUY'; }
+function keyOf(t: RecentTrade): string {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tx = (t as any).transactionHash ?? t.id ?? '';
+  return `${tx}-${t.asset ?? ''}-${t.outcomeIndex ?? ''}-${tsOf(t)}`;
+}
 function timeAgo(ts: number): string {
   if (!ts) return '';
   const d = Math.floor(Date.now() / 1000) - ts;
@@ -68,14 +73,39 @@ export default function ActivityPage() {
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('all');
   const [q, setQ] = useState('');
   const [elapsed, setElapsed] = useState(0);
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [flashKeys, setFlashKeys] = useState<Set<string>>(new Set());
   const startedAt = useRef(Date.now());
+  const seenRef = useRef<Map<string, RecentTrade>>(new Map());
+  const firstRef = useRef(true);
 
   useEffect(() => {
     let live = true;
     const load = () => {
       fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' })
         .then(r => r.json())
-        .then(d => { if (live && Array.isArray(d?.trades)) setTrades(d.trades); })
+        .then(d => {
+          if (!live || !Array.isArray(d?.trades)) return;
+          const incoming = d.trades as RecentTrade[];
+          const fresh = new Set<string>();
+          for (const t of incoming) {
+            const k = keyOf(t);
+            if (!seenRef.current.has(k)) {
+              if (!firstRef.current) fresh.add(k);
+              seenRef.current.set(k, t);
+            }
+          }
+          firstRef.current = false;
+          // keep a continuously-growing feed: newest 500 across all polls
+          const merged = [...seenRef.current.values()].sort((a, b) => tsOf(b) - tsOf(a)).slice(0, 500);
+          seenRef.current = new Map(merged.map(t => [keyOf(t), t]));
+          setTrades(merged);
+          setLastUpdate(new Date());
+          if (fresh.size) {
+            setFlashKeys(fresh);
+            setTimeout(() => setFlashKeys(new Set()), 1500);
+          }
+        })
         .catch(() => {})
         .finally(() => { if (live) setLoading(false); });
     };
@@ -189,7 +219,7 @@ export default function ActivityPage() {
         </button>
         <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/35">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          Updating every {REFRESH_MS / 1000}s
+          {lastUpdate ? `Updated ${lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : `Updating every ${REFRESH_MS / 1000}s`}
         </span>
       </div>
 
@@ -274,12 +304,13 @@ export default function ActivityPage() {
 
             {loading ? (
               Array.from({ length: 10 }).map((_, i) => <div key={i} className="h-11 animate-shimmer rounded my-1" />)
-            ) : tableRows.map((t, i) => {
+            ) : tableRows.map((t) => {
               const buy = isBuy(t);
               const name = t.proxyWallet ? formatAddress(t.proxyWallet, 6) : '—';
               const price = t.price != null ? `${(Number(t.price) * 100).toFixed(1)}%` : '—';
+              const flashing = flashKeys.has(keyOf(t));
               return (
-                <div key={t.id ?? i} className="grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] items-center px-3 py-2 text-xs transition-colors hover:bg-white/[0.03]"
+                <div key={keyOf(t)} className={`grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] items-center px-3 py-2 text-xs transition-colors hover:bg-white/[0.03] ${flashing ? 'animate-flash' : ''}`}
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                   <a href={marketUrl(t.eventSlug, t.slug)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 min-w-0 hover:text-white">
                     {t.icon ? (
