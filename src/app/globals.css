@@ -7,6 +7,27 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ─── Violet design tokens ───────────────────────────────── */
+
+:root {
+  /* Tint scale — violet-500 (139 92 246) at each alpha */
+  --vi-glow:      rgba(139,92,246,0.08);  /* glass hover glow layer  */
+  --vi-bg:        rgba(139,92,246,0.12);  /* subtle background fill  */
+  --vi-tint:      rgba(139,92,246,0.15);  /* tinted background       */
+  --vi-fill:      rgba(139,92,246,0.18);  /* active / selected fill  */
+  --vi-border-xs: rgba(139,92,246,0.20);  /* hairline border         */
+  --vi-border:    rgba(139,92,246,0.25);  /* default border          */
+  --vi-border-md: rgba(139,92,246,0.30);  /* medium border           */
+  --vi-border-lg: rgba(139,92,246,0.35);  /* focus / active border   */
+  --vi-border-xl: rgba(139,92,246,0.40);  /* accent border / ring    */
+
+  /* Gradient pairs — violet-600 (#7c3aed) → purple-600 (#9333ea) */
+  --vi-grad:     linear-gradient(135deg, #7c3aed, #9333ea);
+  --vi-grad-25:  linear-gradient(135deg, rgba(124,58,237,0.25), rgba(147,51,234,0.25));
+  --vi-grad-30:  linear-gradient(135deg, rgba(124,58,237,0.30), rgba(147,51,234,0.30));
+  --vi-grad-60:  linear-gradient(135deg, rgba(124,58,237,0.60), rgba(147,51,234,0.60));
+}
+
 /* ─── Keyframes ─────────────────────────────────────────── */
 
 @keyframes shimmer {
@@ -151,10 +172,10 @@
 }
 .glass-hover:hover {
   background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(139, 92, 246, 0.35);
-  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.2),
+  border-color: var(--vi-border-lg);
+  box-shadow: 0 0 0 1px var(--vi-border-xs),
               0 8px 32px rgba(0, 0, 0, 0.35),
-              0 0 60px rgba(139, 92, 246, 0.08);
+              0 0 60px var(--vi-glow);
   transform: translateY(-2px);
 }
 
@@ -189,10 +210,10 @@
 
 /* ─── Scrollbar ─────────────────────────────────────────── */
 
-* { scrollbar-width: thin; scrollbar-color: rgba(139,92,246,0.25) transparent; }
+* { scrollbar-width: thin; scrollbar-color: var(--vi-border) transparent; }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: var(--vi-border-md); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.55); }
 
 /* ─── Base ───────────────────────────────────────────────── */

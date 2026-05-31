@@ -94,7 +94,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             >
               {window === tw.value && (
                 <span className="absolute inset-0 rounded-xl"
-                  style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.6), rgba(147,51,234,0.6))', border: '1px solid rgba(139,92,246,0.4)' }} />
+                  style={{ background: 'var(--vi-grad-60)', border: '1px solid var(--vi-border-xl)' }} />
               )}
               <span className="relative">{tw.label}</span>
             </button>
@@ -116,7 +116,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             onClick={() => setVerifiedOnly(v => !v)}
             className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-violet-300' : 'text-white/35 hover:text-white/60'}`}
             style={verifiedOnly
-              ? { background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.35)' }
+              ? { background: 'var(--vi-bg)', border: '1px solid var(--vi-border-lg)' }
               : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             ✓ Verified
@@ -326,7 +326,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       rel="noopener noreferrer"
                       title="Open on Polymarket"
                       className="flex h-6 w-6 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-                      style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
+                      style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }}
                     >
                       <svg className="h-3 w-3 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

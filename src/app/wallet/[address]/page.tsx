@@ -161,7 +161,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
                     style={{
                       background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-                      boxShadow: '0 0 0 2px rgba(139,92,246,0.4), 0 0 40px rgba(124,58,237,0.35)',
+                      boxShadow: '0 0 0 2px var(--vi-border-xl), 0 0 40px rgba(124,58,237,0.35)',
                     }}>
                     {short[0]?.toUpperCase()}
                   </div>
@@ -253,7 +253,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             <StatsCard
               label="Open Value"
               value={formatCurrency(openVal, true)}
-              gradient="rgba(139,92,246,0.15)"
+              gradient="var(--vi-tint)"
               icon={<svg style={{width:14,height:14}} className="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>}
               delay={60}
             />
@@ -371,7 +371,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   >
                     {tab === t && (
                       <span className="absolute inset-0 rounded-xl"
-                        style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(147,51,234,0.55))', border:'1px solid rgba(139,92,246,0.4)' }} />
+                        style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(147,51,234,0.55))', border:'1px solid var(--vi-border-xl)' }} />
                     )}
                     <span className="relative">
                       {t === 'open' ? `Open (${open.length})` : `Closed (${closed.length})`}

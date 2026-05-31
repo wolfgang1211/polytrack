@@ -20,7 +20,7 @@ export default function StatsCard({ label, value, sub, valueClass, gradient, ico
         <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">{label}</p>
         {icon && (
           <div className="flex h-7 w-7 items-center justify-center rounded-lg"
-            style={{ background: gradient ?? 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: gradient ?? 'var(--vi-tint)', border: '1px solid var(--vi-border-xs)' }}>
             <span className="text-sm">{icon}</span>
           </div>
         )}

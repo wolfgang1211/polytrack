@@ -95,7 +95,7 @@ export default function InsightsPage() {
               label="Avg P&L / Trader"
               value={(avgPnl >= 0 ? '+' : '') + formatCurrency(avgPnl, true)}
               sub="per ranked trader"
-              gradient="rgba(139,92,246,0.15)"
+              gradient="var(--vi-tint)"
               icon={<svg style={{width:16,height:16}} className="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
             />
           </div>
@@ -160,7 +160,7 @@ export default function InsightsPage() {
               <p className="text-sm font-bold text-white mb-1">{title}</p>
               <p className="text-xs text-white/35 leading-relaxed">{desc}</p>
               <span className="mt-3 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
-                style={{ background: 'rgba(139,92,246,0.15)', color: 'rgba(167,139,250,0.7)', border: '1px solid rgba(139,92,246,0.2)' }}>
+                style={{ background: 'var(--vi-tint)', color: 'rgba(167,139,250,0.7)', border: '1px solid var(--vi-border-xs)' }}>
                 Coming Soon
               </span>
             </div>

@@ -84,7 +84,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
             onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         ) : (
           <div className="h-10 w-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.25))', border: '1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: 'var(--vi-grad-25)', border: '1px solid var(--vi-border-xs)' }}>
             📈
           </div>
         )}
@@ -231,7 +231,7 @@ export default function MarketsPage() {
                 key={s.key}
                 onClick={() => setSort(s.key)}
                 className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all ${sort === s.key ? 'text-white' : 'text-white/40 hover:text-white/70'}`}
-                style={sort === s.key ? { background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.3)' } : { border: '1px solid transparent' }}
+                style={sort === s.key ? { background: 'var(--vi-fill)', border: '1px solid var(--vi-border-md)' } : { border: '1px solid transparent' }}
               >
                 {s.label}
               </button>
@@ -248,7 +248,7 @@ export default function MarketsPage() {
             onClick={() => setCat(c)}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${cat === c ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
             style={cat === c
-              ? { background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.35)' }
+              ? { background: 'var(--vi-fill)', border: '1px solid var(--vi-border-lg)' }
               : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             {c}

@@ -228,7 +228,7 @@ export default function ActivityPage() {
       <div className="animate-fade-in-up">
         <div className="flex items-center gap-3">
           <span className="flex h-9 w-9 items-center justify-center rounded-xl"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(147,51,234,0.3))', border: '1px solid rgba(139,92,246,0.25)' }}>
+            style={{ background: 'var(--vi-grad-30)', border: '1px solid var(--vi-border)' }}>
             <svg className="h-4 w-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
@@ -259,7 +259,7 @@ export default function ActivityPage() {
             value={sizeFilter}
             onChange={e => setSizeFilter(e.target.value as SizeFilter)}
             className="appearance-none rounded-xl glass py-2 pl-3 pr-8 text-[11px] font-semibold text-white/70 outline-none cursor-pointer"
-            style={{ border: '1px solid rgba(139,92,246,0.25)' }}>
+            style={{ border: '1px solid var(--vi-border)' }}>
             {SIZE_FILTERS.map(s => (
               <option key={s.key} value={s.key} style={{ background: '#0f0a1e', color: '#fff' }}>{s.label}</option>
             ))}

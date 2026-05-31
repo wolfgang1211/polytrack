@@ -107,7 +107,7 @@ export default function HomeLeaderboard() {
         </div>
         <Link href="/leaderboard"
           className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-violet-300 transition-colors hover:text-violet-200"
-          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)' }}>
+          style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border)' }}>
           View full board →
         </Link>
       </div>

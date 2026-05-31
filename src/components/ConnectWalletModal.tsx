@@ -34,7 +34,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
         className="relative w-full max-w-sm rounded-3xl p-7 animate-scale-in"
         style={{
           background: 'linear-gradient(135deg,rgba(14,14,24,0.98),rgba(18,18,32,0.98))',
-          border: '1px solid rgba(139,92,246,0.3)',
+          border: '1px solid var(--vi-border-md)',
           boxShadow: '0 0 80px rgba(124,58,237,0.15), 0 30px 60px rgba(0,0,0,0.7)',
         }}
         onClick={e => e.stopPropagation()}
@@ -51,7 +51,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
         {/* Icon */}
         <div
           className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
-          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)' }}
+          style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border-md)' }}
         >
           <svg className="h-7 w-7 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
@@ -71,7 +71,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
             placeholder="0x… wallet address"
             autoFocus
             className="w-full rounded-xl glass px-4 py-3 text-sm text-white/80 placeholder-white/25 outline-none"
-            style={{ border: error ? '1px solid rgba(251,113,133,0.5)' : '1px solid rgba(139,92,246,0.2)' }}
+            style={{ border: error ? '1px solid rgba(251,113,133,0.5)' : '1px solid var(--vi-border-xs)' }}
           />
           {error && <p className="text-xs text-rose-400 -mt-1">Invalid Ethereum address</p>}
           <button

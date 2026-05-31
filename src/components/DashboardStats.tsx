@@ -83,7 +83,7 @@ export default function DashboardStats() {
         label="24h Volume"
         value={loading ? '—' : formatCurrency(stats?.volume24h ?? 0, true)}
         loading={loading}
-        gradient="rgba(139,92,246,0.18)"
+        gradient="var(--vi-fill)"
         icon={
           <svg style={{ width: 16, height: 16 }} className="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

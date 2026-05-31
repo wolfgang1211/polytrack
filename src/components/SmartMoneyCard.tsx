@@ -31,7 +31,7 @@ export default function SmartMoneyCard() {
         </div>
         <Link href="/leaderboard"
           className="rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-violet-300 transition-colors hover:text-violet-200"
-          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)' }}>
+          style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border)' }}>
           View All →
         </Link>
       </div>

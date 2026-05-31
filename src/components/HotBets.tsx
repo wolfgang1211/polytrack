@@ -38,7 +38,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
           onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
       ) : (
         <div className="h-7 w-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs"
-          style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.2)' }}>
+          style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-xs)' }}>
           🔥
         </div>
       )}

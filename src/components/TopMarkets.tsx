@@ -67,7 +67,7 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
           />
         ) : (
           <div className="h-9 w-9 rounded-xl flex-shrink-0 flex items-center justify-center text-sm"
-            style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.3),rgba(147,51,234,0.3))', border:'1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: 'var(--vi-grad-30)', border: '1px solid var(--vi-border-xs)' }}>
             📈
           </div>
         )}
@@ -145,7 +145,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarket
         <div className="mt-4 flex justify-center">
           <Link href="/markets"
             className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
-            style={{ background: 'rgba(139,92,246,0.14)', border: '1px solid rgba(139,92,246,0.3)' }}>
+            style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-md)' }}>
             View All Markets →
           </Link>
         </div>

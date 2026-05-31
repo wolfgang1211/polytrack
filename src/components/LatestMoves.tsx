@@ -107,7 +107,7 @@ export default function LatestMoves({ address }: { address: string }) {
           <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Latest Moves</h2>
           <span className="rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
-            style={{ background: 'rgba(139,92,246,0.12)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.2)' }}>
+            style={{ background: 'var(--vi-bg)', color: '#a78bfa', border: '1px solid var(--vi-border-xs)' }}>
             Copy-trade signal
           </span>
         </div>

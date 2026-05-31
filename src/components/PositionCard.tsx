@@ -106,8 +106,8 @@ export default function PositionCard({ position, delay = 0 }: Props) {
           rel="noopener noreferrer"
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-[11px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
           style={{
-            background: 'linear-gradient(135deg, rgba(124,58,237,0.25), rgba(147,51,234,0.25))',
-            border: '1px solid rgba(139,92,246,0.3)',
+            background: 'var(--vi-grad-25)',
+            border: '1px solid var(--vi-border-md)',
             color: '#a78bfa',
           }}
         >

@@ -180,7 +180,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-all hover:scale-[1.03] hover:brightness-110"
-          style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.6),rgba(147,51,234,0.6))', border: '1px solid rgba(139,92,246,0.4)' }}
+          style={{ background: 'var(--vi-grad-60)', border: '1px solid var(--vi-border-xl)' }}
         >
           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -615,7 +615,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
                   onChange={e => setAmount(e.target.value)}
                   min="0"
                   className="w-full rounded-xl glass pl-7 pr-4 py-2.5 text-sm font-bold text-white outline-none"
-                  style={{ border: '1px solid rgba(139,92,246,0.3)' }}
+                  style={{ border: '1px solid var(--vi-border-md)' }}
                 />
               </div>
             </div>

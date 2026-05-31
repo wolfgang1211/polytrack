@@ -67,7 +67,7 @@ export default function Navbar() {
                   >
                     {active && (
                       <span className="absolute inset-0 rounded-lg"
-                        style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }} />
+                        style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
                     )}
                     <span className="relative">{label}</span>
                   </Link>
@@ -153,8 +153,8 @@ export default function Navbar() {
                 aria-expanded={mobileOpen}
                 className="lg:hidden flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-200"
                 style={{
-                  background: mobileOpen ? 'rgba(139,92,246,0.15)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${mobileOpen ? 'rgba(139,92,246,0.35)' : 'rgba(255,255,255,0.1)'}`,
+                  background: mobileOpen ? 'var(--vi-tint)' : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${mobileOpen ? 'var(--vi-border-lg)' : 'rgba(255,255,255,0.1)'}`,
                 }}
               >
                 <div className="flex h-4 w-4 flex-col items-center justify-center gap-[5px]">
@@ -197,8 +197,8 @@ export default function Navbar() {
                       className={`relative flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200
                         ${active ? 'text-white' : 'text-white/50 hover:text-white/80 hover:bg-white/[0.03]'}`}
                       style={active ? {
-                        background: 'rgba(139,92,246,0.12)',
-                        border: '1px solid rgba(139,92,246,0.25)',
+                        background: 'var(--vi-bg)',
+                        border: '1px solid var(--vi-border)',
                       } : {}}
                     >
                       <span>{label}</span>
@@ -282,7 +282,7 @@ export default function Navbar() {
         </div>
 
         <div className="h-px w-full"
-          style={{ background: 'linear-gradient(90deg,transparent,rgba(139,92,246,0.4),rgba(59,130,246,0.4),transparent)' }} />
+          style={{ background: 'linear-gradient(90deg,transparent,var(--vi-border-xl),rgba(59,130,246,0.4),transparent)' }} />
       </header>
     </>
   );
