@@ -180,7 +180,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   <div className="mt-2.5 flex flex-wrap gap-2 text-[10px] normal-case tracking-normal font-normal">
                     <span style={{ color: '#fbbf24' }}>🔥 85+ Elite</span>
                     <span style={{ color: '#34d399' }}>⚡ 65+ Sharp</span>
-                    <span style={{ color: '#38bdf8' }}>• 40+ Solid</span>
+                    <span style={{ color: '#a855f7' }}>• 40+ Solid</span>
                     <span style={{ color: '#fb7185' }}>• &lt;40 Risky</span>
                   </div>
                 </div>
@@ -329,4 +329,27 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}
                     >
                       <svg className="h-3 w-3 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeL
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        {!loading && sorted.length > 0 && (
+          <div className="px-4 py-3 flex items-center justify-between glass-strong"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+            <span className="text-[10px] text-white/20">{sorted.length} traders</span>
+            <span className="text-[10px] text-white/15">data-api.polymarket.com</span>
+          </div>
+        )}
+        </div>
+      </div>
+    </div>
+  );
+}
