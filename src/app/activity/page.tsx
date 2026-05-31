@@ -73,7 +73,7 @@ export default function ActivityPage() {
   useEffect(() => {
     let live = true;
     const load = () => {
-      fetch('/api/activity')
+      fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' })
         .then(r => r.json())
         .then(d => { if (live && Array.isArray(d?.trades)) setTrades(d.trades); })
         .catch(() => {})
