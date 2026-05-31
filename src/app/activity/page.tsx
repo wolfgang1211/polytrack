@@ -5,7 +5,7 @@ import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 
-const REFRESH_MS = 10_000;
+const REFRESH_MS = 2_000;
 
 /* ── helpers ──────────────────────────────────────────── */
 function tsOf(t: RecentTrade): number { return Number(t.timestamp ?? t.createdAt ?? 0); }
@@ -29,11 +29,13 @@ function fmtClock(sec: number): string {
   return `${m}m ${s.toString().padStart(2, '0')}s`;
 }
 
-type SizeFilter = 'all' | '1k' | '10k';
-const SIZE_FILTERS: { key: SizeFilter; label: string; min: number }[] = [
-  { key: 'all', label: 'All Sizes', min: 0 },
-  { key: '1k',  label: '> $1K',     min: 1_000 },
-  { key: '10k', label: '> $10K',    min: 10_000 },
+type SizeFilter = 'all' | 'lt100' | '100-1k' | '1k-10k' | '10k';
+const SIZE_FILTERS: { key: SizeFilter; label: string; min: number; max: number }[] = [
+  { key: 'all',    label: 'All Sizes',  min: 0,      max: Infinity },
+  { key: 'lt100',  label: '< $100',     min: 0,      max: 100 },
+  { key: '100-1k', label: '$100 - 1K',  min: 100,    max: 1_000 },
+  { key: '1k-10k', label: '$1K - 10K',  min: 1_000,  max: 10_000 },
+  { key: '10k',    label: '$10K+',      min: 10_000, max: Infinity },
 ];
 
 interface MarketAgg {
@@ -87,10 +89,11 @@ export default function ActivityPage() {
     return () => clearInterval(id);
   }, []);
 
-  const minSize = SIZE_FILTERS.find(s => s.key === sizeFilter)!.min;
+  const range = SIZE_FILTERS.find(s => s.key === sizeFilter)!;
   const filtered = useMemo(
-    () => trades.filter(t => usd(t) >= minSize).sort((a, b) => tsOf(b) - tsOf(a)),
-    [trades, minSize]
+    () => trades.filter(t => { const u = usd(t); return u >= range.min && u < range.max; })
+      .sort((a, b) => tsOf(b) - tsOf(a)),
+    [trades, range.min, range.max]
   );
 
   const stats = useMemo(() => {
@@ -165,19 +168,29 @@ export default function ActivityPage() {
 
       {/* Filter bar */}
       <div className="flex items-center gap-2 animate-fade-in-up" style={{ animationDelay: '90ms' }}>
-        <div className="flex gap-1 rounded-xl glass p-1">
-          {SIZE_FILTERS.map(s => (
-            <button key={s.key} onClick={() => setSizeFilter(s.key)}
-              className={`rounded-lg px-3 py-1.5 text-[11px] font-semibold transition-all ${sizeFilter === s.key ? 'text-white' : 'text-white/40 hover:text-white/70'}`}
-              style={sizeFilter === s.key ? { background: 'rgba(139,92,246,0.18)', border: '1px solid rgba(139,92,246,0.3)' } : { border: '1px solid transparent' }}>
-              {s.label}
-            </button>
-          ))}
+        <div className="relative">
+          <select
+            value={sizeFilter}
+            onChange={e => setSizeFilter(e.target.value as SizeFilter)}
+            className="appearance-none rounded-xl glass py-2 pl-3 pr-8 text-[11px] font-semibold text-white/70 outline-none cursor-pointer"
+            style={{ border: '1px solid rgba(139,92,246,0.25)' }}>
+            {SIZE_FILTERS.map(s => (
+              <option key={s.key} value={s.key} style={{ background: '#0f0a1e', color: '#fff' }}>{s.label}</option>
+            ))}
+          </select>
+          <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
         </div>
         <button onClick={() => setPaused(p => !p)}
-          className="flex items-center gap-1.5 rounded-xl glass px-3 py-2 text-[11px] font-semibold text-white/60 transition-colors hover:text-white">
+          className="flex items-center gap-1.5 rounded-xl glass px-3 py-2 text-[11px] font-semibold text-white/60 transition-colors hover:text-white"
+          style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
           {paused ? '▶ Resume' : '❚❚ Pause'}
         </button>
+        <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
+          Updating every {REFRESH_MS / 1000}s
+        </span>
       </div>
 
       {/* Treemap */}
