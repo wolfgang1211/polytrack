@@ -339,29 +339,23 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             </div>
           )}
 
-          {/* ── Two-column: sidebar + main panel ── */}
+          {/* ── Top row: sidebar + PnL timeline ── */}
           <div className="grid gap-4 lg:grid-cols-[300px_1fr] items-start">
             {/* Left sidebar */}
             <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
               <WalletSidebar address={address} positions={all} openValue={openVal} />
             </div>
 
-            {/* Main panel */}
-            <div className="flex min-w-0 flex-col gap-4">
-              <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                <PnlTimeline address={address} />
-              </div>
-
-              {/* Performance charts */}
-              <WalletCharts positions={all} />
-
-              {/* Behaviour & activity analytics */}
-              <WalletActivity address={address} positions={all} />
-
-              {/* Latest moves (copy-trade signal) */}
-              <LatestMoves address={address} />
+            {/* PnL timeline */}
+            <div className="animate-fade-in-up min-w-0" style={{ animationDelay: '140ms' }}>
+              <PnlTimeline address={address} />
             </div>
           </div>
+
+          {/* ── Full-width analytics ── */}
+          <WalletCharts positions={all} />
+          <WalletActivity address={address} positions={all} />
+          <LatestMoves address={address} />
 
           {/* ── Positions ── */}
           <div className="animate-fade-in-up" style={{ animationDelay: '200ms' }}>
