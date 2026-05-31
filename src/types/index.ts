@@ -62,6 +62,7 @@ export interface TopMarket {
   image?: string;
   endDateIso?: string;
   endDate?: string;
+  category?: string;
 }
 
 export interface RecentTrade {

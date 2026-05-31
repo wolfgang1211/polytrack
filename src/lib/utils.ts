@@ -51,7 +51,7 @@ export function rankBadge(rank: number): string {
 export const CATEGORY_PATTERNS: [string, RegExp][] = [
   ['Crypto',        /bitcoin|btc|eth(?:ereum)?|crypto|solana|sol\b|doge|token|defi|nft|web3|blockchain|binance|xrp|avax|chainlink|usdc|stablecoin/i],
   ['Politics',      /trump|biden|harris|election|president|congress|senate|democrat|republican|ballot|vote|poll|minister|prime\s+minister|parliament|white\s+house|nato|geopolit|campaign/i],
-  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics/i],
+  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|fifa|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics|spurs|thunder|lakers|celtics|warriors|heat|bulls|knicks|nuggets|mavericks|bucks|sixers|hawks|rockets|vs\.|win\s+the\s+game/i],
   ['Entertainment', /oscar|grammy|emmy|movie|film|show|tv\b|music|celebrity|award|actor|actress|box\s+office|netflix|album|billboard|spotify/i],
   ['Tech',          /\bai\b|gpt|openai|spacex|nasa|rocket|apple|google|microsoft|meta\b|amazon|tesla|nvidia|startup|ipo|antitrust/i],
   ['World',         /war|conflict|ceasefire|sanction|nato|invasion|russia|ukraine|israel|china|taiwan|climate|hurricane|earthquake/i],
@@ -62,6 +62,26 @@ export function detectCategory(title: string): string {
     if (re.test(title)) return cat;
   }
   return 'Other';
+}
+
+const API_CAT_MAP: Record<string, string> = {
+  crypto: 'Crypto', cryptocurrency: 'Crypto', defi: 'Crypto', web3: 'Crypto',
+  politics: 'Politics', political: 'Politics', elections: 'Politics', government: 'Politics',
+  sports: 'Sports', sport: 'Sports',
+  tech: 'Tech', technology: 'Tech', science: 'Tech',
+  entertainment: 'Entertainment', 'pop culture': 'Entertainment', music: 'Entertainment',
+  world: 'World', global: 'World', news: 'World',
+};
+
+export function resolveCategory(apiCategory: string | undefined, title: string): string {
+  if (apiCategory) {
+    const norm = apiCategory.toLowerCase().trim();
+    if (API_CAT_MAP[norm]) return API_CAT_MAP[norm];
+    for (const [alias, cat] of Object.entries(API_CAT_MAP)) {
+      if (norm.includes(alias)) return cat;
+    }
+  }
+  return detectCategory(title);
 }
 
 /** Risk-adjusted "Smart Score" (0–100) computed relative to a dataset.

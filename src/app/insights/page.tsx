@@ -41,8 +41,6 @@ export default function InsightsPage() {
 
   const totalPnl  = data.reduce((s, e) => s + e.pnl, 0);
   const totalVol  = data.reduce((s, e) => s + e.vol, 0);
-  const profitCount = data.filter(e => e.pnl > 0).length;
-  const winRate   = data.length ? Math.round((profitCount / data.length) * 100) : 0;
   const avgPnl    = data.length ? totalPnl / data.length : 0;
   const top3      = data.slice(0, 3);
 
@@ -87,10 +85,10 @@ export default function InsightsPage() {
               icon={<svg style={{width:16,height:16}} className="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}
             />
             <StatBlock
-              label="Profitable Traders"
-              value={`${winRate}%`}
-              sub={`${profitCount} of ${data.length}`}
-              gradient={winRate >= 50 ? 'rgba(251,191,36,0.15)' : 'rgba(251,113,133,0.12)'}
+              label="Top Traders"
+              value={`${data.length}`}
+              sub="ranked by all-time P&L"
+              gradient="rgba(251,191,36,0.15)"
               icon={<svg style={{width:16,height:16}} className="text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>}
             />
             <StatBlock

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { TopMarket } from '@/types';
-import { formatCurrency, detectCategory } from '@/lib/utils';
+import { formatCurrency, resolveCategory } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 
 /* ── helpers ───────────────────────────────────────────── */
@@ -66,7 +66,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
   const href      = marketUrl(market.eventSlug, market.slug);
   const outcomes  = parseJson(market.outcomes);
   const prices    = parseJson(market.outcomePrices);
-  const cat       = detectCategory(market.question ?? '');
+  const cat       = resolveCategory(market.category, market.question ?? '');
   const close     = closesIn(market.endDate);
 
   return (
@@ -170,8 +170,13 @@ export default function MarketsPage() {
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
+    const nowMs = Date.now();
     return markets.filter(m => {
-      if (cat !== 'All' && detectCategory(m.question ?? '') !== cat) return false;
+      if (m.endDate) {
+        const end = new Date(m.endDate).getTime();
+        if (!isNaN(end) && end < nowMs - 3_600_000) return false;
+      }
+      if (cat !== 'All' && resolveCategory(m.category, m.question ?? '') !== cat) return false;
       if (query && !(m.question ?? '').toLowerCase().includes(query)) return false;
       return true;
     });

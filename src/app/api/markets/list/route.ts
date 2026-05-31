@@ -31,21 +31,32 @@ export async function GET(req: NextRequest) {
     const json = await res.json();
     const raw = Array.isArray(json) ? json : (json.value ?? json.markets ?? []);
 
+    const nowMs = Date.now();
+
     // Slim the payload to the fields the UI needs.
-    const markets = raw.map((m: Record<string, unknown>) => ({
-      id: m.id,
-      question: m.question,
-      slug: m.slug,
-      eventSlug: m.eventSlug ?? (Array.isArray(m.events) && m.events[0] ? (m.events[0] as Record<string, unknown>).slug : undefined),
-      volume24hrNum: m.volume24hr != null ? Number(m.volume24hr) : undefined,
-      volumeNum: m.volumeNum != null ? Number(m.volumeNum) : (m.volume != null ? Number(m.volume) : undefined),
-      liquidityNum: m.liquidityNum != null ? Number(m.liquidityNum) : (m.liquidity != null ? Number(m.liquidity) : undefined),
-      outcomePrices: m.outcomePrices,
-      outcomes: m.outcomes,
-      image: m.image ?? m.icon,
-      endDate: m.endDate ?? m.endDateIso,
-      category: m.category ?? undefined,
-    }));
+    const markets = raw
+      .filter((m: Record<string, unknown>) => {
+        if (m.active === false || m.closed === true || m.resolved === true) return false;
+        if (m.endDate) {
+          const end = new Date(m.endDate as string).getTime();
+          if (!isNaN(end) && end < nowMs - 3_600_000) return false;
+        }
+        return true;
+      })
+      .map((m: Record<string, unknown>) => ({
+        id: m.id,
+        question: m.question,
+        slug: m.slug,
+        eventSlug: m.eventSlug ?? (Array.isArray(m.events) && m.events[0] ? (m.events[0] as Record<string, unknown>).slug : undefined),
+        volume24hrNum: m.volume24hr != null ? Number(m.volume24hr) : undefined,
+        volumeNum: m.volumeNum != null ? Number(m.volumeNum) : (m.volume != null ? Number(m.volume) : undefined),
+        liquidityNum: m.liquidityNum != null ? Number(m.liquidityNum) : (m.liquidity != null ? Number(m.liquidity) : undefined),
+        outcomePrices: m.outcomePrices,
+        outcomes: m.outcomes,
+        image: m.image ?? m.icon,
+        endDate: m.endDate ?? m.endDateIso,
+        category: m.category ?? undefined,
+      }));
 
     return NextResponse.json(markets, {
       headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
