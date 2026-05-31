@@ -100,14 +100,6 @@ export default function DashboardPage() {
         {/* Hero content: headline + buttons (left) · smart money (right) */}
         <div className="relative grid gap-8 lg:grid-cols-[1fr_minmax(280px,360px)] lg:items-center">
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <span className="flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-                Live
-              </span>
-            </div>
-
             <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl">
               <span className="text-white">Track Polymarket&apos;s</span>
               <br />
