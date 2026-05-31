@@ -82,11 +82,17 @@ export default function ActivityPage() {
   useEffect(() => {
     let live = true;
     const load = () => {
-      fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' })
+      // Fetch DIRECTLY from Polymarket's data-api in the browser — bypasses our
+      // Vercel route and any edge/CDN caching, so the feed is genuinely live.
+      // Falls back to our own route if the direct call is blocked (CORS).
+      const direct = `https://data-api.polymarket.com/trades?limit=500&_=${Date.now()}`;
+      fetch(direct, { cache: 'no-store' })
         .then(r => r.json())
-        .then(d => {
-          if (!live || !Array.isArray(d?.trades)) return;
-          const incoming = d.trades as RecentTrade[];
+        .then(d => (Array.isArray(d) ? d : (d?.trades ?? [])))
+        .catch(() => fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(d => d?.trades ?? []))
+        .then((incomingRaw: RecentTrade[]) => {
+          if (!live || !Array.isArray(incomingRaw)) return;
+          const incoming = incomingRaw;
           const fresh = new Set<string>();
           for (const t of incoming) {
             const k = keyOf(t);
