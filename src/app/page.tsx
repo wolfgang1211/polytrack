@@ -2,7 +2,6 @@
 
 import WalletSearch from '@/components/WalletSearch';
 import HomeLeaderboard from '@/components/HomeLeaderboard';
-import TopMarkets from '@/components/TopMarkets';
 import HotBets from '@/components/HotBets';
 import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
@@ -15,21 +14,23 @@ export default function DashboardPage() {
       {/* ── Live trade ticker (real-time pulse, top of page) ── */}
       <LiveTicker />
 
-      {/* ── Command bar: brand tagline + wallet search (dashboard, not landing) ── */}
-      <div className="relative overflow-hidden rounded-2xl px-4 py-3.5 sm:px-5 animate-fade-in-up"
+      {/* ── Hero: centered headline + wallet search ── */}
+      <div className="relative overflow-hidden rounded-2xl px-4 py-10 sm:px-6 sm:py-14 animate-fade-in-up"
         style={{
           background: 'linear-gradient(135deg, rgba(124,58,237,0.10), rgba(147,51,234,0.06))',
           border: '1px solid rgba(255,255,255,0.07)',
         }}>
-        <div className="relative flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-2.5">
-            <p className="text-sm font-semibold text-white/70">
-              Tracking Polymarket&apos;s <span className="text-grad font-bold">sharpest money</span> — discover, follow, copy.
-            </p>
-          </div>
+        <div className="relative mx-auto flex max-w-2xl flex-col items-center text-center">
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+            <span className="text-white">Track Polymarket&apos;s</span>{' '}
+            <span className="text-grad">sharpest money</span>
+          </h1>
+          <p className="mt-3 text-base font-medium text-white/45 sm:text-lg">
+            Discover, follow and copy the most profitable traders.
+          </p>
 
-          {/* Search — primary action, always in reach */}
-          <div className="w-full lg:max-w-md">
+          {/* Search — directly under the headline */}
+          <div className="mt-7 w-full max-w-lg">
             <WalletSearch />
           </div>
         </div>
@@ -44,11 +45,6 @@ export default function DashboardPage() {
         <div className="lg:sticky lg:top-4">
           <RisingTraders />
         </div>
-      </div>
-
-      {/* ── Markets — secondary context, below all trader activity ── */}
-      <div className="mt-2">
-        <TopMarkets />
       </div>
 
       {/* ── Hot Markets ── */}

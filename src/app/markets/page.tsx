@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { TopMarket } from '@/types';
 import { formatCurrency, resolveCategory } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
+import TopMarkets from '@/components/TopMarkets';
 
 /* ── helpers ───────────────────────────────────────────── */
 
@@ -202,6 +203,9 @@ export default function MarketsPage() {
           Browse {markets.length || '120+'} active prediction markets — search, filter by category, and sort by volume, liquidity or closing time.
         </p>
       </div>
+
+      {/* Featured: top markets by 24h volume */}
+      <TopMarkets />
 
       {/* Toolbar */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between animate-fade-in-up" style={{ animationDelay: '60ms' }}>

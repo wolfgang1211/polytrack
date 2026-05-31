@@ -295,9 +295,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   </div>
 
                   {/* Smart Score */}
-                  <div className="flex items-center justify-end gap-1.5" title={`${tier.label} · score ${score}/100`}>
-                    <span className="text-sm font-black tabular-nums" style={{ color: tier.color }}>{score}</span>
-                    <span className="text-[11px] leading-none">{tier.badge}</span>
+                  <div className="flex items-center justify-end gap-1" title={`${tier.label} · score ${score}/100`}>
+                    <span className="w-7 text-right text-sm font-black tabular-nums" style={{ color: tier.color }}>{score}</span>
+                    <span className="w-4 text-center text-[11px] leading-none">{tier.badge}</span>
                   </div>
 
                   {/* Actions */}

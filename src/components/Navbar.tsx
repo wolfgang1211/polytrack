@@ -35,21 +35,32 @@ function SearchBar() {
     <form onSubmit={handleSubmit} className="relative group">
       <div
         className={`absolute inset-0 rounded-xl transition-opacity duration-300 pointer-events-none ${focused ? 'opacity-100' : 'opacity-0'}`}
-        style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.4),rgba(59,130,246,0.4))', filter: 'blur(8px)', transform: 'scale(1.02)' }}
+        style={{ background: 'linear-gradient(135deg,rgba(139,92,246,0.4),rgba(147,51,234,0.4))', filter: 'blur(8px)', transform: 'scale(1.02)' }}
       />
       <div className={`relative flex items-center rounded-xl glass transition-all duration-200 ${error ? 'border-rose-500/60' : focused ? 'border-violet-500/50' : ''}`}>
-        <svg className={`absolute left-3 h-3.5 w-3.5 transition-colors duration-200 ${focused ? 'text-violet-400' : 'text-white/30'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+        <button type="submit" aria-label="Search wallet"
+          className={`absolute left-2.5 flex h-5 w-5 items-center justify-center transition-colors duration-200 ${focused ? 'text-violet-400' : 'text-white/30'} hover:text-violet-300`}>
+          <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
         <input
           value={value}
           onChange={e => { setValue(e.target.value); setError(false); }}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder="0x… search wallet"
+          spellCheck={false}
+          autoComplete="off"
           className="w-44 bg-transparent py-2 pl-8 pr-3 text-xs text-white/80 placeholder-white/25 outline-none sm:w-56"
         />
       </div>
+      {error && (
+        <p className="absolute left-0 top-full mt-1 whitespace-nowrap rounded-md px-2 py-1 text-[10px] font-medium text-rose-300"
+          style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.25)' }}>
+          Enter a valid 0x wallet address (42 chars)
+        </p>
+      )}
     </form>
   );
 }
