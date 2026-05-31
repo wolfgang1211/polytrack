@@ -106,10 +106,6 @@ export default function DashboardPage() {
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
                 Live
               </span>
-              <span className="rounded-full px-3 py-0.5 text-[11px] font-semibold uppercase tracking-widest"
-                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.18)', color: 'rgba(196,181,253,0.9)' }}>
-                AlphaBoard Intelligence
-              </span>
             </div>
 
             <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl">
@@ -120,7 +116,7 @@ export default function DashboardPage() {
                   backgroundImage: 'linear-gradient(110deg,#c4b5fd 5%,#a78bfa 35%,#818cf8 65%,#60a5fa 95%)',
                   filter: 'drop-shadow(0 4px 30px rgba(124,58,237,0.45))',
                 }}>
-                sharpest money.
+                Sharpest Money Moves
               </span>
             </h1>
 
