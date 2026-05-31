@@ -13,7 +13,7 @@ const HEADERS = {
 export async function GET() {
   try {
     const res = await fetch(
-      'https://data-api.polymarket.com/trades?limit=500',
+      `https://data-api.polymarket.com/trades?limit=500&takerOnly=false&_=${Date.now()}`,
       { headers: HEADERS, cache: 'no-store' }
     );
     if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });
