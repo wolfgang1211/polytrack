@@ -5,7 +5,7 @@ import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 
-const REFRESH_MS = 1_000;
+const REFRESH_MS = 2_000;
 
 /* ── helpers ──────────────────────────────────────────── */
 function tsOf(t: RecentTrade): number {
@@ -92,6 +92,7 @@ export default function ActivityPage() {
   const [elapsed, setElapsed] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [flashKeys, setFlashKeys] = useState<Set<string>>(new Set());
+  const [session, setSession] = useState({ volume: 0, trades: 0, buys: 0, sells: 0 });
   const startedAt = useRef(Date.now());
   const seenRef = useRef<Map<string, RecentTrade>>(new Map());
   const firstRef = useRef(true);
@@ -103,12 +104,15 @@ export default function ActivityPage() {
   const mergeTrades = useCallback((incoming: RecentTrade[]) => {
     if (!Array.isArray(incoming) || !incoming.length) return;
     const fresh = new Set<string>();
+    let addV = 0, addT = 0, addB = 0, addS = 0;
     for (const t of incoming) {
       if (!t || !t.asset) continue;
       const k = keyOf(t);
       if (!seenRef.current.has(k)) {
-        if (!firstRef.current) fresh.add(k);
         seenRef.current.set(k, t);
+        // session totals count every trade ever seen (not just the 500 window)
+        addV += usd(t); addT += 1; if (isBuy(t)) addB += 1; else addS += 1;
+        if (!firstRef.current) fresh.add(k);
       }
     }
     firstRef.current = false;
@@ -116,6 +120,7 @@ export default function ActivityPage() {
     seenRef.current = new Map(merged.map(t => [keyOf(t), t]));
     setTrades(merged);
     setLastUpdate(new Date());
+    if (addT) setSession(s => ({ volume: s.volume + addV, trades: s.trades + addT, buys: s.buys + addB, sells: s.sells + addS }));
     if (fresh.size) {
       setFlashKeys(prev => new Set([...prev, ...fresh]));
       setTimeout(() => setFlashKeys(new Set()), 1500);
@@ -186,15 +191,6 @@ export default function ActivityPage() {
     [trades, range.min, range.max]
   );
 
-  const stats = useMemo(() => {
-    let volume = 0, buys = 0, sells = 0;
-    for (const t of filtered) {
-      volume += usd(t);
-      if (isBuy(t)) buys++; else sells++;
-    }
-    return { volume, buys, sells, count: filtered.length };
-  }, [filtered]);
-
   // aggregate by market for the treemap
   const treemap = useMemo<MarketAgg[]>(() => {
     const map = new Map<string, MarketAgg>();
@@ -249,10 +245,10 @@ export default function ActivityPage() {
       {/* Stat strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 animate-fade-in-up" style={{ animationDelay: '60ms' }}>
         <Stat label="Status" value={paused ? 'Paused' : 'Live'} valueClass={paused ? 'text-amber-400' : 'text-emerald-400'} dot={!paused} />
-        <Stat label="Volume" value={formatCurrency(stats.volume, true)} valueClass="text-grad" />
-        <Stat label="Trades" value={String(stats.count)} />
-        <Stat label="Buys" value={String(stats.buys)} valueClass="text-emerald-400" />
-        <Stat label="Sells" value={String(stats.sells)} valueClass="text-rose-400" />
+        <Stat label="Volume" value={formatCurrency(session.volume, true)} valueClass="text-grad" />
+        <Stat label="Trades" value={session.trades.toLocaleString('en-US')} />
+        <Stat label="Buys" value={session.buys.toLocaleString('en-US')} valueClass="text-emerald-400" />
+        <Stat label="Sells" value={session.sells.toLocaleString('en-US')} valueClass="text-rose-400" />
         <Stat label="Session" value={fmtClock(elapsed)} />
       </div>
 
