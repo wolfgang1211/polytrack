@@ -116,15 +116,20 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const closed = all.filter(p => p.currentValue === 0 && p.curPrice === 0);
   const shown  = tab === 'open' ? open : closed;
 
-  const positionsPnl = all.reduce((s, p) => s + positionPnl(p), 0);
-  // Positions endpoint returns empty for fully-resolved wallets (all markets settled).
-  // Use the timeline's trade-replay realized P&L as the authoritative figure; fall back
-  // to the positions sum when the timeline hasn't loaded yet.
-  const totalPnl   = timelineData !== null ? timelineData.realized : positionsPnl;
+  // Single source of truth for P&L (matches WalletSidebar):
+  //  realized   = lifetime realized P&L across ALL positions (realizedPnl)
+  //  unrealized = mark-to-market of OPEN positions only (cashPnl on closed/redeemed
+  //               positions is reported as -costBasis, so summing it over all
+  //               positions double-counts losses — we exclude closed ones).
+  const realizedTotal  = all.reduce((s, p) => s + (Number(p.realizedPnl) || 0), 0);
+  const unrealizedOpen = open.reduce((s, p) => s + (Number(p.cashPnl) || 0), 0);
+  const totalPnl   = realizedTotal + unrealizedOpen;
   const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
   const roi        = invested > 0 ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
-  const shownPnl   = shown.reduce((s, p) => s + positionPnl(p), 0);
+  const shownPnl   = tab === 'open'
+    ? open.reduce((s, p) => s + (Number(p.realizedPnl) || 0) + (Number(p.cashPnl) || 0), 0)
+    : closed.reduce((s, p) => s + (Number(p.realizedPnl) || 0), 0);
   const insights   = useMemo(() => computeInsights(all), [all]);
 
   const short = formatAddress(address, 8);

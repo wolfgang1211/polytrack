@@ -6,7 +6,7 @@ import {
   PieChart, Pie,
 } from 'recharts';
 import type { Position } from '@/types';
-import { detectCategory, formatCurrency, positionPnl } from '@/lib/utils';
+import { detectCategory, formatCurrency } from '@/lib/utils';
 
 const CAT_COLORS: Record<string, string> = {
   Crypto: '#f59e0b',
@@ -53,11 +53,14 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
     let realized = 0;
     let unrealized = 0;
     for (const p of positions) {
+      const isOpen = p.currentValue > 0 || p.curPrice > 0;
+      // True P&L: realized for all, unrealized (cashPnl) only for open positions —
+      // closed/redeemed report cashPnl as -costBasis and would double-count losses.
+      const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
       const c = detectCategory(p.title);
-      cat[c] = (cat[c] ?? 0) + positionPnl(p);
-      // cashPnl = unrealized mark-to-market of held shares; realizedPnl = profit already taken.
+      cat[c] = (cat[c] ?? 0) + pnl;
       realized += p.realizedPnl ?? 0;
-      unrealized += p.cashPnl ?? 0;
+      if (isOpen) unrealized += p.cashPnl ?? 0;
     }
     const catData = Object.entries(cat)
       .map(([name, value]) => ({ name, value }))

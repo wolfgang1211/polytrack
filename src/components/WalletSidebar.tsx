@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Position, RecentTrade } from '@/types';
-import { formatCurrency, positionPnl } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 
 function Row({ label, value, valueClass = 'text-white/75' }: { label: string; value: string; valueClass?: string }) {
   return (
@@ -42,9 +42,13 @@ export default function WalletSidebar({
     const markets = new Set<string>();
     for (const p of positions) {
       realized += p.realizedPnl ?? 0;
-      unrealized += p.cashPnl ?? 0;
+      // Only count cashPnl (unrealized mark-to-market) for OPEN positions —
+      // closed/redeemed positions report cashPnl as -costBasis, which would
+      // double-count losses if summed over everything.
+      const isOpen = p.currentValue > 0 || p.curPrice > 0;
+      if (isOpen) unrealized += p.cashPnl ?? 0;
       invested += p.initialValue ?? 0;
-      const pnl = positionPnl(p);
+      const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
       if (pnl > 0) wins++; else if (pnl < 0) losses++;
       if (p.conditionId) markets.add(p.conditionId);
     }

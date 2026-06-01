@@ -18,8 +18,14 @@ export function formatCurrency(value: number, compact = false): string {
 // already taken from sells. Total = realized + unrealized. Using cashPnl alone
 // makes active traders / market-makers look like they lose almost everything.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function positionPnl(p: { cashPnl?: number; realizedPnl?: number } | any): number {
-  return (Number(p?.realizedPnl) || 0) + (Number(p?.cashPnl) || 0);
+export function positionPnl(p: { cashPnl?: number; realizedPnl?: number; currentValue?: number; curPrice?: number } | any): number {
+  const realized = Number(p?.realizedPnl) || 0;
+  const cash = Number(p?.cashPnl) || 0;
+  // Only include unrealized cashPnl while the position is OPEN. For closed/
+  // redeemed positions the data-api reports cashPnl as -costBasis, which would
+  // double-count the loss on top of realizedPnl.
+  const isOpen = (Number(p?.currentValue) || 0) > 0 || (Number(p?.curPrice) || 0) > 0;
+  return realized + (isOpen ? cash : 0);
 }
 
 export function formatAddress(address: string, chars = 6): string {
