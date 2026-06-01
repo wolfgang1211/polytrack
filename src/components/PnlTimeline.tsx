@@ -29,21 +29,34 @@ function TimelineTooltip({ active, payload }: TipProps) {
   );
 }
 
-export default function PnlTimeline({ address }: { address: string }) {
-  const [data, setData] = useState<TimelineResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function PnlTimeline({
+  address,
+  data: externalData,
+  loading: externalLoading,
+}: {
+  address: string;
+  data?: TimelineResponse | null;
+  loading?: boolean;
+}) {
+  const [internalData, setInternalData] = useState<TimelineResponse | null>(null);
+  const [internalLoading, setInternalLoading] = useState(externalData === undefined);
 
+  // Only self-fetch when the parent hasn't supplied data
   useEffect(() => {
+    if (externalData !== undefined) return;
     if (!address) return;
     let live = true;
-    setLoading(true);
+    setInternalLoading(true);
     fetch(`/api/wallet/${address}/timeline`)
       .then(r => r.json())
-      .then((d: TimelineResponse) => { if (live && Array.isArray(d?.points)) setData(d); })
+      .then((d: TimelineResponse) => { if (live && Array.isArray(d?.points)) setInternalData(d); })
       .catch(() => {})
-      .finally(() => { if (live) setLoading(false); });
+      .finally(() => { if (live) setInternalLoading(false); });
     return () => { live = false; };
-  }, [address]);
+  }, [address, externalData]);
+
+  const data = externalData !== undefined ? externalData : internalData;
+  const loading = externalData !== undefined ? (externalLoading ?? false) : internalLoading;
 
   const points = data?.points ?? [];
   const current = data?.realized ?? 0;

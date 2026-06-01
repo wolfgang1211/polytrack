@@ -70,15 +70,26 @@ interface MarketAgg {
   href: string;
 }
 
-/* ── stat card ────────────────────────────────────────── */
-function Stat({ label, value, valueClass, dot }: { label: string; value: string; valueClass?: string; dot?: boolean }) {
+/* ── section header ───────────────────────────────────── */
+function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
-    <div className="glass rounded-2xl px-4 py-3">
-      <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-white/35">
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+    </div>
+  );
+}
+
+/* ── data cell ─────────────────────────────────────────── */
+function DataCell({ label, value, accent, dot }: { label: string; value: string; accent?: string; dot?: boolean }) {
+  return (
+    <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[110px]">
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
         {dot && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />}
         {label}
       </p>
-      <p className={`mt-1 text-lg font-black tabular-nums ${valueClass ?? 'text-white'}`}>{value}</p>
+      <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
     </div>
   );
 }
@@ -224,32 +235,32 @@ export default function ActivityPage() {
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Header */}
+      {/* ── [01] Header ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl"
-            style={{ background: 'var(--vi-grad-30)', border: '1px solid var(--vi-border)' }}>
-            <svg className="h-4 w-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </span>
-          <div>
-            <h1 className="text-2xl font-black tracking-tight sm:text-3xl">
-              <span className="text-white">Live Trading </span><span className="text-grad">Activity</span>
-            </h1>
-            <p className="text-xs text-white/40">Real-time market trades and volume from Polymarket</p>
-          </div>
-        </div>
+        <SectionHeader index="[01]" label="Live Activity" />
+        <h1 className="text-2xl font-black tracking-tight sm:text-3xl mb-2">
+          <span className="text-white">Live Trading </span><span className="text-grad">Activity</span>
+        </h1>
+        <p className="text-sm text-white/40">Real-time market trades and volume from Polymarket</p>
       </div>
 
-      {/* Stat strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 animate-fade-in-up" style={{ animationDelay: '60ms' }}>
-        <Stat label="Status" value={paused ? 'Paused' : 'Live'} valueClass={paused ? 'text-amber-400' : 'text-emerald-400'} dot={!paused} />
-        <Stat label="Volume" value={formatCurrency(session.volume, true)} valueClass="text-grad" />
-        <Stat label="Trades" value={session.trades.toLocaleString('en-US')} />
-        <Stat label="Buys" value={session.buys.toLocaleString('en-US')} valueClass="text-emerald-400" />
-        <Stat label="Sells" value={session.sells.toLocaleString('en-US')} valueClass="text-rose-400" />
-        <Stat label="Session" value={fmtClock(elapsed)} />
+      {/* ── [02] Session Stats strip ── */}
+      <div>
+        <SectionHeader index="[02]" label="Session Stats" />
+        <div className="flex overflow-x-auto animate-fade-in-up" style={{ animationDelay: '60ms',
+          background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <DataCell label="Status" value={paused ? 'Paused' : 'Live'} accent={paused ? '#fbbf24' : '#34d399'} dot={!paused} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Volume" value={formatCurrency(session.volume, true)} accent="rgba(139,92,246,0.95)" />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Trades" value={session.trades.toLocaleString('en-US')} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Buys" value={session.buys.toLocaleString('en-US')} accent="#34d399" />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Sells" value={session.sells.toLocaleString('en-US')} accent="#fb7185" />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Session" value={fmtClock(elapsed)} />
+        </div>
       </div>
 
       {/* Filter bar */}
@@ -279,13 +290,10 @@ export default function ActivityPage() {
         </span>
       </div>
 
-      {/* Treemap */}
+      {/* ── [03] Heatmap ── */}
       <section className="glass rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-        <div className="mb-1 flex items-center gap-2">
-          <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Dynamic Treemap Activity</h2>
-        </div>
-        <p className="mb-3 text-[11px] text-white/35">Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
+        <SectionHeader index="[03]" label="Market Heatmap" />
+        <p className="mb-3 text-[11px] text-white/35" style={{ marginTop: '-12px' }}>Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
 
         {loading ? (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
@@ -331,15 +339,12 @@ export default function ActivityPage() {
         )}
       </section>
 
-      {/* Recent trades table */}
+      {/* ── [04] Trade Feed ── */}
       <section className="glass rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '150ms' }}>
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-              <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Recent Trades</h2>
-            </div>
-            <p className="mt-0.5 text-[11px] text-white/30">Last {filtered.length} trades</p>
+            <SectionHeader index="[04]" label="Trade Feed" />
+            <p className="text-[11px] text-white/30" style={{ marginTop: '-12px' }}>Last {filtered.length} trades</p>
           </div>
           <div className="relative">
             <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">

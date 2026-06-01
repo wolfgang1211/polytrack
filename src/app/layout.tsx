@@ -9,9 +9,51 @@ const geistMono = JetBrains_Mono({ variable: '--font-geist-mono', subsets: ['lat
 const displayFont = Syne({ variable: '--font-syne', subsets: ['latin'], weight: ['700', '800'] });
 const serifFont = Playfair_Display({ variable: '--font-serif-display', subsets: ['latin'], weight: ['700', '800', '900'], style: ['normal', 'italic'] });
 
+const SITE_URL = 'https://www.alphaboard.xyz';
+
 export const metadata: Metadata = {
-  title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
-  description: 'Track top Polymarket traders and monitor wallet performance in real time.',
+  title: {
+    default: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    template: '%s | AlphaBoard',
+  },
+  description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: SITE_URL,
+    siteName: 'AlphaBoard',
+    title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'AlphaBoard — Real-time alpha from the best Polymarket traders',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
+    images: ['/opengraph-image'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

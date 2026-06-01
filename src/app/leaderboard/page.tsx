@@ -5,11 +5,25 @@ import LeaderboardTable from '@/components/LeaderboardTable';
 import type { LeaderboardEntry, TimeWindow } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 
-function StatPill({ label, value, color }: { label: string; value: string; color: string }) {
+function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
-    <div className="animate-fade-in-up text-center sm:text-left">
-      <p className="text-lg font-black sm:text-xl" style={{ color }}>{value}</p>
-      <p className="text-[10px] uppercase tracking-widest text-white/30 mt-0.5">{label}</p>
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+    </div>
+  );
+}
+
+function DataCell({ label, value, accent, loading }: { label: string; value: string; accent?: string; loading?: boolean }) {
+  return (
+    <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[130px]">
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{label}</p>
+      {loading ? (
+        <div className="h-6 w-20 rounded animate-shimmer" />
+      ) : (
+        <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
+      )}
     </div>
   );
 }
@@ -46,58 +60,54 @@ export default function LeaderboardPage() {
   return (
     <div className="flex flex-col gap-8">
 
-      {/* Header */}
+      {/* ── [01] Header ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-          <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket</span>
-        </div>
+        <SectionHeader index="[01]" label="Leaderboard" />
+        <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl mb-3">
+          <span className="text-white">Trader</span>{' '}
+          <span className="text-grad">Leaderboard</span>
+        </h1>
+        <p className="text-sm text-white/40 max-w-lg">
+          Top prediction market traders ranked by P&amp;L, volume and Smart Score.
+        </p>
+      </div>
 
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl">
-              <span className="text-white">Trader</span>{' '}
-              <span className="text-grad">Leaderboard</span>
-            </h1>
-            <p className="mt-3 text-sm text-white/40 max-w-lg">
-              Top prediction market traders ranked by P&amp;L, volume and Smart Score.
-            </p>
-          </div>
-
-          {/* Live stats strip */}
-          {!loading && data.length > 0 && (
-            <div className="glass rounded-2xl px-5 py-3 flex flex-wrap items-center gap-6
-              divide-x divide-white/[0.06] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              <StatPill label="Traders" value={String(data.length)} color="#a78bfa" />
-              <div className="pl-6">
-                <StatPill label="Total Vol" value={formatCurrency(totalVol, true)} color="#60a5fa" />
-              </div>
-              <div className="pl-6">
-                <StatPill
-                  label="Net P&L"
-                  value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-                  color={totalPnl >= 0 ? '#34d399' : '#fb7185'}
-                />
-              </div>
-              {topTrader && (
-                <div className="pl-6">
-                  <StatPill label="Top Earner" value={'+' + formatCurrency(topTrader.pnl, true)} color="#fbbf24" />
-                </div>
-              )}
-            </div>
-          )}
+      {/* ── [02] Stats strip ── */}
+      <div>
+        <SectionHeader index="[02]" label="Session Stats" />
+        <div className="flex overflow-x-auto animate-fade-in-up"
+          style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <DataCell label="Traders" value={loading ? '—' : String(data.length)} accent="rgba(167,139,250,0.95)" loading={loading} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Total Vol" value={loading ? '—' : formatCurrency(totalVol, true)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Net P&L"
+            value={loading ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
+            accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
+            loading={loading}
+          />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Top Earner"
+            value={loading || !topTrader ? '—' : '+' + formatCurrency(topTrader.pnl, true)}
+            accent="rgba(251,191,36,0.95)"
+            loading={loading}
+          />
         </div>
       </div>
 
-      {/* Table */}
-      <LeaderboardTable
-        data={data}
-        loading={loading}
-        error={error}
-        window={timeWindow}
-        onWindowChange={setTimeWindow}
-      />
+      {/* ── [03] Rankings ── */}
+      <div>
+        <SectionHeader index="[03]" label="Rankings" />
+        <LeaderboardTable
+          data={data}
+          loading={loading}
+          error={error}
+          window={timeWindow}
+          onWindowChange={setTimeWindow}
+        />
+      </div>
     </div>
   );
 }

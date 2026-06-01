@@ -58,6 +58,16 @@ const CAT_COLOR: Record<string, string> = {
   Tech: '#38bdf8', World: '#a78bfa', Entertainment: '#f472b6', Other: '#94a3b8',
 };
 
+function SectionHeader({ index, label }: { index: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+    </div>
+  );
+}
+
 /* ── card ──────────────────────────────────────────────── */
 
 function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
@@ -188,24 +198,26 @@ export default function MarketsPage() {
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Header */}
+      {/* ── [01] Header ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-          <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket · Live</span>
-        </div>
-        <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl">
+        <SectionHeader index="[01]" label="Markets Explorer" />
+        <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl mb-3">
           <span className="text-white">Markets</span>{' '}
           <span className="text-grad">Explorer</span>
         </h1>
-        <p className="mt-2 text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-white/40 max-w-lg">
           Browse {markets.length || '120+'} active prediction markets — search, filter by category, and sort by volume, liquidity or closing time.
         </p>
       </div>
 
-      {/* Featured: top markets by 24h volume */}
-      <TopMarkets />
+      {/* ── [02] Featured ── */}
+      <div>
+        <SectionHeader index="[02]" label="Featured" />
+        <TopMarkets />
+      </div>
+
+      {/* ── [03] All Markets ── */}
+      <SectionHeader index="[03]" label="All Markets" />
 
       {/* Toolbar */}
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between animate-fade-in-up" style={{ animationDelay: '60ms' }}>

@@ -195,16 +195,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
 function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; loading: boolean }) {
   return (
     <section>
-      <SectionHeader
-        accent="rgba(139,92,246,0.8)"
-        title="LP Opportunities"
-        sub="Markets ranked by spread × volume — wider spread + high volume = higher fee potential"
-        icon={
-          <svg className="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-          </svg>
-        }
-      />
+      <SectionHeader index="[03]" label="LP Opportunities" />
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => <div key={i} className="glass rounded-2xl h-52 animate-shimmer" />)}
@@ -247,31 +238,21 @@ function LPLeaderboardSection() {
 
   return (
     <section>
-      <SectionHeader
-        accent="rgba(52,211,153,0.8)"
-        title="LP Leaderboard"
-        sub="Highest-volume traders — market makers and liquidity providers ranked by trading volume"
-        icon={
-          <svg className="h-4 w-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-          </svg>
-        }
-        controls={
-          <div className="flex gap-0.5 rounded-xl glass p-0.5">
-            {LP_PERIODS.map(p => (
-              <button key={p} onClick={() => setPeriod(p)}
-                className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                  ${period === p ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
-                {period === p && (
-                  <span className="absolute inset-0 rounded-lg"
-                    style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.4),rgba(16,185,129,0.4))', border: '1px solid rgba(52,211,153,0.3)' }} />
-                )}
-                <span className="relative">{labels[p]}</span>
-              </button>
-            ))}
-          </div>
-        }
-      />
+      <SectionHeader index="[09]" label="LP Leaderboard" controls={
+        <div className="flex gap-0.5 rounded-xl glass p-0.5">
+          {LP_PERIODS.map(p => (
+            <button key={p} onClick={() => setPeriod(p)}
+              className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
+                ${period === p ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
+              {period === p && (
+                <span className="absolute inset-0 rounded-lg"
+                  style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.4),rgba(16,185,129,0.4))', border: '1px solid rgba(52,211,153,0.3)' }} />
+              )}
+              <span className="relative">{labels[p]}</span>
+            </button>
+          ))}
+        </div>
+      } />
 
       <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Table header */}
@@ -397,32 +378,22 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
 
   return (
     <section>
-      <SectionHeader
-        accent="rgba(56,189,248,0.8)"
-        title="Market Depth Analysis"
-        sub="Live orderbook depth, bid/ask spread and liquidity quality score from CLOB API"
-        icon={
-          <svg className="h-4 w-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4" />
-          </svg>
-        }
-        controls={
-          opps.length > 0 ? (
-            <select
-              value={selected?.conditionId ?? ''}
-              onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
-              className="rounded-xl glass px-3 py-1.5 text-xs text-white/70 outline-none max-w-xs truncate"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
-            >
-              {opps.map(o => (
-                <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
-                  {o.question.slice(0, 50)}…
-                </option>
-              ))}
-            </select>
-          ) : null
-        }
-      />
+      <SectionHeader index="[06]" label="Market Depth" controls={
+        opps.length > 0 ? (
+          <select
+            value={selected?.conditionId ?? ''}
+            onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+            className="rounded-xl glass px-3 py-1.5 text-xs text-white/70 outline-none max-w-xs truncate"
+            style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            {opps.map(o => (
+              <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
+                {o.question.slice(0, 50)}…
+              </option>
+            ))}
+          </select>
+        ) : null
+      } />
 
       <div className="glass rounded-2xl p-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {loading && (
@@ -567,16 +538,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
 
   return (
     <section>
-      <SectionHeader
-        accent="rgba(251,191,36,0.8)"
-        title="Reward Simulator"
-        sub='Estimate your daily maker rebate: "If I add $X of liquidity, how much can I earn?"'
-        icon={
-          <svg className="h-4 w-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10H9m3-10v10M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" />
-          </svg>
-        }
-      />
+      <SectionHeader index="[07]" label="Reward Simulator" />
 
       <div className="grid gap-5 lg:grid-cols-[1fr_1fr]">
         {/* Inputs */}
@@ -709,31 +671,21 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
 
   return (
     <section>
-      <SectionHeader
-        accent="rgba(96,165,250,0.8)"
-        title="Price History"
-        sub="Historical mid-price for the selected market (Polymarket CLOB). Current spread shown alongside — only price history is published by the API."
-        icon={
-          <svg className="h-4 w-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3v18h18M7 14l4-4 3 3 5-6" />
-          </svg>
-        }
-        controls={
-          <div className="flex gap-0.5 rounded-xl glass p-0.5">
-            {PH_WINDOWS.map(w => (
-              <button key={w.key} onClick={() => setWin(w.key)}
-                className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                  ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
-                {win === w.key && (
-                  <span className="absolute inset-0 rounded-lg"
-                    style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(147,51,234,0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
-                )}
-                <span className="relative">{w.label}</span>
-              </button>
-            ))}
-          </div>
-        }
-      />
+      <SectionHeader index="[04]" label="Price History" controls={
+        <div className="flex gap-0.5 rounded-xl glass p-0.5">
+          {PH_WINDOWS.map(w => (
+            <button key={w.key} onClick={() => setWin(w.key)}
+              className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
+                ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
+              {win === w.key && (
+                <span className="absolute inset-0 rounded-lg"
+                  style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(147,51,234,0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
+              )}
+              <span className="relative">{w.label}</span>
+            </button>
+          ))}
+        </div>
+      } />
 
       <div className="glass rounded-2xl p-4" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Market selector */}
@@ -858,16 +810,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
 
   return (
     <section>
-      <SectionHeader
-        accent="rgba(167,139,250,0.8)"
-        title="LP Calculator"
-        sub="Compare multiple markets side by side — for the same capital, which one pays the most maker reward?"
-        icon={
-          <svg className="h-4 w-4 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m4 10V11m4 6v-4M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
-          </svg>
-        }
-      />
+      <SectionHeader index="[05]" label="LP Calculator" />
 
       <div className="glass rounded-2xl p-5 flex flex-col gap-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Capital input */}
@@ -980,16 +923,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
   return (
     <section>
       {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
-      <SectionHeader
-        accent="rgba(34,197,94,0.8)"
-        title="Market Alert"
-        sub="Pick a market and a spread threshold — get pinged on Telegram when the spread widens past it (great for catching LP entry windows)."
-        icon={
-          <svg className="h-4 w-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-          </svg>
-        }
-      />
+      <SectionHeader index="[08]" label="Market Alert" />
 
       <div className="glass rounded-2xl p-5 flex flex-col gap-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         <div className="grid gap-4 sm:grid-cols-2">
@@ -1066,23 +1000,22 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
 
 /* ─────────────────────────── shared UI ─────────────────────────── */
 
-function SectionHeader({ accent, title, sub, icon, controls }: {
-  accent: string; title: string; sub: string;
-  icon: React.ReactNode; controls?: React.ReactNode;
-}) {
+function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
-      <div className="flex items-start gap-3">
-        <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl"
-          style={{ background: `${accent}20`, border: `1px solid ${accent}40` }}>
-          {icon}
-        </div>
-        <div>
-          <h2 className="text-base font-black text-white">{title}</h2>
-          <p className="text-[11px] text-white/35 mt-0.5 max-w-lg leading-relaxed">{sub}</p>
-        </div>
-      </div>
-      {controls && <div className="flex-shrink-0">{controls}</div>}
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
+    </div>
+  );
+}
+
+function DataCell({ label, value, accent }: { label: string; value: string; accent?: string }) {
+  return (
+    <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[140px]">
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{label}</p>
+      <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
     </div>
   );
 }
@@ -1125,22 +1058,16 @@ export default function LiquidityPage() {
   return (
     <div className="flex flex-col gap-8">
 
-      {/* Page header */}
+      {/* ── [01] Header ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-          <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Market Making</span>
-        </div>
-        <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl">
+        <SectionHeader index="[01]" label="Liquidity Hub" />
+        <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl mb-3">
           <span className="text-white">Liquidity</span>{' '}
           <span className="text-grad">Hub</span>
         </h1>
-        <p className="mt-3 text-sm text-white/40 max-w-xl">
+        <p className="text-sm text-white/40 max-w-xl">
           Discover LP opportunities, analyze market depth, and simulate maker rewards on Polymarket.
         </p>
-
-        {/* Freshness + refresh */}
         <div className="mt-4 flex items-center gap-3">
           <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
@@ -1159,24 +1086,27 @@ export default function LiquidityPage() {
             Refresh
           </button>
         </div>
+      </div>
 
-        {/* Quick stats */}
-        {!oppsLoading && opps.length > 0 && (
-          <div className="mt-5 flex flex-wrap gap-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-            {[
-              { label: 'Markets Analyzed', value: String(opps.length) },
-              { label: 'Avg Spread', value: `${(opps.reduce((s, o) => s + o.spread, 0) / opps.length * 100).toFixed(1)}¢` },
-              { label: 'Total 24h Vol', value: formatCurrency(opps.reduce((s, o) => s + o.volume24h, 0), true) },
-            ].map(s => (
-              <div key={s.label} className="glass rounded-xl px-4 py-2.5 flex items-center gap-2.5">
-                <div>
-                  <p className="text-sm font-black text-white">{s.value}</p>
-                  <p className="text-[10px] text-white/30 uppercase tracking-wider">{s.label}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+      {/* ── [02] Quick Stats strip ── */}
+      <div>
+        <SectionHeader index="[02]" label="Market Overview" />
+        <div className="flex overflow-x-auto animate-fade-in-up"
+          style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <DataCell label="Markets Analyzed" value={oppsLoading ? '—' : String(opps.length)} accent="rgba(167,139,250,0.95)" />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Avg Spread"
+            value={oppsLoading || !opps.length ? '—' : `${(opps.reduce((s, o) => s + o.spread, 0) / opps.length * 100).toFixed(1)}¢`}
+            accent="rgba(251,191,36,0.95)"
+          />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Total 24h Vol"
+            value={oppsLoading ? '—' : formatCurrency(opps.reduce((s, o) => s + o.volume24h, 0), true)}
+            accent="rgba(139,92,246,0.95)"
+          />
+        </div>
       </div>
 
       <LPOpportunitiesSection opps={opps} loading={oppsLoading} />

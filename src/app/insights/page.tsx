@@ -6,21 +6,25 @@ import type { LeaderboardEntry } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 
-function StatBlock({ label, value, sub, icon, gradient }: {
-  label: string; value: string; sub?: string;
-  icon: React.ReactNode; gradient: string;
-}) {
+function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
-    <div className="glass glass-hover gradient-border rounded-2xl p-5 animate-fade-in-up">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl"
-          style={{ background: gradient, border: '1px solid rgba(255,255,255,0.08)' }}>
-          {icon}
-        </div>
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">{label}</p>
-      </div>
-      <p className="text-2xl font-black text-white">{value}</p>
-      {sub && <p className="mt-1 text-[11px] text-white/30">{sub}</p>}
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+    </div>
+  );
+}
+
+function DataCell({ label, value, accent, loading }: { label: string; value: string; accent?: string; loading?: boolean }) {
+  return (
+    <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[140px]">
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{label}</p>
+      {loading ? (
+        <div className="h-6 w-20 rounded animate-shimmer" />
+      ) : (
+        <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
+      )}
     </div>
   );
 }
@@ -47,65 +51,47 @@ export default function InsightsPage() {
   return (
     <div className="flex flex-col gap-10">
 
-      {/* Header */}
+      {/* ── [01] Header ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-2 mb-4">
-          <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#f59e0b,#ef4444)' }} />
-          <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Analytics</span>
-        </div>
-        <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl">
+        <SectionHeader index="[01]" label="Insights" />
+        <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl mb-3">
           <span className="text-white">Market</span>{' '}
-          <span style={{ background: 'linear-gradient(135deg,#f59e0b,#ef4444)', WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>
-            Insights
-          </span>
+          <span className="text-grad">Insights</span>
         </h1>
-        <p className="mt-3 text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-white/40 max-w-lg">
           Global statistics and analytics for top Polymarket traders.
         </p>
       </div>
 
-      {/* Global stats */}
-      {!loading && data.length > 0 && (
-        <section>
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-white/25">Global Overview</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatBlock
-              label="Total Volume"
-              value={formatCurrency(totalVol, true)}
-              sub="across top traders"
-              gradient="rgba(147,51,234,0.18)"
-              icon={<svg style={{width:16,height:16}} className="text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
-            />
-            <StatBlock
-              label="Total P&L"
-              value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-              sub="net profit"
-              gradient={totalPnl >= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(251,113,133,0.15)'}
-              icon={<svg style={{width:16,height:16}} className="text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}
-            />
-            <StatBlock
-              label="Top Traders"
-              value={`${data.length}`}
-              sub="ranked by all-time P&L"
-              gradient="rgba(251,191,36,0.15)"
-              icon={<svg style={{width:16,height:16}} className="text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>}
-            />
-            <StatBlock
-              label="Avg P&L / Trader"
-              value={(avgPnl >= 0 ? '+' : '') + formatCurrency(avgPnl, true)}
-              sub="per ranked trader"
-              gradient="var(--vi-tint)"
-              icon={<svg style={{width:16,height:16}} className="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>}
-            />
-          </div>
-        </section>
-      )}
+      {/* ── [02] Global Overview strip ── */}
+      <section>
+        <SectionHeader index="[02]" label="Global Overview" />
+        <div className="flex overflow-x-auto animate-fade-in-up"
+          style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <DataCell label="Total Volume" value={loading ? '—' : formatCurrency(totalVol, true)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Total P&L"
+            value={loading ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
+            accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
+            loading={loading}
+          />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell label="Top Traders" value={loading ? '—' : String(data.length)} accent="rgba(251,191,36,0.95)" loading={loading} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <DataCell
+            label="Avg P&L / Trader"
+            value={loading ? '—' : (avgPnl >= 0 ? '+' : '') + formatCurrency(avgPnl, true)}
+            accent="rgba(167,139,250,0.95)"
+            loading={loading}
+          />
+        </div>
+      </section>
 
-      {/* Top 3 traders */}
+      {/* ── [03] Top Performers ── */}
       {!loading && top3.length > 0 && (
         <section>
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-white/25">Top Performers — All Time</p>
+          <SectionHeader index="[03]" label="Top Performers — All Time" />
           <div className="grid gap-4 sm:grid-cols-3">
             {top3.map((e, i) => {
               const medals = ['🥇', '🥈', '🥉'];
@@ -145,9 +131,9 @@ export default function InsightsPage() {
         </section>
       )}
 
-      {/* Coming soon features */}
+      {/* ── [04] Coming Soon ── */}
       <section className="animate-fade-in-up">
-        <p className="mb-4 text-[10px] font-semibold uppercase tracking-widest text-white/25">Coming Soon</p>
+        <SectionHeader index="[04]" label="Coming Soon" />
         <div className="grid gap-3 sm:grid-cols-3">
           {[
             { icon: '📊', title: 'Category Analytics',   desc: 'Win rates by market category — Politics, Crypto, Sports, and more.' },

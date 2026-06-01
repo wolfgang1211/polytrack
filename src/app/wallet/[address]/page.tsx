@@ -75,6 +75,8 @@ function computeInsights(positions: Position[]): Insights | null {
   return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, bestCategoryCount, avgPositionSize, biggestWin, biggestLoss };
 }
 
+interface TimelineData { points: { t: number; pnl: number }[]; realized: number; trades: number }
+
 export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
   const [data, setData] = useState<WalletData | null>(null);
@@ -82,6 +84,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('open');
   const [showTelegram, setShowTelegram] = useState(false);
+  const [timelineData, setTimelineData] = useState<TimelineData | null>(null);
+  const [timelineLoading, setTimelineLoading] = useState(true);
   const { isWatched, toggle } = useWatchlist();
 
   useEffect(() => {
@@ -95,12 +99,28 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
       .finally(() => setLoading(false));
   }, [address]);
 
+  useEffect(() => {
+    if (!address) return;
+    let live = true;
+    setTimelineLoading(true);
+    fetch(`/api/wallet/${address}/timeline`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((d: TimelineData) => { if (live && Array.isArray(d?.points)) setTimelineData(d); })
+      .catch(() => {})
+      .finally(() => { if (live) setTimelineLoading(false); });
+    return () => { live = false; };
+  }, [address]);
+
   const all = data?.positions ?? [];
   const open   = all.filter(p => p.currentValue > 0 || p.curPrice > 0);
   const closed = all.filter(p => p.currentValue === 0 && p.curPrice === 0);
   const shown  = tab === 'open' ? open : closed;
 
-  const totalPnl   = all.reduce((s, p) => s + positionPnl(p), 0);
+  const positionsPnl = all.reduce((s, p) => s + positionPnl(p), 0);
+  // Positions endpoint returns empty for fully-resolved wallets (all markets settled).
+  // Use the timeline's trade-replay realized P&L as the authoritative figure; fall back
+  // to the positions sum when the timeline hasn't loaded yet.
+  const totalPnl   = timelineData !== null ? timelineData.realized : positionsPnl;
   const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
   const roi        = invested > 0 ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
@@ -267,8 +287,10 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             />
             <StatsCard
               label="Total Pos."
-              value={String(all.length)}
-              sub={data?.truncated ? `${all.length}+ (capped)` : 'all time'}
+              value={all.length > 0 ? String(all.length) : timelineData ? `${timelineData.trades}` : '0'}
+              sub={all.length > 0
+                ? (data?.truncated ? `${all.length}+ (capped)` : 'all time')
+                : timelineData ? 'trades (from history)' : 'all time'}
               gradient="rgba(168,85,247,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
@@ -349,7 +371,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             {/* Main panel — everything fits in this column */}
             <div className="flex min-w-0 flex-col gap-4">
               <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                <PnlTimeline address={address} />
+                <PnlTimeline address={address} data={timelineData} loading={timelineLoading} />
               </div>
               <WalletCharts positions={all} />
               <WalletActivity address={address} positions={all} />
