@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Inter, JetBrains_Mono, Syne, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import { AuthProvider } from '@/lib/useAuth';
+import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = JetBrains_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -108,6 +110,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <Footer />
         </AuthProvider>
+        <Script id="jsonld-org" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+        <Script id="jsonld-home" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </body>
     </html>
   );
