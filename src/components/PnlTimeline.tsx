@@ -33,10 +33,15 @@ export default function PnlTimeline({
   address,
   data: externalData,
   loading: externalLoading,
+  anchor,
 }: {
   address: string;
   data?: TimelineResponse | null;
   loading?: boolean;
+  /** Authoritative realized P&L to anchor the curve's endpoint to. The trade
+   *  replay can be incomplete for very high-volume wallets, so when provided we
+   *  shift the whole curve so its last point equals this value. */
+  anchor?: number | null;
 }) {
   const [internalData, setInternalData] = useState<TimelineResponse | null>(null);
   const [internalLoading, setInternalLoading] = useState(externalData === undefined);
@@ -58,8 +63,11 @@ export default function PnlTimeline({
   const data = externalData !== undefined ? externalData : internalData;
   const loading = externalData !== undefined ? (externalLoading ?? false) : internalLoading;
 
-  const points = data?.points ?? [];
-  const current = data?.realized ?? 0;
+  const rawPoints = data?.points ?? [];
+  const rawLast = rawPoints.length ? rawPoints[rawPoints.length - 1].pnl : 0;
+  const offset = (anchor != null && rawPoints.length) ? anchor - rawLast : 0;
+  const points = offset ? rawPoints.map(p => ({ ...p, pnl: p.pnl + offset })) : rawPoints;
+  const current = anchor != null ? anchor : (data?.realized ?? 0);
   const positive = current >= 0;
   const stroke = positive ? '#34d399' : '#fb7185';
 

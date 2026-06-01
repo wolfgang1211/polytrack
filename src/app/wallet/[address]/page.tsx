@@ -376,7 +376,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             {/* Main panel — everything fits in this column */}
             <div className="flex min-w-0 flex-col gap-4">
               <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                <PnlTimeline address={address} data={timelineData} loading={timelineLoading} />
+                <PnlTimeline address={address} data={timelineData} loading={timelineLoading} anchor={realizedTotal} />
               </div>
               <WalletCharts positions={all} />
               <WalletActivity address={address} positions={all} />
