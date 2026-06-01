@@ -254,3 +254,54 @@ body {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
+
+/* ─── Prose for legal / content pages ───────────────────── */
+
+.prose-custom h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-custom p {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom li {
+  font-size: 0.875rem;
+  line-height: 1.75;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 0.25rem;
+}
+
+.prose-custom strong {
+  color: rgba(255,255,255,0.7);
+}
+
+.prose-custom a {
+  color: #a855f7;
+  text-decoration: underline;
+  transition: color 0.2s;
+}
+
+.prose-custom a:hover {
+  color: #c084fc;
+}

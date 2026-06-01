@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono, Syne, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { AuthProvider } from '@/lib/useAuth';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="h-px w-full pointer-events-none"
             style={{ background: 'linear-gradient(90deg,transparent 0%,var(--vi-border-xs) 20%,var(--vi-border-xs) 80%,transparent 100%)' }} />
           <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
