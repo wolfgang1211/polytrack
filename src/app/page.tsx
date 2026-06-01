@@ -8,57 +8,77 @@ import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
 import LiveTicker from '@/components/LiveTicker';
 
+function SectionHeader({ index, label }: { index: string; label: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-10">
 
-      {/* ── Live trade ticker (real-time pulse, top of page) ── */}
+      {/* ── Live trade ticker ── */}
       <LiveTicker />
 
-      {/* ── Hero: headline (left) + Smart Money preview (right) ── */}
-      <div className="relative overflow-hidden rounded-3xl px-6 py-8 sm:px-8 sm:py-10 animate-fade-in-up"
-        style={{
-          background: 'linear-gradient(135deg, rgba(124,58,237,0.10), rgba(147,51,234,0.06))',
-          border: '1px solid rgba(255,255,255,0.07)',
-        }}>
-        {/* Aurora orbs */}
-        <div className="pointer-events-none absolute -top-24 -left-16 h-64 w-64 rounded-full animate-orb"
-          style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.28) 0%, transparent 70%)', filter: 'blur(50px)' }} />
-        <div className="pointer-events-none absolute -bottom-28 right-10 h-72 w-72 rounded-full animate-orb"
-          style={{ background: 'radial-gradient(circle, rgba(147,51,234,0.20) 0%, transparent 70%)', filter: 'blur(55px)', animationDelay: '6s' }} />
+      {/* ── [01] Hero ── */}
+      <div className="animate-fade-in-up">
+        <div className="flex items-center gap-3 mb-8">
+          <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>[01]</span>
+          <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.22)' }}>Terminal Intelligence</span>
+        </div>
 
-        <div className="relative grid gap-8 lg:grid-cols-[1fr_minmax(300px,380px)] lg:items-center">
-          <div>
-            <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              <span className="text-white">Track Polymarket&apos;s</span>{' '}
-              <span className="text-grad">Sharpest Money Moves</span>
+        <div className="grid gap-10 lg:grid-cols-[1fr_minmax(280px,340px)] lg:items-start">
+          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+            <h1
+              className="text-4xl font-black leading-[1.12] lg:text-5xl"
+              style={{ fontFamily: 'var(--font-serif-display, Georgia, serif)' }}
+            >
+              <span className="text-white">Real-time </span>
+              <span className="text-grad">alpha</span>
+              <span className="text-white"> from the best</span>
             </h1>
-            <p className="mt-4 max-w-lg text-base font-medium text-white/45 sm:text-lg">
+            <p className="mt-5 max-w-sm text-sm font-medium leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
               Discover, follow and copy the most profitable traders on Polymarket in real time.
             </p>
           </div>
-
-          {/* Smart Money preview card */}
           <SmartMoneyCard />
         </div>
       </div>
 
-      {/* ── Stats ── */}
-      <DashboardStats />
+      {/* ── [02] Platform Stats ── */}
+      <div>
+        <SectionHeader index="[02]" label="Platform Stats" />
+        <DashboardStats />
+      </div>
 
-      {/* ── Live activity rail (big trades) + rising traders ── */}
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px] items-start">
-        <RecentBigTrades />
-        <div className="lg:sticky lg:top-4">
-          <RisingTraders />
+      {/* ── [03] Live Feed + Rising Traders ── */}
+      <div>
+        <SectionHeader index="[03]" label="Live Feed" />
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px] items-start">
+          <RecentBigTrades />
+          <div className="lg:sticky lg:top-4">
+            <RisingTraders />
+          </div>
         </div>
       </div>
 
-      {/* ── Top Markets (12) ── */}
-      <TopMarkets limit={12} showViewAll />
+      {/* ── [04] Top Markets ── */}
+      <div>
+        <SectionHeader index="[04]" label="Top Markets" />
+        <TopMarkets limit={12} showViewAll />
+      </div>
 
-      {/* ── Hot Markets ── */}
-      <HotBets />
+      {/* ── [05] Hot Bets ── */}
+      <div>
+        <SectionHeader index="[05]" label="Hot Bets" />
+        <HotBets />
+      </div>
 
     </div>
   );

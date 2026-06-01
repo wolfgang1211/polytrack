@@ -5,6 +5,7 @@
   --color-foreground: #f1f2f6;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-syne);
 }
 
 /* ─── Violet design tokens ───────────────────────────────── */
@@ -135,6 +136,25 @@
 
 @utility animate-number-pop {
   animation: number-pop 0.3s ease;
+}
+
+@utility terminal-label {
+  font-family: var(--font-geist-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.30);
+}
+
+@utility section-rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--vi-border), transparent);
+}
+
+@utility data-strip {
+  background: rgba(255,255,255,0.02);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 
 /* Seamless horizontal ticker — the track holds two identical copies, so
