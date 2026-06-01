@@ -45,21 +45,26 @@ export async function GET(
   const { address } = await ctx.params;
 
   const PAGE = 500;
-  const MAX_PAGES = 6; // up to 3,000 trades
+  const MAX_PAGES = 40;   // up to 20,000 trades → covers long histories
+  const BATCH = 5;        // fetch pages 5-at-a-time to bound latency
 
   try {
     const trades: RecentTrade[] = [];
-    for (let page = 0; page < MAX_PAGES; page++) {
-      const res = await fetch(
-        `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${page * PAGE}`,
-        { headers: HEADERS, next: { revalidate: 120 } }
-      ).catch(() => null);
-      if (!res || !res.ok) break;
-      const json = await res.json();
-      const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
-      if (!batch.length) break;
-      trades.push(...batch);
-      if (batch.length < PAGE) break;
+    let stop = false;
+    for (let start = 0; start < MAX_PAGES && !stop; start += BATCH) {
+      const pages = Array.from({ length: Math.min(BATCH, MAX_PAGES - start) }, (_, j) => start + j);
+      const results = await Promise.all(pages.map(p =>
+        fetch(
+          `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
+          { headers: HEADERS, next: { revalidate: 120 } }
+        ).then(r => (r.ok ? r.json() : null)).catch(() => null)
+      ));
+      for (const json of results) {
+        const batch: RecentTrade[] = Array.isArray(json) ? json : (json?.value ?? json?.data ?? []);
+        if (!batch || !batch.length) { stop = true; continue; }
+        trades.push(...batch);
+        if (batch.length < PAGE) stop = true;
+      }
     }
 
     // Oldest -> newest so the replay is chronological.
