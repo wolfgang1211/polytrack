@@ -15,6 +15,7 @@ const NAV_LINKS = [
   { href: '/activity',    label: 'Activity'    },
   { href: '/liquidity',   label: 'Liquidity'   },
   { href: '/insights',    label: 'Insights'    },
+  { href: '/faq',         label: 'FAQ'         },
 ];
 
 export default function Navbar() {
