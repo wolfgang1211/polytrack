@@ -473,7 +473,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
                 <span className="text-xs text-white/40">Liquidity Quality</span>
                 <span className="rounded-full px-3 py-0.5 text-sm font-black"
                   style={{ background: `${scoreColor(depth.qualityScore)}20`, color: scoreColor(depth.qualityScore), border: `1px solid ${scoreColor(depth.qualityScore)}40` }}>
-                  {depth.qualityScore}/100 — {scoreLabel(depth.qualityScore)}
+                  {depth.qualityScore}/100, {scoreLabel(depth.qualityScore)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -488,13 +488,13 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             <div className="grid gap-4 lg:grid-cols-2">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/70 mb-2">
-                  Bids — Total {formatCurrency(depth.bidDepthTotal, true)}
+                  Bids · Total {formatCurrency(depth.bidDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.bids} best={depth.bestBid} side="bid" maxTotal={maxTotal} />
               </div>
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-rose-400/70 mb-2">
-                  Asks — Total {formatCurrency(depth.askDepthTotal, true)}
+                  Asks · Total {formatCurrency(depth.askDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.asks} best={depth.bestAsk} side="ask" maxTotal={maxTotal} />
               </div>
@@ -595,7 +595,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
           <div className="rounded-xl px-4 py-3 text-[10px] text-white/25 leading-relaxed"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
             <strong className="text-white/40">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
-            Estimates only — actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
+            Estimates only; actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
           </div>
         </div>
 
@@ -973,7 +973,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
             <div className="text-right">
               <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Status</p>
               <p className="text-xs font-bold" style={{ color: wouldFire ? '#34d399' : 'rgba(255,255,255,0.45)' }}>
-                {wouldFire ? `✓ Above ${thr}¢ — would alert now` : `Below ${thr}¢ threshold`}
+                {wouldFire ? `✓ Above ${thr}¢, would alert now` : `Below ${thr}¢ threshold`}
               </p>
             </div>
           </div>
@@ -991,7 +991,7 @@ function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
           Set up alert on Telegram
         </button>
         <p className="text-[10px] text-white/25 text-center leading-relaxed">
-          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out — for now you&apos;ll get whale &amp; liquidity alerts on join.
+          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out; for now you&apos;ll get whale &amp; liquidity alerts on join.
         </p>
       </div>
     </section>

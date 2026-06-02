@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Disclaimer',
-  description: 'AlphaBoard financial disclaimer — important information about the nature of our analytics platform.',
+  description: 'AlphaBoard financial disclaimer: important information about the nature of our analytics platform.',
   alternates: { canonical: '/disclaimer' },
 };
 
@@ -38,8 +38,8 @@ export default function DisclaimerPage() {
         <section>
           <h2>1. Not Financial Advice</h2>
           <p>
-            All content provided on AlphaBoard — including but not limited to trader rankings, Smart Scores,
-            market analytics, liquidity data, P&amp;L figures, LP estimates, and trade signals — is provided
+            All content provided on AlphaBoard, including but not limited to trader rankings, Smart Scores,
+            market analytics, liquidity data, P&amp;L figures, LP estimates, and trade signals, is provided
             strictly for <strong>informational and educational purposes</strong>. None of the information
             constitutes:
           </p>

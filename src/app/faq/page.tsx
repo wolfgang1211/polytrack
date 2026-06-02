@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'FAQ',
-  description: 'Frequently asked questions about AlphaBoard — Polymarket analytics, Smart Scores, liquidity and more.',
+  description: 'Frequently asked questions about AlphaBoard: Polymarket analytics, Smart Scores, liquidity and more.',
   alternates: { canonical: '/faq' },
 };
 
@@ -20,7 +20,7 @@ const QA: Record<string, QAItem[]> = {
   general: [
     {
       q: 'What is AlphaBoard?',
-      a: 'AlphaBoard is an independent analytics platform for Polymarket prediction markets. We track top traders, analyze market data, and provide tools for liquidity providers — all in real time.',
+      a: 'AlphaBoard is an independent analytics platform for Polymarket prediction markets. We track top traders, analyze market data, and provide tools for liquidity providers, all in real time.',
     },
     {
       q: 'Is AlphaBoard free to use?',

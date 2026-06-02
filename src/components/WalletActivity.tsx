@@ -257,7 +257,7 @@ export default function WalletActivity({ address, positions }: { address: string
 
         {/* 4 — Outcome bias */}
         <Panel accent="#fbbf24" title="Outcome Bias"
-          sub="Yes vs No share of buy orders — does this wallet lean optimistic or contrarian?">
+          sub="Yes vs No share of buy orders: does this wallet lean optimistic or contrarian?">
           {bias.totalN === 0 ? (
             <p className="flex h-36 items-center justify-center text-sm text-white/25">No buy orders found</p>
           ) : (
@@ -292,7 +292,7 @@ export default function WalletActivity({ address, positions }: { address: string
 
       {/* 5 — Activity heatmap (full width) */}
       <Panel accent="#f472b6" title="Activity Heatmap"
-        sub="Weekly trading rhythm — darker cells mean more trades in that day/hour slot (local time)">
+        sub="Weekly trading rhythm: darker cells mean more trades in that day/hour slot (local time)">
         <div className="overflow-x-auto">
           <div className="min-w-[480px]">
             {/* hour axis */}
@@ -308,7 +308,7 @@ export default function WalletActivity({ address, positions }: { address: string
                   {row.map((c, ci) => {
                     const intensity = heat.max > 0 ? c / heat.max : 0;
                     return (
-                      <div key={ci} title={`${DAY_LABELS[ri]} ${ci}:00 — ${c} trade${c === 1 ? '' : 's'}`}
+                      <div key={ci} title={`${DAY_LABELS[ri]} ${ci}:00, ${c} trade${c === 1 ? '' : 's'}`}
                         className="aspect-square flex-1 rounded-sm"
                         style={{
                           background: c === 0 ? 'rgba(255,255,255,0.03)'

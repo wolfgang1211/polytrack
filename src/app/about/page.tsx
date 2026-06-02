@@ -3,7 +3,7 @@ import Logo from '@/components/Logo';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'Learn about AlphaBoard — the real-time analytics platform for Polymarket prediction markets.',
+  description: 'Learn about AlphaBoard, the real-time analytics platform for Polymarket prediction markets.',
   alternates: { canonical: '/about' },
 };
 
@@ -25,7 +25,7 @@ export default function AboutPage() {
           <h2>What is AlphaBoard?</h2>
           <p>
             AlphaBoard is an independent analytics platform built for the Polymarket ecosystem. We track,
-            rank, and analyze the most profitable prediction market traders in real time — giving you
+            rank, and analyze the most profitable prediction market traders in real time, giving you
             the tools to discover where smart money flows.
           </p>
           <p>
@@ -43,7 +43,7 @@ export default function AboutPage() {
               { icon: '📊', title: 'Markets Explorer', desc: 'Browse 100+ active markets with real-time prices, volume and liquidity data.' },
               { icon: '⚡', title: 'Live Activity Feed', desc: 'Watch trades happen in real time with dynamic treemap visualization.' },
               { icon: '💧', title: 'Liquidity Hub', desc: 'Discover LP opportunities, analyze spreads and simulate maker rewards.' },
-              { icon: '🔍', title: 'Wallet Checker', desc: 'Analyze any Ethereum wallet — P&L, win rate, trade history and more.' },
+              { icon: '🔍', title: 'Wallet Checker', desc: 'Analyze any Ethereum wallet: P&L, win rate, trade history and more.' },
               { icon: '🔔', title: 'Smart Alerts', desc: 'Get Telegram notifications for whale trades, market moves and LP opportunities.' },
             ].map(({ icon, title, desc }) => (
               <div
@@ -91,7 +91,7 @@ export default function AboutPage() {
           <h2>Important Notice</h2>
           <p>
             AlphaBoard is an <strong>independent project</strong> and is not affiliated with, endorsed by,
-            or officially connected to Polymarket. We are an analytics and data visualization tool only —
+            or officially connected to Polymarket. We are an analytics and data visualization tool only;
             we do not facilitate trading, custody funds, or provide financial advice.
           </p>
           <p>

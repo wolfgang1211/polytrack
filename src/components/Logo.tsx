@@ -5,9 +5,8 @@ interface LogoProps {
 }
 
 /**
- * AlphaBoard mark — a clean, free-standing "A" (alpha) glyph in two-tone purple.
- * No background tile: just the geometric letterform, matching the brand mockup.
- * Inline SVG so it stays crisp and needs no network request.
+ * AlphaBoard mark — single-piece, stylized "A" matching the refreshed brand mark.
+ * Soft lavender → deeper purple vertical gradient, clean geometry, no outline.
  */
 export default function Logo({ size = 36, className }: LogoProps) {
   return (
@@ -21,28 +20,24 @@ export default function Logo({ size = 36, className }: LogoProps) {
       aria-label="AlphaBoard"
     >
       <defs>
-        <linearGradient id="abLeft" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#a855f7" />
+        <linearGradient id="abGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e9d5ff" />
+          <stop offset="0.45" stopColor="#c084fc" />
           <stop offset="1" stopColor="#7c3aed" />
-        </linearGradient>
-        <linearGradient id="abRight" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#d8b4fe" />
-          <stop offset="1" stopColor="#a855f7" />
         </linearGradient>
       </defs>
 
-      {/* Right leg (lighter) — drawn first so the left leg overlaps at the apex */}
+      {/* Single-piece stylized A: trunk + legs unified, with a clean aperture */}
       <path
-        d="M42 12 L66 70 L54 70 L34 22 Z"
-        fill="url(#abRight)"
+        d="M36 10 L28 38 L18 72 L32 72 L40 48 L48 72 L62 72 L52 38 Z"
+        fill="url(#abGrad)"
       />
-      {/* Left leg (darker) */}
+
+      {/* Optional light apex highlight for depth */}
       <path
-        d="M38 12 L14 70 L26 70 L46 22 Z"
-        fill="url(#abLeft)"
+        d="M36 10 L34 18 L38 18 Z"
+        fill="rgba(255,255,255,0.25)"
       />
-      {/* Crossbar */}
-      <rect x="26" y="46" width="28" height="10" rx="3" fill="url(#abLeft)" />
     </svg>
   );
 }

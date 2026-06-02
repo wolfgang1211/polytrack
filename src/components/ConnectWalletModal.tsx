@@ -83,7 +83,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
           </button>
         </form>
 
-        <p className="mt-4 text-center text-[10px] text-white/18">Web3 wallet connection — coming soon</p>
+        <p className="mt-4 text-center text-[10px] text-white/18">Web3 wallet connection, coming soon</p>
       </div>
     </div>
   );

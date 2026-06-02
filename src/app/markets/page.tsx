@@ -206,7 +206,7 @@ export default function MarketsPage() {
           <span className="text-grad">Explorer</span>
         </h1>
         <p className="text-sm text-white/40 max-w-lg">
-          Browse {markets.length || '120+'} active prediction markets — search, filter by category, and sort by volume, liquidity or closing time.
+          Browse {markets.length || '120+'} active prediction markets. Search, filter by category, and sort by volume, liquidity or closing time.
         </p>
       </div>
 

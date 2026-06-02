@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'AlphaBoard terms of service — rules and conditions for using our platform.',
+  description: 'AlphaBoard terms of service: rules and conditions for using our platform.',
   alternates: { canonical: '/terms' },
 };
 
@@ -67,8 +67,8 @@ export default function TermsPage() {
         <section>
           <h2>6. Intellectual Property</h2>
           <p>
-            All content, features, and functionality of the Service — including but not limited to text,
-            graphics, logos, icons, the Smart Score algorithm, and software — are owned by AlphaBoard and
+            All content, features, and functionality of the Service, including but not limited to text,
+            graphics, logos, icons, the Smart Score algorithm, and software, are owned by AlphaBoard and
             protected by intellectual property laws. You may not reproduce, distribute, or create derivative
             works without our express written consent.
           </p>

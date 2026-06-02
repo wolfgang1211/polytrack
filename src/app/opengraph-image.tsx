@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
-export const alt = 'AlphaBoard — Real-time alpha from the best Polymarket traders';
+export const alt = 'AlphaBoard: Real-time alpha from the best Polymarket traders';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 

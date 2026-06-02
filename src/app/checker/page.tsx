@@ -58,14 +58,14 @@ export default function WalletCheckerPage() {
             <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
               <p className="text-xs font-bold text-white/70 mb-1.5">What does P&amp;L mean?</p>
               <p className="text-[11px] leading-relaxed text-white/35">
-                Net profit or loss from all Polymarket activity — realized gains from closed positions plus
+                Net profit or loss from all Polymarket activity: realized gains from closed positions plus
                 unrealized mark-to-market on open ones. Read it alongside volume and position count.
               </p>
             </div>
             <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
               <p className="text-xs font-bold text-white/70 mb-1.5">How to read win rate</p>
               <p className="text-[11px] leading-relaxed text-white/35">
-                Share of resolved positions that finished profitably. On its own it&apos;s not enough —
+                Share of resolved positions that finished profitably. On its own it&apos;s not enough;
                 position size, odds paid and total P&amp;L together determine whether a strategy works.
               </p>
             </div>

@@ -91,7 +91,7 @@ export default function InsightsPage() {
       {/* ── [03] Top Performers ── */}
       {!loading && top3.length > 0 && (
         <section>
-          <SectionHeader index="[03]" label="Top Performers — All Time" />
+          <SectionHeader index="[03]" label="Top Performers, All Time" />
           <div className="grid gap-4 sm:grid-cols-3">
             {top3.map((e, i) => {
               const medals = ['🥇', '🥈', '🥉'];
@@ -136,7 +136,7 @@ export default function InsightsPage() {
         <SectionHeader index="[04]" label="Coming Soon" />
         <div className="grid gap-3 sm:grid-cols-3">
           {[
-            { icon: '📊', title: 'Category Analytics',   desc: 'Win rates by market category — Politics, Crypto, Sports, and more.' },
+            { icon: '📊', title: 'Category Analytics',   desc: 'Win rates by market category: Politics, Crypto, Sports, and more.' },
             { icon: '🔥', title: 'Trend Detection',       desc: 'Traders with the fastest-growing PnL over the last 7 days.' },
             { icon: '🤖', title: 'AI Trade Signals',      desc: 'Pattern-based signals derived from whale wallet activity.' },
           ].map(({ icon, title, desc }) => (

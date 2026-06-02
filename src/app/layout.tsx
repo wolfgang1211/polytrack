@@ -17,7 +17,7 @@ const SITE_URL = 'https://www.alphaboard.xyz';
 
 export const metadata: Metadata = {
   title: {
-    default: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    default: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     template: '%s | AlphaBoard',
   },
   description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
@@ -30,20 +30,20 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: SITE_URL,
     siteName: 'AlphaBoard',
-    title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    title: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
     images: [
       {
         url: '/opengraph-image',
         width: 1200,
         height: 630,
-        alt: 'AlphaBoard — Real-time alpha from the best Polymarket traders',
+        alt: 'AlphaBoard: Real-time alpha from the best Polymarket traders',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AlphaBoard — Polymarket Leaderboard & Wallet Tracker',
+    title: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
     images: ['/opengraph-image'],
   },

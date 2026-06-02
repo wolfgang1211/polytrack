@@ -60,7 +60,7 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">What Is a Whale Trade?</h3>
         <p className="text-white/50">
-          A whale trade is an unusually large transaction — typically above $10k notional. 
+          A whale trade is an unusually large transaction, typically above $10k notional.
           These trades often precede price moves and can signal informed positioning.
         </p>
       </div>
@@ -95,7 +95,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!post) return { title: 'Post Not Found' };
   return {
     title: post.title,
-    description: `AlphaBoard blog — ${post.title}`,
+    description: `AlphaBoard blog: ${post.title}`,
     alternates: { canonical: `/blog/${params.slug}` },
   };
 }
