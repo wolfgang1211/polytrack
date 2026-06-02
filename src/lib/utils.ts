@@ -24,7 +24,7 @@ export function positionPnl(p: { cashPnl?: number; realizedPnl?: number; current
   // Only include unrealized cashPnl while the position is OPEN. For closed/
   // redeemed positions the data-api reports cashPnl as -costBasis, which would
   // double-count the loss on top of realizedPnl.
-  const isOpen = (Number(p?.currentValue) || 0) > 0 || (Number(p?.curPrice) || 0) > 0;
+  const isOpen = (Number(p?.currentValue) || 0) > 0;
   return realized + (isOpen ? cash : 0);
 }
 

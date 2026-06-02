@@ -113,8 +113,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   }, [address]);
 
   const all = data?.positions ?? [];
-  const open   = all.filter(p => p.currentValue > 0 || p.curPrice > 0);
-  const closed = all.filter(p => p.currentValue === 0 && p.curPrice === 0);
+  const open   = all.filter(p => p.currentValue > 0);
+  const closed = all.filter(p => !(p.currentValue > 0));
   const shown  = tab === 'open' ? open : closed;
 
   // Single source of truth for P&L (matches WalletSidebar):

@@ -278,8 +278,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     </div>
                   </div>
 
-                  {/* 7d sparkline */}
-                  <div className="flex items-center justify-center">
+                  {/* 7d sparkline — based on last 80 trades */}
+                  <div className="flex items-center justify-center" title="P&L trend (last 80 trades)">
                     <Sparkline data={spark} width={88} height={26} />
                   </div>
 

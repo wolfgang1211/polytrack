@@ -22,28 +22,39 @@ export async function GET(
   const { address } = await ctx.params;
 
   const PAGE = 500;
-  const MAX_PAGES = 4;   // up to 2,000 trades
+  // Activity analytics (trades-by-hour, hold time, buy/sell ratio) need a
+  // meaningful sample. Fetch up to 20,000 trades (40 pages) so high-volume
+  // wallets get accurate behavioural stats. Natural early-exit when the API
+  // returns a partial or empty page.
+  const MAX_PAGES = 40;
+  const BATCH = 10;
 
   try {
     const trades: RecentTrade[] = [];
-    for (let page = 0; page < MAX_PAGES; page++) {
-      const res = await fetch(
-        `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${page * PAGE}`,
-        { headers: HEADERS, next: { revalidate: 120 } }
-      ).catch(() => null);
-      if (!res || !res.ok) break;
-      const json = await res.json();
-      const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
-      if (!batch.length) break;
-      trades.push(...batch);
-      if (batch.length < PAGE) break;
+    let stop = false;
+    for (let start = 0; start < MAX_PAGES && !stop; start += BATCH) {
+      const end = Math.min(start + BATCH, MAX_PAGES);
+      const pages = Array.from({ length: end - start }, (_, j) => start + j);
+      const results = await Promise.all(pages.map(p =>
+        fetch(
+          `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
+          { headers: HEADERS, next: { revalidate: 3600 } }
+        ).then(r => (r.ok ? r.json() : null)).catch(() => null)
+      ));
+      for (const json of results) {
+        if (json === null || json === undefined) continue;
+        const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
+        if (!batch.length) { stop = true; break; }
+        trades.push(...batch);
+        if (batch.length < PAGE) { stop = true; break; }
+      }
     }
 
     trades.sort((a, b) => tsOf(b) - tsOf(a));
 
     return NextResponse.json(
       { trades, count: trades.length },
-      { headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' } }
+      { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' } }
     );
   } catch {
     return NextResponse.json({ error: 'Failed to fetch activity' }, { status: 500 });

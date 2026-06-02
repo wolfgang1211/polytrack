@@ -63,7 +63,7 @@ export default function PnlTimeline({
   const data = externalData !== undefined ? externalData : internalData;
   const loading = externalData !== undefined ? (externalLoading ?? false) : internalLoading;
 
-  const rawPoints = data?.points ?? [];
+  const rawPoints = [...(data?.points ?? [])].sort((a, b) => a.t - b.t);
   const rawLast = rawPoints.length ? rawPoints[rawPoints.length - 1].pnl : 0;
   const offset = (anchor != null && rawPoints.length) ? anchor - rawLast : 0;
   const points = offset ? rawPoints.map(p => ({ ...p, pnl: p.pnl + offset })) : rawPoints;
@@ -76,7 +76,10 @@ export default function PnlTimeline({
       <div className="mb-3 flex items-end justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">PnL Timeline</p>
-          <p className="text-[10px] text-white/25 mt-0.5">Cumulative realized P&amp;L from trade history</p>
+          <p className="text-[10px] text-white/25 mt-0.5">
+            Cumulative realized P&amp;L from trade history
+            {data?.trades ? ` · ${data.trades.toLocaleString()} trades` : ''}
+          </p>
         </div>
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-wider text-white/25">Current</p>

@@ -53,14 +53,14 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
     let realized = 0;
     let unrealized = 0;
     for (const p of positions) {
-      const isOpen = p.currentValue > 0 || p.curPrice > 0;
+      const isOpen = p.currentValue > 0;
       // True P&L: realized for all, unrealized (cashPnl) only for open positions —
       // closed/redeemed report cashPnl as -costBasis and would double-count losses.
       const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
       const c = detectCategory(p.title);
       cat[c] = (cat[c] ?? 0) + pnl;
-      realized += p.realizedPnl ?? 0;
-      if (isOpen) unrealized += p.cashPnl ?? 0;
+      realized += Number(p.realizedPnl) || 0;
+      if (isOpen) unrealized += Number(p.cashPnl) || 0;
     }
     const catData = Object.entries(cat)
       .map(([name, value]) => ({ name, value }))

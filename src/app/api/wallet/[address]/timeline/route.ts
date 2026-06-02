@@ -45,25 +45,33 @@ export async function GET(
   const { address } = await ctx.params;
 
   const PAGE = 500;
-  const MAX_PAGES = 40;   // up to 20,000 trades → covers long histories
-  const BATCH = 5;        // fetch pages 5-at-a-time to bound latency
+  // No hard page cap — stop naturally when the API returns a partial/empty page.
+  // Safety ceiling of 600 pages (300,000 trades) guards against infinite loops on
+  // API bugs; no real Polymarket wallet is expected to exceed this.
+  const MAX_PAGES = 600;
+  const BATCH = 20; // 20 concurrent requests per round → ~10s for 300-page wallets
 
   try {
     const trades: RecentTrade[] = [];
     let stop = false;
     for (let start = 0; start < MAX_PAGES && !stop; start += BATCH) {
-      const pages = Array.from({ length: Math.min(BATCH, MAX_PAGES - start) }, (_, j) => start + j);
+      const end = Math.min(start + BATCH, MAX_PAGES);
+      const pages = Array.from({ length: end - start }, (_, j) => start + j);
       const results = await Promise.all(pages.map(p =>
         fetch(
           `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
-          { headers: HEADERS, next: { revalidate: 120 } }
+          // Historical trade pages are immutable — cache for 1 h to avoid
+          // re-fetching thousands of pages on every wallet view.
+          { headers: HEADERS, next: { revalidate: 3600 } }
         ).then(r => (r.ok ? r.json() : null)).catch(() => null)
       ));
       for (const json of results) {
+        // null = transient network failure — skip this page, don't abort the whole fetch
+        if (json === null || json === undefined) continue;
         const batch: RecentTrade[] = Array.isArray(json) ? json : (json?.value ?? json?.data ?? []);
-        if (!batch || !batch.length) { stop = true; continue; }
+        if (!batch.length) { stop = true; break; }   // empty page = data exhausted
         trades.push(...batch);
-        if (batch.length < PAGE) stop = true;
+        if (batch.length < PAGE) { stop = true; break; } // partial page = last page
       }
     }
 
@@ -102,8 +110,8 @@ export async function GET(
       points.push({ t, pnl: Math.round(realized * 100) / 100 });
     }
 
-    // Downsample to ~150 points, always keeping the last.
-    const MAX_POINTS = 150;
+    // Downsample to ~300 points — finer resolution for wallets with long histories.
+    const MAX_POINTS = 300;
     let series = points;
     if (points.length > MAX_POINTS) {
       const step = points.length / MAX_POINTS;
@@ -120,7 +128,8 @@ export async function GET(
     };
 
     return NextResponse.json(body, {
-      headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
+      // Cache for 1 h — trade history is append-only, old pages never change.
+      headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to build timeline' }, { status: 500 });

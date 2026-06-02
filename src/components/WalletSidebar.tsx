@@ -41,12 +41,12 @@ export default function WalletSidebar({
     let realized = 0, unrealized = 0, invested = 0, wins = 0, losses = 0;
     const markets = new Set<string>();
     for (const p of positions) {
-      realized += p.realizedPnl ?? 0;
+      realized += Number(p.realizedPnl) || 0;
       // Only count cashPnl (unrealized mark-to-market) for OPEN positions —
       // closed/redeemed positions report cashPnl as -costBasis, which would
       // double-count losses if summed over everything.
-      const isOpen = p.currentValue > 0 || p.curPrice > 0;
-      if (isOpen) unrealized += p.cashPnl ?? 0;
+      const isOpen = p.currentValue > 0;
+      if (isOpen) unrealized += Number(p.cashPnl) || 0;
       invested += p.initialValue ?? 0;
       const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
       if (pnl > 0) wins++; else if (pnl < 0) losses++;
