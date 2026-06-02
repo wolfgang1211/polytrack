@@ -1,0 +1,4 @@
+file 'C:/Users/wolfgang/polymarket-project/.video-build/alphaboard-ad/01_intro.mp4'
+file 'C:/Users/wolfgang/polymarket-project/.video-build/alphaboard-ad/02_dashboard.mp4'
+file 'C:/Users/wolfgang/polymarket-project/.video-build/alphaboard-ad/03_signals.mp4'
+file 'C:/Users/wolfgang/polymarket-project/.video-build/alphaboard-ad/04_cta.mp4'
