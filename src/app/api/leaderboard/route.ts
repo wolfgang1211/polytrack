@@ -9,11 +9,9 @@ const PERIOD_MAP: Record<string, string> = {
 };
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const timeWindow = searchParams.get('window') || 'allTime';
-  // API max limit is 50
-  const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 50);
-
+  const timeWindow = request.nextUrl.searchParams.get('window') || 'allTime';
+  const limitParam = request.nextUrl.searchParams.get('limit') || '50';
+  const limit = Math.min(Number(limitParam), 50);
   const timePeriod = PERIOD_MAP[timeWindow] ?? 'ALL';
 
   try {
@@ -29,10 +27,7 @@ export async function GET(request: NextRequest) {
     );
 
     if (!res.ok) {
-      return NextResponse.json(
-        { error: `Upstream error: ${res.status}` },
-        { status: res.status }
-      );
+      return NextResponse.json({ error: `Upstream error: ${res.status}` }, { status: res.status });
     }
 
     const json = await res.json();
