@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
+import CopyAddress from '@/components/CopyAddress';
 
 const REFRESH_MS = 2_000;
 
@@ -380,8 +381,11 @@ export default function ActivityPage() {
                     ) : <span className="h-6 w-6 flex-shrink-0 rounded bg-white/5" />}
                     <span className="truncate text-white/70">{t.title ?? t.asset ?? '—'}</span>
                   </a>
-                  <a href={t.proxyWallet ? `/wallet/${t.proxyWallet.toLowerCase()}` : undefined}
-                    className="truncate font-mono text-[11px] text-white/45 hover:text-violet-300">{name}</a>
+                  <div className="flex items-center gap-1 min-w-0">
+                    <a href={t.proxyWallet ? `/wallet/${t.proxyWallet.toLowerCase()}` : undefined}
+                      className="truncate font-mono text-[11px] text-white/45 hover:text-violet-300">{name}</a>
+                    {t.proxyWallet && <CopyAddress address={t.proxyWallet} />}
+                  </div>
                   <span className="truncate text-white/55">{t.outcome ?? '—'}</span>
                   <span className="flex justify-center">
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase"

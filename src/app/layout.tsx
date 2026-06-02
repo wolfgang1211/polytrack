@@ -5,7 +5,6 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
-import { AuthProvider } from '@/lib/useAuth';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -99,8 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         </div>
-        <AuthProvider>
-          <Navbar />
+        <Navbar />
           {/* 1px violet scan-line beneath navbar */}
           <div className="h-px w-full pointer-events-none"
             style={{ background: 'linear-gradient(90deg,transparent 0%,var(--vi-border-xs) 20%,var(--vi-border-xs) 80%,transparent 100%)' }} />
@@ -109,7 +107,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <Footer />
-        </AuthProvider>
         <Script id="jsonld-org" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <Script id="jsonld-home" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </body>

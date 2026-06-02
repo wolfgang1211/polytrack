@@ -15,6 +15,7 @@ import LatestMoves from '@/components/LatestMoves';
 import WalletActivity from '@/components/WalletActivity';
 import PnlTimeline from '@/components/PnlTimeline';
 import WalletSidebar from '@/components/WalletSidebar';
+import CopyAddress from '@/components/CopyAddress';
 
 type Tab = 'open' | 'closed';
 
@@ -199,7 +200,10 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                     <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Wallet</span>
                   </div>
                   <h1 className="text-xl font-black text-white sm:text-2xl">{short}</h1>
-                  <p className="font-mono text-[11px] text-white/25 mt-0.5 break-all max-w-xs">{address}</p>
+                  <div className="flex items-start gap-1.5 mt-0.5">
+                    <p className="font-mono text-[11px] text-white/25 break-all max-w-xs">{address}</p>
+                    <CopyAddress address={address} className="mt-0.5" />
+                  </div>
 
                   {/* at-a-glance pills */}
                   <div className="mt-3 flex flex-wrap items-center gap-2">

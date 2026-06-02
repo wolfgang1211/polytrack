@@ -4,9 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TelegramModal from '@/components/TelegramModal';
-import AuthModal from '@/components/AuthModal';
 import Logo from '@/components/Logo';
-import { useAuth } from '@/lib/useAuth';
 
 const NAV_LINKS = [
   { href: '/checker',     label: 'Wallet Checker' },
@@ -21,10 +19,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const pathname = usePathname();
   const [showTelegram, setShowTelegram] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup' | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, ready, signOut } = useAuth();
 
   // Close mobile menu on route change
   useEffect(() => { setMobileOpen(false); }, [pathname]);
@@ -32,7 +27,6 @@ export default function Navbar() {
   return (
     <>
       {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
-      {authMode && <AuthModal initialMode={authMode} onClose={() => setAuthMode(null)} />}
 
       <header className="sticky top-0 z-50">
         <div
@@ -100,52 +94,6 @@ export default function Navbar() {
               >
                 ⭐
               </Link>
-
-              {/* Auth — desktop only; mobile gets full auth section in mobile menu */}
-              <div className="hidden lg:flex items-center gap-2">
-                {!ready ? null : user ? (
-                  <div className="relative">
-                    <button onClick={() => setMenuOpen(o => !o)}
-                      className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition-colors hover:bg-white/5"
-                      style={{ border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-black text-white"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)' }}>
-                        {user.name[0]?.toUpperCase()}
-                      </span>
-                      <span className="hidden max-w-[100px] truncate text-xs font-semibold text-white/70 sm:block">{user.name}</span>
-                    </button>
-                    {menuOpen && (
-                      <>
-                        <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                        <div className="absolute right-0 top-11 z-50 w-44 rounded-xl glass-strong p-1.5 animate-scale-in"
-                          style={{ border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
-                          <p className="truncate px-2.5 py-1.5 text-[10px] text-white/35">{user.email}</p>
-                          <Link href="/watchlist" onClick={() => setMenuOpen(false)}
-                            className="block rounded-lg px-2.5 py-2 text-xs font-semibold text-white/70 transition-colors hover:bg-white/5">
-                            ⭐ Watchlist
-                          </Link>
-                          <button onClick={() => { signOut(); setMenuOpen(false); }}
-                            className="block w-full rounded-lg px-2.5 py-2 text-left text-xs font-semibold text-rose-300 transition-colors hover:bg-white/5">
-                            Sign out
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    <button onClick={() => setAuthMode('signin')}
-                      className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:text-white">
-                      Log in
-                    </button>
-                    <button onClick={() => setAuthMode('signup')}
-                      className="rounded-xl px-3.5 py-1.5 text-xs font-bold text-white transition-all hover:brightness-110"
-                      style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)', boxShadow: '0 2px 12px rgba(124,58,237,0.35)' }}>
-                      Sign up
-                    </button>
-                  </>
-                )}
-              </div>
 
               {/* Hamburger — mobile/tablet only */}
               <button
@@ -236,48 +184,6 @@ export default function Navbar() {
                 </Link>
               </div>
 
-              {/* Auth */}
-              {ready && (
-                user ? (
-                  <div className="flex items-center justify-between rounded-xl px-4 py-3"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black text-white"
-                        style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)' }}>
-                        {user.name[0]?.toUpperCase()}
-                      </span>
-                      <div className="min-w-0">
-                        <p className="text-xs font-semibold text-white/80 truncate">{user.name}</p>
-                        <p className="text-[10px] text-white/30 truncate">{user.email}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => { signOut(); setMobileOpen(false); }}
-                      className="flex-shrink-0 ml-3 rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-300 transition-colors hover:bg-white/5"
-                      style={{ border: '1px solid rgba(244,63,94,0.2)' }}
-                    >
-                      Sign out
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => { setAuthMode('signin'); setMobileOpen(false); }}
-                      className="flex-1 rounded-xl px-3 py-2.5 text-xs font-semibold text-white/70 transition-colors hover:text-white"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}
-                    >
-                      Log in
-                    </button>
-                    <button
-                      onClick={() => { setAuthMode('signup'); setMobileOpen(false); }}
-                      className="flex-1 rounded-xl px-3 py-2.5 text-xs font-bold text-white transition-all hover:brightness-110"
-                      style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)', boxShadow: '0 2px 12px rgba(124,58,237,0.35)' }}
-                    >
-                      Sign up
-                    </button>
-                  </div>
-                )
-              )}
             </div>
           </div>
         </div>

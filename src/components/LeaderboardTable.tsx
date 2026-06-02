@@ -8,6 +8,7 @@ import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
 import { useWatchlist } from '@/lib/useWatchlist';
 import Sparkline from './Sparkline';
+import CopyAddress from './CopyAddress';
 
 type LbSortField = 'pnl' | 'vol' | 'rank' | 'score';
 
@@ -270,7 +271,10 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                         ${isTop3 ? rs.text : 'text-white/85'}`}>
                         {displayName}
                       </p>
-                      <p className="font-mono text-[10px] text-white/20 truncate">{formatAddress(entry.proxyWallet)}</p>
+                      <div className="flex items-center gap-1">
+                        <p className="font-mono text-[10px] text-white/20 truncate">{formatAddress(entry.proxyWallet)}</p>
+                        <CopyAddress address={entry.proxyWallet} />
+                      </div>
                     </div>
                   </div>
 
