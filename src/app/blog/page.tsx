@@ -20,7 +20,7 @@ const POSTS = [
   {
     slug: 'smart-score-explained',
     title: 'Smart Score Explained: What Separates Top Polymarket Traders',
-    excerpt: ‘How AlphaBoard’s Smart Score works: the methodology behind ranking the best traders.’,
+    excerpt: "How AlphaBoard’s Smart Score works: the methodology behind ranking the best traders.",
     date: '2026-05-17',
     readTime: '6 min',
     tags: ['Smart Score', 'Traders', 'Analytics'],
