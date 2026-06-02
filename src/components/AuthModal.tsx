@@ -43,7 +43,7 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
         <div className="mb-5 flex flex-col items-center text-center">
           <div className="mb-3 flex items-center gap-2">
             <Logo size={30} />
-            <span className="text-lg font-bold text-grad">AlphaBoard</span>
+            <span className="text-lg font-bold text-[#a855f7]">AlphaBoard</span>
           </div>
           <h2 className="text-xl font-black text-white">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
           <p className="mt-1 text-xs text-white/40">

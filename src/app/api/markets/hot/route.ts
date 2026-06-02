@@ -23,6 +23,19 @@ export interface HotMarket {
   lastTrade: number;
 }
 
+interface PolymarketTrade {
+  timestamp?: number | string;
+  conditionId?: string;
+  title?: string;
+  asset?: string;
+  slug?: string;
+  eventSlug?: string;
+  icon?: string;
+  usdcSize?: number | string;
+  size?: number | string;
+  price?: number | string;
+}
+
 export async function GET(req: NextRequest) {
   const period = req.nextUrl.searchParams.get('period') ?? '24h';
   const windowSec = PERIOD_SECONDS[period] ?? PERIOD_SECONDS['24h'];
@@ -36,16 +49,14 @@ export async function GET(req: NextRequest) {
     if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });
 
     const json = await res.json();
-    const raw: unknown[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
+    const raw: PolymarketTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
 
     // Filter to the selected time window
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const inWindow = raw.filter((t: any) => Number(t.timestamp ?? 0) >= since);
+    const inWindow = raw.filter((t) => Number(t.timestamp ?? 0) >= since);
 
     // Group by conditionId (fall back to title)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const map = new Map<string, HotMarket>();
-    for (const t of inWindow as any[]) {
+    for (const t of inWindow) {
       const key = t.conditionId ?? t.title ?? t.asset ?? 'unknown';
       const usdc = (t.usdcSize != null)
         ? Number(t.usdcSize)

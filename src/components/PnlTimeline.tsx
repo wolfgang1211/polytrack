@@ -7,7 +7,7 @@ import {
 import { formatCurrency } from '@/lib/utils';
 
 interface TimelinePoint { t: number; pnl: number }
-interface TimelineResponse { points: TimelinePoint[]; realized: number; trades: number }
+interface TimelineResponse { points: TimelinePoint[]; realized: number; trades: number; ceiling?: boolean }
 
 interface TipProps {
   active?: boolean;
@@ -77,8 +77,11 @@ export default function PnlTimeline({
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">PnL Timeline</p>
           <p className="text-[10px] text-white/25 mt-0.5">
-            Cumulative realized P&amp;L from trade history
-            {data?.trades ? ` · ${data.trades.toLocaleString()} trades` : ''}
+            {data?.ceiling
+              ? `Last 3,500 trades · public API limit`
+              : data?.trades
+                ? `${data.trades.toLocaleString()} trades · full history`
+                : 'Cumulative realized P&L from trade history'}
           </p>
         </div>
         <div className="text-right">

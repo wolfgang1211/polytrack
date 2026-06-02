@@ -21,33 +21,26 @@ export async function GET(
 ) {
   const { address } = await ctx.params;
 
+  // Same 3,500-trade hard ceiling as the timeline endpoint.
   const PAGE = 500;
-  // Activity analytics (trades-by-hour, hold time, buy/sell ratio) need a
-  // meaningful sample. Fetch up to 20,000 trades (40 pages) so high-volume
-  // wallets get accurate behavioural stats. Natural early-exit when the API
-  // returns a partial or empty page.
-  const MAX_PAGES = 40;
-  const BATCH = 10;
+  const MAX_OFFSET = 3000;
+  const pageCount = MAX_OFFSET / PAGE + 1; // pages 0..6
 
   try {
-    const trades: RecentTrade[] = [];
-    let stop = false;
-    for (let start = 0; start < MAX_PAGES && !stop; start += BATCH) {
-      const end = Math.min(start + BATCH, MAX_PAGES);
-      const pages = Array.from({ length: end - start }, (_, j) => start + j);
-      const results = await Promise.all(pages.map(p =>
+    const results = await Promise.all(
+      Array.from({ length: pageCount }, (_, p) =>
         fetch(
           `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
           { headers: HEADERS, next: { revalidate: 3600 } }
-        ).then(r => (r.ok ? r.json() : null)).catch(() => null)
-      ));
-      for (const json of results) {
-        if (json === null || json === undefined) continue;
-        const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
-        if (!batch.length) { stop = true; break; }
-        trades.push(...batch);
-        if (batch.length < PAGE) { stop = true; break; }
-      }
+        ).then(r => r.ok ? r.json() : null).catch(() => null)
+      )
+    );
+
+    const trades: RecentTrade[] = [];
+    for (const json of results) {
+      if (!json) continue;
+      const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
+      trades.push(...batch);
     }
 
     trades.sort((a, b) => tsOf(b) - tsOf(a));

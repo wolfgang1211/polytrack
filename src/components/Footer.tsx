@@ -29,8 +29,8 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-2.5">
               <Logo size={28} />
               <div className="flex flex-col leading-none">
-                <span className="text-sm font-bold text-grad">AlphaBoard</span>
-                <span className="text-[9px] text-white/25 font-medium tracking-widest uppercase">Analytics</span>
+                <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
+                <span className="text-[9px] text-[#a855f7] font-medium tracking-widest uppercase">Analytics</span>
               </div>
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/30">

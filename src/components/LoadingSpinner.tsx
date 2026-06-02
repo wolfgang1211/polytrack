@@ -14,13 +14,13 @@ export default function LoadingSpinner({ text = 'Loading…' }: { text?: string 
 
 export function SkeletonRow({ cols }: { cols: number }) {
   return (
-    <tr>
+    <>
       {Array.from({ length: cols }).map((_, i) => (
-        <td key={i} className="px-4 py-4">
+        <div key={i} className="px-4 py-2">
           <div className="h-3.5 rounded-full animate-shimmer" style={{ width: i === 1 ? '60%' : '80%' }} />
-        </td>
+        </div>
       ))}
-    </tr>
+    </>
   );
 }
 

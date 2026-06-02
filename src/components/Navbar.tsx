@@ -44,8 +44,8 @@ export default function Navbar() {
                 <Logo size={38} className="relative transition-transform duration-300 group-hover:scale-105" />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-sm font-bold text-grad">AlphaBoard</span>
-                <span className="text-[9px] text-white/25 font-medium tracking-widest uppercase">Analytics</span>
+                <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
+                <span className="text-[9px] text-[#a855f7] font-medium tracking-widest uppercase">Analytics</span>
               </div>
             </Link>
 

@@ -123,7 +123,7 @@ const QA: Record<string, QAItem[]> = {
   ],
 };
 
-function AccordionItem({ id, q, a }: { id: string; q: string; a: React.ReactNode }) {
+function AccordionItem({ q, a }: { id: string; q: string; a: React.ReactNode }) {
   return (
     <details
       className="group rounded-xl"
@@ -195,7 +195,7 @@ export default function FAQPage() {
            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
         <h3 className="text-sm font-semibold text-white/70 mb-2">Still have questions?</h3>
         <p className="text-xs text-white/30 mb-4">
-          Can't find the answer you're looking for? Reach out to us.
+          Can&apos;t find the answer you&apos;re looking for? Reach out to us.
         </p>
         <a href="https://t.me/alphaboard" target="_blank" rel="noopener noreferrer"
            className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"

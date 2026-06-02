@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { LeaderboardEntry, SortOrder, TimeWindow } from '@/types';
 import { formatCurrency, formatAddress, computeSmartScores, scoreTier } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
@@ -46,6 +46,7 @@ function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
 }
 
 export default function LeaderboardTable({ data, loading, error, window, onWindowChange, sparklines, flashKeys }: Props) {
+  const router = useRouter();
   const [sortField, setSortField] = useState<LbSortField>('pnl');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [search, setSearch] = useState('');
@@ -57,6 +58,10 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
   function handleSort(field: LbSortField) {
     if (sortField === field) setSortOrder(o => o === 'desc' ? 'asc' : 'desc');
     else { setSortField(field); setSortOrder('desc'); }
+  }
+
+  function openWallet(address: string) {
+    router.push(`/wallet/${address.toLowerCase()}`);
   }
 
   // Smart Score computed across the full dataset (percentile-based)
@@ -223,11 +228,19 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             const flashing = flashKeys?.has(entry.proxyWallet.toLowerCase());
 
             return (
-              <Link
+              <div
                 key={entry.proxyWallet}
-                href={`/wallet/${entry.proxyWallet.toLowerCase()}`}
                 className="group block"
                 style={{ animationDelay: `${idx * 25}ms` }}
+                onClick={() => openWallet(entry.proxyWallet)}
+                role="link"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openWallet(entry.proxyWallet);
+                  }
+                }}
               >
                 <div
                   className={`grid ${GRID} px-4 py-2 items-center transition-all duration-200
@@ -305,7 +318,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center justify-end gap-1" onClick={e => e.preventDefault()}>
+                  <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
                     {/* Watchlist star */}
                     <button
                       onClick={e => { e.preventDefault(); toggle(entry.proxyWallet, entry.userName || undefined); }}
@@ -328,6 +341,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       href={profileUrl(entry.proxyWallet)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={e => e.stopPropagation()}
                       title="Open on Polymarket"
                       className="flex h-6 w-6 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
                       style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }}
@@ -339,7 +353,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     </a>
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>

@@ -15,7 +15,7 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
         <h3 className="text-sm font-semibold text-white/80 mt-6">1. Understanding Spread</h3>
         <p className="text-white/50">
           Spread is the difference between best bid and best ask. Tighter spreads attract more flow, 
-          which increases fee revenue. Tight spreads also score higher on AlphaBoard's LP Score.
+          which increases fee revenue. Tight spreads also score higher on AlphaBoard&apos;s LP Score.
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">2. Depth Matters</h3>
         <p className="text-white/50">
@@ -24,7 +24,7 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">3. Estimating APR</h3>
         <p className="text-white/50">
-          Use AlphaBoard's formula: pool_share × 24h_volume × 0.1% maker rebate. 
+          Use AlphaBoard&apos;s formula: pool_share × 24h_volume × 0.1% maker rebate.
           Compare this against DeFi alternatives to find the best risk-adjusted yield.
         </p>
       </div>
@@ -37,8 +37,8 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
     content: (
       <div className="space-y-4">
         <p>
-          AlphaBoard's Smart Score combines consistency, efficiency, and diversification into a single metric. 
-          Here's how we calculate it and why it matters.
+          AlphaBoard&apos;s Smart Score combines consistency, efficiency, and diversification into a single metric.
+          Here&apos;s how we calculate it and why it matters.
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">Methodology</h3>
         <p className="text-white/50">
@@ -55,7 +55,7 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
     content: (
       <div className="space-y-4">
         <p>
-          Large trades often move markets. Learn how to track whale activity using AlphaBoard's 
+          Large trades often move markets. Learn how to track whale activity using AlphaBoard&apos;s
           Activity feed, wallet monitoring, and alert configuration.
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">What Is a Whale Trade?</h3>

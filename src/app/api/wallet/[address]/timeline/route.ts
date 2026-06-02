@@ -27,6 +27,8 @@ export interface TimelineResponse {
   points: TimelinePoint[];
   realized: number;
   trades: number;
+  /** True when the wallet hit the data-api's 3,500-trade public ceiling */
+  ceiling: boolean;
 }
 
 /**
@@ -44,35 +46,31 @@ export async function GET(
 ) {
   const { address } = await ctx.params;
 
+  // data-api.polymarket.com enforces a hard server-side limit: offset > 3000
+  // returns HTTP 400 ("max historical activity offset of 3000 exceeded").
+  // No cursor, timestamp, or sort parameter bypasses this — all are silently
+  // ignored. The absolute maximum is 7 pages × 500 = 3,500 trades.
   const PAGE = 500;
-  // No hard page cap — stop naturally when the API returns a partial/empty page.
-  // Safety ceiling of 600 pages (300,000 trades) guards against infinite loops on
-  // API bugs; no real Polymarket wallet is expected to exceed this.
-  const MAX_PAGES = 600;
-  const BATCH = 20; // 20 concurrent requests per round → ~10s for 300-page wallets
+  const MAX_OFFSET = 3000; // server hard limit
+  const pageCount = MAX_OFFSET / PAGE + 1; // pages 0..6
 
   try {
-    const trades: RecentTrade[] = [];
-    let stop = false;
-    for (let start = 0; start < MAX_PAGES && !stop; start += BATCH) {
-      const end = Math.min(start + BATCH, MAX_PAGES);
-      const pages = Array.from({ length: end - start }, (_, j) => start + j);
-      const results = await Promise.all(pages.map(p =>
+    // Fetch all pages concurrently in one round — no batching loop needed.
+    const results = await Promise.all(
+      Array.from({ length: pageCount }, (_, p) =>
         fetch(
           `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
-          // Historical trade pages are immutable — cache for 1 h to avoid
-          // re-fetching thousands of pages on every wallet view.
+          // Each page URL is immutable — pages don't change after they're full.
           { headers: HEADERS, next: { revalidate: 3600 } }
-        ).then(r => (r.ok ? r.json() : null)).catch(() => null)
-      ));
-      for (const json of results) {
-        // null = transient network failure — skip this page, don't abort the whole fetch
-        if (json === null || json === undefined) continue;
-        const batch: RecentTrade[] = Array.isArray(json) ? json : (json?.value ?? json?.data ?? []);
-        if (!batch.length) { stop = true; break; }   // empty page = data exhausted
-        trades.push(...batch);
-        if (batch.length < PAGE) { stop = true; break; } // partial page = last page
-      }
+        ).then(r => r.ok ? r.json() : null).catch(() => null)
+      )
+    );
+
+    const trades: RecentTrade[] = [];
+    for (const json of results) {
+      if (!json) continue;
+      const batch: RecentTrade[] = Array.isArray(json) ? json : (json?.value ?? json?.data ?? []);
+      trades.push(...batch);
     }
 
     // Oldest -> newest so the replay is chronological.
@@ -125,6 +123,7 @@ export async function GET(
       points: series,
       realized: Math.round(realized * 100) / 100,
       trades: trades.length,
+      ceiling: trades.length >= pageCount * PAGE,
     };
 
     return NextResponse.json(body, {
