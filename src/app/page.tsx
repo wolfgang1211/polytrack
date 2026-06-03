@@ -39,7 +39,7 @@ export default function DashboardPage() {
               className="text-4xl font-black leading-[1.12] lg:text-5xl"
               style={{ fontFamily: 'var(--font-serif-display, Georgia, serif)' }}
             >
-              <span className="text-white">Real-time </span>
+              <span className="text-white">Real time</span>
               <span className="text-grad">alpha</span>
               <span className="text-white"> from the best</span>
             </h1>
