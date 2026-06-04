@@ -23,7 +23,7 @@ export interface LPOpportunity {
   bidDepth: number | null;   // USD within 5¢ of best bid (null = orderbook unavailable)
   askDepth: number | null;
   depthKnown: boolean;
-  estDailyFee: number;   // rough maker fee potential ($/day)
+  estDailyFee: number;   // spread capture for a $1K LP position ($/day)
   score: number;         // 0–100 opportunity score
   scoreBreakdown: {      // point contributions that sum to `score`
     spread: number;      // out of 35
@@ -49,6 +49,9 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
 // Maker rebate ≈ 0.1% of notional volume traded against resting orders.
 const MAKER_REBATE_RATE = 0.001;
+
+// Assumed LP capital for estDailyFee — same assumption as the Reward Simulator.
+const DEFAULT_CAPITAL = 1_000;
 
 // Robustly derive best bid/ask + depth-within-5¢ from a raw orderbook,
 // regardless of how the venue sorts the levels.
@@ -136,8 +139,9 @@ export async function GET() {
       const mid = (bestBid + bestAsk) / 2 || 0.5;
       const spreadPct = clamp01(mid > 0 ? spread / mid : 0);
 
-      // Fee potential: a maker capturing roughly half the spread on 24h flow.
-      const estDailyFee = vol24h * spread * 0.5 * (1 + MAKER_REBATE_RATE);
+      // Fee potential: pool-share-weighted spread capture for a $1K LP position.
+      const poolShare = DEFAULT_CAPITAL / (liquidity + DEFAULT_CAPITAL || DEFAULT_CAPITAL);
+      const estDailyFee = poolShare * vol24h * spread * 0.5;
 
       // Score 0–100: volume + spread edge + how two-sided the market is.
       const volScore     = Math.min(1, Math.log10(Math.max(1, vol24h)) / 7); // ~10M → 1
@@ -161,7 +165,7 @@ export async function GET() {
 
       let riskPts = 0;
       if (daysToResolve != null) {
-        if (daysToResolve < 5) riskPts += 2;
+        if (daysToResolve < 5) riskPts += 3;  // resolving imminently → High on its own
         else if (daysToResolve < 14) riskPts += 1;
       }
       if (spreadVol > 30) riskPts += 2;

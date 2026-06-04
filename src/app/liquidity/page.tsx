@@ -99,7 +99,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       {/* Fee potential */}
       <div className="flex items-center justify-between rounded-xl px-3 py-2"
         style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)' }}>
-        <span className="text-[10px] uppercase tracking-wider text-amber-300/70">Est. spread capture / day</span>
+        <span className="text-[10px] uppercase tracking-wider text-amber-300/70">Est. spread capture / day ($1K LP)</span>
         <span className="text-sm font-black text-amber-300">{formatCurrency(opp.estDailyFee, true)}</span>
       </div>
 
@@ -120,7 +120,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           </div>
           {/* Spread volatility */}
           <div>
-            <p className="text-[9px] uppercase tracking-wider text-white/30 mb-0.5">Spread vol 24h</p>
+            <p className="text-[9px] uppercase tracking-wider text-white/30 mb-0.5">Price move 24h</p>
             <p className={`text-xs font-bold ${opp.spreadVol > 30 ? 'text-rose-400' : opp.spreadVol > 10 ? 'text-amber-300' : 'text-white/70'}`}>
               {opp.spreadVol.toFixed(1)}%
             </p>
@@ -163,7 +163,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
                 <span className="font-bold text-sky-300">{opp.scoreBreakdown.volume}/45</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-white/50">Depth</span>
+                <span className="text-white/50">Balance</span>
                 <span className="font-bold text-emerald-300">{opp.scoreBreakdown.depth}/20</span>
               </span>
               <span className="mt-1.5 flex items-center justify-between border-t border-white/10 pt-1.5 text-[11px]">
