@@ -8,7 +8,6 @@ import {
 } from 'recharts';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
-import TelegramModal from '@/components/TelegramModal';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
@@ -903,109 +902,15 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   7) MARKET ALERT
-════════════════════════════════════════════════════════════════ */
-
-function MarketAlertSection({ opps }: { opps: LPOpportunity[] }) {
-  const [selected, setSelected] = useState<LPOpportunity | null>(null);
-  const [threshold, setThreshold] = useState('3');
-  const [showTelegram, setShowTelegram] = useState(false);
-
-  useEffect(() => {
-    if (opps.length > 0 && !selected) setSelected(opps[0]);
-  }, [opps, selected]);
-
-  const thr = parseFloat(threshold) || 0;
-  const currentSpread = selected ? selected.spread * 100 : 0;
-  const wouldFire = selected ? currentSpread >= thr : false;
-
-  return (
-    <section>
-      {showTelegram && <TelegramModal onClose={() => setShowTelegram(false)} />}
-      <SectionHeader index="[08]" label="Market Alert" />
-
-      <div className="glass rounded-2xl p-5 flex flex-col gap-5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-xs font-semibold text-white/50 mb-2">Market</label>
-            <select
-              value={selected?.conditionId ?? ''}
-              onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
-              className="w-full rounded-xl glass px-4 py-2.5 text-xs text-white/75 outline-none truncate"
-              style={{ border: '1px solid rgba(255,255,255,0.1)' }}
-            >
-              {opps.map(o => (
-                <option key={o.conditionId} value={o.conditionId} className="bg-[#0d0d1a]">
-                  {o.question.slice(0, 60)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-white/50 mb-2">Alert when spread ≥ (¢)</label>
-            <div className="flex gap-2">
-              <input type="number" min="0" step="0.5" value={threshold} onChange={e => setThreshold(e.target.value)}
-                className="w-24 rounded-xl glass px-4 py-2.5 text-sm font-bold text-white outline-none"
-                style={{ border: '1px solid rgba(34,197,94,0.3)' }} />
-              {[1, 2, 3, 5].map(v => (
-                <button key={v} onClick={() => setThreshold(String(v))}
-                  className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-white/40 transition-all hover:text-white/70"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                  {v}¢
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Live status against threshold */}
-        {selected && (
-          <div className="rounded-xl px-4 py-3 flex items-center justify-between"
-            style={{
-              background: wouldFire ? 'rgba(52,211,153,0.08)' : 'rgba(255,255,255,0.03)',
-              border: `1px solid ${wouldFire ? 'rgba(52,211,153,0.25)' : 'rgba(255,255,255,0.06)'}`,
-            }}>
-            <div>
-              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Current spread</p>
-              <p className="text-lg font-black" style={{ color: wouldFire ? '#34d399' : '#fbbf24' }}>{currentSpread.toFixed(1)}¢</p>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-0.5">Status</p>
-              <p className="text-xs font-bold" style={{ color: wouldFire ? '#34d399' : 'rgba(255,255,255,0.45)' }}>
-                {wouldFire ? `✓ Above ${thr}¢, would alert now` : `Below ${thr}¢ threshold`}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* CTA */}
-        <button
-          onClick={() => setShowTelegram(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold text-white transition-all hover:scale-[1.01] hover:brightness-110"
-          style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', boxShadow: '0 4px 24px rgba(34,197,94,0.3)' }}
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
-          </svg>
-          Set up alert on Telegram
-        </button>
-        <p className="text-[10px] text-white/25 text-center leading-relaxed">
-          Connect via our Telegram bot to receive spread alerts. Per-market threshold pushes are rolling out; for now you&apos;ll get whale &amp; liquidity alerts on join.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 /* ─────────────────────────── shared UI ─────────────────────────── */
 
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
   );
@@ -1114,7 +1019,6 @@ export default function LiquidityPage() {
       <LPCalculator opps={opps} />
       <MarketDepthSection opps={opps} />
       <RewardSimulator opps={opps} />
-      <MarketAlertSection opps={opps} />
       <LPLeaderboardSection />
     </div>
   );

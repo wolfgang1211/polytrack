@@ -42,6 +42,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@alphaboardxyz',
+    creator: '@alphaboardxyz',
     title: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
     images: ['/opengraph-image'],

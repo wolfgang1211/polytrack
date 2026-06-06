@@ -101,18 +101,6 @@ export default function AboutPage() {
             <a href="/privacy" className="underline text-purple-400 hover:text-purple-300">Privacy Policy</a>.
           </p>
         </section>
-
-        <section>
-          <h2>Contact</h2>
-          <p>
-            Have questions, feedback, or partnership inquiries? Reach out to us:
-          </p>
-          <ul>
-            <li>Email: <strong>hello@alphaboard.xyz</strong></li>
-            <li>Telegram: <a href="https://t.me/alphaboard" target="_blank" rel="noopener noreferrer" className="underline text-purple-400 hover:text-purple-300">@alphaboard</a></li>
-            <li>X (Twitter): <a href="https://x.com/alphaboard" target="_blank" rel="noopener noreferrer" className="underline text-purple-400 hover:text-purple-300">@alphaboard</a></li>
-          </ul>
-        </section>
       </div>
     </article>
   );

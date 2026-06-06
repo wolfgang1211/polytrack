@@ -39,7 +39,7 @@ export default function Footer() {
             </p>
             <div className="mt-5">
               <a
-                href="https://x.com/alphaboard"
+                href="https://x.com/alphaboardxyz"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="X (Twitter)"

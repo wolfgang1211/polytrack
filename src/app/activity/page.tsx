@@ -76,8 +76,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
     </div>
   );
 }

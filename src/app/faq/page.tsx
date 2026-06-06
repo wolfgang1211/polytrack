@@ -189,20 +189,6 @@ export default function FAQPage() {
           <CategorySection key={id} id={id} items={items} />
         ))}
       </div>
-
-      {/* ── Still need help? ── */}
-      <div className="mt-14 rounded-2xl p-6 text-center"
-           style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <h3 className="text-sm font-semibold text-white/70 mb-2">Still have questions?</h3>
-        <p className="text-xs text-white/30 mb-4">
-          Can&apos;t find the answer you&apos;re looking for? Reach out to us.
-        </p>
-        <a href="https://t.me/alphaboard" target="_blank" rel="noopener noreferrer"
-           className="inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
-           style={{ background: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.25)' }}>
-          Contact via Telegram
-        </a>
-      </div>
     </article>
   );
 }
