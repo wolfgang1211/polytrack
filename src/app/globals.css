@@ -23,6 +23,21 @@
   --vi-grad-25:   linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.25));
   --vi-grad-30:   linear-gradient(135deg,rgba(124,58,237,0.30),rgba(147,51,234,0.30));
   --vi-grad-60:   linear-gradient(135deg,rgba(124,58,237,0.60),rgba(147,51,234,0.60));
+
+  /* Product design tokens */
+  --surface-1: rgba(255,255,255,0.035);
+  --surface-2: rgba(255,255,255,0.055);
+  --surface-3: rgba(255,255,255,0.075);
+  --border-subtle: rgba(255,255,255,0.07);
+  --border-default: rgba(255,255,255,0.10);
+  --text-primary: rgba(255,255,255,0.88);
+  --text-secondary: rgba(255,255,255,0.58);
+  --text-tertiary: rgba(255,255,255,0.38);
+  --text-muted: rgba(255,255,255,0.24);
+  --success: #34d399;
+  --danger: #fb7185;
+  --warning: #fbbf24;
+  --info: #60a5fa;
 }
 
 /* keyframes */
@@ -150,17 +165,17 @@
 
 /* glass */
 .glass {
-  background:rgba(255,255,255,.04);
+  background:var(--surface-1);
   backdrop-filter:blur(24px);
   -webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(255,255,255,.07);
+  border:1px solid var(--border-subtle);
 }
 
 .glass-strong {
-  background:rgba(255,255,255,.07);
+  background:var(--surface-2);
   backdrop-filter:blur(32px);
   -webkit-backdrop-filter:blur(32px);
-  border:1px solid rgba(255,255,255,.10);
+  border:1px solid var(--border-default);
 }
 
 .glass-hover {
@@ -224,12 +239,12 @@ body {
 }
 
 /* prose */
-.prose-custom h2 { font-size:1.25rem; font-weight:700; color:rgba(255,255,255,.9); margin-bottom:.75rem; }
-.prose-custom h3 { font-size:1rem; font-weight:600; color:rgba(255,255,255,.7); margin-top:1rem; margin-bottom:.5rem; }
-.prose-custom p  { font-size:.875rem; line-height:1.75; color:rgba(255,255,255,.45); margin-bottom:.75rem; }
+.prose-custom h2 { font-size:1.25rem; font-weight:700; color:var(--text-primary); margin-bottom:.75rem; }
+.prose-custom h3 { font-size:1rem; font-weight:600; color:rgba(255,255,255,.72); margin-top:1rem; margin-bottom:.5rem; }
+.prose-custom p  { font-size:.875rem; line-height:1.75; color:var(--text-secondary); margin-bottom:.75rem; }
 .prose-custom ul { list-style:disc; padding-left:1.25rem; margin-bottom:.75rem; }
-.prose-custom li { font-size:.875rem; line-height:1.75; color:rgba(255,255,255,.45); margin-bottom:.25rem; }
-.prose-custom strong { color:rgba(255,255,255,.7); }
+.prose-custom li { font-size:.875rem; line-height:1.75; color:var(--text-secondary); margin-bottom:.25rem; }
+.prose-custom strong { color:rgba(255,255,255,.78); }
 .prose-custom a { color:#a855f7; text-decoration:underline; transition:color .2s; }
 .prose-custom a:hover { color:#c084fc; }
 

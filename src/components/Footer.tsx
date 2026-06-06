@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Logo from '@/components/Logo';
+import Logo, { WordmarkLogo } from '@/components/Logo';
 
 const PRODUCT_LINKS = [
   { href: '/leaderboard', label: 'Leaderboard' },
@@ -27,11 +27,8 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <Logo size={28} />
-              <div className="flex flex-col leading-none">
-                <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
-                <span className="text-[9px] text-[#a855f7] font-medium tracking-widest uppercase">Analytics</span>
-              </div>
+              <Logo size={28} className="sm:hidden" />
+              <WordmarkLogo height={30} className="hidden sm:block opacity-95" />
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/30">
               Real-time analytics and leaderboard for Polymarket. Track top traders,
