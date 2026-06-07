@@ -151,6 +151,12 @@
   border-bottom:1px solid rgba(255,255,255,.07);
 }
 
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
 /* marquee */
 .marquee-track {
   display:flex;

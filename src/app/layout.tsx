@@ -104,7 +104,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* 1px violet scan-line beneath navbar */}
           <div className="h-px w-full pointer-events-none"
             style={{ background: 'linear-gradient(90deg,transparent 0%,var(--vi-border-xs) 20%,var(--vi-border-xs) 80%,transparent 100%)' }} />
-          <main className="mx-auto max-w-7xl px-4 py-8">
+          <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8">
             <Breadcrumb />
             {children}
           </main>

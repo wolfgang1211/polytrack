@@ -21,23 +21,23 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-8 sm:gap-10">
 
       {/* ── Live trade ticker ── */}
       <LiveTicker />
 
       {/* ── [01] Hero ── */}
       <div className="animate-fade-in-up">
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>[01]</span>
           <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.22)' }}>Terminal Intelligence</span>
         </div>
 
-        <div className="grid gap-10 lg:grid-cols-[1fr_minmax(280px,340px)] lg:items-start">
+        <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_minmax(280px,340px)] lg:items-start">
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <h1
-              className="text-4xl font-black leading-[1.12] lg:text-5xl"
+              className="text-3xl font-black leading-[1.12] sm:text-4xl lg:text-5xl"
               style={{ fontFamily: 'var(--font-serif-display, Georgia, serif)' }}
             >
               <span className="text-white">Real time</span>
@@ -45,7 +45,7 @@ export default function DashboardPage() {
               <span className="text-grad">alpha</span>
               <span className="text-white"> from the best</span>
             </h1>
-            <p className="mt-5 max-w-sm text-sm font-medium leading-relaxed" style={{ color: 'rgba(255,255,255,0.38)' }}>
+            <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed sm:mt-5" style={{ color: 'rgba(255,255,255,0.46)' }}>
               Discover, follow and copy the most profitable traders on Polymarket in real time.
             </p>
           </div>
