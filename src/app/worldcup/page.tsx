@@ -3,6 +3,11 @@ import { resolveTeam } from '@/lib/wcTeams';
 import { fetchWinnerData, fetchWcEvents } from '@/lib/wcData';
 import WorldCupClient from './WorldCupClient';
 
+// Always render per-request: the param-less /worldcup was getting pinned to a
+// stale prerendered shell in the ISR cache. Upstream data stays cached 60s
+// via fetch revalidate, so this is cheap.
+export const dynamic = 'force-dynamic';
+
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 export async function generateMetadata(
