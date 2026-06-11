@@ -35,6 +35,7 @@ interface WcMarket {
   slug?: string;
   oneDayPriceChange?: number;
   lastTradePrice?: number | null;
+  clobTokenYes?: string;
 }
 
 interface WcEvent {
@@ -259,10 +260,10 @@ function CountrySelector({
 
 /* ── odds history chart ────────────────────────────────── */
 
-type HistoryInterval = '1w' | '1m' | 'max';
+type HistoryInterval = '1d' | '1w' | '1m' | 'max';
 
-function OddsHistoryChart({ token, team }: { token?: string; team: string }) {
-  const [interval, setIntervalSel] = useState<HistoryInterval>('1m');
+function OddsHistoryChart({ token, team, defaultInterval = '1m' }: { token?: string; team: string; defaultInterval?: HistoryInterval }) {
+  const [interval, setIntervalSel] = useState<HistoryInterval>(defaultInterval);
   const [points, setPoints] = useState<{ t: number; p: number }[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -298,7 +299,7 @@ function OddsHistoryChart({ token, team }: { token?: string; team: string }) {
           )}
         </div>
         <div className="flex gap-1 rounded-lg glass p-0.5">
-          {(['1w', '1m', 'max'] as HistoryInterval[]).map(k => (
+          {(['1d', '1w', '1m', 'max'] as HistoryInterval[]).map(k => (
             <button key={k} onClick={() => setIntervalSel(k)}
               className={`rounded-md px-2 py-1 text-[10px] font-bold uppercase transition-all ${interval === k ? 'text-white' : 'text-white/35 hover:text-white/65'}`}
               style={interval === k ? { background: 'var(--vi-fill)', border: '1px solid var(--vi-border-md)' } : { border: '1px solid transparent' }}>
@@ -594,6 +595,294 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
             ))}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ── match center ──────────────────────────────────────── */
+
+interface MatchGroup {
+  key: string;
+  teamA: string;
+  teamB: string;
+  kickoff: number | null;
+  status: 'live' | 'upcoming' | 'ended';
+  main: WcEvent | null;
+  extras: WcEvent[];
+  volume24hr: number;
+  slugs: string[];
+}
+
+function buildMatchGroups(events: WcEvent[]): MatchGroup[] {
+  const map = new Map<string, MatchGroup>();
+  const now = Date.now();
+
+  for (const e of events) {
+    if (!e.isMatch) continue;
+    const base = e.title.split(' - ')[0].trim();
+    const teams = base.split(/ vs\.? /i);
+    if (teams.length !== 2) continue;
+
+    let g = map.get(base);
+    if (!g) {
+      g = {
+        key: base,
+        teamA: teams[0].trim(),
+        teamB: teams[1].trim(),
+        kickoff: null,
+        status: 'upcoming',
+        main: null,
+        extras: [],
+        volume24hr: 0,
+        slugs: [],
+      };
+      map.set(base, g);
+    }
+    const k = parseKickoff(e.gameStartTime);
+    if (k != null && g.kickoff == null) g.kickoff = k;
+    if (e.title.trim() === base) g.main = e; else g.extras.push(e);
+    g.volume24hr += e.volume24hr;
+    g.slugs.push(e.slug);
+  }
+
+  const groups = [...map.values()];
+  for (const g of groups) {
+    if (g.kickoff == null) continue;
+    const ms = g.kickoff - now;
+    g.status = ms <= 0 ? (ms > -2.5 * 3_600_000 ? 'live' : 'ended') : 'upcoming';
+  }
+
+  return groups
+    .filter(g => g.status !== 'ended')
+    .sort((a, b) =>
+      (a.status === 'live' ? 0 : 1) - (b.status === 'live' ? 0 : 1) ||
+      (a.kickoff ?? Infinity) - (b.kickoff ?? Infinity)
+    );
+}
+
+/** Moneyline outcomes ordered teamA / draw / teamB. */
+function moneylineChips(g: MatchGroup): { label: string; price: number }[] {
+  const rows: { label: string; price: number }[] = [];
+  for (const m of g.main?.markets ?? []) {
+    const p = yesPrice(m);
+    const t = (m.groupItemTitle ?? '').replace(/\s*\(.*\)\s*$/, '').trim();
+    if (p == null || !t) continue;
+    rows.push({ label: t, price: p });
+  }
+  const find = (name: string) => rows.find(r => r.label.toLowerCase() === name.toLowerCase());
+  const a = find(g.teamA);
+  const b = find(g.teamB);
+  const draw = rows.find(r => /^draw$/i.test(r.label));
+  const ordered = [a, draw, b].filter(Boolean) as { label: string; price: number }[];
+  return ordered.length >= 2 ? ordered : rows.slice(0, 3);
+}
+
+function MatchDetail({ group, trades }: { group: MatchGroup; trades: RecentTrade[] }) {
+  const mainTeamMarket = group.main?.markets.find(
+    m => (m.groupItemTitle ?? '').toLowerCase().startsWith(group.teamA.toLowerCase())
+  );
+  const slugSet = useMemo(() => new Set(group.slugs), [group.slugs]);
+  const matchTrades = useMemo(
+    () => trades.filter(t => t.eventSlug && slugSet.has(t.eventSlug)).slice(0, 8),
+    [trades, slugSet]
+  );
+  const maxAmount = matchTrades.reduce((m, t) => Math.max(m, usdcSize(t)), 0);
+
+  return (
+    <div className="flex flex-col gap-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      {/* In-match odds movement */}
+      <OddsHistoryChart
+        token={mainTeamMarket?.clobTokenYes}
+        team={`${group.teamA} to win`}
+        defaultInterval="1d"
+      />
+
+      {/* Side markets */}
+      {group.extras.length > 0 && (
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-2">More markets</p>
+          <div className="flex flex-col gap-1.5">
+            {group.extras.map(e => {
+              const suffix = e.title.includes(' - ') ? e.title.split(' - ').slice(1).join(' - ') : e.title;
+              const chips = e.markets
+                .map(m => ({ label: (m.groupItemTitle ?? '').replace(/\s*\(.*\)\s*$/, '') || m.question || '', price: yesPrice(m) }))
+                .filter(c => c.label && c.price != null)
+                .sort((x, y) => (y.price ?? 0) - (x.price ?? 0))
+                .slice(0, 4);
+              return (
+                <a key={e.id} href={marketUrl(e.slug, e.markets[0]?.slug)} target="_blank" rel="noopener noreferrer"
+                  className="group flex flex-wrap items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-white/[0.04]"
+                  style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors min-w-[120px]">{suffix}</span>
+                  <span className="ml-auto flex flex-wrap gap-1.5">
+                    {chips.map((c, i) => (
+                      <span key={c.label + i} className="font-mono text-[10px] rounded-md px-1.5 py-0.5"
+                        style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.55)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        {c.label} <span className="font-black text-white/80">{((c.price ?? 0) * 100).toFixed(0)}¢</span>
+                      </span>
+                    ))}
+                  </span>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Match money flow */}
+      <div>
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-2">Money on this match</p>
+        {matchTrades.length === 0 ? (
+          <p className="text-xs text-white/25 py-3 text-center rounded-xl"
+            style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            No large trades on this match yet
+          </p>
+        ) : (
+          <div className="rounded-xl overflow-hidden p-1"
+            style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
+            {matchTrades.map((t, i) => (
+              <WcTradeRow key={String(t.id ?? i)} trade={t} maxAmount={maxAmount} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MatchCenterCard({ group, expanded, onToggle, trades }: {
+  group: MatchGroup; expanded: boolean; onToggle: () => void; trades: RecentTrade[];
+}) {
+  const chips = moneylineChips(group);
+  const isLive = group.status === 'live';
+  const kickoff = group.kickoff ? kickoffLabel(group.main?.gameStartTime ?? null) : null;
+
+  return (
+    <div className="glass gradient-border rounded-2xl p-5 animate-fade-in-up">
+      {/* Header row */}
+      <button onClick={onToggle} className="w-full text-left">
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-2xl leading-none">{teamFlag(group.teamA)}</span>
+          <span className="text-sm font-black text-white/90">{group.teamA}</span>
+          <span className="font-mono text-[10px] text-white/30">vs</span>
+          <span className="text-2xl leading-none">{teamFlag(group.teamB)}</span>
+          <span className="text-sm font-black text-white/90">{group.teamB}</span>
+
+          <span className="ml-auto flex items-center gap-2">
+            {isLive ? (
+              <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider"
+                style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Live
+              </span>
+            ) : kickoff && (
+              <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider"
+                style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                ⏱ {kickoff}
+              </span>
+            )}
+            <svg className={`h-4 w-4 text-white/30 transition-transform ${expanded ? 'rotate-180' : ''}`}
+              viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clipRule="evenodd" />
+            </svg>
+          </span>
+        </div>
+
+        {/* Implied probability bars */}
+        {chips.length > 0 && (
+          <div className="mt-4 flex flex-col gap-1.5">
+            {chips.map((c, i) => {
+              const isDraw = /^draw$/i.test(c.label);
+              const color = isDraw ? 'rgba(255,255,255,0.35)' : i === 0 ? '#a855f7' : '#38bdf8';
+              return (
+                <div key={c.label + i} className="flex items-center gap-2">
+                  <span className="w-24 sm:w-32 truncate text-[11px] font-semibold text-white/60 flex-shrink-0">{c.label}</span>
+                  <div className="relative flex-1 h-4 rounded-md overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                    <div className="absolute inset-y-0 left-0 rounded-md"
+                      style={{ width: `${c.price * 100}%`, background: `${color}55`, borderRight: `2px solid ${color}`, transition: 'width 0.8s ease' }} />
+                  </div>
+                  <span className="w-10 text-right font-mono text-xs font-black tabular-nums text-white/85 flex-shrink-0">
+                    {(c.price * 100).toFixed(0)}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div className="mt-3 flex items-center justify-between">
+          <span className="text-[10px] text-white/30">{formatCurrency(group.volume24hr, true)} 24h vol · {group.extras.length + (group.main ? 1 : 0)} markets</span>
+          <span className="text-[10px] font-semibold text-white/35">{expanded ? 'Hide details ▲' : 'Match details ▼'}</span>
+        </div>
+      </button>
+
+      {expanded && <MatchDetail group={group} trades={trades} />}
+    </div>
+  );
+}
+
+function MatchCenter({ events }: { events: WcEvent[] }) {
+  const [liveEvents, setLiveEvents] = useState<WcEvent[] | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [trades, setTrades] = useState<RecentTrade[]>([]);
+
+  /* fresher polling for live/imminent matches */
+  useEffect(() => {
+    const load = () => {
+      fetch('/api/worldcup/live')
+        .then(r => r.json())
+        .then(d => { if (Array.isArray(d)) setLiveEvents(d); })
+        .catch(() => {});
+    };
+    load();
+    const id = setInterval(load, 20_000);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/worldcup/trades')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d?.trades)) setTrades(d.trades); })
+      .catch(() => {});
+  }, []);
+
+  const merged = useMemo(() => {
+    if (!liveEvents) return events;
+    const byId = new Map(events.map(e => [e.id, e]));
+    for (const e of liveEvents) byId.set(e.id, e);
+    return [...byId.values()];
+  }, [events, liveEvents]);
+
+  const groups = useMemo(() => buildMatchGroups(merged).slice(0, 8), [merged]);
+  const liveCount = groups.filter(g => g.status === 'live').length;
+
+  if (groups.length === 0) {
+    return (
+      <div className="glass rounded-2xl py-12 text-center">
+        <p className="text-2xl mb-2">🏟️</p>
+        <p className="text-sm text-white/25">Match markets open closer to kickoff — check back soon</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {liveCount > 0 && (
+        <p className="text-xs text-white/35">
+          <span className="font-bold text-emerald-400">{liveCount} live</span> — implied win probabilities update every ~20s from Polymarket order flow.
+        </p>
+      )}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {groups.map(g => (
+          <MatchCenterCard
+            key={g.key}
+            group={g}
+            trades={trades}
+            expanded={expanded === g.key}
+            onToggle={() => setExpanded(e => (e === g.key ? null : g.key))}
+          />
+        ))}
       </div>
     </div>
   );
@@ -1215,6 +1504,11 @@ export default function WorldCupClient({
                   style={{ background: 'rgba(124,58,237,0.18)', border: '1px solid rgba(124,58,237,0.45)' }}>
                   🌍 Pick your nation
                 </a>
+                <a href="#match-center"
+                  className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  🏟️ Match center
+                </a>
                 <a href="#smart-money"
                   className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white"
                   style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
@@ -1291,8 +1585,13 @@ export default function WorldCupClient({
       ) : (
         /* ── All-nations mode ── */
         <>
+          <div id="match-center" className="scroll-mt-24">
+            <SectionHeader index="[03]" label="Match Center · Live & Upcoming" />
+            <MatchCenter events={events} />
+          </div>
+
           <div>
-            <SectionHeader index="[03]" label="Championship Odds Race" />
+            <SectionHeader index="[04]" label="Championship Odds Race" />
             {winner && winner.teams.length > 0 && (
               <div className="mb-4"><MoversStrip teams={winner.teams} /></div>
             )}
@@ -1300,17 +1599,17 @@ export default function WorldCupClient({
           </div>
 
           <div>
-            <SectionHeader index="[04]" label="What The Pros Are Holding" />
+            <SectionHeader index="[05]" label="What The Pros Are Holding" />
             <ProsPicks team={null} />
           </div>
 
           <div id="upset-radar" className="scroll-mt-24">
-            <SectionHeader index="[05]" label="Upset Radar" />
+            <SectionHeader index="[06]" label="Upset Radar" />
             <UpsetRadar events={events} winner={winner} />
           </div>
 
           <div>
-            <SectionHeader index="[06]" label="Tournament Markets" />
+            <SectionHeader index="[07]" label="Tournament Markets" />
             <div className="flex items-center gap-2 mb-4">
               <div className="flex gap-1 rounded-xl glass p-1">
                 {([['matches', `Matches (${matches.length})`], ['futures', `Futures (${futures.length})`]] as [Tab, string][]).map(([key, label]) => (
@@ -1344,7 +1643,7 @@ export default function WorldCupClient({
           </div>
 
           <div id="smart-money" className="scroll-mt-24">
-            <SectionHeader index="[07]" label="World Cup Smart Money" />
+            <SectionHeader index="[08]" label="World Cup Smart Money" />
             <WcSmartMoney team={null} />
           </div>
         </>

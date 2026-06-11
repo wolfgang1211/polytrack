@@ -35,6 +35,7 @@ export interface WcMarketRow {
   closed: boolean;
   oneDayPriceChange: number;
   lastTradePrice: number | null;
+  clobTokenYes?: string;
 }
 
 export interface WcEventRow {
@@ -126,6 +127,7 @@ function slimMarket(m: Obj): WcMarketRow {
     closed: m.closed === true,
     oneDayPriceChange: m.oneDayPriceChange != null ? Number(m.oneDayPriceChange) : 0,
     lastTradePrice: m.lastTradePrice != null ? Number(m.lastTradePrice) : null,
+    clobTokenYes: parseJsonArr(m.clobTokenIds)[0],
   };
 }
 
