@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { resolveTeam } from '@/lib/wcTeams';
+import { fetchWinnerData, fetchWcEvents } from '@/lib/wcData';
 import WorldCupClient from './WorldCupClient';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -46,5 +47,18 @@ export default async function WorldCupPage(
   const raw = typeof sp.team === 'string' ? sp.team : undefined;
   const initialTeam = raw ? (resolveTeam(raw)?.canonical ?? null) : null;
 
-  return <WorldCupClient initialTeam={initialTeam} />;
+  // Server-side data so the page ships with real numbers in the HTML
+  // (no empty "—" first paint; good for SEO and link previews too).
+  const [initialWinner, initialEvents] = await Promise.all([
+    fetchWinnerData(60),
+    fetchWcEvents(60),
+  ]);
+
+  return (
+    <WorldCupClient
+      initialTeam={initialTeam}
+      initialWinner={initialWinner}
+      initialEvents={initialEvents}
+    />
+  );
 }

@@ -449,7 +449,13 @@ function ProsPicks({ team }: { team: string | null }) {
 
 /* ── upset radar ───────────────────────────────────────── */
 
-function UpsetRadar({ events }: { events: WcEvent[] }) {
+function scoreColor(score: number): string {
+  if (score >= 70) return '#fb7185';
+  if (score >= 40) return '#fbbf24';
+  return 'rgba(255,255,255,0.45)';
+}
+
+function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData | null }) {
   const [trades, setTrades] = useState<RecentTrade[]>([]);
 
   useEffect(() => {
@@ -459,9 +465,10 @@ function UpsetRadar({ events }: { events: WcEvent[] }) {
       .catch(() => {});
   }, []);
 
-  /* biggest 24h odds swings on match markets */
+  /* biggest 24h odds swings on match markets, scored 0–100
+     (60% odds move magnitude + 40% relative volume) */
   const movers = useMemo(() => {
-    const rows: { label: string; eventTitle: string; change: number; last: number | null; eventSlug: string; marketSlug?: string }[] = [];
+    const rows: { label: string; eventTitle: string; change: number; last: number | null; vol: number; eventSlug: string; marketSlug?: string }[] = [];
     for (const e of events) {
       if (!e.isMatch) continue;
       for (const m of e.markets) {
@@ -472,13 +479,31 @@ function UpsetRadar({ events }: { events: WcEvent[] }) {
           eventTitle: e.title,
           change: ch,
           last: m.lastTradePrice ?? yesPrice(m),
+          vol: m.volume24hr ?? 0,
           eventSlug: e.slug,
           marketSlug: m.slug,
         });
       }
     }
-    return rows.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 6);
+    const top = rows.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 6);
+    const maxVol = top.reduce((mx, r) => Math.max(mx, r.vol), 0);
+    return top.map(r => ({
+      ...r,
+      score: Math.min(100, Math.round(
+        Math.min(60, Math.abs(r.change) * 100 * 4) +
+        (maxVol > 0 ? Math.min(40, (r.vol / maxVol) * 40) : 0)
+      )),
+    }));
   }, [events]);
+
+  /* longshot nations with the most action — shown when swings are quiet */
+  const longshots = useMemo(() => {
+    const teams = winner?.teams ?? [];
+    return teams
+      .filter(t => t.price > 0 && t.price <= 0.10)
+      .sort((a, b) => b.volume24hr - a.volume24hr)
+      .slice(0, 5);
+  }, [winner]);
 
   /* big money on longshots (≤35¢) */
   const underdogMoney = useMemo(
@@ -489,29 +514,24 @@ function UpsetRadar({ events }: { events: WcEvent[] }) {
     [trades]
   );
 
-  if (movers.length === 0 && underdogMoney.length === 0) {
-    return (
-      <div className="glass rounded-2xl py-12 text-center">
-        <p className="text-2xl mb-2">📡</p>
-        <p className="text-sm text-white/25">Radar is quiet — no unusual odds moves or longshot money right now</p>
-      </div>
-    );
-  }
-
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      {/* Odds swings */}
+      {/* Odds swings (or longshot watch when quiet) */}
       <div className="glass gradient-border rounded-2xl p-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">⚡ Biggest 24h odds swings</p>
-        {movers.length === 0 ? (
-          <p className="text-sm text-white/25 py-6 text-center">No big swings today</p>
-        ) : (
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">
+          {movers.length > 0 ? '⚡ Biggest 24h odds swings' : '👀 Longshot watch'}
+        </p>
+        {movers.length > 0 ? (
           <div className="flex flex-col gap-1">
             {movers.map((m, i) => {
               const up = m.change > 0;
               return (
                 <a key={m.label + i} href={marketUrl(m.eventSlug, m.marketSlug)} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
+                  <span title="Upset Score: odds move + volume" className="font-mono text-[10px] font-black rounded-md px-1.5 py-1 flex-shrink-0 w-11 text-center"
+                    style={{ background: `${scoreColor(m.score)}1a`, color: scoreColor(m.score), border: `1px solid ${scoreColor(m.score)}40` }}>
+                    {m.score}
+                  </span>
                   <span className="font-mono text-[11px] font-black w-14 flex-shrink-0" style={{ color: up ? '#34d399' : '#fb7185' }}>
                     {up ? '▲' : '▼'} {(Math.abs(m.change) * 100).toFixed(0)}pp
                   </span>
@@ -526,6 +546,23 @@ function UpsetRadar({ events }: { events: WcEvent[] }) {
               );
             })}
           </div>
+        ) : longshots.length > 0 ? (
+          <>
+            <p className="text-[10px] text-white/30 mb-2">No big swings today — these low-odds nations are seeing the most action:</p>
+            <div className="flex flex-col gap-1">
+              {longshots.map(t => (
+                <a key={t.team} href={marketUrl('world-cup-winner', t.slug)} target="_blank" rel="noopener noreferrer"
+                  className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
+                  <span className="text-base leading-none flex-shrink-0">{teamFlag(t.team)}</span>
+                  <span className="flex-1 min-w-0 truncate text-xs font-semibold text-white/75 group-hover:text-white transition-colors">{t.team}</span>
+                  <span className="font-mono text-[10px] text-white/30">{formatCurrency(t.volume24hr, true)} 24h</span>
+                  <span className="font-mono text-xs font-black text-grad w-10 text-right">{(t.price * 100).toFixed(0)}¢</span>
+                </a>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-white/25 py-6 text-center">Loading radar…</p>
         )}
       </div>
 
@@ -533,7 +570,10 @@ function UpsetRadar({ events }: { events: WcEvent[] }) {
       <div className="glass gradient-border rounded-2xl p-4">
         <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">🎯 Big money on longshots (≤35¢)</p>
         {underdogMoney.length === 0 ? (
-          <p className="text-sm text-white/25 py-6 text-center">No longshot whales right now</p>
+          <p className="text-sm text-white/25 py-6 text-center px-4">
+            Whale longshot buys land here — usually right around kickoff.
+            Keep an eye on the <a href="#smart-money" className="text-white/50 underline hover:text-white/80">live money feed</a> below.
+          </p>
         ) : (
           <div className="flex flex-col gap-1">
             {underdogMoney.map((t, i) => (
@@ -1047,11 +1087,17 @@ function WcSmartMoney({ team }: { team: string | null }) {
 
 type Tab = 'matches' | 'futures';
 
-export default function WorldCupClient({ initialTeam }: { initialTeam: string | null }) {
-  const [winner, setWinner] = useState<WinnerData | null>(null);
-  const [winnerLoading, setWinnerLoading] = useState(true);
-  const [events, setEvents] = useState<WcEvent[]>([]);
-  const [eventsLoading, setEventsLoading] = useState(true);
+export default function WorldCupClient({
+  initialTeam, initialWinner = null, initialEvents = [],
+}: {
+  initialTeam: string | null;
+  initialWinner?: WinnerData | null;
+  initialEvents?: WcEvent[];
+}) {
+  const [winner, setWinner] = useState<WinnerData | null>(initialWinner);
+  const [winnerLoading, setWinnerLoading] = useState(initialWinner == null);
+  const [events, setEvents] = useState<WcEvent[]>(initialEvents);
+  const [eventsLoading, setEventsLoading] = useState(initialEvents.length === 0);
   const [tab, setTab] = useState<Tab>('matches');
   const [selectedTeam, setSelectedTeam] = useState<string | null>(initialTeam);
 
@@ -1065,17 +1111,22 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
   }, []);
 
   useEffect(() => {
-    fetch('/api/worldcup/winner')
-      .then(r => r.json())
-      .then(d => { if (d?.teams) setWinner(d); })
-      .catch(() => {})
-      .finally(() => setWinnerLoading(false));
-
-    fetch('/api/worldcup/matches')
-      .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setEvents(d); })
-      .catch(() => {})
-      .finally(() => setEventsLoading(false));
+    // Only fetch what the server didn't already provide.
+    if (winnerLoading) {
+      fetch('/api/worldcup/winner')
+        .then(r => r.json())
+        .then(d => { if (d?.teams) setWinner(d); })
+        .catch(() => {})
+        .finally(() => setWinnerLoading(false));
+    }
+    if (eventsLoading) {
+      fetch('/api/worldcup/matches')
+        .then(r => r.json())
+        .then(d => { if (Array.isArray(d)) setEvents(d); })
+        .catch(() => {})
+        .finally(() => setEventsLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const matches = useMemo(() => {
@@ -1155,9 +1206,26 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
                 <span className="text-grad">2026 Hub</span> <span className="align-middle">🏆</span>
               </h1>
               <p className="text-sm text-white/40">
-                Every FIFA World Cup market on Polymarket, one pitch. Pick your nation,
-                follow the odds, track the smart money.
+                Track every World Cup 2026 market before the crowd does — odds, smart money
+                and nation-by-nation momentum in one dashboard.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a href="#nation-picker"
+                  className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-white transition-all hover:scale-[1.02]"
+                  style={{ background: 'rgba(124,58,237,0.18)', border: '1px solid rgba(124,58,237,0.45)' }}>
+                  🌍 Pick your nation
+                </a>
+                <a href="#smart-money"
+                  className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  🐋 View smart money
+                </a>
+                <a href="#upset-radar"
+                  className="flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-semibold text-white/70 transition-all hover:text-white"
+                  style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                  📡 Upset radar
+                </a>
+              </div>
               {liveCount > 0 && (
                 <p className="mt-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
                   style={{ background: 'rgba(52,211,153,0.10)', color: '#34d399', border: '1px solid rgba(52,211,153,0.25)' }}>
@@ -1183,7 +1251,11 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
               <div key={s.label} className="rounded-xl px-4 py-3"
                 style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <p className="text-[10px] uppercase tracking-wider text-white/25">{s.label}</p>
-                <p className="text-lg font-black text-white/85 truncate">{s.value}</p>
+                <p className="text-lg font-black text-white/85 truncate">
+                  {winnerLoading
+                    ? <span className="animate-pulse text-sm font-semibold text-white/30">Loading live data…</span>
+                    : s.value}
+                </p>
               </div>
             ))}
           </div>
@@ -1191,7 +1263,7 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
       </div>
 
       {/* ── [02] Nation picker ── */}
-      <div>
+      <div id="nation-picker" className="scroll-mt-24">
         <SectionHeader index="[02]" label="Pick Your Nation" />
         {winnerLoading ? (
           <div className="h-10 rounded-xl animate-shimmer" />
@@ -1211,7 +1283,7 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
             <SectionHeader index="[04]" label={`Pros Holding ${selectedTeam}`} />
             <ProsPicks team={selectedTeam} />
           </div>
-          <div>
+          <div id="smart-money" className="scroll-mt-24">
             <SectionHeader index="[05]" label={`${selectedTeam} · Money Flow`} />
             <WcSmartMoney team={selectedTeam} />
           </div>
@@ -1232,9 +1304,9 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
             <ProsPicks team={null} />
           </div>
 
-          <div>
+          <div id="upset-radar" className="scroll-mt-24">
             <SectionHeader index="[05]" label="Upset Radar" />
-            <UpsetRadar events={events} />
+            <UpsetRadar events={events} winner={winner} />
           </div>
 
           <div>
@@ -1271,7 +1343,7 @@ export default function WorldCupClient({ initialTeam }: { initialTeam: string | 
             )}
           </div>
 
-          <div>
+          <div id="smart-money" className="scroll-mt-24">
             <SectionHeader index="[07]" label="World Cup Smart Money" />
             <WcSmartMoney team={null} />
           </div>
