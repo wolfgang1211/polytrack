@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Logo, { WordmarkLogo } from '@/components/Logo';
+import Logo from '@/components/Logo';
 
 const PRODUCT_LINKS = [
   { href: '/leaderboard', label: 'Leaderboard' },
@@ -26,11 +26,13 @@ export default function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {/* Brand */}
           <div className="lg:col-span-1">
+            {/* Same brand lockup as the navbar: mark + HTML text */}
             <Link href="/" className="inline-flex items-center gap-2.5">
-              {/* span wrapper: Logo sets display via inline style, which would
-                  override Tailwind's sm:hidden — hide the wrapper instead */}
-              <span className="sm:hidden"><Logo size={28} /></span>
-              <WordmarkLogo height={30} className="hidden sm:block opacity-95" />
+              <Logo size={32} />
+              <span className="flex flex-col leading-none">
+                <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
+                <span className="text-[9px] text-[#a855f7] font-medium tracking-widest uppercase">Analytics</span>
+              </span>
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/30">
               Real-time analytics and leaderboard for Polymarket. Track top traders,
