@@ -7,6 +7,7 @@ import TelegramModal from '@/components/TelegramModal';
 import Logo from '@/components/Logo';
 
 const NAV_LINKS = [
+  { href: '/worldcup',    label: 'World Cup 🏆' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/checker',     label: 'Wallet Checker' },
   { href: '/markets',     label: 'Markets'     },
