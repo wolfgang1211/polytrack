@@ -27,7 +27,9 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5">
-              <Logo size={28} className="sm:hidden" />
+              {/* span wrapper: Logo sets display via inline style, which would
+                  override Tailwind's sm:hidden — hide the wrapper instead */}
+              <span className="sm:hidden"><Logo size={28} /></span>
               <WordmarkLogo height={30} className="hidden sm:block opacity-95" />
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/30">
