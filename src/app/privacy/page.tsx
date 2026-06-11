@@ -86,7 +86,6 @@ export default function PrivacyPage() {
             <li>Object to or restrict processing.</li>
             <li>Data portability.</li>
           </ul>
-          <p>To exercise these rights, contact us at <strong>privacy@alphaboard.xyz</strong>.</p>
         </section>
 
         <section>
@@ -110,14 +109,6 @@ export default function PrivacyPage() {
           <p>
             We may update this Privacy Policy from time to time. We will notify you of any changes by
             posting the new policy on this page and updating the &ldquo;Last updated&rdquo; date.
-          </p>
-        </section>
-
-        <section>
-          <h2>11. Contact Us</h2>
-          <p>
-            If you have questions about this Privacy Policy, please contact us at:{' '}
-            <strong>privacy@alphaboard.xyz</strong>
           </p>
         </section>
       </div>
