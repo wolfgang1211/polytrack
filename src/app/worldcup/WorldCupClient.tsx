@@ -519,9 +519,18 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
     <div className="grid gap-4 lg:grid-cols-2">
       {/* Odds swings (or longshot watch when quiet) */}
       <div className="glass gradient-border rounded-2xl p-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">
-          {movers.length > 0 ? '⚡ Biggest 24h odds swings' : '👀 Longshot watch'}
-        </p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
+            {movers.length > 0 ? '⚡ Biggest 24h odds swings' : '👀 Longshot watch'}
+          </p>
+          {movers.length > 0 && (
+            <a href="/api/worldcup/card?type=upset" target="_blank" rel="noopener noreferrer"
+              title="Open shareable image card"
+              className="text-[10px] font-semibold text-white/30 hover:text-white/70 transition-colors">
+              📸 Card
+            </a>
+          )}
+        </div>
         {movers.length > 0 ? (
           <div className="flex flex-col gap-1">
             {movers.map((m, i) => {
@@ -816,6 +825,18 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
           <span className="text-[10px] font-semibold text-white/35">{expanded ? 'Hide details ▲' : 'Match details ▼'}</span>
         </div>
       </button>
+
+      {group.main && (
+        <div className="mt-2 flex justify-end">
+          <a href={`/api/worldcup/card?type=match&event=${encodeURIComponent(group.main.slug)}`}
+            target="_blank" rel="noopener noreferrer"
+            title="Open shareable image card"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-white/35 transition-colors hover:text-white/75"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+            📸 Share card
+          </a>
+        </div>
+      )}
 
       {expanded && <MatchDetail group={group} trades={trades} />}
     </div>
@@ -1340,11 +1361,18 @@ function WcSmartMoney({ team }: { team: string | null }) {
             {team ? `${team} Money Flow` : 'WC Smart Money'} {!belowThreshold && <span style={{ color: 'rgba(255,255,255,0.20)' }}>$250+</span>}
           </span>
         </div>
-        {lastUpdate && (
-          <span className="font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
-            {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </span>
-        )}
+        <span className="flex items-center gap-3">
+          <a href="/api/worldcup/card?type=whale" target="_blank" rel="noopener noreferrer"
+            title="Open shareable whale card"
+            className="text-[10px] font-semibold text-white/30 hover:text-white/70 transition-colors">
+            📸 Whale card
+          </a>
+          {lastUpdate && (
+            <span className="font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
+              {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </span>
+          )}
+        </span>
       </div>
 
       <div className="rounded-xl overflow-hidden"
