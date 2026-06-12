@@ -76,7 +76,7 @@ function computeInsights(positions: Position[]): Insights | null {
   return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, bestCategoryCount, avgPositionSize, biggestWin, biggestLoss };
 }
 
-interface TimelineData { points: { t: number; pnl: number }[]; realized: number; trades: number }
+interface TimelineData { points: { t: number; pnl: number }[]; realized: number; trades: number; ceiling?: boolean; source?: 'user-pnl-api' | 'graph' | 'data-api' }
 
 export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
@@ -104,11 +104,14 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
     if (!address) return;
     let live = true;
     setTimelineLoading(true);
+    setTimelineData(null);
+
     fetch(`/api/wallet/${address}/timeline`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((d: TimelineData) => { if (live && Array.isArray(d?.points)) setTimelineData(d); })
       .catch(() => {})
       .finally(() => { if (live) setTimelineLoading(false); });
+
     return () => { live = false; };
   }, [address]);
 
@@ -124,9 +127,13 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   //               positions double-counts losses — we exclude closed ones).
   const realizedTotal  = all.reduce((s, p) => s + (Number(p.realizedPnl) || 0), 0);
   const unrealizedOpen = open.reduce((s, p) => s + (Number(p.cashPnl) || 0), 0);
-  const totalPnl   = realizedTotal + unrealizedOpen;
+  const cappedTotalPnl = realizedTotal + unrealizedOpen;
+  const officialTotalPnl = timelineData?.source === 'user-pnl-api' ? timelineData.realized : null;
+  const totalPnl = officialTotalPnl ?? cappedTotalPnl;
   const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
-  const roi        = invested > 0 ? (totalPnl / invested) * 100 : null;
+  // ROI from capped positions is misleading on huge wallets, so hide it when
+  // official full-history PnL is available but positions are capped.
+  const roi        = invested > 0 && !(officialTotalPnl != null && data?.truncated) ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
   const shownPnl   = tab === 'open'
     ? open.reduce((s, p) => s + (Number(p.realizedPnl) || 0) + (Number(p.cashPnl) || 0), 0)
@@ -271,9 +278,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Stats ── */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatsCard
-              label="Total P&L"
+              label={officialTotalPnl != null ? "Polymarket P&L" : "Total P&L"}
               value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-              sub={roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI` : undefined}
+              sub={officialTotalPnl != null ? 'Polymarket official P&L' : (roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI` : undefined)}
               valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-white/50'}
               gradient={totalPnl >= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(251,113,133,0.15)'}
               icon={<svg style={{width:14,height:14}} className={totalPnl>=0?'text-emerald-400':'text-rose-400'} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}

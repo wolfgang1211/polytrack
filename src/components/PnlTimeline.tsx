@@ -93,7 +93,13 @@ export default function PnlTimeline({
       </div>
 
       {loading ? (
-        <div className="h-56 rounded-xl animate-shimmer" />
+        <div className="flex h-56 flex-col items-center justify-center gap-3 rounded-xl animate-shimmer text-center">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
+          <div>
+            <p className="text-xs font-semibold text-white/45">Building full-history PnL chart…</p>
+            <p className="mt-1 text-[10px] text-white/25">Large wallets can take a few seconds</p>
+          </div>
+        </div>
       ) : points.length < 2 ? (
         <div className="flex h-56 items-center justify-center text-xs text-white/25">
           Not enough trade history to chart
@@ -120,7 +126,7 @@ export default function PnlTimeline({
             />
             <Tooltip content={<TimelineTooltip />} />
             <ReferenceLine y={0} stroke="rgba(255,255,255,0.15)" strokeDasharray="3 3" />
-            <Area type="monotone" dataKey="pnl" stroke={stroke} strokeWidth={2} fill="url(#pnlFill)" />
+            <Area type="linear" dataKey="pnl" stroke={stroke} strokeWidth={3} fill="url(#pnlFill)" dot={false} activeDot={{ r: 4 }} isAnimationActive={false} connectNulls />
           </AreaChart>
         </ResponsiveContainer>
       )}

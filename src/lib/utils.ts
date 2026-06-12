@@ -70,7 +70,12 @@ export function detectCategory(title: string): string {
   return 'Other';
 }
 
+export function isWorldCupMarketText(text: string): boolean {
+  return /(?:\bfifwc\b|fifa|world[-\s]?cup|worldcup)/i.test(text);
+}
+
 const API_CAT_MAP: Record<string, string> = {
+  'world cup': 'World Cup', fifwc: 'World Cup', fifa: 'World Cup',
   crypto: 'Crypto', cryptocurrency: 'Crypto', defi: 'Crypto', web3: 'Crypto',
   politics: 'Politics', political: 'Politics', elections: 'Politics', government: 'Politics',
   sports: 'Sports', sport: 'Sports',
@@ -79,7 +84,11 @@ const API_CAT_MAP: Record<string, string> = {
   world: 'World', global: 'World', news: 'World',
 };
 
-export function resolveCategory(apiCategory: string | undefined, title: string): string {
+export function resolveCategory(apiCategory: string | undefined, title: string, extraText = ''): string {
+  const combined = `${title} ${extraText}`;
+
+  if (isWorldCupMarketText(combined)) return 'World Cup';
+
   if (apiCategory) {
     const norm = apiCategory.toLowerCase().trim();
     if (API_CAT_MAP[norm]) return API_CAT_MAP[norm];
@@ -87,7 +96,7 @@ export function resolveCategory(apiCategory: string | undefined, title: string):
       if (norm.includes(alias)) return cat;
     }
   }
-  return detectCategory(title);
+  return detectCategory(combined);
 }
 
 /** Risk-adjusted "Smart Score" (0–100) computed relative to a dataset.

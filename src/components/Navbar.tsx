@@ -7,7 +7,7 @@ import TelegramModal from '@/components/TelegramModal';
 import Logo from '@/components/Logo';
 
 const NAV_LINKS = [
-  { href: '/worldcup',    label: 'World Cup 🏆' },
+  { href: '/world-cup',   label: 'World Cup 🏆', featured: true },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/checker',     label: 'Wallet Checker' },
   { href: '/markets',     label: 'Markets'     },
@@ -70,18 +70,21 @@ export default function Navbar() {
 
             {/* Desktop nav links */}
             <nav className="hidden items-center gap-0.5 lg:flex">
-              {NAV_LINKS.map(({ href, label }) => {
-                const active = pathname === href;
+              {NAV_LINKS.map(({ href, label, featured }) => {
+                const active = pathname === href || pathname.startsWith(`${href}/`);
                 return (
                   <Link
                     key={href}
                     href={href}
                     className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200
-                      ${active ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
+                      ${active ? 'text-white' : featured ? 'text-violet-100/80 hover:text-white' : 'text-white/45 hover:text-white/75'}`}
+                    style={featured && !active ? { background: 'rgba(124,58,237,0.12)', border: '1px solid rgba(168,85,247,0.24)' } : undefined}
                   >
                     {active && (
                       <span className="absolute inset-0 rounded-lg"
-                        style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
+                        style={featured
+                          ? { background: 'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(34,197,94,0.25))', border: '1px solid rgba(168,85,247,0.50)', boxShadow: '0 0 24px rgba(124,58,237,0.18)' }
+                          : { background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
                     )}
                     <span className="relative">{label}</span>
                   </Link>

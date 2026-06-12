@@ -28,17 +28,62 @@ export interface TimelineResponse {
   trades: number;
   /** True when the wallet hit the data-api's 3,500-trade public ceiling */
   ceiling: boolean;
-  /** Data provenance — 'graph' means full history, 'data-api' means capped */
-  source?: 'graph' | 'data-api';
+  /** Data provenance — user-pnl-api is Polymarket's pre-aggregated daily PnL API. */
+  source?: 'user-pnl-api' | 'graph' | 'data-api';
 }
 
 function downsample(points: TimelinePoint[], max: number): TimelinePoint[] {
   if (points.length <= max) return points;
-  const step = points.length / max;
+
+  // We still calculate PnL from EVERY trade, but the browser cannot draw tens of
+  // thousands of SVG points smoothly. So we compress the visual curve while
+  // preserving each bucket's start, low, high, and end points. This keeps spikes
+  // visible and avoids the “flat/blank chart” effect on high-volume wallets.
+  const bucketSize = Math.ceil(points.length / Math.max(1, Math.floor(max / 4)));
   const out: TimelinePoint[] = [];
-  for (let i = 0; i < max; i++) out.push(points[Math.floor(i * step)]);
-  out.push(points[points.length - 1]);
+
+  for (let i = 0; i < points.length; i += bucketSize) {
+    const bucket = points.slice(i, i + bucketSize);
+    if (!bucket.length) continue;
+
+    let min = bucket[0];
+    let maxPoint = bucket[0];
+    for (const p of bucket) {
+      if (p.pnl < min.pnl) min = p;
+      if (p.pnl > maxPoint.pnl) maxPoint = p;
+    }
+
+    for (const p of [bucket[0], min, maxPoint, bucket[bucket.length - 1]]) {
+      const last = out[out.length - 1];
+      if (!last || last.t !== p.t || last.pnl !== p.pnl) out.push(p);
+    }
+  }
+
+  const lastRaw = points[points.length - 1];
+  const lastOut = out[out.length - 1];
+  if (!lastOut || lastOut.t !== lastRaw.t || lastOut.pnl !== lastRaw.pnl) {
+    out.push(lastRaw);
+  }
   return out;
+}
+
+async function fetchPolymarketUserPnl(address: string): Promise<TimelinePoint[] | null> {
+  try {
+    const url = `https://user-pnl-api.polymarket.com/user-pnl?user_address=${address}&interval=all&fidelity=1d`;
+    const res = await fetch(url, { headers: HEADERS, next: { revalidate: 1800 } });
+    if (!res.ok) return null;
+    const json = await res.json();
+    if (!Array.isArray(json)) return null;
+
+    const points = json
+      .map((p: { t?: number; p?: number }) => ({ t: Number(p.t), pnl: Number(p.p) }))
+      .filter((p: TimelinePoint) => Number.isFinite(p.t) && Number.isFinite(p.pnl) && p.t > 0)
+      .sort((a: TimelinePoint, b: TimelinePoint) => a.t - b.t);
+
+    return points.length ? points : null;
+  } catch {
+    return null;
+  }
 }
 
 // ── The Graph (Polymarket subgraph) ────────────────────────────────────────
@@ -96,22 +141,32 @@ async function fetchFillPage(
   query: string,
   wallet: string,
   skip: number,
-): Promise<GraphFill[]> {
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, variables: { wallet, skip } }),
-    });
-    if (!res.ok) return [];
-    const json = await res.json();
-    return (json?.data?.enrichedOrderFilleds ?? []) as GraphFill[];
-  } catch {
-    return [];
+): Promise<GraphFill[] | null> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': HEADERS['User-Agent'],
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({ query, variables: { wallet, skip } }),
+      });
+      if (!res.ok) continue;
+      const json = await res.json();
+      if (json?.errors?.length) continue;
+      return (json?.data?.enrichedOrderFilleds ?? []) as GraphFill[];
+    } catch {
+      // Retry transient Graph/indexer/network failures.
+    }
   }
+  return null;
 }
 
-/** Paginate one role (taker or maker) until an under-full page arrives. */
+/** Paginate one role (taker or maker). Pages are fetched in small parallel
+ * windows so high-volume wallets do not leave the chart stuck on a blank
+ * loading skeleton for a long time. */
 async function fetchSide(
   url: string,
   wallet: string,
@@ -119,11 +174,25 @@ async function fetchSide(
 ): Promise<Array<GraphFill & { isTaker: boolean }>> {
   const query = asMaker ? MAKER_QUERY : TAKER_QUERY;
   const out: Array<GraphFill & { isTaker: boolean }> = [];
-  for (let p = 0; p < 500; p++) {
-    const batch = await fetchFillPage(url, query, wallet, p * 1000);
-    for (const f of batch) out.push({ ...f, isTaker: !asMaker });
-    if (batch.length < 1000) break;
+  const WINDOW = 8;
+
+  for (let base = 0; base < 500; base += WINDOW) {
+    const pages = await Promise.all(
+      Array.from({ length: WINDOW }, (_, i) => fetchFillPage(url, query, wallet, (base + i) * 1000))
+    );
+
+    let shouldStop = false;
+    for (const batch of pages) {
+      if (batch === null) continue;
+      for (const f of batch) out.push({ ...f, isTaker: !asMaker });
+      if (batch.length < 1000) {
+        shouldStop = true;
+        break;
+      }
+    }
+    if (shouldStop) break;
   }
+
   return out;
 }
 
@@ -198,14 +267,36 @@ function replayGraphFills(
  * (3,500-trade hard ceiling) when the subgraph returns no results.
  */
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   ctx: RouteContext<'/api/wallet/[address]/timeline'>
 ) {
   const { address } = await ctx.params;
   const apiKey = process.env.GRAPH_API_KEY;
+  const mode = req.nextUrl.searchParams.get('mode');
+
+  // ── Path 0: Polymarket's pre-aggregated PnL API — fast full-history chart ──
+  // Predicts.guru appears to use this endpoint. It returns daily PnL points in
+  // ~100ms even for wallets with hundreds of thousands of trades, because the
+  // heavy trade replay is already done upstream by Polymarket.
+  if (mode !== 'graph') {
+    const pnlPoints = await fetchPolymarketUserPnl(address);
+    if (pnlPoints?.length) {
+      const realized = pnlPoints[pnlPoints.length - 1].pnl;
+      const body: TimelineResponse = {
+        points: downsample(pnlPoints, 300),
+        realized: Math.round(realized * 100) / 100,
+        trades: 0,
+        ceiling: false,
+        source: 'user-pnl-api',
+      };
+      return NextResponse.json(body, {
+        headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600' },
+      });
+    }
+  }
 
   // ── Path 1: The Graph — no offset ceiling ──────────────────────────────
-  if (apiKey) {
+  if (apiKey && mode !== 'fast') {
     try {
       const fills = await fetchAllGraphFills(address, apiKey);
       if (fills.length > 0) {

@@ -40,6 +40,10 @@
   --info: #60a5fa;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* keyframes */
 @keyframes shimmer {
   0%   { background-position:-200% center; }

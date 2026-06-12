@@ -41,7 +41,7 @@ function closesIn(endDate?: string): string | null {
   return `${Math.max(1, Math.floor(ms / 60_000))}m`;
 }
 
-const CATS = ['All', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Other'] as const;
+const CATS = ['All', 'World Cup', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Other'] as const;
 type Cat = typeof CATS[number];
 
 const SORTS = [
@@ -54,9 +54,14 @@ const SORTS = [
 type SortKey = typeof SORTS[number]['key'];
 
 const CAT_COLOR: Record<string, string> = {
+  'World Cup': '#22c55e',
   Politics: '#fb7185', Crypto: '#fbbf24', Sports: '#34d399',
   Tech: '#38bdf8', World: '#a78bfa', Entertainment: '#f472b6', Other: '#94a3b8',
 };
+
+function categoryText(m: Pick<TopMarket, 'category' | 'question' | 'slug' | 'eventSlug'>): string {
+  return resolveCategory(m.category, m.question ?? '', `${m.slug ?? ''} ${m.eventSlug ?? ''}`);
+}
 
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
@@ -72,13 +77,12 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 /* ── card ──────────────────────────────────────────────── */
 
 function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
-  const price     = yesPrice(market);
   const volume    = vol24h(market);
   const liquidity = market.liquidityNum ?? 0;
   const href      = marketUrl(market.eventSlug, market.slug);
   const outcomes  = parseJson(market.outcomes);
   const prices    = parseJson(market.outcomePrices);
-  const cat       = resolveCategory(market.category, market.question ?? '');
+  const cat       = categoryText(market);
   const close     = closesIn(market.endDate);
 
   return (
@@ -188,8 +192,14 @@ export default function MarketsPage() {
         const end = new Date(m.endDate).getTime();
         if (!isNaN(end) && end < nowMs - 3_600_000) return false;
       }
-      if (cat !== 'All' && resolveCategory(m.category, m.question ?? '') !== cat) return false;
-      if (query && !(m.question ?? '').toLowerCase().includes(query)) return false;
+      const resolvedCat = categoryText(m);
+      if (cat === 'Sports') {
+        if (resolvedCat !== 'Sports' && resolvedCat !== 'World Cup') return false;
+      } else if (cat !== 'All' && resolvedCat !== cat) {
+        return false;
+      }
+      const haystack = `${m.question ?? ''} ${m.slug ?? ''} ${m.eventSlug ?? ''} ${resolvedCat}`.toLowerCase();
+      if (query && !haystack.includes(query)) return false;
       return true;
     });
   }, [markets, cat, q]);

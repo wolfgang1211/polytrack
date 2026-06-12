@@ -88,7 +88,7 @@ export default function WalletSidebar({
       </Section>
 
       <Section title="PnL Breakdown">
-        <Row label="Realized" value={`${sign(stats.realized)}${formatCurrency(stats.realized, true)}`} valueClass={cls(stats.realized)} />
+        <Row label="Position Realized" value={`${sign(stats.realized)}${formatCurrency(stats.realized, true)}`} valueClass={cls(stats.realized)} />
         <Row label="Unrealized" value={`${sign(stats.unrealized)}${formatCurrency(stats.unrealized, true)}`} valueClass={cls(stats.unrealized)} />
         <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
         <Row label="Total P&L" value={`${sign(stats.totalPnl)}${formatCurrency(stats.totalPnl, true)}`} valueClass={cls(stats.totalPnl)} />

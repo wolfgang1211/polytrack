@@ -11,10 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/worldcup`,
+      url: `${baseUrl}/world-cup`,
       lastModified: new Date(),
-      changeFrequency: 'always' as const,
-      priority: 0.9,
+      changeFrequency: 'hourly' as const,
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/leaderboard`,

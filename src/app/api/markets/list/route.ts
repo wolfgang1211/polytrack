@@ -14,6 +14,27 @@ const SORT_MAP: Record<string, string> = {
   ending: 'endDate',
 };
 
+function textField(m: Record<string, unknown>, key: string): string | undefined {
+  return typeof m[key] === 'string' ? (m[key] as string) : undefined;
+}
+
+function eventSlugFrom(m: Record<string, unknown>): string | undefined {
+  if (typeof m.eventSlug === 'string') return m.eventSlug;
+  if (Array.isArray(m.events) && m.events[0]) {
+    const event = m.events[0] as Record<string, unknown>;
+    return textField(event, 'slug');
+  }
+  return undefined;
+}
+
+function marketCategory(m: Record<string, unknown>, question: string, slug?: string, eventSlug?: string): string | undefined {
+  const apiCategory = textField(m, 'category');
+  const text = `${question} ${slug ?? ''} ${eventSlug ?? ''}`;
+
+  if (/(?:\bfifwc\b|fifa|world[-\s]?cup|worldcup)/i.test(text)) return 'World Cup';
+  return apiCategory;
+}
+
 export async function GET(req: NextRequest) {
   const sp = req.nextUrl.searchParams;
   const sortKey = sp.get('sort') ?? 'vol24h';
@@ -43,20 +64,26 @@ export async function GET(req: NextRequest) {
         }
         return true;
       })
-      .map((m: Record<string, unknown>) => ({
-        id: m.id,
-        question: m.question,
-        slug: m.slug,
-        eventSlug: m.eventSlug ?? (Array.isArray(m.events) && m.events[0] ? (m.events[0] as Record<string, unknown>).slug : undefined),
-        volume24hrNum: m.volume24hr != null ? Number(m.volume24hr) : undefined,
-        volumeNum: m.volumeNum != null ? Number(m.volumeNum) : (m.volume != null ? Number(m.volume) : undefined),
-        liquidityNum: m.liquidityNum != null ? Number(m.liquidityNum) : (m.liquidity != null ? Number(m.liquidity) : undefined),
-        outcomePrices: m.outcomePrices,
-        outcomes: m.outcomes,
-        image: m.image ?? m.icon,
-        endDate: m.endDate ?? m.endDateIso,
-        category: m.category ?? undefined,
-      }));
+      .map((m: Record<string, unknown>) => {
+        const question = textField(m, 'question') ?? '';
+        const slug = textField(m, 'slug');
+        const eventSlug = eventSlugFrom(m);
+
+        return {
+          id: m.id,
+          question,
+          slug,
+          eventSlug,
+          volume24hrNum: m.volume24hr != null ? Number(m.volume24hr) : undefined,
+          volumeNum: m.volumeNum != null ? Number(m.volumeNum) : (m.volume != null ? Number(m.volume) : undefined),
+          liquidityNum: m.liquidityNum != null ? Number(m.liquidityNum) : (m.liquidity != null ? Number(m.liquidity) : undefined),
+          outcomePrices: m.outcomePrices,
+          outcomes: m.outcomes,
+          image: m.image ?? m.icon,
+          endDate: m.endDate ?? m.endDateIso,
+          category: marketCategory(m, question, slug, eventSlug),
+        };
+      });
 
     return NextResponse.json(markets, {
       headers: { 'Cache-Control': 'public, s-maxage=120, stale-while-revalidate=300' },
