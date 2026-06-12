@@ -4,7 +4,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.alphaboard.xyz';
-const SHARE_CARD_VERSION = '20260612b';
+const SHARE_CARD_VERSION = '20260612c';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 type ShareType = 'upset' | 'whale' | 'match';
@@ -35,19 +35,19 @@ function sharePath(type: ShareType, event?: string): string {
 
 function titleFor(type: ShareType): string {
   if (type === 'whale') return 'World Cup Whale Flow — AlphaBoard';
-  if (type === 'match') return 'World Cup Live Match Odds — AlphaBoard';
+  if (type === 'match') return 'Live World Cup Odds — AlphaBoard';
   return 'World Cup Upset Radar — AlphaBoard';
 }
 
 function descriptionFor(type: ShareType): string {
   if (type === 'whale') return 'Live World Cup money-flow signal from AlphaBoard.';
-  if (type === 'match') return 'Market-implied World Cup match odds, rendered as a live AlphaBoard card.';
+  if (type === 'match') return 'Live World Cup odds, money flow and market-implied probabilities on AlphaBoard.';
   return 'The biggest 24h World Cup odds swing, rendered as a live AlphaBoard card.';
 }
 
 function tweetTextFor(type: ShareType): string {
   if (type === 'whale') return '🐋 World Cup whale flow — live money moves on AlphaBoard';
-  if (type === 'match') return 'World Cup live match odds on AlphaBoard';
+  if (type === 'match') return 'Live World Cup odds, money flow and market-implied probabilities on AlphaBoard';
   return '📡 World Cup upset radar — biggest 24h odds swing on AlphaBoard';
 }
 

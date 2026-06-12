@@ -37,7 +37,7 @@ function Frame({ children, tagline }: { children: React.ReactNode; tagline: stri
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #0a0a0b 0%, #1a0a2e 55%, #0a0a0b 100%)',
+        background: 'linear-gradient(135deg, #09080f 0%, #1b0b31 52%, #09080f 100%)',
         width: '100%',
         height: '100%',
         display: 'flex',
@@ -50,7 +50,12 @@ function Frame({ children, tagline }: { children: React.ReactNode; tagline: stri
       <div style={{
         position: 'absolute', top: '-25%', right: '-10%', width: '55%', height: '85%',
         borderRadius: '50%', filter: 'blur(70px)',
-        background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.20) 0%, transparent 70%)',
+        background: 'radial-gradient(ellipse at center, rgba(168,85,247,0.24) 0%, transparent 70%)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 22, borderRadius: 30,
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: 'inset 0 0 90px rgba(168,85,247,0.08)',
       }} />
 
       {/* header */}
@@ -67,18 +72,34 @@ function Frame({ children, tagline }: { children: React.ReactNode; tagline: stri
             World Cup 2026 🏆
           </div>
         </div>
-        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.35)', display: 'flex' }}>{tagline}</div>
+        <div style={{
+          fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.72)', display: 'flex',
+          alignItems: 'center', gap: 9, padding: '8px 15px', borderRadius: 999,
+          background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+          boxShadow: '0 18px 55px rgba(168,85,247,0.18)',
+        }}>
+          <span style={{ width: 8, height: 8, borderRadius: 99, background: '#a855f7', display: 'flex' }} />
+          {tagline}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' }}>
         {children}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ fontSize: 17, color: 'rgba(255,255,255,0.35)', display: 'flex', letterSpacing: '0.04em' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 1 }}>
+        <div style={{
+          fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.52)', display: 'flex',
+          letterSpacing: '0.03em', padding: '7px 12px', borderRadius: 999,
+          background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.10)',
+        }}>
           alphaboard.xyz/worldcup
         </div>
-        <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.22)', display: 'flex' }}>
+        <div style={{
+          fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.48)', display: 'flex',
+          padding: '7px 12px', borderRadius: 999,
+          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.10)',
+        }}>
           Live Polymarket data · Not financial advice
         </div>
       </div>

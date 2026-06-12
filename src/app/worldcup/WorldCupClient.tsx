@@ -66,7 +66,7 @@ interface ProPick {
 /* ── helpers ───────────────────────────────────────────── */
 
 const SITE_URL = 'https://www.alphaboard.xyz';
-const SHARE_CARD_VERSION = '20260612b';
+const SHARE_CARD_VERSION = '20260612c';
 
 function worldCupShareUrl(type: 'upset' | 'whale' | 'match', event?: string): string {
   const params = new URLSearchParams({ type, v: SHARE_CARD_VERSION });
@@ -953,7 +953,7 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
         <div className="mt-2 flex justify-end gap-1.5">
           <a
             href={xIntentUrl(
-              `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live market odds on AlphaBoard`,
+              `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live World Cup odds, money flow and market-implied probabilities on AlphaBoard`,
               worldCupShareUrl('match', group.main.slug)
             )}
             target="_blank" rel="noopener noreferrer"
@@ -962,7 +962,7 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
             style={{ background: 'rgba(56,189,248,0.07)', border: '1px solid rgba(56,189,248,0.2)' }}>
             🐦 Share on X
           </a>
-          <a href={`/worldcup/card?type=match&event=${encodeURIComponent(group.main.slug)}`}
+          <a href={`/worldcup/card?type=match&v=${SHARE_CARD_VERSION}&event=${encodeURIComponent(group.main.slug)}`}
             target="_blank" rel="noopener noreferrer"
             title="Open the image — save it to attach natively to a post"
             className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-white/35 transition-colors hover:text-white/75"
