@@ -65,6 +65,18 @@ interface ProPick {
 
 /* ── helpers ───────────────────────────────────────────── */
 
+const SITE_URL = 'https://www.alphaboard.xyz';
+
+function worldCupShareUrl(type: 'upset' | 'whale' | 'match', event?: string): string {
+  const params = new URLSearchParams({ type });
+  if (event) params.set('event', event);
+  return `${SITE_URL}/worldcup/share?${params.toString()}`;
+}
+
+function xIntentUrl(text: string, url: string): string {
+  return `https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+}
+
 function parseJsonArr(s: string | undefined): string[] {
   if (!s) return [];
   try { return JSON.parse(s); } catch { return []; }
@@ -141,6 +153,48 @@ function Flag({ team, size = 18, className = '' }: { team: string; size?: number
       className={`flex-shrink-0 rounded-[3px] object-cover ${className}`}
       style={{ width: size, height: h, boxShadow: '0 0 0 1px rgba(255,255,255,0.10)' }}
     />
+  );
+}
+
+function teamsFromEventTitle(title: string): [string, string] | null {
+  const base = title.split(' - ')[0].trim();
+  const teams = base.split(/ vs\.? /i).map(t => t.trim()).filter(Boolean);
+  return teams.length === 2 ? [teams[0], teams[1]] : null;
+}
+
+function outcomeTeam(label: string, teams: [string, string] | null): string | null {
+  if (!teams) return null;
+  if (/^draw\b/i.test(label)) return null;
+  if (textMentionsTeam(label, teams[0])) return teams[0];
+  if (textMentionsTeam(label, teams[1])) return teams[1];
+  return null;
+}
+
+function MatchFlagLockup({ teams }: { teams: [string, string] | null }) {
+  if (!teams) {
+    return (
+      <div className="h-10 w-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base"
+        style={{ background: 'var(--vi-grad-25)', border: '1px solid var(--vi-border-xs)' }}>⚽</div>
+    );
+  }
+
+  const colors = teamColors(teams[0]);
+  return (
+    <div className="relative h-10 w-12 flex-shrink-0">
+      <div className="absolute inset-0 rounded-2xl opacity-70 blur-lg"
+        style={{ background: `linear-gradient(135deg, ${colors.primary}44, ${colors.secondary}22)` }} />
+      <div className="relative flex h-10 w-12 items-center justify-center rounded-2xl"
+        style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.10)' }}>
+        <span className="absolute left-1.5 top-2.5 rounded-md p-0.5"
+          style={{ background: 'rgba(2,6,23,0.92)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <Flag team={teams[0]} size={22} />
+        </span>
+        <span className="absolute right-1.5 bottom-2.5 rounded-md p-0.5"
+          style={{ background: 'rgba(2,6,23,0.92)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <Flag team={teams[1]} size={22} />
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -531,13 +585,26 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
       .slice(0, 5);
   }, [winner]);
 
-  /* big money on longshots (≤35¢) */
-  const underdogMoney = useMemo(
+  /* big money on longshots: odds must be cheap; trade size must be meaningful */
+  const LONGSHOT_PRICE_CEILING = 0.35;
+  const BIG_LONGSHOT_USDC = 1_000;
+  const WATCH_LONGSHOT_USDC = 250;
+
+  const longshotBuys = useMemo(
     () => trades
-      .filter(t => (t.side ?? '').toUpperCase() === 'BUY' && t.price != null && Number(t.price) <= 0.35 && usdcSize(t) >= 1_000)
-      .sort((a, b) => usdcSize(b) - usdcSize(a))
-      .slice(0, 6),
+      .filter(t => (t.side ?? '').toUpperCase() === 'BUY' && t.price != null && Number(t.price) <= LONGSHOT_PRICE_CEILING)
+      .sort((a, b) => usdcSize(b) - usdcSize(a)),
     [trades]
+  );
+
+  const underdogMoney = useMemo(
+    () => longshotBuys.filter(t => usdcSize(t) >= BIG_LONGSHOT_USDC).slice(0, 6),
+    [longshotBuys]
+  );
+
+  const longshotWatch = useMemo(
+    () => longshotBuys.filter(t => usdcSize(t) >= WATCH_LONGSHOT_USDC && usdcSize(t) < BIG_LONGSHOT_USDC).slice(0, 5),
+    [longshotBuys]
   );
 
   return (
@@ -549,10 +616,15 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
             {movers.length > 0 ? '⚡ Biggest 24h odds swings' : '👀 Longshot watch'}
           </p>
           {movers.length > 0 && (
-            <a href="/api/worldcup/card?type=upset" target="_blank" rel="noopener noreferrer"
-              title="Open shareable image card"
-              className="text-[10px] font-semibold text-white/30 hover:text-white/70 transition-colors">
-              📸 Card
+            <a
+              href={xIntentUrl(
+                '📡 World Cup upset radar — biggest 24h odds swing on AlphaBoard',
+                worldCupShareUrl('upset')
+              )}
+              target="_blank" rel="noopener noreferrer"
+              title="Share on X — the live card renders in the tweet"
+              className="text-[10px] font-semibold text-white/35 hover:text-white/80 transition-colors">
+              𝕏 Share Card
             </a>
           )}
         </div>
@@ -603,12 +675,36 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
 
       {/* Longshot money */}
       <div className="glass gradient-border rounded-2xl p-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">🎯 Big money on longshots (≤35¢)</p>
+        <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/35 mb-3">🎯 Big money on longshots (≤35¢ odds)</p>
         {underdogMoney.length === 0 ? (
-          <p className="text-sm text-white/25 py-6 text-center px-4">
-            Whale longshot buys land here — usually right around kickoff.
-            Keep an eye on the <a href="#smart-money" className="text-white/50 underline hover:text-white/80">live money feed</a> below.
-          </p>
+          longshotWatch.length > 0 ? (
+            <div className="flex flex-col gap-1">
+              <p className="px-2 pb-2 text-[10px] leading-relaxed text-white/34">
+                No $1K+ longshot buys right now — showing only $250+ ≤35¢-odds buys as a watchlist, not a whale signal.
+              </p>
+              {longshotWatch.map((t, i) => (
+                <a key={String(t.id ?? i)} href={marketUrl(t.eventSlug, t.slug)} target="_blank" rel="noopener noreferrer"
+                  className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
+                  <span className="font-mono text-xs font-black text-white/70 w-14 flex-shrink-0 text-right">{formatCurrency(usdcSize(t), true)}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold text-white/75 truncate group-hover:text-white transition-colors">{t.title ?? '—'}</p>
+                    <p className="text-[10px] text-white/30 truncate">
+                      {t.outcome} @ {t.price != null ? `${(Number(t.price) * 100).toFixed(0)}¢` : '—'} · {timeAgo(t.timestamp ?? t.createdAt)} ago
+                    </p>
+                  </div>
+                  <span className="font-mono text-[9px] font-black uppercase rounded px-1.5 py-0.5 flex-shrink-0"
+                    style={{ background: 'rgba(251,191,36,0.10)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.22)' }}>
+                    Watch
+                  </span>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-white/25 py-6 text-center px-4">
+              No $250+ longshot buys right now. Smaller prints are hidden so this stays a real big-money radar.
+              Keep an eye on the <a href="#smart-money" className="text-white/50 underline hover:text-white/80">live money feed</a> below.
+            </p>
+          )
         ) : (
           <div className="flex flex-col gap-1">
             {underdogMoney.map((t, i) => (
@@ -855,9 +951,10 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
       {group.main && (
         <div className="mt-2 flex justify-end gap-1.5">
           <a
-            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-              `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live market odds on AlphaBoard`
-            )}&url=${encodeURIComponent(`https://www.alphaboard.xyz/worldcup?match=${group.main.slug}`)}`}
+            href={xIntentUrl(
+              `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live market odds on AlphaBoard`,
+              worldCupShareUrl('match', group.main.slug)
+            )}
             target="_blank" rel="noopener noreferrer"
             title="Share on X — the live odds card renders in the tweet"
             className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-white/40 transition-colors hover:text-white/80"
@@ -1107,6 +1204,7 @@ function MatchCard({ event }: { event: WcEvent }) {
   const href = marketUrl(event.slug, event.markets[0]?.slug);
   const kickoff = kickoffLabel(event.gameStartTime);
   const isLive = kickoff === 'LIVE';
+  const teams = teamsFromEventTitle(event.title);
 
   const chips: { label: string; price: number }[] = [];
   if (event.markets.length > 1) {
@@ -1129,17 +1227,19 @@ function MatchCard({ event }: { event: WcEvent }) {
     <a href={href} target="_blank" rel="noopener noreferrer"
       className="group glass glass-hover gradient-border rounded-2xl p-5 flex flex-col gap-4 animate-fade-in-up">
       <div className="flex items-start gap-3">
-        {event.image ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={event.image} alt="" className="h-10 w-10 rounded-xl object-cover flex-shrink-0"
-            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-        ) : (
-          <div className="h-10 w-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base"
-            style={{ background: 'var(--vi-grad-25)', border: '1px solid var(--vi-border-xs)' }}>⚽</div>
-        )}
-        <p className="text-sm font-semibold text-white/85 line-clamp-2 leading-snug flex-1 group-hover:text-white transition-colors">
-          {event.title}
-        </p>
+        <MatchFlagLockup teams={teams} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-white/85 line-clamp-2 leading-snug group-hover:text-white transition-colors">
+            {event.title}
+          </p>
+          {teams && (
+            <p className="mt-1 flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-[0.12em] text-white/28">
+              <span>{teams[0]}</span>
+              <span className="text-white/16">vs</span>
+              <span>{teams[1]}</span>
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center gap-2 -mt-1">
@@ -1164,7 +1264,10 @@ function MatchCard({ event }: { event: WcEvent }) {
               style={i === 0
                 ? { background: 'rgba(124,58,237,0.10)', border: '1px solid rgba(124,58,237,0.28)' }
                 : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <p className="text-[11px] font-semibold text-white/40 truncate">{c.label}</p>
+              <p className="flex items-center justify-center gap-1 text-[11px] font-semibold text-white/45 truncate">
+                {outcomeTeam(c.label, teams) && <Flag team={outcomeTeam(c.label, teams)!} size={14} />}
+                <span className="truncate">{c.label}</span>
+              </p>
               <p className={`text-base font-black ${i === 0 ? 'text-grad' : 'text-white/70'}`}>
                 {(c.price * 100).toFixed(0)}¢
               </p>
@@ -1292,57 +1395,149 @@ function TeamSpotlight({
   );
 }
 
-/* ── smart money feed ──────────────────────────────────── */
+/* ── smart money command center ───────────────────────── */
+
+function proPickMentionsTeam(pick: ProPick, team: string): boolean {
+  return (
+    textMentionsTeam(pick.title, team) ||
+    textMentionsTeam(pick.outcome, team) ||
+    textMentionsTeam(pick.eventSlug, team) ||
+    textMentionsTeam(pick.slug, team)
+  );
+}
+
+function FlowStatCard({
+  label,
+  value,
+  detail,
+  accent = '#a855f7',
+  badge,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  accent?: string;
+  badge?: string;
+}) {
+  return (
+    <div className="relative overflow-hidden rounded-2xl p-4"
+      style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(90deg, transparent, ${accent}AA, transparent)` }} />
+      <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full blur-2xl" style={{ background: `${accent}22` }} />
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.16em] text-white/35">{label}</p>
+          <p className="mt-2 truncate text-xl font-black text-white/90">{value}</p>
+          <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-white/45">{detail}</p>
+        </div>
+        {badge && (
+          <span className="rounded-xl px-2 py-1 text-xs" style={{ background: `${accent}16`, border: `1px solid ${accent}35` }}>
+            {badge}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ProConvictionCard({ pick, activeTeam }: { pick: ProPick; activeTeam: string | null }) {
+  const colors = teamColors(activeTeam ?? '');
+  const href = marketUrl(pick.eventSlug, pick.slug);
+  const topWallet = pick.wallets?.[0];
+
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      className="group relative block overflow-hidden rounded-2xl p-4 transition-all hover:-translate-y-0.5 hover:border-white/18"
+      style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="absolute inset-y-0 left-0 w-1" style={{ background: `linear-gradient(180deg, ${colors.primary}, ${colors.secondary})` }} />
+      <div className="absolute -right-10 -top-10 h-28 w-28 rounded-full blur-3xl transition-opacity group-hover:opacity-100"
+        style={{ background: `${colors.primary}22`, opacity: 0.55 }} />
+      <div className="relative flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="font-mono text-[9px] font-black uppercase tracking-[0.14em] text-white/35">Pro conviction</p>
+          <p className="mt-1 text-sm font-black leading-snug text-white/88 line-clamp-2">{pick.title}</p>
+        </div>
+        <span className="shrink-0 rounded-xl px-2 py-1 font-mono text-[10px] font-black uppercase"
+          style={{ background: `${colors.primary}18`, color: colors.primary, border: `1px solid ${colors.primary}40` }}>
+          {pick.outcome}
+        </span>
+      </div>
+      <div className="relative mt-4 flex items-end justify-between gap-3">
+        <div>
+          <p className="font-mono text-2xl font-black tabular-nums text-white">{formatCurrency(pick.totalValue, true)}</p>
+          <p className="mt-1 text-[11px] text-white/40">
+            {pick.proCount} top wallet{pick.proCount > 1 ? 's' : ''}{topWallet ? ` · lead ${formatAddress(topWallet.address, 5)}` : ''}
+          </p>
+        </div>
+        <span className="text-[11px] font-semibold text-white/35 group-hover:text-white/65">Open market →</span>
+      </div>
+    </a>
+  );
+}
 
 function WcTradeRow({ trade, maxAmount }: { trade: RecentTrade; maxAmount: number }) {
   const amount = usdcSize(trade);
   const isBuy = (trade.side ?? '').toUpperCase() === 'BUY';
   const ts = trade.timestamp ?? trade.createdAt;
   const href = marketUrl(trade.eventSlug, trade.slug);
-  const wallet = trade.proxyWallet ? formatAddress(trade.proxyWallet, 6) : '—';
+  const wallet = trade.proxyWallet ? formatAddress(trade.proxyWallet, 6) : 'Unknown';
   const isWhale = amount >= 10_000;
   const accent = isBuy ? '#34d399' : '#fb7185';
   const barPct = maxAmount > 0 ? Math.min((amount / maxAmount) * 100, 100) : 0;
 
   return (
-    <div className="group relative flex items-center gap-2 py-1.5 pl-3 pr-2 rounded-md transition-colors hover:bg-white/[0.03] animate-fade-in">
-      <span className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: accent }} />
-      <div className="absolute inset-y-0 left-0 rounded-md pointer-events-none"
-        style={{ width: `${barPct}%`, background: `${accent}09`, transition: 'width 0.6s ease' }} />
+    <div className="group relative overflow-hidden rounded-2xl p-3 transition-all hover:bg-white/[0.045]"
+      style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.065)' }}>
+      <div className="absolute inset-y-0 left-0 pointer-events-none"
+        style={{ width: `${barPct}%`, background: `linear-gradient(90deg, ${accent}16, transparent)`, transition: 'width 0.6s ease' }} />
+      <span className="absolute left-0 top-3 bottom-3 w-0.5 rounded-full" style={{ background: accent }} />
 
-      <span className="relative flex-shrink-0 font-mono text-[9px] font-black uppercase w-9 text-center rounded px-1 py-0.5"
-        style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}38` }}>
-        {isBuy ? 'BUY' : 'SELL'}
-      </span>
+      <div className="relative flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-lg px-2 py-1 font-mono text-[9px] font-black uppercase tracking-[0.12em]"
+              style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}42` }}>
+              {isBuy ? 'BUY' : 'SELL'}
+            </span>
+            {isWhale && (
+              <span className="rounded-lg px-2 py-1 font-mono text-[9px] font-black uppercase tracking-[0.12em] text-amber-200"
+                style={{ background: 'rgba(251,191,36,0.13)', border: '1px solid rgba(251,191,36,0.35)' }}>
+                Whale
+              </span>
+            )}
+            {trade.outcome && (
+              <span className="max-w-[180px] truncate rounded-lg px-2 py-1 font-mono text-[9px] font-black uppercase tracking-[0.1em] text-white/55"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }}>
+                {trade.outcome}
+              </span>
+            )}
+          </div>
+          <a href={href} target="_blank" rel="noopener noreferrer"
+            className="mt-2 block text-sm font-semibold leading-snug text-white/76 transition-colors line-clamp-2 group-hover:text-white">
+            {trade.title ?? 'World Cup market trade'}
+          </a>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] text-white/32">
+            <a href={trade.proxyWallet ? `/wallet/${trade.proxyWallet.toLowerCase()}` : undefined}
+              className="font-mono hover:text-white/70">
+              {wallet}
+            </a>
+            <span>•</span>
+            <span className="font-mono">{timeAgo(ts) || 'now'}</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="hidden sm:inline text-white/25">Polymarket flow tape</span>
+          </div>
+        </div>
 
-      <span className="relative flex-shrink-0 flex items-center gap-1 w-[76px] justify-end text-right">
-        {isWhale && <span title="Whale" className="text-[10px]">🐋</span>}
-        <span className={`font-mono text-xs font-black tabular-nums ${isWhale ? 'text-grad' : ''}`}
-          style={{ color: isWhale ? undefined : 'rgba(255,255,255,0.88)' }}>
-          {formatCurrency(amount, true)}
-        </span>
-      </span>
-
-      {trade.outcome && (
-        <span className="relative flex-shrink-0 hidden md:inline font-mono text-[9px] rounded px-1.5 py-0.5 max-w-[90px] truncate"
-          style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          {trade.outcome}
-        </span>
-      )}
-
-      <a href={href} target="_blank" rel="noopener noreferrer"
-        className="relative flex-1 min-w-0 text-[11px] transition-colors truncate hover:opacity-80"
-        style={{ color: 'rgba(255,255,255,0.48)' }}>
-        {trade.title ?? '—'}
-      </a>
-
-      <div className="relative flex-shrink-0 text-right hidden sm:block w-[52px]">
-        <a href={trade.proxyWallet ? `/wallet/${trade.proxyWallet.toLowerCase()}` : undefined}
-          className="font-mono text-[9px] block truncate hover:opacity-80"
-          style={{ color: 'rgba(255,255,255,0.28)' }}>
-          {wallet}
-        </a>
-        <p className="font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.18)' }}>{timeAgo(ts)}</p>
+        <div className="shrink-0 text-left sm:text-right">
+          <p className={`font-mono text-xl font-black tabular-nums ${isWhale ? 'text-grad' : ''}`}
+            style={{ color: isWhale ? undefined : 'rgba(255,255,255,0.92)' }}>
+            {formatCurrency(amount, true)}
+          </p>
+          <a href={href} target="_blank" rel="noopener noreferrer"
+            className="mt-1 inline-flex text-[10px] font-semibold text-white/30 transition-colors hover:text-white/70">
+            View market →
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -1350,30 +1545,60 @@ function WcTradeRow({ trade, maxAmount }: { trade: RecentTrade; maxAmount: numbe
 
 function WcSmartMoney({ team }: { team: string | null }) {
   const [trades, setTrades] = useState<RecentTrade[]>([]);
+  const [proPicks, setProPicks] = useState<ProPick[]>([]);
+  const [scanned, setScanned] = useState<number | null>(null);
   const [belowThreshold, setBelowThreshold] = useState(false);
   const [loading, setLoading] = useState(true);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const load = useCallback(() => {
-    fetch('/api/worldcup/trades')
-      .then(r => r.json())
-      .then(d => {
+    Promise.allSettled([
+      fetch('/api/worldcup/trades').then(r => r.json()),
+      fetch('/api/worldcup/pros').then(r => r.json()),
+    ]).then(([tradeResult, prosResult]) => {
+      if (tradeResult.status === 'fulfilled') {
+        const d = tradeResult.value;
         const list = Array.isArray(d) ? d : (d?.trades ?? []);
-        if (!Array.isArray(list)) return;
-        setBelowThreshold(Boolean(d?.belowThreshold));
-        setTrades(list);
-        setLastUpdate(new Date());
-      })
-      .catch(() => {})
+        if (Array.isArray(list)) {
+          setBelowThreshold(Boolean(d?.belowThreshold));
+          setTrades(list);
+        }
+      }
+      if (prosResult.status === 'fulfilled') {
+        const d = prosResult.value;
+        const picks = Array.isArray(d?.picks) ? d.picks : [];
+        setProPicks(picks);
+        setScanned(typeof d?.scanned === 'number' ? d.scanned : null);
+      }
+      setLastUpdate(new Date());
+    }).catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), { rootMargin: '240px' });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     load();
-    timer.current = setInterval(load, 15_000);
-    return () => { if (timer.current) clearInterval(timer.current); };
   }, [load]);
+
+  useEffect(() => {
+    if (!isVisible) {
+      if (timer.current) clearInterval(timer.current);
+      timer.current = null;
+      return;
+    }
+    timer.current = setInterval(load, 20_000);
+    return () => { if (timer.current) clearInterval(timer.current); };
+  }, [isVisible, load]);
 
   const shown = useMemo(() => {
     if (!team) return trades;
@@ -1384,55 +1609,193 @@ function WcSmartMoney({ team }: { team: string | null }) {
     );
   }, [trades, team]);
 
+  const relevantPicks = useMemo(() => {
+    const picks = team ? proPicks.filter(p => proPickMentionsTeam(p, team)) : proPicks;
+    return [...picks].sort((a, b) => b.totalValue - a.totalValue);
+  }, [proPicks, team]);
+
   const maxAmount = shown.reduce((m, t) => Math.max(m, usdcSize(t)), 0);
+  const buyValue = shown.filter(t => (t.side ?? '').toUpperCase() === 'BUY').reduce((sum, t) => sum + usdcSize(t), 0);
+  const sellValue = shown.filter(t => (t.side ?? '').toUpperCase() === 'SELL').reduce((sum, t) => sum + usdcSize(t), 0);
+  const flowTotal = buyValue + sellValue;
+  const flowLeader = buyValue >= sellValue ? 'BUY' : 'SELL';
+  const flowShare = flowTotal > 0 ? Math.round((Math.max(buyValue, sellValue) / flowTotal) * 100) : 0;
+  const topTrade = shown.reduce<RecentTrade | null>((best, trade) => usdcSize(trade) > usdcSize(best ?? {}) ? trade : best, null);
+  const topProPick = relevantPicks[0];
+  const totalProValue = relevantPicks.reduce((sum, pick) => sum + pick.totalValue, 0);
+  const whaleCount = shown.filter(t => usdcSize(t) >= 10_000).length;
+  const colors = teamColors(team ?? '');
+  const modeLabel = belowThreshold ? 'Small-flow mode' : '$250+ filtered';
+  const tradeRows = shown.slice(0, 14);
+  const radarPicks = relevantPicks.slice(0, 4);
 
   return (
-    <section className="flex flex-col">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2.5">
-          <span className="flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-bold"
-            style={{ background: 'rgba(52,211,153,0.10)', color: '#34d399', border: '1px solid rgba(52,211,153,0.20)' }}>
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            Live
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            {team ? `${team} Money Flow` : 'WC Smart Money'} {!belowThreshold && <span style={{ color: 'rgba(255,255,255,0.20)' }}>$250+</span>}
-          </span>
+    <section ref={sectionRef} className="relative overflow-hidden rounded-[28px] p-4 sm:p-5 lg:p-6"
+      style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.13), rgba(15,23,42,0.64) 42%, rgba(2,6,23,0.92))', border: '1px solid rgba(255,255,255,0.10)', boxShadow: '0 24px 80px rgba(0,0,0,0.34)' }}>
+      <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full blur-3xl" style={{ background: `${colors.primary}18` }} />
+      <div className="pointer-events-none absolute -right-20 top-20 h-56 w-56 rounded-full blur-3xl" style={{ background: `${colors.secondary}14` }} />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08]"
+        style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.22) 1px, transparent 1px)', backgroundSize: '44px 44px' }} />
+
+      <div className="relative flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="max-w-2xl">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em]"
+              style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.30)' }}>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live intelligence
+            </span>
+            <span className="rounded-full px-3 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-white/50"
+              style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.10)' }}>
+              {modeLabel}
+            </span>
+          </div>
+          <h3 className="mt-4 text-2xl font-black tracking-tight text-white sm:text-3xl">
+            {team ? `${teamFlag(team)} ${team} Smart Money Command Center` : 'Smart Money Command Center'}
+          </h3>
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/52">
+            Pro-wallet conviction, live flow tape and whale status in one place — built to separate real signal from World Cup market noise.
+          </p>
         </div>
-        <span className="flex items-center gap-3">
-          <a href="/api/worldcup/card?type=whale" target="_blank" rel="noopener noreferrer"
-            title="Open shareable whale card"
-            className="text-[10px] font-semibold text-white/30 hover:text-white/70 transition-colors">
-            📸 Whale card
+
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <a
+            href={xIntentUrl(
+              '🐋 World Cup whale flow — live money moves on AlphaBoard',
+              worldCupShareUrl('whale')
+            )}
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-xs font-black text-white/80 transition-all hover:-translate-y-0.5 hover:text-white"
+            style={{ background: 'rgba(124,58,237,0.18)', border: '1px solid rgba(168,85,247,0.34)', boxShadow: '0 16px 40px rgba(124,58,237,0.16)' }}>
+            Share whale card on X
+            <span className="text-white/35">↗</span>
           </a>
           {lastUpdate && (
-            <span className="font-mono text-[9px]" style={{ color: 'rgba(255,255,255,0.18)' }}>
-              {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <span className="rounded-2xl px-3 py-2 font-mono text-[10px] text-white/35"
+              style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              Updated {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
-        </span>
+        </div>
       </div>
 
-      <div className="rounded-xl overflow-hidden"
-        style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
-        {loading ? (
-          <div className="flex flex-col gap-1.5 p-2">
-            {Array.from({ length: 8 }).map((_, i) => <div key={i} className="h-8 rounded-md animate-shimmer" />)}
+      <div className="relative mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <FlowStatCard
+          label="Top pro position"
+          value={topProPick ? `${topProPick.outcome} · ${formatCurrency(topProPick.totalValue, true)}` : 'No pro signal'}
+          detail={topProPick ? topProPick.title : 'No top-wallet World Cup exposure is visible for this filter yet.'}
+          accent={colors.primary}
+          badge="Pro"
+        />
+        <FlowStatCard
+          label="Whale status"
+          value={whaleCount > 0 ? `${whaleCount} active` : 'Quiet tape'}
+          detail={belowThreshold ? 'No whale-size trades above the live filter; showing latest activity instead.' : 'Large World Cup trades are being filtered into the live tape.'}
+          accent="#f59e0b"
+          badge={belowThreshold ? 'Fallback' : 'Whale'}
+        />
+        <FlowStatCard
+          label="Live flow bias"
+          value={flowTotal > 0 ? `${flowLeader} ${flowShare}%` : 'No flow'}
+          detail={flowTotal > 0 ? `${formatCurrency(buyValue, true)} buys vs ${formatCurrency(sellValue, true)} sells in the visible tape.` : 'No recent trade flow for this scope.'}
+          accent={flowLeader === 'BUY' ? '#34d399' : '#fb7185'}
+          badge="Tape"
+        />
+        <FlowStatCard
+          label="Scanned wallets"
+          value={scanned == null ? '—' : `${scanned}`}
+          detail={totalProValue > 0 ? `${formatCurrency(totalProValue, true)} tracked pro exposure in this view.` : 'Top leaderboard wallets are monitored for World Cup exposure.'}
+          accent="#38bdf8"
+          badge="Source"
+        />
+      </div>
+
+      {belowThreshold && (
+        <div className="relative mt-4 rounded-2xl px-4 py-3"
+          style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.22)' }}>
+          <p className="text-xs leading-relaxed text-amber-100/78">
+            <span className="font-black text-amber-200">Small-flow mode:</span> no whale-size World Cup trades are clearing the main threshold right now, so the live tape shows latest market activity for context instead of pretending every print is smart money.
+          </p>
+        </div>
+      )}
+
+      <div className="relative mt-5 grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="rounded-3xl p-4"
+          style={{ background: 'rgba(255,255,255,0.028)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/35">Flow radar</p>
+              <h4 className="mt-1 text-lg font-black text-white/86">Pro conviction map</h4>
+            </div>
+            <span className="rounded-full px-2.5 py-1 font-mono text-[9px] font-black uppercase text-white/35"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              {team ? 'Team scope' : 'All nations'}
+            </span>
           </div>
-        ) : shown.length === 0 ? (
-          <div className="py-10 text-center">
-            <p className="text-2xl mb-2">⚽</p>
-            <p className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.22)' }}>
-              {team ? `No recent large trades on ${team} markets` : 'No recent World Cup trades — check back at kickoff'}
-            </p>
+
+          {loading ? (
+            <div className="grid gap-3">
+              {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-28 rounded-2xl animate-shimmer" />)}
+            </div>
+          ) : radarPicks.length === 0 ? (
+            <div className="rounded-2xl py-10 text-center" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-3xl mb-3">🛰️</p>
+              <p className="text-sm font-semibold text-white/58">No pro conviction signal yet</p>
+              <p className="mt-1 text-xs text-white/34">When top wallets build a World Cup position, it appears here as a readable signal card.</p>
+            </div>
+          ) : (
+            <div className="grid gap-3">
+              {radarPicks.map((pick, i) => (
+                <ProConvictionCard key={`${pick.slug ?? pick.title}-${i}`} pick={pick} activeTeam={team} />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-3xl p-4"
+          style={{ background: 'rgba(255,255,255,0.028)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-white/35">Live tape</p>
+              <h4 className="mt-1 text-lg font-black text-white/86">Biggest World Cup prints</h4>
+            </div>
+            {topTrade && (
+              <span className="rounded-full px-2.5 py-1 font-mono text-[9px] font-black uppercase text-white/45"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                Top {formatCurrency(usdcSize(topTrade), true)}
+              </span>
+            )}
           </div>
-        ) : (
-          <div className="max-h-[420px] overflow-y-auto p-1.5">
-            {shown.map((t, i) => (
-              <WcTradeRow key={String(t.id ?? `${t.proxyWallet}-${t.timestamp}-${i}`)} trade={t} maxAmount={maxAmount} />
-            ))}
-          </div>
-        )}
+
+          {loading ? (
+            <div className="flex flex-col gap-2">
+              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-20 rounded-2xl animate-shimmer" />)}
+            </div>
+          ) : tradeRows.length === 0 ? (
+            <div className="rounded-2xl py-12 text-center" style={{ background: 'rgba(255,255,255,0.025)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-3xl mb-3">⚽</p>
+              <p className="text-sm font-semibold text-white/58">
+                {team ? `No recent ${team} flow` : 'No recent World Cup flow'}
+              </p>
+              <p className="mt-1 text-xs text-white/34">The tape updates automatically when new trades arrive.</p>
+            </div>
+          ) : (
+            <div className="max-h-[560px] space-y-2 overflow-y-auto pr-1">
+              {tradeRows.map((t, i) => (
+                <WcTradeRow key={String(t.id ?? `${t.proxyWallet}-${t.timestamp}-${i}`)} trade={t} maxAmount={maxAmount} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="relative mt-4 flex flex-wrap items-center gap-2 text-[10px] text-white/32">
+        <span className="rounded-full px-2.5 py-1" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          Data source: Polymarket trades + AlphaBoard top-wallet scan
+        </span>
+        <span className="rounded-full px-2.5 py-1" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.07)' }}>
+          Polling pauses when this module is off-screen
+        </span>
       </div>
     </section>
   );
