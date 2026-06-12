@@ -113,6 +113,62 @@ export function teamFlag(name: string): string {
   return resolveTeam(name)?.flag ?? '⚽';
 }
 
+/* ── nation colors (merged from Hermes's WorldCupBoard) ── */
+
+export interface TeamColors { primary: string; secondary: string }
+
+const TEAM_COLORS: Record<string, TeamColors> = {
+  'Spain':              { primary: '#ef4444', secondary: '#facc15' },
+  'France':             { primary: '#2563eb', secondary: '#ef4444' },
+  'Portugal':           { primary: '#16a34a', secondary: '#dc2626' },
+  'England':            { primary: '#e2e8f0', secondary: '#ef4444' },
+  'Argentina':          { primary: '#38bdf8', secondary: '#e2e8f0' },
+  'Brazil':             { primary: '#22c55e', secondary: '#facc15' },
+  'Germany':            { primary: '#facc15', secondary: '#ef4444' },
+  'Netherlands':        { primary: '#f97316', secondary: '#2563eb' },
+  'Norway':             { primary: '#dc2626', secondary: '#2563eb' },
+  'Belgium':            { primary: '#facc15', secondary: '#ef4444' },
+  'Colombia':           { primary: '#facc15', secondary: '#2563eb' },
+  'Mexico':             { primary: '#16a34a', secondary: '#ef4444' },
+  'South Africa':       { primary: '#16a34a', secondary: '#facc15' },
+  'Czechia':            { primary: '#2563eb', secondary: '#ef4444' },
+  'South Korea':        { primary: '#e2e8f0', secondary: '#2563eb' },
+  'USA':                { primary: '#2563eb', secondary: '#ef4444' },
+  'Paraguay':           { primary: '#ef4444', secondary: '#2563eb' },
+  'Canada':             { primary: '#ef4444', secondary: '#e2e8f0' },
+  'Bosnia-Herzegovina': { primary: '#2563eb', secondary: '#facc15' },
+  'Japan':              { primary: '#e2e8f0', secondary: '#ef4444' },
+  'Curacao':            { primary: '#2563eb', secondary: '#facc15' },
+  'Morocco':            { primary: '#dc2626', secondary: '#16a34a' },
+  'Haiti':              { primary: '#2563eb', secondary: '#ef4444' },
+  'Scotland':           { primary: '#38bdf8', secondary: '#e2e8f0' },
+  'Ecuador':            { primary: '#facc15', secondary: '#2563eb' },
+  'Ivory Coast':        { primary: '#f97316', secondary: '#22c55e' },
+  'Switzerland':        { primary: '#ef4444', secondary: '#e2e8f0' },
+  'Uruguay':            { primary: '#38bdf8', secondary: '#e2e8f0' },
+  'Croatia':            { primary: '#ef4444', secondary: '#2563eb' },
+  'Denmark':            { primary: '#dc2626', secondary: '#e2e8f0' },
+  'Serbia':             { primary: '#ef4444', secondary: '#2563eb' },
+  'Sweden':             { primary: '#2563eb', secondary: '#facc15' },
+  'Poland':             { primary: '#e2e8f0', secondary: '#dc2626' },
+  'Italy':              { primary: '#16a34a', secondary: '#ef4444' },
+  'Türkiye':            { primary: '#dc2626', secondary: '#e2e8f0' },
+  'Qatar':              { primary: '#9f1239', secondary: '#e2e8f0' },
+  'Australia':          { primary: '#2563eb', secondary: '#facc15' },
+  'Saudi Arabia':       { primary: '#16a34a', secondary: '#e2e8f0' },
+  'Iran':               { primary: '#16a34a', secondary: '#ef4444' },
+  'Ghana':              { primary: '#facc15', secondary: '#16a34a' },
+  'Nigeria':            { primary: '#16a34a', secondary: '#e2e8f0' },
+};
+
+const DEFAULT_COLORS: TeamColors = { primary: '#a855f7', secondary: '#38bdf8' };
+
+/** National kit colors for a team name; AlphaBoard purple/blue when unknown. */
+export function teamColors(name: string): TeamColors {
+  const r = resolveTeam(name);
+  return (r && TEAM_COLORS[r.canonical]) ?? DEFAULT_COLORS;
+}
+
 function escapeRe(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

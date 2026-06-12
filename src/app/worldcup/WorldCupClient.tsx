@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
-import { teamFlag, textMentionsTeam } from '@/lib/wcTeams';
+import { teamFlag, teamColors, textMentionsTeam } from '@/lib/wcTeams';
 
 /* ── types ─────────────────────────────────────────────── */
 
@@ -233,6 +233,7 @@ function CountrySelector({
         </button>
         {filtered.map((t, i) => {
           const active = selected === t.team;
+          const tc = teamColors(t.team);
           return (
             <button
               key={t.team + i}
@@ -240,7 +241,7 @@ function CountrySelector({
               title={`${t.team} — ${(t.price * 100).toFixed(1)}% implied`}
               className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${active ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
               style={active
-                ? { background: 'rgba(124,58,237,0.18)', border: '1px solid rgba(124,58,237,0.45)' }
+                ? { background: `${tc.primary}22`, border: `1px solid ${tc.primary}77`, boxShadow: `0 0 14px ${tc.primary}22` }
                 : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <span className="text-sm leading-none">{teamFlag(t.team)}</span>
               {t.team}
@@ -803,7 +804,8 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
           <div className="mt-4 flex flex-col gap-1.5">
             {chips.map((c, i) => {
               const isDraw = /^draw$/i.test(c.label);
-              const color = isDraw ? 'rgba(255,255,255,0.35)' : i === 0 ? '#a855f7' : '#38bdf8';
+              // Nation kit colors (merged from Hermes's country-colored cards)
+              const color = isDraw ? 'rgba(255,255,255,0.35)' : teamColors(c.label).primary;
               return (
                 <div key={c.label + i} className="flex items-center gap-2">
                   <span className="w-24 sm:w-32 truncate text-[11px] font-semibold text-white/60 flex-shrink-0">{c.label}</span>
@@ -1176,8 +1178,10 @@ function TeamSpotlight({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Identity card */}
+      {/* Identity card — nation kit color wash (merged from Hermes) */}
       <div className="relative glass gradient-border rounded-2xl p-6 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `linear-gradient(120deg, ${teamColors(team).primary}14, transparent 45%, ${teamColors(team).secondary}0d)` }} />
         <div className="absolute -right-6 -top-10 text-[140px] leading-none select-none pointer-events-none" style={{ opacity: 0.08 }}>
           {teamFlag(team)}
         </div>
