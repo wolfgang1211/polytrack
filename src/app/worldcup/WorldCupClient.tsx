@@ -5,7 +5,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'rec
 import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
-import { teamFlag, teamColors, textMentionsTeam } from '@/lib/wcTeams';
+import { teamFlag, teamFlagCode, teamColors, textMentionsTeam } from '@/lib/wcTeams';
 
 /* ── types ─────────────────────────────────────────────── */
 
@@ -117,6 +117,30 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
     </div>
+  );
+}
+
+/* ── flag image (flagcdn) — emoji flags don't render on Windows ── */
+
+function Flag({ team, size = 18, className = '' }: { team: string; size?: number; className?: string }) {
+  const code = teamFlagCode(team);
+  const h = Math.round(size * 0.75);
+  if (!code) {
+    return (
+      <span className={`inline-flex items-center justify-center flex-shrink-0 ${className}`}
+        style={{ width: size, height: h, fontSize: size * 0.8, lineHeight: 1 }}>⚽</span>
+    );
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`https://flagcdn.com/w40/${code}.png`}
+      srcSet={`https://flagcdn.com/w80/${code}.png 2x`}
+      alt=""
+      loading="lazy"
+      className={`flex-shrink-0 rounded-[3px] object-cover ${className}`}
+      style={{ width: size, height: h, boxShadow: '0 0 0 1px rgba(255,255,255,0.10)' }}
+    />
   );
 }
 
@@ -243,7 +267,7 @@ function CountrySelector({
               style={active
                 ? { background: `${tc.primary}22`, border: `1px solid ${tc.primary}77`, boxShadow: `0 0 14px ${tc.primary}22` }
                 : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <span className="text-sm leading-none">{teamFlag(t.team)}</span>
+              <Flag team={t.team} size={17} />
               {t.team}
               <span className="font-mono text-[10px]" style={{ color: active ? '#c4b5fd' : 'rgba(255,255,255,0.25)' }}>
                 {t.price * 100 < 1 ? '<1' : (t.price * 100).toFixed(0)}%
@@ -564,7 +588,7 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
               {longshots.map(t => (
                 <a key={t.team} href={marketUrl('world-cup-winner', t.slug)} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
-                  <span className="text-base leading-none flex-shrink-0">{teamFlag(t.team)}</span>
+                  <Flag team={t.team} size={18} />
                   <span className="flex-1 min-w-0 truncate text-xs font-semibold text-white/75 group-hover:text-white transition-colors">{t.team}</span>
                   <span className="font-mono text-[10px] text-white/30">{formatCurrency(t.volume24hr, true)} 24h</span>
                   <span className="font-mono text-xs font-black text-grad w-10 text-right">{(t.price * 100).toFixed(0)}¢</span>
@@ -773,10 +797,10 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
       {/* Header row */}
       <button onClick={onToggle} className="w-full text-left">
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-2xl leading-none">{teamFlag(group.teamA)}</span>
+          <Flag team={group.teamA} size={26} />
           <span className="text-sm font-black text-white/90">{group.teamA}</span>
           <span className="font-mono text-[10px] text-white/30">vs</span>
-          <span className="text-2xl leading-none">{teamFlag(group.teamB)}</span>
+          <Flag team={group.teamB} size={26} />
           <span className="text-sm font-black text-white/90">{group.teamB}</span>
 
           <span className="ml-auto flex items-center gap-2">
@@ -987,7 +1011,7 @@ function OddsRow({ team, rank, maxPrice, highlight }: { team: WinnerTeam; rank: 
         {medal ?? rank}
       </span>
 
-      <span className="relative text-lg leading-none flex-shrink-0 w-7 text-center">{teamFlag(team.team)}</span>
+      <span className="relative flex-shrink-0 w-7 flex justify-center"><Flag team={team.team} size={22} /></span>
 
       <span className="relative flex-1 min-w-0 truncate text-sm font-semibold text-white/80 group-hover:text-white transition-colors">
         {team.team}
@@ -1065,7 +1089,7 @@ function MoversStrip({ teams }: { teams: WinnerTeam[] }) {
         return (
           <div key={t.team} className="flex items-center gap-2 rounded-xl px-3 py-2"
             style={{ background: up ? 'rgba(52,211,153,0.07)' : 'rgba(251,113,133,0.07)', border: `1px solid ${up ? 'rgba(52,211,153,0.2)' : 'rgba(251,113,133,0.2)'}` }}>
-            <span className="text-base leading-none">{teamFlag(t.team)}</span>
+            <Flag team={t.team} size={18} />
             <span className="text-xs font-bold text-white/75">{t.team}</span>
             <span className="font-mono text-[11px] font-black" style={{ color: up ? '#34d399' : '#fb7185' }}>
               {up ? '▲' : '▼'} {(Math.abs(t.change24h) * 100).toFixed(1)}pp
@@ -1182,11 +1206,11 @@ function TeamSpotlight({
       <div className="relative glass gradient-border rounded-2xl p-6 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none"
           style={{ background: `linear-gradient(120deg, ${teamColors(team).primary}14, transparent 45%, ${teamColors(team).secondary}0d)` }} />
-        <div className="absolute -right-6 -top-10 text-[140px] leading-none select-none pointer-events-none" style={{ opacity: 0.08 }}>
-          {teamFlag(team)}
+        <div className="absolute -right-8 -top-8 select-none pointer-events-none" style={{ opacity: 0.07 }}>
+          <Flag team={team} size={260} />
         </div>
         <div className="relative flex flex-wrap items-center gap-5">
-          <span className="text-6xl leading-none">{teamFlag(team)}</span>
+          <Flag team={team} size={64} />
           <div className="flex-1 min-w-[180px]">
             <h2 className="text-2xl font-black text-white">{team}</h2>
             <p className="text-xs text-white/40 mt-1">
@@ -1248,7 +1272,7 @@ function TeamSpotlight({
             {futures.map((f, i) => (
               <a key={f.eventTitle + i} href={marketUrl(f.eventSlug, f.marketSlug)} target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.04]">
-                <span className="text-base leading-none flex-shrink-0">{teamFlag(team)}</span>
+                <Flag team={team} size={18} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-white/80 truncate group-hover:text-white transition-colors">{f.eventTitle}</p>
                   {f.question && <p className="text-[11px] text-white/30 truncate">{f.question}</p>}
@@ -1581,7 +1605,7 @@ export default function WorldCupClient({
             {[
               { label: 'Winner Mkt Volume', value: totalWcVol ? formatCurrency(totalWcVol, true) : '—' },
               { label: '24h Volume', value: winner ? formatCurrency(winner.event.volume24hr, true) : '—' },
-              { label: 'Market Favorite', value: favorite ? `${teamFlag(favorite.team)} ${favorite.team}` : '—' },
+              { label: 'Market Favorite', value: favorite ? <span className="inline-flex items-center gap-1.5"><Flag team={favorite.team} size={18} /> {favorite.team}</span> : '—' },
               { label: 'Implied Odds', value: favorite ? `${(favorite.price * 100).toFixed(0)}%` : '—' },
             ].map(s => (
               <div key={s.label} className="rounded-xl px-4 py-3"

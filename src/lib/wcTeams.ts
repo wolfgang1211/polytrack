@@ -5,13 +5,14 @@
 interface TeamMeta {
   iso: string;            // ISO 3166-1 alpha-2 for flag emoji
   aliases: string[];      // all spellings that may appear in market titles
+  flagCode?: string;      // flagcdn.com override (e.g. 'gb-eng' for England)
 }
 
 const TEAMS: Record<string, TeamMeta> = {
   'Argentina':            { iso: 'AR', aliases: ['argentina'] },
   'Brazil':               { iso: 'BR', aliases: ['brazil'] },
   'France':               { iso: 'FR', aliases: ['france'] },
-  'England':              { iso: 'GB', aliases: ['england'] },
+  'England':              { iso: 'GB', aliases: ['england'], flagCode: 'gb-eng' },
   'Spain':                { iso: 'ES', aliases: ['spain'] },
   'Germany':              { iso: 'DE', aliases: ['germany'] },
   'Portugal':             { iso: 'PT', aliases: ['portugal'] },
@@ -50,8 +51,8 @@ const TEAMS: Record<string, TeamMeta> = {
   'Norway':               { iso: 'NO', aliases: ['norway'] },
   'Sweden':               { iso: 'SE', aliases: ['sweden'] },
   'Denmark':              { iso: 'DK', aliases: ['denmark'] },
-  'Scotland':             { iso: 'GB', aliases: ['scotland'] },
-  'Wales':                { iso: 'GB', aliases: ['wales'] },
+  'Scotland':             { iso: 'GB', aliases: ['scotland'], flagCode: 'gb-sct' },
+  'Wales':                { iso: 'GB', aliases: ['wales'], flagCode: 'gb-wls' },
   'Ireland':              { iso: 'IE', aliases: ['ireland', 'republic of ireland'] },
   'Austria':              { iso: 'AT', aliases: ['austria'] },
   'Switzerland':          { iso: 'CH', aliases: ['switzerland'] },
@@ -111,6 +112,18 @@ export function resolveTeam(name: string): { canonical: string; iso: string; fla
 /** Flag for a raw team name; ⚽ when unknown (e.g. "Team AM" playoff placeholders). */
 export function teamFlag(name: string): string {
   return resolveTeam(name)?.flag ?? '⚽';
+}
+
+/** flagcdn.com code for a team (e.g. 'tr', 'gb-eng'); null when unknown.
+    Use real flag images in UI — emoji flags don't render on Windows. */
+export function teamFlagCode(name: string): string | null {
+  const n = name.trim().toLowerCase();
+  for (const [, meta] of Object.entries(TEAMS).filter(([canonical, m]) =>
+    canonical.toLowerCase() === n || m.aliases.some(a => a === n)
+  )) {
+    return (meta.flagCode ?? meta.iso).toLowerCase();
+  }
+  return null;
 }
 
 /* ── nation colors (merged from Hermes's WorldCupBoard) ── */
