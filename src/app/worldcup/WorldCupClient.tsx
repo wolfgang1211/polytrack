@@ -66,9 +66,10 @@ interface ProPick {
 /* ── helpers ───────────────────────────────────────────── */
 
 const SITE_URL = 'https://www.alphaboard.xyz';
+const SHARE_CARD_VERSION = '20260612b';
 
 function worldCupShareUrl(type: 'upset' | 'whale' | 'match', event?: string): string {
-  const params = new URLSearchParams({ type });
+  const params = new URLSearchParams({ type, v: SHARE_CARD_VERSION });
   if (event) params.set('event', event);
   return `${SITE_URL}/worldcup/share?${params.toString()}`;
 }

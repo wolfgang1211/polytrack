@@ -4,6 +4,7 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.alphaboard.xyz';
+const SHARE_CARD_VERSION = '20260612b';
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 type ShareType = 'upset' | 'whale' | 'match';
@@ -21,13 +22,13 @@ function cleanEvent(value: string | undefined): string | undefined {
 }
 
 function cardImagePath(type: ShareType, event?: string): string {
-  const params = new URLSearchParams({ type });
+  const params = new URLSearchParams({ type, v: SHARE_CARD_VERSION });
   if (type === 'match' && event) params.set('event', event);
   return `/worldcup/card?${params.toString()}`;
 }
 
 function sharePath(type: ShareType, event?: string): string {
-  const params = new URLSearchParams({ type });
+  const params = new URLSearchParams({ type, v: SHARE_CARD_VERSION });
   if (type === 'match' && event) params.set('event', event);
   return `/worldcup/share?${params.toString()}`;
 }
