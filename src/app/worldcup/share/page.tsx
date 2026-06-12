@@ -23,7 +23,7 @@ function cleanEvent(value: string | undefined): string | undefined {
 function cardImagePath(type: ShareType, event?: string): string {
   const params = new URLSearchParams({ type });
   if (type === 'match' && event) params.set('event', event);
-  return `/api/worldcup/card?${params.toString()}`;
+  return `/worldcup/card?${params.toString()}`;
 }
 
 function sharePath(type: ShareType, event?: string): string {

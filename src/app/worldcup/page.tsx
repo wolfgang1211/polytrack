@@ -20,7 +20,7 @@ export async function generateMetadata(
 
   // Match share links: og:image renders the live match card
   if (matchSlug) {
-    const ogImage = `/api/worldcup/card?type=match&event=${encodeURIComponent(matchSlug)}`;
+    const ogImage = `/worldcup/card?type=match&event=${encodeURIComponent(matchSlug)}`;
     const title = 'World Cup 2026 — Live Match Odds';
     const description = 'Market-implied win probabilities, smart money and live odds on AlphaBoard.';
     return {
