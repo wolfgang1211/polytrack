@@ -827,13 +827,23 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
       </button>
 
       {group.main && (
-        <div className="mt-2 flex justify-end">
+        <div className="mt-2 flex justify-end gap-1.5">
+          <a
+            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+              `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live market odds on AlphaBoard`
+            )}&url=${encodeURIComponent(`https://www.alphaboard.xyz/worldcup?match=${group.main.slug}`)}`}
+            target="_blank" rel="noopener noreferrer"
+            title="Share on X — the live odds card renders in the tweet"
+            className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-white/40 transition-colors hover:text-white/80"
+            style={{ background: 'rgba(56,189,248,0.07)', border: '1px solid rgba(56,189,248,0.2)' }}>
+            🐦 Share on X
+          </a>
           <a href={`/api/worldcup/card?type=match&event=${encodeURIComponent(group.main.slug)}`}
             target="_blank" rel="noopener noreferrer"
-            title="Open shareable image card"
+            title="Open the image — save it to attach natively to a post"
             className="flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-semibold text-white/35 transition-colors hover:text-white/75"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-            📸 Share card
+            📸 Image
           </a>
         </div>
       )}

@@ -16,6 +16,29 @@ export async function generateMetadata(
   const sp = await searchParams;
   const raw = typeof sp.team === 'string' ? sp.team : undefined;
   const team = raw ? resolveTeam(raw)?.canonical : undefined;
+  const matchSlug = typeof sp.match === 'string' && /^[a-z0-9-]+$/i.test(sp.match) ? sp.match : undefined;
+
+  // Match share links: og:image renders the live match card
+  if (matchSlug) {
+    const ogImage = `/api/worldcup/card?type=match&event=${encodeURIComponent(matchSlug)}`;
+    const title = 'World Cup 2026 — Live Match Odds';
+    const description = 'Market-implied win probabilities, smart money and live odds on AlphaBoard.';
+    return {
+      title,
+      description,
+      alternates: { canonical: '/worldcup' },
+      openGraph: {
+        title: `${title} | AlphaBoard`, description,
+        url: `/worldcup?match=${encodeURIComponent(matchSlug)}`,
+        images: [{ url: ogImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${title} | AlphaBoard`, description,
+        images: [ogImage],
+      },
+    };
+  }
 
   const title = team
     ? `${team} — World Cup 2026 Odds & Money Flow`
