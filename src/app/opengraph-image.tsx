@@ -35,29 +35,37 @@ export default function Image() {
           }}
         />
 
-        {/* Logo "A" */}
+        {/* Brand mark */}
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '16px',
+            justifyContent: 'center',
+            width: '120px',
+            height: '120px',
             marginBottom: '24px',
           }}
         >
-          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
             <defs>
-              <linearGradient id="abLeft" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#a855f7" />
+              <linearGradient id="abMark" x1="16" y1="12" x2="102" y2="102" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#c084fc" />
+                <stop offset="0.55" stopColor="#a855f7" />
                 <stop offset="1" stopColor="#7c3aed" />
               </linearGradient>
-              <linearGradient id="abRight" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#d8b4fe" />
-                <stop offset="1" stopColor="#a855f7" />
-              </linearGradient>
             </defs>
-            <path d="M42 12 L66 70 L54 70 L34 22 Z" fill="url(#abRight)" />
-            <path d="M38 12 L14 70 L26 70 L46 22 Z" fill="url(#abLeft)" />
-            <rect x="26" y="46" width="28" height="10" rx="3" fill="url(#abLeft)" />
+            <path
+              d="M8 110 L45 22 C49 14 61 14 65 22 L77 45 L64 56 L55 36 L28 110 Z"
+              fill="url(#abMark)"
+            />
+            <path
+              d="M49 84 L69 60 C74 54 82 54 87 60 L112 89 C118 95 114 106 106 106 H83 C79 106 75 104 72 101 L63 91 L88 91 L75 77 L55 97 C49 103 39 98 41 89 C42 87 45 85 49 84 Z"
+              fill="url(#abMark)"
+            />
+            <path
+              d="M37 74 L79 58 C86 56 90 65 85 70 L56 97 C52 100 46 98 43 94 C39 89 39 82 44 78 L53 71 L37 74 Z"
+              fill="url(#abMark)"
+            />
           </svg>
         </div>
 

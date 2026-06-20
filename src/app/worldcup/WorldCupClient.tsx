@@ -124,11 +124,11 @@ function kickoffLabel(iso: string | null): string | null {
 
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+    <div className="flex min-w-0 items-center gap-3 mb-5">
+      <span className="font-mono text-[10px] font-black tracking-widest flex-shrink-0" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <div className="h-px w-8 flex-shrink-0 sm:w-12" style={{ background: 'var(--vi-border)' }} />
+      <span className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <div className="h-px flex-1 min-w-[24px]" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
     </div>
   );
 }
@@ -255,11 +255,11 @@ function Countdown({ target, title }: { target: number; title: string }) {
   );
 
   return (
-    <div>
-      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/30 mb-2">
+    <div className="min-w-0 max-w-full">
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/30 mb-2 truncate">
         Next kickoff · <span className="text-white/50">{title}</span>
       </p>
-      <div className="flex items-center gap-1.5">
+      <div className="flex max-w-full items-center gap-1.5 overflow-hidden">
         {d > 0 && <>{cell(d, 'day')}<span className="text-white/20 font-black">:</span></>}
         {cell(h, 'hrs')}<span className="text-white/20 font-black">:</span>
         {cell(m, 'min')}<span className="text-white/20 font-black">:</span>
@@ -288,7 +288,7 @@ function CountrySelector({
         <p className="text-xs text-white/40">
           Pick a nation to see <span className="text-white/70 font-semibold">only their markets</span> — odds, matches, futures and money flow.
         </p>
-        <div className="relative flex items-center rounded-xl glass sm:w-64">
+        <div className="relative flex w-full min-w-0 items-center rounded-xl glass sm:w-64">
           <svg className="absolute left-3 h-3.5 w-3.5 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -301,7 +301,7 @@ function CountrySelector({
         </div>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 -mb-1" style={{ scrollbarWidth: 'thin' }}>
+      <div className="flex max-w-full gap-2 overflow-x-auto pb-2 -mb-1" style={{ scrollbarWidth: 'thin' }}>
         <button
           onClick={() => onSelect(null)}
           className={`flex-shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${!selected ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
@@ -890,17 +890,17 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
   const kickoff = group.kickoff ? kickoffLabel(group.main?.gameStartTime ?? null) : null;
 
   return (
-    <div className="glass gradient-border rounded-2xl p-5 animate-fade-in-up">
+    <div className="glass gradient-border rounded-2xl p-4 sm:p-5 w-full max-w-full min-w-0 overflow-hidden animate-fade-in-up">
       {/* Header row */}
-      <button onClick={onToggle} className="w-full text-left">
-        <div className="flex items-center gap-3 flex-wrap">
+      <button onClick={onToggle} className="w-full min-w-0 text-left">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <Flag team={group.teamA} size={26} />
-          <span className="text-sm font-black text-white/90">{group.teamA}</span>
+          <span className="min-w-0 truncate text-sm font-black text-white/90">{group.teamA}</span>
           <span className="font-mono text-[10px] text-white/30">vs</span>
           <Flag team={group.teamB} size={26} />
-          <span className="text-sm font-black text-white/90">{group.teamB}</span>
+          <span className="min-w-0 truncate text-sm font-black text-white/90">{group.teamB}</span>
 
-          <span className="ml-auto flex items-center gap-2">
+          <span className="flex min-w-0 items-center gap-2 sm:ml-auto">
             {isLive ? (
               <span className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider"
                 style={{ background: 'rgba(52,211,153,0.12)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)' }}>
@@ -928,13 +928,19 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
               // Nation kit colors (merged from Hermes's country-colored cards)
               const color = isDraw ? 'rgba(255,255,255,0.35)' : teamColors(c.label).primary;
               return (
-                <div key={c.label + i} className="flex items-center gap-2">
-                  <span className="w-24 sm:w-32 truncate text-[11px] font-semibold text-white/60 flex-shrink-0">{c.label}</span>
-                  <div className="relative flex-1 h-4 rounded-md overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                <div key={c.label + i} className="grid min-w-0 gap-1 sm:flex sm:items-center sm:gap-2">
+                  <div className="flex min-w-0 items-center justify-between gap-2 sm:hidden">
+                    <span className="min-w-0 truncate text-[11px] font-semibold text-white/60">{c.label}</span>
+                    <span className="font-mono text-xs font-black tabular-nums text-white/85 flex-shrink-0">
+                      {(c.price * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <span className="hidden w-32 truncate text-[11px] font-semibold text-white/60 flex-shrink-0 sm:block">{c.label}</span>
+                  <div className="relative min-w-0 flex-1 h-4 rounded-md overflow-hidden" style={{ background: 'rgba(255,255,255,0.04)' }}>
                     <div className="absolute inset-y-0 left-0 rounded-md"
                       style={{ width: `${c.price * 100}%`, background: `${color}55`, borderRight: `2px solid ${color}`, transition: 'width 0.8s ease' }} />
                   </div>
-                  <span className="w-10 text-right font-mono text-xs font-black tabular-nums text-white/85 flex-shrink-0">
+                  <span className="hidden w-10 text-right font-mono text-xs font-black tabular-nums text-white/85 flex-shrink-0 sm:block">
                     {(c.price * 100).toFixed(0)}%
                   </span>
                 </div>
@@ -943,14 +949,14 @@ function MatchCenterCard({ group, expanded, onToggle, trades }: {
           </div>
         )}
 
-        <div className="mt-3 flex items-center justify-between">
-          <span className="text-[10px] text-white/30">{formatCurrency(group.volume24hr, true)} 24h vol · {group.extras.length + (group.main ? 1 : 0)} markets</span>
+        <div className="mt-3 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <span className="min-w-0 truncate text-[10px] text-white/30">{formatCurrency(group.volume24hr, true)} 24h vol · {group.extras.length + (group.main ? 1 : 0)} markets</span>
           <span className="text-[10px] font-semibold text-white/35">{expanded ? 'Hide details ▲' : 'Match details ▼'}</span>
         </div>
       </button>
 
       {group.main && (
-        <div className="mt-2 flex justify-end gap-1.5">
+        <div className="mt-2 flex flex-wrap justify-end gap-1.5">
           <a
             href={xIntentUrl(
               `${teamFlag(group.teamA)} ${group.teamA} vs ${teamFlag(group.teamB)} ${group.teamB} — live World Cup odds, money flow and market-implied probabilities on AlphaBoard`,
@@ -1028,7 +1034,7 @@ function MatchCenter({ events }: { events: WcEvent[] }) {
           <span className="font-bold text-emerald-400">{liveCount} live</span> — implied win probabilities update every ~20s from Polymarket order flow.
         </p>
       )}
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid min-w-0 gap-4 lg:grid-cols-2">
         {groups.map(g => (
           <MatchCenterCard
             key={g.key}
@@ -1061,7 +1067,7 @@ function ShareButtons({ team }: { team: string }) {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       <button onClick={copy}
         className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white/70 transition-all hover:text-white"
         style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }}>
@@ -1226,8 +1232,8 @@ function MatchCard({ event }: { event: WcEvent }) {
 
   return (
     <a href={href} target="_blank" rel="noopener noreferrer"
-      className="group glass glass-hover gradient-border rounded-2xl p-5 flex flex-col gap-4 animate-fade-in-up">
-      <div className="flex items-start gap-3">
+      className="group glass glass-hover gradient-border rounded-2xl p-4 sm:p-5 flex w-full max-w-full min-w-0 flex-col gap-4 overflow-hidden animate-fade-in-up">
+      <div className="flex min-w-0 items-start gap-3">
         <MatchFlagLockup teams={teams} />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-white/85 line-clamp-2 leading-snug group-hover:text-white transition-colors">
@@ -1243,7 +1249,7 @@ function MatchCard({ event }: { event: WcEvent }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2 -mt-1">
+      <div className="flex flex-wrap items-center gap-2 -mt-1">
         {kickoff && (
           <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
             style={isLive
@@ -1253,7 +1259,7 @@ function MatchCard({ event }: { event: WcEvent }) {
             {isLive ? 'Live' : kickoff === 'Ended' ? 'Ended' : `Kickoff ${kickoff}`}
           </span>
         )}
-        <span className="ml-auto text-[10px] font-semibold text-white/30">
+        <span className="text-[10px] font-semibold text-white/30 sm:ml-auto">
           {formatCurrency(event.volume24hr, true)} 24h vol
         </span>
       </div>
@@ -1322,8 +1328,8 @@ function TeamSpotlight({
             </p>
             <div className="mt-3"><ShareButtons team={team} /></div>
           </div>
-          <div className="flex gap-3">
-            <div className="rounded-xl px-4 py-3 text-center" style={{ background: 'rgba(124,58,237,0.10)', border: '1px solid rgba(124,58,237,0.3)' }}>
+          <div className="flex w-full flex-wrap gap-3 sm:w-auto">
+            <div className="min-w-[132px] flex-1 rounded-xl px-4 py-3 text-center" style={{ background: 'rgba(124,58,237,0.10)', border: '1px solid rgba(124,58,237,0.3)' }}>
               <p className="text-[10px] uppercase tracking-wider text-white/30">Win World Cup</p>
               <p className="text-2xl font-black text-grad">{pct == null ? '—' : pct < 1 ? '<1%' : `${pct.toFixed(1)}%`}</p>
               {Math.abs(change) >= 0.1 && (
@@ -1332,7 +1338,7 @@ function TeamSpotlight({
                 </p>
               )}
             </div>
-            <div className="rounded-xl px-4 py-3 text-center glass">
+            <div className="min-w-[132px] flex-1 rounded-xl px-4 py-3 text-center glass">
               <p className="text-[10px] uppercase tracking-wider text-white/30">24h Volume</p>
               <p className="text-2xl font-black text-white/85">{entry ? formatCurrency(entry.volume24hr, true) : '—'}</p>
               <p className="font-mono text-[10px] text-white/25">on winner mkt</p>
@@ -1658,7 +1664,6 @@ function WcSmartMoney({ team }: { team: string | null }) {
             Pro-wallet conviction, live flow tape and whale status in one place — built to separate real signal from World Cup market noise.
           </p>
         </div>
-
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           <a
             href={xIntentUrl(
@@ -1907,24 +1912,24 @@ export default function WorldCupClient({
   const favorite = winner?.teams[0];
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex min-w-0 flex-col gap-8 overflow-x-hidden">
 
       {/* ── [01] Hero ── */}
       <div className="relative animate-fade-in-up">
         <SectionHeader index="[01]" label="World Cup 2026 · Special Coverage" />
 
-        <div className="relative glass gradient-border rounded-2xl px-6 py-7 overflow-hidden">
+        <div className="relative glass gradient-border rounded-2xl w-full max-w-full px-4 py-6 sm:px-6 sm:py-7 overflow-hidden">
           <PitchLines />
           <div className="absolute inset-0 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse at top right, rgba(124,58,237,0.12), transparent 60%)' }} />
 
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-xl">
+          <div className="relative flex min-w-0 flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-xl min-w-0">
               <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl mb-3">
                 <span className="text-white">World Cup</span>{' '}
                 <span className="text-grad">2026 Hub</span> <span className="align-middle">🏆</span>
               </h1>
-              <p className="text-sm text-white/40">
+              <p className="text-sm text-white/40 break-words">
                 Track every World Cup 2026 market before the crowd does — odds, smart money
                 and nation-by-nation momentum in one dashboard.
               </p>
@@ -1972,7 +1977,7 @@ export default function WorldCupClient({
               { label: 'Market Favorite', value: favorite ? <span className="inline-flex items-center gap-1.5"><Flag team={favorite.team} size={18} /> {favorite.team}</span> : '—' },
               { label: 'Implied Odds', value: favorite ? `${(favorite.price * 100).toFixed(0)}%` : '—' },
             ].map(s => (
-              <div key={s.label} className="rounded-xl px-4 py-3"
+              <div key={s.label} className="min-w-0 rounded-xl px-3 py-3 sm:px-4"
                 style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                 <p className="text-[10px] uppercase tracking-wider text-white/25">{s.label}</p>
                 <p className="text-lg font-black text-white/85 truncate">

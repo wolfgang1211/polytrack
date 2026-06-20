@@ -17,6 +17,30 @@ export async function generateMetadata(
   const raw = typeof sp.team === 'string' ? sp.team : undefined;
   const team = raw ? resolveTeam(raw)?.canonical : undefined;
   const matchSlug = typeof sp.match === 'string' && /^[a-z0-9-]+$/i.test(sp.match) ? sp.match : undefined;
+  const share = typeof sp.share === 'string' && /^(upset|whale)$/.test(sp.share) ? sp.share : undefined;
+
+  // Upset/whale share links: og:image renders the live data card
+  if (share) {
+    const ogImage = `/api/worldcup/card?type=${share}`;
+    const title = share === 'whale' ? 'World Cup Whale Alert 🐋' : 'World Cup Upset Radar 📡';
+    const description = share === 'whale'
+      ? 'The biggest World Cup trade on Polymarket right now — live on AlphaBoard.'
+      : 'The biggest 24h World Cup odds swing on Polymarket — live on AlphaBoard.';
+    return {
+      title, description,
+      alternates: { canonical: '/worldcup' },
+      openGraph: {
+        title: `${title} | AlphaBoard`, description,
+        url: `/worldcup?share=${share}`,
+        images: [{ url: ogImage, width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${title} | AlphaBoard`, description,
+        images: [ogImage],
+      },
+    };
+  }
 
   // Match share links: og:image renders the live match card
   if (matchSlug) {
