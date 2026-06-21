@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
     images: [
       {
-        url: '/og-home-v2.png',
+        url: '/opengraph-image',
         width: 1200,
         height: 630,
         alt: 'AlphaBoard: Real-time alpha from the best Polymarket traders',
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     creator: '@alphaboardxyz',
     title: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
-    images: ['/og-home-v2.png'],
+    images: ['/opengraph-image'],
   },
   robots: {
     index: true,
