@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { LeaderboardEntry } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
+import RisingTraders from '@/components/RisingTraders';
 
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
@@ -132,13 +133,18 @@ export default function InsightsPage() {
         </section>
       )}
 
-      {/* ── [04] Coming Soon ── */}
+      {/* ── [04] Trend Detection ── */}
       <section className="animate-fade-in-up">
-        <SectionHeader index="[04]" label="Coming Soon" />
-        <div className="grid gap-3 sm:grid-cols-3">
+        <SectionHeader index="[04]" label="Trend Detection — Rising Traders" />
+        <RisingTraders />
+      </section>
+
+      {/* ── [05] Coming Soon ── */}
+      <section className="animate-fade-in-up">
+        <SectionHeader index="[05]" label="Coming Soon" />
+        <div className="grid gap-3 sm:grid-cols-2">
           {[
             { icon: '📊', title: 'Category Analytics',   desc: 'Win rates by market category: Politics, Crypto, Sports, and more.' },
-            { icon: '🔥', title: 'Trend Detection',       desc: 'Traders with the fastest-growing PnL over the last 7 days.' },
             { icon: '🤖', title: 'AI Trade Signals',      desc: 'Pattern-based signals derived from whale wallet activity.' },
           ].map(({ icon, title, desc }) => (
             <div key={title} className="glass rounded-2xl p-5"

@@ -4,6 +4,15 @@ export const metadata: Metadata = {
   title: 'Terms of Service',
   description: 'AlphaBoard terms of service: rules and conditions for using our platform.',
   alternates: { canonical: '/terms' },
+  openGraph: {
+    title: 'Terms of Service | AlphaBoard',
+    description: 'AlphaBoard terms of service: rules and conditions for using our platform.',
+    url: '/terms',
+  },
+  twitter: {
+    title: 'Terms of Service | AlphaBoard',
+    description: 'AlphaBoard terms of service: rules and conditions for using our platform.',
+  },
 };
 
 export default function TermsPage() {
@@ -147,13 +156,6 @@ export default function TermsPage() {
           <p>
             These Terms shall be governed by and construed in accordance with the laws of the jurisdiction
             in which AlphaBoard operates, without regard to conflict of law provisions.
-          </p>
-        </section>
-
-        <section>
-          <h2>15. Contact</h2>
-          <p>
-            For questions about these Terms, contact us at: <strong>legal@alphaboard.xyz</strong>
           </p>
         </section>
       </div>

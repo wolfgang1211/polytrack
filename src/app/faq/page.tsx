@@ -4,6 +4,15 @@ export const metadata: Metadata = {
   title: 'FAQ',
   description: 'Frequently asked questions about AlphaBoard: Polymarket analytics, Smart Scores, liquidity and more.',
   alternates: { canonical: '/faq' },
+  openGraph: {
+    title: 'FAQ | AlphaBoard',
+    description: 'Frequently asked questions about AlphaBoard: Polymarket analytics, Smart Scores, liquidity and more.',
+    url: '/faq',
+  },
+  twitter: {
+    title: 'FAQ | AlphaBoard',
+    description: 'Frequently asked questions about AlphaBoard: Polymarket analytics, Smart Scores, liquidity and more.',
+  },
 };
 
 const CATEGORIES = [
@@ -60,7 +69,7 @@ const QA: Record<string, QAItem[]> = {
   markets: [
     {
       q: 'What are the different market categories?',
-      a: 'AlphaBoard categorizes markets into: Politics, Crypto, Sports, World, Esports, Science, Entertainment, Elections, Tech, and Other. You can filter markets by any category using the tab bar.',
+      a: 'AlphaBoard categorizes markets into: World Cup, Politics, Crypto, Sports, Tech, World, Entertainment, and Other. You can filter markets by any category using the tab bar.',
     },
     {
       q: 'What do YES/NO prices mean?',
@@ -90,7 +99,7 @@ const QA: Record<string, QAItem[]> = {
     },
     {
       q: 'Is LP risk-free?',
-      a: 'No. LP carries risks including: impermanent loss (if the market price moves against your position), smart contract risk, reward program changes, and market resolution risk. Always do your own research.',
+      a: 'No. LP carries risks including: inventory risk (the price moving against the side you are holding), adverse selection by better-informed traders, smart contract risk, reward program changes, and market resolution risk. Always do your own research.',
     },
   ],
   wallet: [

@@ -619,7 +619,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
           {/* Your share */}
           <div className="rounded-2xl px-5 py-3 glass flex items-center justify-between">
             <span className="text-xs text-white/40">Your pool share</span>
-            <span className="text-sm font-black text-white">{pct(yourShare, 3)}</span>
+            <span className="text-sm font-black text-white">{selected ? pct(yourShare, 3) : '—'}</span>
           </div>
         </div>
       </div>

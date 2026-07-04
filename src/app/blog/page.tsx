@@ -5,6 +5,15 @@ export const metadata: Metadata = {
   title: 'Blog',
   description: 'AlphaBoard insights: Polymarket strategies, LP guides, and smart money analysis.',
   alternates: { canonical: '/blog' },
+  openGraph: {
+    title: 'Blog | AlphaBoard',
+    description: 'AlphaBoard insights: Polymarket strategies, LP guides, and smart money analysis.',
+    url: '/blog',
+  },
+  twitter: {
+    title: 'Blog | AlphaBoard',
+    description: 'AlphaBoard insights: Polymarket strategies, LP guides, and smart money analysis.',
+  },
 };
 
 const POSTS = [

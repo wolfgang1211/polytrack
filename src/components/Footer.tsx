@@ -9,6 +9,7 @@ const PRODUCT_LINKS = [
   { href: '/liquidity',   label: 'Liquidity Hub' },
   { href: '/insights',    label: 'Insights' },
   { href: '/checker',     label: 'Wallet Checker' },
+  { href: '/compare',     label: 'Compare Traders' },
 ];
 
 const LEGAL_LINKS = [

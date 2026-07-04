@@ -249,6 +249,19 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   </svg>
                   Open on Polymarket
                 </a>
+                {/* Share on X — the link unfurls with the wallet's P&L card */}
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${short} on Polymarket — tracked with @alphaboardxyz`)}&url=${encodeURIComponent(`https://www.alphaboard.xyz/wallet/${address}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
+                  style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)' }}
+                >
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                  Share Card
+                </a>
                 {/* Watchlist */}
                 <button
                   onClick={() => toggle(address)}
@@ -303,10 +316,12 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             />
             <StatsCard
               label="Total Pos."
-              value={all.length > 0 ? String(all.length) : timelineData ? `${timelineData.trades}` : '0'}
+              value={all.length > 0
+                ? String(all.length)
+                : timelineData && timelineData.trades > 0 ? `${timelineData.trades}` : '—'}
               sub={all.length > 0
                 ? (data?.truncated ? `${all.length}+ (capped)` : 'all time')
-                : timelineData ? 'trades (from history)' : 'all time'}
+                : timelineData && timelineData.trades > 0 ? 'trades (from history)' : 'position data unavailable'}
               gradient="rgba(168,85,247,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
@@ -381,13 +396,23 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           <div className="grid gap-4 lg:grid-cols-[280px_1fr] items-start">
             {/* Left sidebar */}
             <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-              <WalletSidebar address={address} positions={all} openValue={openVal} />
+              <WalletSidebar address={address} positions={all} openValue={openVal} officialPnl={officialTotalPnl} />
             </div>
 
             {/* Main panel — everything fits in this column */}
             <div className="flex min-w-0 flex-col gap-4">
               <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                <PnlTimeline address={address} data={timelineData} loading={timelineLoading} anchor={realizedTotal} />
+                {/* Anchor only when the curve comes from an incomplete trade replay
+                    AND we actually have position data to anchor to. The official
+                    user-pnl-api curve is already authoritative — anchoring it to a
+                    positions-derived total (which can be 0 for old wallets whose
+                    positions the data-api no longer returns) flattens the chart. */}
+                <PnlTimeline
+                  address={address}
+                  data={timelineData}
+                  loading={timelineLoading}
+                  anchor={timelineData?.source === 'user-pnl-api' || all.length === 0 ? null : realizedTotal}
+                />
               </div>
               <WalletCharts positions={all} />
               <WalletActivity address={address} positions={all} />

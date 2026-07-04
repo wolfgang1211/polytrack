@@ -5,6 +5,15 @@ export const metadata: Metadata = {
   title: 'About',
   description: 'Learn about AlphaBoard, the real-time analytics platform for Polymarket prediction markets.',
   alternates: { canonical: '/about' },
+  openGraph: {
+    title: 'About | AlphaBoard',
+    description: 'Learn about AlphaBoard, the real-time analytics platform for Polymarket prediction markets.',
+    url: '/about',
+  },
+  twitter: {
+    title: 'About | AlphaBoard',
+    description: 'Learn about AlphaBoard, the real-time analytics platform for Polymarket prediction markets.',
+  },
 };
 
 export default function AboutPage() {
@@ -39,8 +48,8 @@ export default function AboutPage() {
           <h2>What We Offer</h2>
           <div className="grid gap-4 sm:grid-cols-2 not-prose">
             {[
-              { icon: '🏆', title: 'Trader Leaderboard', desc: 'Top 50 traders ranked by P&L, volume and our proprietary Smart Score.' },
-              { icon: '📊', title: 'Markets Explorer', desc: 'Browse 100+ active markets with real-time prices, volume and liquidity data.' },
+              { icon: '🏆', title: 'Trader Leaderboard', desc: 'Top traders ranked by P&L, volume and our proprietary Smart Score.' },
+              { icon: '📊', title: 'Markets Explorer', desc: 'Browse hundreds of active markets with real-time prices, volume and liquidity data.' },
               { icon: '⚡', title: 'Live Activity Feed', desc: 'Watch trades happen in real time with dynamic treemap visualization.' },
               { icon: '💧', title: 'Liquidity Hub', desc: 'Discover LP opportunities, analyze spreads and simulate maker rewards.' },
               { icon: '🔍', title: 'Wallet Checker', desc: 'Analyze any Ethereum wallet: P&L, win rate, trade history and more.' },

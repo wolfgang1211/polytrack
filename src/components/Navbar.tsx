@@ -17,6 +17,7 @@ const NAV_LINKS = [
 ];
 
 const MORE_LINKS = [
+  { href: '/compare',   label: 'Compare Traders' },
   { href: '/watchlist', label: 'Watchlist' },
   { href: '/blog',      label: 'Blog' },
   { href: '/api-docs',  label: 'API Docs' },

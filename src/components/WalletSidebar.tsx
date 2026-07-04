@@ -23,9 +23,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function WalletSidebar({
-  address, positions, openValue,
-}: { address: string; positions: Position[]; openValue: number }) {
+  address, positions, openValue, officialPnl,
+}: { address: string; positions: Position[]; openValue: number; officialPnl?: number | null }) {
   const [trades, setTrades] = useState<RecentTrade[] | null>(null);
+
+  // Old / very large wallets can come back with an empty positions list from
+  // the data-api even though Polymarket's P&L history knows their lifetime
+  // PnL. Fall back to the official number instead of showing $0 everywhere.
+  const useOfficialFallback = positions.length === 0 && officialPnl != null;
 
   useEffect(() => {
     if (!address) return;
@@ -52,6 +57,9 @@ export default function WalletSidebar({
       if (pnl > 0) wins++; else if (pnl < 0) losses++;
       if (p.conditionId) markets.add(p.conditionId);
     }
+    if (useOfficialFallback) {
+      realized = officialPnl as number;
+    }
     const avgBet = positions.length ? invested / positions.length : 0;
     const totalPnl = realized + unrealized;
     const equity = openValue + realized;
@@ -73,7 +81,7 @@ export default function WalletSidebar({
       positions: positions.length, markets: markets.size,
       buys, sells, buyPct, buyVol, sellVol, hasTrades: !!trades,
     };
-  }, [positions, openValue, trades]);
+  }, [positions, openValue, trades, useOfficialFallback, officialPnl]);
 
   const sign = (v: number) => (v >= 0 ? '+' : '');
   const cls = (v: number) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-white/50');
@@ -93,13 +101,27 @@ export default function WalletSidebar({
         <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
         <Row label="Total P&L" value={`${sign(stats.totalPnl)}${formatCurrency(stats.totalPnl, true)}`} valueClass={cls(stats.totalPnl)} />
         <Row label="Position Value" value={formatCurrency(openValue, true)} />
+        {useOfficialFallback && (
+          <p className="mt-1.5 text-[10px] leading-relaxed text-white/25">
+            Position-level data isn&apos;t available for this wallet — P&amp;L shown is
+            Polymarket&apos;s official lifetime figure.
+          </p>
+        )}
       </Section>
 
       <Section title="Core Stats">
-        <Row label="Avg Bet" value={formatCurrency(stats.avgBet, true)} />
-        <Row label="Win / Loss" value={`${stats.wins} / ${stats.losses}`} />
-        <Row label="Positions" value={String(stats.positions)} />
-        <Row label="Unique Markets" value={String(stats.markets)} />
+        {useOfficialFallback ? (
+          <p className="text-[11px] leading-relaxed text-white/25">
+            Not available — the data API returns no position history for this wallet.
+          </p>
+        ) : (
+          <>
+            <Row label="Avg Bet" value={formatCurrency(stats.avgBet, true)} />
+            <Row label="Win / Loss" value={`${stats.wins} / ${stats.losses}`} />
+            <Row label="Positions" value={String(stats.positions)} />
+            <Row label="Unique Markets" value={String(stats.markets)} />
+          </>
+        )}
       </Section>
 
       <Section title="Buy / Sell Ratio">

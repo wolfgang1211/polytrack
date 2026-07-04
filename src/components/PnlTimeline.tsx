@@ -71,17 +71,28 @@ export default function PnlTimeline({
   const positive = current >= 0;
   const stroke = positive ? '#34d399' : '#fb7185';
 
+  // Inactive wallets: the P&L series can be flat across the whole window the
+  // API returns (all profit was made earlier). Flag it so the flat line does
+  // not read like a broken chart.
+  const isFlat = points.length > 1 && (() => {
+    let min = points[0].pnl, max = points[0].pnl;
+    for (const p of points) { if (p.pnl < min) min = p.pnl; if (p.pnl > max) max = p.pnl; }
+    return (max - min) <= Math.max(1, Math.abs(current) * 0.001);
+  })();
+
   return (
     <div className="glass rounded-2xl p-4">
       <div className="mb-3 flex items-end justify-between">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">PnL Timeline</p>
           <p className="text-[10px] text-white/25 mt-0.5">
-            {data?.ceiling
-              ? `Last 3,500 trades · public API limit`
-              : data?.trades
-                ? `${data.trades.toLocaleString()} trades · full history`
-                : 'Cumulative realized P&L from trade history'}
+            {isFlat
+              ? 'No P&L change in the period covered by available history — this wallet has been inactive'
+              : data?.ceiling
+                ? `Last 3,500 trades · public API limit`
+                : data?.trades
+                  ? `${data.trades.toLocaleString()} trades · full history`
+                  : 'Cumulative realized P&L from trade history'}
           </p>
         </div>
         <div className="text-right">

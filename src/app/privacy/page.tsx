@@ -4,6 +4,15 @@ export const metadata: Metadata = {
   title: 'Privacy Policy',
   description: 'AlphaBoard privacy policy: how we collect, use and protect your data.',
   alternates: { canonical: '/privacy' },
+  openGraph: {
+    title: 'Privacy Policy | AlphaBoard',
+    description: 'AlphaBoard privacy policy: how we collect, use and protect your data.',
+    url: '/privacy',
+  },
+  twitter: {
+    title: 'Privacy Policy | AlphaBoard',
+    description: 'AlphaBoard privacy policy: how we collect, use and protect your data.',
+  },
 };
 
 export default function PrivacyPage() {

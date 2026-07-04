@@ -4,6 +4,15 @@ export const metadata: Metadata = {
   title: 'Disclaimer',
   description: 'AlphaBoard financial disclaimer: important information about the nature of our analytics platform.',
   alternates: { canonical: '/disclaimer' },
+  openGraph: {
+    title: 'Disclaimer | AlphaBoard',
+    description: 'AlphaBoard financial disclaimer: important information about the nature of our analytics platform.',
+    url: '/disclaimer',
+  },
+  twitter: {
+    title: 'Disclaimer | AlphaBoard',
+    description: 'AlphaBoard financial disclaimer: important information about the nature of our analytics platform.',
+  },
 };
 
 export default function DisclaimerPage() {
@@ -132,14 +141,6 @@ export default function DisclaimerPage() {
             liable for any direct, indirect, incidental, special, or consequential damages resulting from
             your use of or inability to use the Service, including but not limited to financial losses from
             trading decisions made based on information provided on this platform.
-          </p>
-        </section>
-
-        <section>
-          <h2>9. Contact</h2>
-          <p>
-            If you have questions about this Disclaimer, contact us at:{' '}
-            <strong>legal@alphaboard.xyz</strong>
           </p>
         </section>
       </div>
