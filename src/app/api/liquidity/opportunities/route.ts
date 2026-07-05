@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { CLOB_BASE } from '@/lib/clob';
+import { rewardsOf } from '@/lib/rewards';
 
 const G_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -34,6 +35,12 @@ export interface LPOpportunity {
   daysToResolve: number | null;  // days until market resolves
   spreadVol: number;             // 24h spread/price volatility proxy (%)
   risk: 'Low' | 'Medium' | 'High';
+  /* ── Polymarket liquidity rewards program (real data, not an estimate) ── */
+  hasRewards: boolean;
+  rewardsDailyRate: number;          // USD paid out per day to makers in this market
+  rewardsMinSize: number | null;     // min qualifying order size (shares)
+  rewardsMaxSpread: number | null;   // max distance from mid to qualify (¢)
+  estDailyReward: number;            // $1K capital's est. share of the daily pool
 }
 
 interface ClobBook {
@@ -68,29 +75,50 @@ function fromBook(book: ClobBook): { bestBid: number; bestAsk: number; bidDepth:
 
 export async function GET() {
   try {
-    // 1 — Top markets by 24h volume (gamma already returns bestBid/bestAsk/spread)
-    const mRes = await fetch(
-      'https://gamma-api.polymarket.com/markets?active=true&closed=false&order=volume24hr&ascending=false&limit=40',
-      { headers: G_HEADERS, next: { revalidate: 60 } }
-    );
-    if (!mRes.ok) throw new Error(`Markets ${mRes.status}`);
+    // 1 — Wide candidate pool: top by 24h volume AND top by liquidity, deduped.
+    //     One hot event (e.g. World Cup) can monopolise the volume list, which
+    //     would starve the simulator/calculator of non-event and reward markets.
+    const fetchGamma = async (order: string) => {
+      const res = await fetch(
+        `https://gamma-api.polymarket.com/markets?active=true&closed=false&order=${order}&ascending=false&limit=100`,
+        { headers: G_HEADERS, next: { revalidate: 60 } }
+      );
+      if (!res.ok) return [];
+      const json = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (Array.isArray(json) ? json : (json.markets ?? json.value ?? [])) as any[];
+    };
+    const [byVol, byLiq] = await Promise.all([fetchGamma('volume24hr'), fetchGamma('liquidity')]);
+    if (!byVol.length && !byLiq.length) throw new Error('Markets unavailable');
 
-    const mJson = await mRes.json();
+    const seenIds = new Set<string>();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const markets: any[] = Array.isArray(mJson) ? mJson : (mJson.markets ?? mJson.value ?? []);
+    const markets: any[] = [];
+    for (const m of [...byVol, ...byLiq]) {
+      const id = String(m?.conditionId ?? m?.id ?? '');
+      if (!id || seenIds.has(id)) continue;
+      seenIds.add(id);
+      markets.push(m);
+    }
 
-    // 2 — Keep tradeable, liquid candidates
+    // 2 — Keep tradeable candidates: real volume OR an active reward pool.
     const candidates = markets
       .filter(m => {
         const ids = parseJson(m.clobTokenIds);
+        if (!ids.length) return false;
         const vol = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
-        return ids.length > 0 && vol > 1000;
+        return vol > 1000 || rewardsOf(m).dailyRate > 0;
       })
-      .slice(0, 15);
+      .sort((a, b) => (b.volume24hrNum ?? Number(b.volume24hr ?? 0)) - (a.volume24hrNum ?? Number(a.volume24hr ?? 0)))
+      .slice(0, 40);
 
-    // 3 — Enrich the top candidates with live orderbook depth (best-effort)
+    // 3 — Enrich the top candidates with live orderbook depth (best-effort).
+    //     Only the first 15 get a live book fetch to bound response latency;
+    //     the rest fall back to gamma's published top-of-book.
+    const BOOK_LIMIT = 15;
     const books = await Promise.allSettled(
-      candidates.map(m => {
+      candidates.map((m, i) => {
+        if (i >= BOOK_LIMIT) return Promise.resolve<ClobBook | null>(null);
         const tokenId = parseJson(m.clobTokenIds)[0];
         return fetch(`${CLOB_BASE}/book?token_id=${tokenId}`, {
           headers: { Accept: 'application/json' },
@@ -172,6 +200,10 @@ export async function GET() {
       else if (spreadVol > 10) riskPts += 1;
       const risk: 'Low' | 'Medium' | 'High' = riskPts >= 3 ? 'High' : riskPts >= 1 ? 'Medium' : 'Low';
 
+      // Real liquidity-rewards program data from gamma.
+      const rw = rewardsOf(m);
+      const estDailyReward = rw.dailyRate > 0 ? poolShare * rw.dailyRate : 0;
+
       return {
         conditionId: m.conditionId ?? m.id ?? '',
         question: m.question ?? 'Unknown',
@@ -196,6 +228,11 @@ export async function GET() {
         daysToResolve,
         spreadVol,
         risk,
+        hasRewards: rw.dailyRate > 0,
+        rewardsDailyRate: rw.dailyRate,
+        rewardsMinSize: rw.minSize,
+        rewardsMaxSpread: rw.maxSpread,
+        estDailyReward,
       };
     });
 

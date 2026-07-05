@@ -11,6 +11,7 @@ import { marketUrl } from '@/lib/builder';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
+import RewardFarms from './RewardFarms';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -530,7 +531,11 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
   const totalLiquidity = (selected?.liquidity ?? 0) || 10_000;
   const yourShare      = amt / (totalLiquidity + amt);
   const dailyVol       = selected?.volume24h ?? 0;
-  const dailyReward    = yourShare * dailyVol * MAKER_REBATE_RATE;
+  // Prefer the market's REAL daily reward pool over the rebate heuristic.
+  const hasRealPool    = (selected?.rewardsDailyRate ?? 0) > 0;
+  const dailyReward    = hasRealPool
+    ? yourShare * (selected?.rewardsDailyRate ?? 0)
+    : yourShare * dailyVol * MAKER_REBATE_RATE;
   const monthlyReward  = dailyReward * 30;
   const yearlyReward   = dailyReward * 365;
   const apr            = amt > 0 ? (yearlyReward / amt) * 100 : 0;
@@ -593,8 +598,19 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
 
           <div className="rounded-xl px-4 py-3 text-[10px] text-white/25 leading-relaxed"
             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <strong className="text-white/40">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
-            Estimates only; actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
+            {hasRealPool ? (
+              <>
+                <strong className="text-emerald-400/70">Real reward pool:</strong> this market pays{' '}
+                <strong className="text-white/50">{formatCurrency(selected?.rewardsDailyRate ?? 0, true)}/day</strong> to makers
+                (Polymarket liquidity rewards program). Estimate = your_share × daily pool.
+                Actual payouts depend on spread tightness, uptime and two-sidedness.
+              </>
+            ) : (
+              <>
+                <strong className="text-white/40">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
+                Estimates only; actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
+              </>
+            )}
           </div>
         </div>
 
@@ -793,10 +809,15 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
       .map(o => {
         const totalLiquidity = (o.liquidity || 0) || 10_000;
         const yourShare      = amt / (totalLiquidity + amt);
-        const dailyReward    = yourShare * (o.volume24h ?? 0) * MAKER_REBATE_RATE;
+        // Prefer the market's REAL daily reward pool (Polymarket liquidity
+        // rewards program); fall back to the maker-rebate estimate otherwise.
+        const hasRealPool    = (o.rewardsDailyRate ?? 0) > 0;
+        const dailyReward    = hasRealPool
+          ? yourShare * o.rewardsDailyRate
+          : yourShare * (o.volume24h ?? 0) * MAKER_REBATE_RATE;
         const monthly        = dailyReward * 30;
         const apr            = amt > 0 ? (dailyReward * 365 / amt) * 100 : 0;
-        return { o, yourShare, dailyReward, monthly, apr };
+        return { o, yourShare, dailyReward, monthly, apr, hasRealPool };
       })
       .sort((a, b) => b.dailyReward - a.dailyReward);
   }, [opps, picked, amt]);
@@ -895,7 +916,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
         )}
 
         <p className="text-[10px] text-white/25 leading-relaxed">
-          Estimates use your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s reward program.
+          Markets with an active Polymarket reward program use their <span className="text-emerald-400/70 font-semibold">real daily pool</span> (your_share × daily pool); others fall back to your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s scoring.
         </p>
       </div>
     </section>
@@ -1015,6 +1036,7 @@ export default function LiquidityPage() {
       </div>
 
       <LPOpportunitiesSection opps={opps} loading={oppsLoading} />
+      <RewardFarms />
       <PriceHistorySection opps={opps} />
       <LPCalculator opps={opps} />
       <MarketDepthSection opps={opps} />
