@@ -8,6 +8,20 @@ export interface MarketRewards {
   maxSpread: number | null;     // max distance from mid to qualify (¢)
 }
 
+/* Match-type markets (single games, O/U, spreads, exact scores…) resolve in
+   hours and get run over by in-play moves — structurally bad LP inventory,
+   whatever the sport. Season-long futures are allowed through. */
+const MATCH_PATTERNS =
+  /\bvs\.?\s|\bO\/U\b|over\/under|^spread:|exact score|halftime|half time|both teams to score|total (?:corners|rounds|goals|points)|team to advance|win on \d{4}-\d{2}-\d{2}|\bmap \d|\(bo\d\)|end in a draw|leading at/i;
+const MATCH_SLUGS = /^(?:mlb|nba|nhl|nfl|lol|cs2?|csgo|val|dota|fifwc)-|-(?:\d{4}-\d{2}-\d{2})(?:-|$)/i;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function isMatchMarket(m: any): boolean {
+  const q = String(m?.question ?? '');
+  const slug = String(m?.slug ?? '');
+  return MATCH_PATTERNS.test(q) || MATCH_SLUGS.test(slug);
+}
+
 /* Sum the active daily reward pools attached to a gamma market. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function rewardsOf(m: any): MarketRewards {

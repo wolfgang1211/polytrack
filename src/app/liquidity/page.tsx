@@ -155,22 +155,32 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
                 Score Breakdown
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-white/50">Spread</span>
-                <span className="font-bold text-amber-300">{opp.scoreBreakdown.spread}/35</span>
+                <span className="text-white/50">Reward Pool</span>
+                <span className="font-bold text-emerald-300">{opp.scoreBreakdown.rewards}/25</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
                 <span className="text-white/50">Volume</span>
-                <span className="font-bold text-sky-300">{opp.scoreBreakdown.volume}/45</span>
+                <span className="font-bold text-sky-300">{opp.scoreBreakdown.volume}/20</span>
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Spread</span>
+                <span className="font-bold text-amber-300">{opp.scoreBreakdown.spread}/15</span>
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Stability</span>
+                <span className="font-bold text-violet-300">{opp.scoreBreakdown.stability}/15</span>
+              </span>
+              <span className="flex items-center justify-between py-0.5 text-[11px]">
+                <span className="text-white/50">Horizon</span>
+                <span className="font-bold text-cyan-300">{opp.scoreBreakdown.horizon}/15</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
                 <span className="text-white/50">Balance</span>
-                <span className="font-bold text-emerald-300">{opp.scoreBreakdown.depth}/20</span>
+                <span className="font-bold text-rose-300">{opp.scoreBreakdown.balance}/10</span>
               </span>
               <span className="mt-1.5 flex items-center justify-between border-t border-white/10 pt-1.5 text-[11px]">
                 <span className="font-semibold text-white/60">Total</span>
-                <span className="font-black text-white">
-                  {opp.scoreBreakdown.spread}+{opp.scoreBreakdown.volume}+{opp.scoreBreakdown.depth} = {sc}/100
-                </span>
+                <span className="font-black text-white">{sc}/100</span>
               </span>
             </span>
           </span>

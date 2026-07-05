@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { CLOB_BASE } from '@/lib/clob';
-import { rewardsOf } from '@/lib/rewards';
+import { rewardsOf, isMatchMarket } from '@/lib/rewards';
 
 const G_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -25,11 +25,14 @@ export interface LPOpportunity {
   askDepth: number | null;
   depthKnown: boolean;
   estDailyFee: number;   // spread capture for a $1K LP position ($/day)
-  score: number;         // 0–100 opportunity score
+  score: number;         // 0–100 LP-suitability score
   scoreBreakdown: {      // point contributions that sum to `score`
-    spread: number;      // out of 35
-    volume: number;      // out of 45
-    depth: number;       // out of 20 (two-sidedness / balance)
+    rewards: number;     // out of 25 — active reward pool size
+    volume: number;      // out of 20
+    spread: number;      // out of 15
+    stability: number;   // out of 15 — low 24h price volatility
+    horizon: number;     // out of 15 — time to resolution
+    balance: number;     // out of 10 — mid near 50/50
   };
   endDate?: string;
   daysToResolve: number | null;  // days until market resolves
@@ -101,11 +104,20 @@ export async function GET() {
       markets.push(m);
     }
 
-    // 2 — Keep tradeable candidates: real volume OR an active reward pool.
+    // 2 — Keep tradeable candidates suitable for LPing:
+    //     real volume OR an active reward pool, NOT a match-type market,
+    //     and at least 3 days from resolution (in-play risk isn't LP risk).
+    const MIN_HORIZON_MS = 3 * 86_400_000;
     const candidates = markets
       .filter(m => {
         const ids = parseJson(m.clobTokenIds);
         if (!ids.length) return false;
+        if (isMatchMarket(m)) return false;
+        const end = m.endDate ?? m.endDateIso;
+        if (end) {
+          const t = new Date(end).getTime();
+          if (!isNaN(t) && t - Date.now() < MIN_HORIZON_MS) return false;
+        }
         const vol = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
         return vol > 1000 || rewardsOf(m).dailyRate > 0;
       })
@@ -171,16 +183,6 @@ export async function GET() {
       const poolShare = DEFAULT_CAPITAL / (liquidity + DEFAULT_CAPITAL || DEFAULT_CAPITAL);
       const estDailyFee = poolShare * vol24h * spread * 0.5;
 
-      // Score 0–100: volume + spread edge + how two-sided the market is.
-      const volScore     = Math.min(1, Math.log10(Math.max(1, vol24h)) / 7); // ~10M → 1
-      const spreadScore  = Math.min(1, spread / 0.05);                       // 5¢ → 1
-      const balanceScore = 1 - Math.min(1, Math.abs(mid - 0.5) * 2);         // 50/50 → 1
-      // Point contributions (sum = score, so the badge matches the tooltip).
-      const spreadPts  = Math.round(35 * spreadScore);
-      const volumePts  = Math.round(45 * volScore);
-      const depthPts   = Math.round(20 * balanceScore);
-      const score = spreadPts + volumePts + depthPts;
-
       // Risk metrics ─────────────────────────────────────────────
       const endDate = m.endDate ?? m.endDateIso ?? undefined;
       const daysToResolve = endDate
@@ -204,6 +206,17 @@ export async function GET() {
       const rw = rewardsOf(m);
       const estDailyReward = rw.dailyRate > 0 ? poolShare * rw.dailyRate : 0;
 
+      // LP-suitability score 0–100 — what actually makes a market worth
+      // quoting: a real reward pool, steady flow, capturable spread, price
+      // stability, time to work the position, and a two-sided book.
+      const rewardsPts   = Math.round(25 * Math.min(1, rw.dailyRate / 100));
+      const volumePts    = Math.round(20 * Math.min(1, Math.log10(Math.max(1, vol24h)) / 7));
+      const spreadPts    = Math.round(15 * Math.min(1, spread / 0.05));
+      const stabilityPts = Math.round(15 * (1 - Math.min(1, spreadVol / 30)));
+      const horizonPts   = Math.round(15 * (daysToResolve == null ? 1 : Math.min(1, daysToResolve / 30)));
+      const balancePts   = Math.round(10 * (1 - Math.min(1, Math.abs(mid - 0.5) * 2)));
+      const score = rewardsPts + volumePts + spreadPts + stabilityPts + horizonPts + balancePts;
+
       return {
         conditionId: m.conditionId ?? m.id ?? '',
         question: m.question ?? 'Unknown',
@@ -223,7 +236,7 @@ export async function GET() {
         depthKnown: parsed != null,
         estDailyFee,
         score,
-        scoreBreakdown: { spread: spreadPts, volume: volumePts, depth: depthPts },
+        scoreBreakdown: { rewards: rewardsPts, volume: volumePts, spread: spreadPts, stability: stabilityPts, horizon: horizonPts, balance: balancePts },
         endDate,
         daysToResolve,
         spreadVol,

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { rewardsOf } from '@/lib/rewards';
+import { rewardsOf, isMatchMarket } from '@/lib/rewards';
 
 const G_HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -70,6 +70,14 @@ export async function GET() {
       const rw = rewardsOf(m);
       if (rw.dailyRate <= 0) continue;
       if (!parseJson(m.clobTokenIds).length) continue;
+      // LP-suitability: skip match-type markets and anything resolving < 3 days
+      // out — pools on those evaporate before a position can be worked.
+      if (isMatchMarket(m)) continue;
+      const endRaw = m.endDate ?? m.endDateIso;
+      if (endRaw) {
+        const t = new Date(endRaw).getTime();
+        if (!isNaN(t) && t - Date.now() < 3 * 86_400_000) continue;
+      }
 
       const liquidity = m.liquidityNum ?? Number(m.liquidity ?? 0);
       const volume24h = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
