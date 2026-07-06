@@ -61,10 +61,23 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   );
 }
 
+interface Vacancy {
+  conditionId: string;
+  question: string;
+  slug: string;
+  eventSlug?: string;
+  dailyRate: number;
+  liquidityNow: number;
+  dropPct: number;
+  shareGainPct: number;
+  hoursAgo: number;
+}
+
 export default function RewardFarms() {
   const [data, setData] = useState<RewardsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
 
   useEffect(() => {
     fetch('/api/liquidity/rewards')
@@ -72,6 +85,10 @@ export default function RewardFarms() {
       .then(d => { if (Array.isArray(d?.farms)) setData(d); })
       .catch(() => {})
       .finally(() => setLoading(false));
+    fetch('/api/liquidity/vacancy')
+      .then(r => r.json())
+      .then(d => { if (Array.isArray(d?.vacancies)) setVacancies(d.vacancies); })
+      .catch(() => {});
   }, []);
 
   const farms = data?.farms ?? [];
@@ -93,6 +110,28 @@ export default function RewardFarms() {
           </span>
         )}
       </div>
+
+      {/* Vacancy Radar — pools where competing liquidity just left */}
+      {vacancies.length > 0 && (
+        <div className="mb-4 rounded-2xl p-4"
+          style={{ background: 'rgba(52,211,153,0.05)', border: '1px solid rgba(52,211,153,0.18)' }}>
+          <p className="mb-2 text-[10px] font-black uppercase tracking-widest" style={{ color: '#34d399' }}>
+            📡 Vacancy Radar — liquidity just left these pools
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {vacancies.slice(0, 5).map(v => (
+              <a key={v.conditionId} href={marketUrl(v.eventSlug, v.slug)} target="_blank" rel="noopener noreferrer"
+                className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs transition-opacity hover:opacity-80">
+                <span className="font-semibold text-white/75 truncate max-w-[50%]">{v.question}</span>
+                <span className="text-rose-400 font-bold tabular-nums">-{v.dropPct.toFixed(0)}% liq</span>
+                <span className="text-emerald-400 font-bold tabular-nums">your share +{v.shareGainPct.toFixed(0)}%</span>
+                <span className="text-white/30 tabular-nums">{formatCurrency(v.dailyRate, true)}/d pool</span>
+                <span className="text-white/20 text-[10px]">vs {v.hoursAgo.toFixed(0)}h ago</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
         {/* Header */}
