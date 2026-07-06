@@ -18,6 +18,22 @@ const WINDOWS = [
   { key: 168, label: '7D' },
 ] as const;
 
+/* Below this coverage, annualising observed earnings is extrapolation noise
+   (2% coverage → 50× multiplier), so the APR is de-emphasised as an estimate. */
+const APR_MIN_COVERAGE = 25;
+
+function AprCell({ apr, coveragePct }: { apr: number; coveragePct: number }) {
+  if (coveragePct < APR_MIN_COVERAGE) {
+    return (
+      <span className="text-right text-xs font-bold tabular-nums text-white/25"
+        title={`Only ${coveragePct.toFixed(0)}% of this window was observed — annualised figure is a rough extrapolation`}>
+        ~{apr >= 1000 ? '>999' : apr.toFixed(0)}%
+      </span>
+    );
+  }
+  return <span className="text-right text-xs font-bold tabular-nums text-amber-300/80">{apr.toFixed(1)}%</span>;
+}
+
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
@@ -112,7 +128,13 @@ export default function Backtester() {
             ))}
           </div>
           {data && data.historyHours > 0 && (
-            <span className="ml-auto text-[10px] text-white/25 pb-1">
+            <span className="ml-auto flex items-center gap-2 pb-1 text-[10px] text-white/25">
+              {data.historyHours < hours * 0.5 && (
+                <span className="rounded-full px-2 py-0.5 font-semibold"
+                  style={{ background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.25)', color: '#fbbf24' }}>
+                  sparse history — results are partial
+                </span>
+              )}
               {data.snapshots} snapshots · {data.historyHours.toFixed(0)}h of recorded history
             </span>
           )}
@@ -146,7 +168,8 @@ export default function Backtester() {
                     Cumulative earnings — <span className="text-amber-300/80">{sel.question ?? sel.conditionId.slice(0, 10) + '…'}</span>
                   </p>
                   <span className="text-xs font-black text-amber-300">
-                    {formatCurrency(sel.earned)} · {sel.effApr.toFixed(1)}% APR
+                    {formatCurrency(sel.earned)}
+                    {sel.coveragePct >= APR_MIN_COVERAGE && <> · {sel.effApr.toFixed(1)}% APR</>}
                   </span>
                 </div>
                 <ResponsiveContainer width="100%" height={180}>
@@ -206,13 +229,17 @@ export default function Backtester() {
                         <p className="truncate text-xs font-semibold text-white/70">
                           {r.question ?? `${r.conditionId.slice(0, 14)}…`}
                         </p>
-                        {!r.active && <p className="text-[9px] text-white/25">pool ended / market resolved</p>}
+                        {!r.active && (
+                          <p className="text-[9px] text-white/25">
+                            {r.resolved === true ? 'market resolved' : 'reward pool inactive'}
+                          </p>
+                        )}
                       </div>
                     </div>
                     <span className="text-right text-xs font-black tabular-nums" style={{ color: isSel ? '#fbbf24' : 'rgba(255,255,255,0.85)' }}>
                       {formatCurrency(r.earned)}
                     </span>
-                    <span className="text-right text-xs font-bold tabular-nums text-amber-300/80">{r.effApr.toFixed(1)}%</span>
+                    <AprCell apr={r.effApr} coveragePct={r.coveragePct} />
                     <span className="text-right text-xs font-bold tabular-nums text-white/50">{formatCurrency(r.avgDailyRate, true)}/d</span>
                     <span className={`text-right text-xs font-bold tabular-nums ${r.coveragePct < 50 ? 'text-rose-400/70' : 'text-white/40'}`}>
                       {r.coveragePct.toFixed(0)}%

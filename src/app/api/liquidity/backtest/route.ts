@@ -27,6 +27,7 @@ export interface BacktestResult {
   eventSlug?: string;
   image?: string;
   active: boolean;          // still an active reward farm right now
+  resolved: boolean | null; // market closed/resolved per gamma (null = unknown)
   earned: number;           // USD earned over covered windows
   effApr: number;           // annualised return on capital over covered time (%)
   coverageHours: number;    // observed (credited) hours
@@ -74,6 +75,53 @@ function downsample(points: BacktestPoint[], max: number): BacktestPoint[] {
 }
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
+
+const G_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+  Accept: 'application/json',
+};
+
+interface GammaMarketInfo {
+  question: string | null;
+  slug: string | null;
+  eventSlug?: string;
+  image?: string;
+  closed: boolean | null;
+}
+
+/** Resolve condition ids → market metadata via gamma-api. Snapshots only
+ * store condition ids; markets that dropped out of the live farm scan
+ * (ended pools, resolved markets, or simply outside the top-400 window)
+ * still need human-readable titles. */
+async function resolveConditionIds(ids: string[]): Promise<Map<string, GammaMarketInfo>> {
+  const out = new Map<string, GammaMarketInfo>();
+  await Promise.all(ids.map(async (id) => {
+    try {
+      const res = await fetch(
+        `https://gamma-api.polymarket.com/markets?condition_ids=${id}`,
+        { headers: G_HEADERS, next: { revalidate: 21600 } }
+      );
+      if (!res.ok) return;
+      const json = await res.json();
+      const m = (Array.isArray(json) ? json[0] : (json?.value ?? json?.markets ?? [])[0]) as
+        Record<string, unknown> | undefined;
+      if (!m) return;
+      const eventSlug = typeof m.eventSlug === 'string'
+        ? m.eventSlug
+        : (Array.isArray(m.events) && m.events[0]
+            ? String((m.events[0] as Record<string, unknown>).slug ?? '') || undefined
+            : undefined);
+      out.set(id, {
+        question: typeof m.question === 'string' ? m.question : null,
+        slug: typeof m.slug === 'string' ? m.slug : null,
+        eventSlug,
+        image: typeof m.image === 'string' ? m.image : (typeof m.icon === 'string' ? m.icon : undefined),
+        closed: typeof m.closed === 'boolean' ? m.closed : null,
+      });
+    } catch { /* unresolved — UI falls back to the condition id */ }
+  }));
+  return out;
+}
 
 export async function GET(req: NextRequest) {
   if (!kvEnabled) {
@@ -141,6 +189,7 @@ export async function GET(req: NextRequest) {
           eventSlug: farm?.eventSlug,
           image: farm?.image,
           active: Boolean(farm),
+          resolved: farm ? false : null, // unknowns filled from gamma below
           earned: r2(a.earned),
           effApr: covH > 0 ? r2((a.earned / capital) * (8_760 / covH) * 100) : 0,
           coverageHours: r2(covH),
@@ -159,6 +208,21 @@ export async function GET(req: NextRequest) {
       if (i < SERIES_FOR_TOP && res.series) res.series = downsample(res.series, MAX_SERIES_POINTS);
       else delete res.series;
     });
+
+    // Fill in titles for markets missing from the live farm scan.
+    const unknown = results.filter(r => r.question == null).map(r => r.conditionId);
+    if (unknown.length) {
+      const meta = await resolveConditionIds(unknown);
+      for (const res of results) {
+        const m = meta.get(res.conditionId);
+        if (!m) continue;
+        res.question = m.question;
+        res.slug = res.slug ?? m.slug;
+        res.eventSlug = res.eventSlug ?? m.eventSlug;
+        res.image = res.image ?? m.image;
+        res.resolved = m.closed;
+      }
+    }
 
     const body: BacktestResponse = {
       enabled: true,
