@@ -26,7 +26,16 @@ interface RewardFarm {
   estApr: number;
   daysToResolve: number | null;
   competition: 'Low' | 'Medium' | 'High';
+  isNew: boolean;
+  endsSoon: boolean;
+  priceVol: number;
+  stability: 'A' | 'B' | 'C' | 'D';
+  riskAdjApr: number;
 }
+
+const STAB_COLOR: Record<RewardFarm['stability'], string> = {
+  A: '#34d399', B: '#a3e635', C: '#fbbf24', D: '#fb7185',
+};
 
 interface RewardsResponse {
   farms: RewardFarm[];
@@ -121,10 +130,25 @@ export default function RewardFarms() {
                   style={{ background: 'var(--vi-grad-25)' }}>💰</div>
               )}
               <div className="min-w-0">
-                <p className="text-xs font-semibold text-white/75 truncate">{f.question}</p>
+                <p className="text-xs font-semibold text-white/75 truncate">
+                  {f.isNew && (
+                    <span className="mr-1.5 rounded px-1 py-px text-[9px] font-black uppercase align-middle"
+                      style={{ background: 'rgba(52,211,153,0.15)', color: '#34d399', border: '1px solid rgba(52,211,153,0.3)' }}>
+                      New
+                    </span>
+                  )}
+                  {f.endsSoon && (
+                    <span className="mr-1.5 rounded px-1 py-px text-[9px] font-black uppercase align-middle"
+                      style={{ background: 'rgba(251,113,133,0.15)', color: '#fb7185', border: '1px solid rgba(251,113,133,0.3)' }}>
+                      Ends soon
+                    </span>
+                  )}
+                  {f.question}
+                </p>
                 <p className="text-[10px] text-white/25">
                   {f.daysToResolve != null ? `resolves in ${f.daysToResolve}d` : 'open-ended'}
                   {' · '}spread {(f.spread * 100).toFixed(1)}¢
+                  {' · '}24h move {f.priceVol.toFixed(1)}%
                 </p>
               </div>
             </div>
@@ -146,9 +170,16 @@ export default function RewardFarms() {
                 {f.competition}
               </span>
             </span>
-            <span className="self-center text-right text-xs font-black tabular-nums"
-              style={{ color: f.estApr >= 20 ? '#34d399' : f.estApr >= 5 ? '#fbbf24' : 'rgba(255,255,255,0.5)' }}>
-              {f.estApr >= 1000 ? '>999' : f.estApr.toFixed(1)}%
+            <span className="self-center text-right">
+              <span className="text-xs font-black tabular-nums"
+                style={{ color: f.estApr >= 20 ? '#34d399' : f.estApr >= 5 ? '#fbbf24' : 'rgba(255,255,255,0.5)' }}>
+                {f.estApr >= 1000 ? '>999' : f.estApr.toFixed(1)}%
+              </span>
+              <span className="ml-1 rounded px-1 py-px text-[9px] font-black align-middle"
+                title={`Stability ${f.stability} — 24h price move ${f.priceVol.toFixed(1)}%`}
+                style={{ background: `${STAB_COLOR[f.stability]}18`, color: STAB_COLOR[f.stability], border: `1px solid ${STAB_COLOR[f.stability]}35` }}>
+                {f.stability}
+              </span>
             </span>
           </a>
         ))}
@@ -162,7 +193,8 @@ export default function RewardFarms() {
       </div>
 
       <p className="mt-2 text-[10px] text-white/25">
-        * Est. APR assumes $1K of qualifying two-sided quotes earning a pro-rata share of the daily pool,
+        * Ranked by risk-adjusted APR (APR × stability grade), so a steady 80% farm outranks a wild 300% one.
+        Est. APR assumes $1K of qualifying two-sided quotes earning a pro-rata share of the daily pool,
         against at least $10K of competing maker capital (thin books attract bots fast). Actual payouts
         depend on Polymarket&apos;s scoring (spread tightness, uptime, two-sidedness) and competition. Not financial advice.
       </p>
