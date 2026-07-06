@@ -13,6 +13,7 @@ import { useWatchlist } from '@/lib/useWatchlist';
 import WalletCharts from '@/components/WalletCharts';
 import LatestMoves from '@/components/LatestMoves';
 import WalletActivity from '@/components/WalletActivity';
+import LpEarnings from '@/components/LpEarnings';
 import PnlTimeline from '@/components/PnlTimeline';
 import WalletSidebar from '@/components/WalletSidebar';
 import CopyAddress from '@/components/CopyAddress';
@@ -415,6 +416,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                 />
               </div>
               <WalletCharts positions={all} />
+              <LpEarnings address={address} />
               <WalletActivity address={address} positions={all} />
               <LatestMoves address={address} />
             </div>

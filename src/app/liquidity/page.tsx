@@ -12,6 +12,7 @@ import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 import RewardFarms from './RewardFarms';
+import Backtester from './Backtester';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -1051,6 +1052,7 @@ export default function LiquidityPage() {
       <LPCalculator opps={opps} />
       <MarketDepthSection opps={opps} />
       <RewardSimulator opps={opps} />
+      <Backtester />
       <LPLeaderboardSection />
     </div>
   );
