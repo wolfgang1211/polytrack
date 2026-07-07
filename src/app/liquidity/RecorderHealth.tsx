@@ -150,7 +150,7 @@ export default function RecorderHealth() {
                   }} />
               </div>
               <p className="mt-1.5 text-[10px] text-white/30">
-                {span(data.coveredHours)} of {span(data.targetHours)} recorded
+                {(data.coveredHours / 24).toFixed(1)}d of {(data.targetHours / 24).toFixed(1)}d recorded
                 {remainingDays > 0
                   ? ` · ~${remainingDays} more day${remainingDays > 1 ? 's' : ''} of recording for a full 7-day backtest`
                   : ' · full 7-day backtest available'}
@@ -187,9 +187,9 @@ export default function RecorderHealth() {
             )}
 
             <p className="text-[10px] text-white/25 leading-relaxed">
-              The recorder snapshots reward-farm liquidity, spread and daily pool every {data.cadenceMin} minutes into KV.
-              &quot;Replayable&quot; coverage counts only observed time — gaps beyond 3h aren&apos;t credited, matching the Backtester.
-              If cadence drifts far above {data.cadenceMin}m or status shows Stalled, the cron pinger likely needs attention.
+              {`The recorder snapshots reward-farm liquidity, spread and daily pool every ${data.cadenceMin} minutes into KV. `}
+              {`"Replayable" coverage counts only observed time — gaps beyond 3h aren't credited, matching the Backtester. `}
+              {`If cadence drifts far above ${data.cadenceMin}m or status shows Stalled, the cron pinger likely needs attention.`}
             </p>
           </>
         )}
