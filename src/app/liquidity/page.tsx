@@ -13,6 +13,7 @@ import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 import RewardFarms from './RewardFarms';
 import Backtester from './Backtester';
+import RecorderHealth from './RecorderHealth';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -1053,6 +1054,7 @@ export default function LiquidityPage() {
       <MarketDepthSection opps={opps} />
       <RewardSimulator opps={opps} />
       <Backtester />
+      <RecorderHealth />
       <LPLeaderboardSection />
     </div>
   );
