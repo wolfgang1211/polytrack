@@ -133,7 +133,7 @@ export default function ModelValidation() {
 
         {!loading && data?.enabled === false && (
           <p className="text-center text-sm text-white/25 py-6">
-            Validation needs both the KV snapshot store and a Graph API key configured.
+            Validation needs the KV snapshot store configured.
           </p>
         )}
 

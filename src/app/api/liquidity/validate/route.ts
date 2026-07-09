@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { fetchMakerGraphFills, type GraphFill } from '@/lib/graphFills';
+import { fetchRecentMakerFills, type MakerFill } from '@/lib/dataApiFills';
 import { readLpSnapshots } from '@/lib/lpSnapshots';
 import { kvEnabled } from '@/lib/kv';
 
@@ -8,8 +8,11 @@ import { kvEnabled } from '@/lib/kv';
  * a real LP wallet actually did?
  *
  * Two series, same window, side by side:
- *   REAL — the wallet's maker-fill spread capture (LH-8 replay: cost-basis
- *          over maker fills only), restricted to the requested window.
+ *   REAL — the wallet's maker-fill spread capture (LH-8-style cost-basis
+ *          replay over maker fills), restricted to the requested window.
+ *          Fills come from the Polymarket data-api (LH-C.1): the orderbook
+ *          subgraph stopped indexing ~2026-04-25, so windowed queries there
+ *          return nothing for every wallet.
  *   SIM  — the LH-9 snapshot replay (share × dailyRate × dt with the same
  *          $10K competing floor and 3h gap cap), restricted to the markets
  *          the wallet actually quoted.
@@ -22,7 +25,7 @@ import { kvEnabled } from '@/lib/kv';
  */
 
 export interface ValidateMarketRow {
-  conditionId: string | null;   // null if gamma couldn't resolve the token
+  conditionId: string | null;
   question: string | null;
   outcome: string | null;
   tokenIds: string[];           // clob token ids the wallet traded in this market
@@ -36,7 +39,7 @@ export interface ValidateMarketRow {
 }
 
 export interface ValidateResponse {
-  enabled: boolean;             // KV + Graph key both configured
+  enabled: boolean;             // KV snapshot store configured
   address: string;
   capital: number;
   hours: number;
@@ -53,99 +56,44 @@ export interface ValidateResponse {
 
 const COMPETING_FLOOR = 10_000;   // matches backtest / rewards.ts
 const GAP_CAP_MS = 3 * 3_600_000; // matches backtest
-const MAX_TOKENS_RESOLVED = 40;   // gamma lookups per request
 const MAX_ROWS = 25;
 
 const r2 = (n: number) => Math.round(n * 100) / 100;
 
-const G_HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  Accept: 'application/json',
-};
+interface TokenAgg { realized: number; volume: number; fills: number; shares: number; cost: number }
 
-interface TokenMeta { conditionId: string | null; question: string | null; outcome: string | null }
+/** LH-8-style cost-basis replay over maker fills, per token. Fills are
+ * window-scoped at fetch time, so realized P&L here is the spread captured
+ * on round-trips completed INSIDE the window; sells of inventory acquired
+ * before the window aren't credited (consistent with LH-8, which also only
+ * counts round-tripped maker inventory). */
+function replayReal(fills: MakerFill[]) {
+  const byToken = new Map<string, TokenAgg>();
 
-/** Resolve clob token ids → { conditionId, question, outcome } via gamma-api.
- * Same endpoint the LP earnings route uses, but we also need conditionId to
- * join real fills against the snapshot series. */
-async function resolveTokens(ids: string[]): Promise<Map<string, TokenMeta>> {
-  const out = new Map<string, TokenMeta>();
-  await Promise.all(ids.map(async (id) => {
-    try {
-      const res = await fetch(
-        `https://gamma-api.polymarket.com/markets?clob_token_ids=${id}`,
-        { headers: G_HEADERS, next: { revalidate: 86400 } }
-      );
-      if (!res.ok) return;
-      const json = await res.json();
-      const m = (Array.isArray(json) ? json[0] : (json?.value ?? json?.markets ?? [])[0]) as
-        Record<string, unknown> | undefined;
-      if (!m) return;
+  for (const f of fills) {
+    const usd = f.shares * f.price;
+    // takerSide is the taker's direction — the maker did the opposite.
+    const makerIsBuying = f.takerSide !== 'BUY';
 
-      let outcome: string | null = null;
-      try {
-        const tokenIds: string[] = Array.isArray(m.clobTokenIds)
-          ? (m.clobTokenIds as string[])
-          : JSON.parse(String(m.clobTokenIds ?? '[]'));
-        const outcomes: string[] = Array.isArray(m.outcomes)
-          ? (m.outcomes as string[])
-          : JSON.parse(String(m.outcomes ?? '[]'));
-        const idx = tokenIds.findIndex(t => String(t) === id);
-        if (idx >= 0 && outcomes[idx]) outcome = String(outcomes[idx]);
-      } catch { /* leave outcome null */ }
-
-      out.set(id, {
-        conditionId: typeof m.conditionId === 'string' ? m.conditionId : null,
-        question: typeof m.question === 'string' ? m.question : null,
-        outcome,
-      });
-    } catch { /* unresolved — row keeps the raw token id */ }
-  }));
-  return out;
-}
-
-interface RealAgg { realized: number; volume: number; fills: number; shares: number; cost: number }
-
-/** LH-8 cost-basis replay over maker fills, per token, window-filtered.
- * Fills BEFORE the window still build inventory (so in-window sells get the
- * right cost basis) but only in-window activity is counted as volume/P&L. */
-function replayReal(fills: GraphFill[], windowStartMs: number) {
-  const sorted = fills.slice().sort((a, b) => Number(a.timestamp) - Number(b.timestamp));
-  const byToken = new Map<string, RealAgg>();
-
-  for (const f of sorted) {
-    const token = f.market.id;
-    const tsMs = Number(f.timestamp) * 1000;
-    const shares = Number(f.size) / 1e6;
-    const usd = shares * Number(f.price);
-    if (!token || !tsMs || shares <= 0) continue;
-
-    const inWindow = tsMs >= windowStartMs;
-    const makerIsBuying = f.side !== 'Buy'; // side is taker-perspective
-
-    const agg = byToken.get(token) ?? { realized: 0, volume: 0, fills: 0, shares: 0, cost: 0 };
+    const agg = byToken.get(f.tokenId) ?? { realized: 0, volume: 0, fills: 0, shares: 0, cost: 0 };
 
     if (makerIsBuying) {
-      agg.shares += shares;
+      agg.shares += f.shares;
       agg.cost += usd;
     } else {
-      const sellShares = Math.min(shares, agg.shares);
+      const sellShares = Math.min(f.shares, agg.shares);
       const avgCost = agg.shares > 0 ? agg.cost / agg.shares : 0;
-      const gain = sellShares * (Number(f.price) - avgCost);
-      if (inWindow) agg.realized += gain;
+      agg.realized += sellShares * (f.price - avgCost);
       agg.shares -= sellShares;
       agg.cost -= avgCost * sellShares;
       if (agg.shares < 1e-9) { agg.shares = 0; agg.cost = 0; }
     }
 
-    if (inWindow) { agg.volume += usd; agg.fills += 1; }
-    byToken.set(token, agg);
+    agg.volume += usd;
+    agg.fills += 1;
+    byToken.set(f.tokenId, agg);
   }
 
-  // Drop tokens with no in-window activity.
-  for (const [token, agg] of byToken) {
-    if (agg.fills === 0) byToken.delete(token);
-  }
   return byToken;
 }
 
@@ -179,10 +127,9 @@ export async function GET(req: NextRequest) {
   const address = (sp.get('address') ?? '').trim().toLowerCase();
   const capital = Math.min(1_000_000, Math.max(1, Number(sp.get('capital')) || 1_000));
   const hours = Math.min(24 * 14, Math.max(1, Number(sp.get('hours')) || 168));
-  const apiKey = process.env.GRAPH_API_KEY;
 
   const empty = (error?: string): ValidateResponse => ({
-    enabled: Boolean(kvEnabled && apiKey),
+    enabled: kvEnabled,
     address, capital, hours,
     windowStart: null, snapshots: 0, historyHours: 0,
     real: { realized: 0, makerVolume: 0, fills: 0, markets: 0 },
@@ -191,18 +138,14 @@ export async function GET(req: NextRequest) {
     ...(error ? { error } : {}),
   });
 
-  if (!kvEnabled || !apiKey) return NextResponse.json(empty());
+  if (!kvEnabled) return NextResponse.json(empty());
   if (!/^0x[0-9a-f]{40}$/.test(address)) {
     return NextResponse.json(empty('Provide a valid wallet address (?address=0x…)'), { status: 200 });
   }
 
   try {
-    const [fills, snapshotsNewestFirst] = await Promise.all([
-      fetchMakerGraphFills(address, apiKey),
-      readLpSnapshots(1000),
-    ]);
-
     const cutoff = Date.now() - hours * 3_600_000;
+    const snapshotsNewestFirst = await readLpSnapshots(1000);
     const snaps = snapshotsNewestFirst
       .filter(s => s.ts >= cutoff)
       .sort((a, b) => a.ts - b.ts);
@@ -210,52 +153,66 @@ export async function GET(req: NextRequest) {
     // Compare only where BOTH series can exist: window starts at the later of
     // the requested cutoff and the first available snapshot.
     const windowStart = snaps.length ? Math.max(cutoff, snaps[0].ts) : cutoff;
+    const historyHours = snaps.length >= 2
+      ? r2((snaps[snaps.length - 1].ts - snaps[0].ts) / 3_600_000)
+      : 0;
 
-    const realByToken = replayReal(fills, windowStart);
+    const fills = await fetchRecentMakerFills(address, Math.floor(windowStart / 1000));
 
-    if (realByToken.size === 0) {
-      const body = empty();
+    if (fills === null) {
+      const body = empty('Fill feed (data-api) unreachable — try again shortly');
       body.windowStart = windowStart;
       body.snapshots = snaps.length;
-      body.historyHours = snaps.length >= 2 ? r2((snaps[snaps.length - 1].ts - snaps[0].ts) / 3_600_000) : 0;
-      body.error = 'No maker fills for this wallet inside the comparison window';
+      body.historyHours = historyHours;
+      return NextResponse.json(body, { status: 200 });
+    }
+
+    if (fills.length === 0) {
+      const body = empty('No maker fills for this wallet inside the comparison window');
+      body.windowStart = windowStart;
+      body.snapshots = snaps.length;
+      body.historyHours = historyHours;
       return NextResponse.json(body, {
         headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' },
       });
     }
 
-    // Resolve the wallet's most active tokens → condition ids.
-    const rankedTokens = [...realByToken.entries()]
-      .sort((a, b) => b[1].volume - a[1].volume)
-      .slice(0, MAX_TOKENS_RESOLVED);
-    const meta = await resolveTokens(rankedTokens.map(([id]) => id));
+    const realByToken = replayReal(fills);
 
-    // Group tokens into markets (condition ids). Unresolved tokens each
-    // become their own row keyed by token id so nothing silently vanishes.
+    // Group tokens into markets — data-api gives conditionId per fill.
     interface MarketGroup {
-      conditionId: string | null; question: string | null; outcome: string | null;
-      tokenIds: string[]; realized: number; volume: number; fills: number;
+      conditionId: string; question: string | null; outcomes: Set<string>;
+      tokenIds: Set<string>; realized: number; volume: number; fills: number;
     }
+    const tokenMeta = new Map<string, { conditionId: string; title: string | null; outcome: string | null }>();
+    for (const f of fills) {
+      if (!tokenMeta.has(f.tokenId)) {
+        tokenMeta.set(f.tokenId, { conditionId: f.conditionId, title: f.title, outcome: f.outcome });
+      }
+    }
+
     const groups = new Map<string, MarketGroup>();
-    for (const [token, agg] of rankedTokens) {
-      const m = meta.get(token);
-      const key = m?.conditionId ?? `token:${token}`;
-      const g = groups.get(key) ?? {
-        conditionId: m?.conditionId ?? null,
-        question: m?.question ?? null,
-        outcome: m?.outcome ?? null,
-        tokenIds: [], realized: 0, volume: 0, fills: 0,
+    for (const [tokenId, agg] of realByToken) {
+      const meta = tokenMeta.get(tokenId);
+      if (!meta) continue;
+      const g = groups.get(meta.conditionId) ?? {
+        conditionId: meta.conditionId,
+        question: meta.title,
+        outcomes: new Set<string>(),
+        tokenIds: new Set<string>(),
+        realized: 0, volume: 0, fills: 0,
       };
-      g.tokenIds.push(token);
+      g.question = g.question ?? meta.title;
+      if (meta.outcome) g.outcomes.add(meta.outcome);
+      g.tokenIds.add(tokenId);
       g.realized += agg.realized;
       g.volume += agg.volume;
       g.fills += agg.fills;
-      if (g.tokenIds.length > 1) g.outcome = null; // both sides quoted — outcome label is noise
-      groups.set(key, g);
+      groups.set(meta.conditionId, g);
     }
 
     // Sim replay over exactly the wallet's markets.
-    const wanted = new Set([...groups.values()].map(g => g.conditionId).filter((x): x is string => Boolean(x)));
+    const wanted = new Set(groups.keys());
     const simByMarket = snaps.length >= 2 ? replaySim(snaps, wanted, capital) : new Map<string, SimAgg>();
 
     const effWindowMs = Math.max(1, Date.now() - windowStart);
@@ -264,12 +221,12 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.volume - a.volume)
       .slice(0, MAX_ROWS)
       .map(g => {
-        const sim = g.conditionId ? simByMarket.get(g.conditionId) : undefined;
+        const sim = simByMarket.get(g.conditionId);
         return {
           conditionId: g.conditionId,
           question: g.question,
-          outcome: g.outcome,
-          tokenIds: g.tokenIds,
+          outcome: g.outcomes.size === 1 ? [...g.outcomes][0] : null,
+          tokenIds: [...g.tokenIds],
           realRealized: r2(g.realized),
           realVolume: r2(g.volume),
           realFills: g.fills,
@@ -288,7 +245,7 @@ export async function GET(req: NextRequest) {
     for (const s of simByMarket.values()) simEarned += s.earned;
 
     const matchedVolume = [...groups.values()]
-      .filter(g => g.conditionId && simByMarket.has(g.conditionId))
+      .filter(g => simByMarket.has(g.conditionId))
       .reduce((s, g) => s + g.volume, 0);
 
     const body: ValidateResponse = {
@@ -296,7 +253,7 @@ export async function GET(req: NextRequest) {
       address, capital, hours,
       windowStart,
       snapshots: snaps.length,
-      historyHours: snaps.length >= 2 ? r2((snaps[snaps.length - 1].ts - snaps[0].ts) / 3_600_000) : 0,
+      historyHours,
       real: { realized: r2(realRealized), makerVolume: r2(realVolume), fills: realFills, markets: groups.size },
       sim: { earned: r2(simEarned), marketsCovered: simByMarket.size },
       matchedVolumePct: realVolume > 0 ? r2((matchedVolume / realVolume) * 100) : 0,
