@@ -14,6 +14,7 @@ import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 import RewardFarms from './RewardFarms';
 import Backtester from './Backtester';
 import RecorderHealth from './RecorderHealth';
+import ModelValidation from './ModelValidation';
 
 /* ─────────────────────────── helpers ─────────────────────────── */
 
@@ -1055,6 +1056,7 @@ export default function LiquidityPage() {
       <RewardSimulator opps={opps} />
       <Backtester />
       <RecorderHealth />
+      <ModelValidation />
       <LPLeaderboardSection />
     </div>
   );
