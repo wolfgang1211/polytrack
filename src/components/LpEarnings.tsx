@@ -31,6 +31,8 @@ interface LpData {
   firstTs: number | null;
   lastTs: number | null;
   markets: LpMarketRow[];
+  freshFills?: number;     // maker fills appended from the live data-api feed
+  tailTruncated?: boolean; // live tail hit the data-api offset ceiling
 }
 
 function timeAgo(ts: number): string {
@@ -78,12 +80,28 @@ export default function LpEarnings({ address }: { address: string }) {
             Realized spread from maker fills · excludes liquidity reward payouts
           </p>
         </div>
-        {data?.lastTs != null && (
-          <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white/45"
-            style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
-            last fill {timeAgo(data.lastTs)} ago
-          </span>
-        )}
+        <div className="flex items-center gap-1.5">
+          {data?.tailTruncated && (
+            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold"
+              title="The live fill feed caps at ~3,500 recent fills — very active periods may be partially counted"
+              style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.25)', color: '#fbbf24' }}>
+              recent history partial
+            </span>
+          )}
+          {data != null && (data.freshFills ?? 0) > 0 && !data.tailTruncated && (
+            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold"
+              title="Includes maker fills from Polymarket's live feed — the archival subgraph lags behind"
+              style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.22)', color: '#34d399' }}>
+              +{(data.freshFills ?? 0).toLocaleString()} live fills
+            </span>
+          )}
+          {data?.lastTs != null && (
+            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white/45"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              last fill {timeAgo(data.lastTs)} ago
+            </span>
+          )}
+        </div>
       </div>
 
       {loading && (

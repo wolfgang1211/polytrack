@@ -157,7 +157,8 @@ export async function GET(req: NextRequest) {
       ? r2((snaps[snaps.length - 1].ts - snaps[0].ts) / 3_600_000)
       : 0;
 
-    const fills = await fetchRecentMakerFills(address, Math.floor(windowStart / 1000));
+    const fillsRes = await fetchRecentMakerFills(address, Math.floor(windowStart / 1000));
+    const fills = fillsRes?.fills ?? null;
 
     if (fills === null) {
       const body = empty('Fill feed (data-api) unreachable — try again shortly');

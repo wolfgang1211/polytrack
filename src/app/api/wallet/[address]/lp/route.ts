@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { fetchMakerGraphFills, type GraphFill } from '@/lib/graphFills';
+import { fetchRecentMakerFills } from '@/lib/dataApiFills';
 
 /* LP Earnings (LH-8) — how much a wallet actually earned by MAKING liquidity.
  *
@@ -37,6 +38,12 @@ export interface LpResponse {
   firstTs: number | null;
   lastTs: number | null;
   markets: LpMarketBreakdown[]; // top markets by maker volume
+  /** LH-D: maker fills appended from the live data-api feed (the orderbook
+   * subgraph stopped indexing ~2026-04-25). */
+  freshFills?: number;
+  /** True when the data-api's 3,500-row offset ceiling cut the fresh tail
+   * short — numbers are then a lower bound for the missing stretch. */
+  tailTruncated?: boolean;
 }
 
 const HEADERS = {
@@ -173,15 +180,36 @@ export async function GET(
   const { address } = await ctx.params;
   const apiKey = process.env.GRAPH_API_KEY;
 
-  if (!apiKey) {
-    return NextResponse.json(
-      { available: false, error: 'GRAPH_API_KEY not configured' },
-      { status: 200 }
-    );
-  }
-
   try {
-    const fills = await fetchMakerGraphFills(address, apiKey);
+    // Base: deep history from the subgraph — stale since ~2026-04-25.
+    const baseFills: GraphFill[] = apiKey
+      ? await fetchMakerGraphFills(address, apiKey).catch(() => [])
+      : [];
+
+    // LH-D: fresh tail from the data-api, starting right after the wallet's
+    // last subgraph fill (or from genesis when the subgraph has nothing).
+    // Shapes are converted to GraphFill so the replay below stays unchanged.
+    const baseLastTs = baseFills.reduce((m, f) => Math.max(m, Number(f.timestamp)), 0);
+    const tail = await fetchRecentMakerFills(address, baseLastTs + 1);
+    const tailFills: GraphFill[] = (tail?.fills ?? []).map((f, i) => ({
+      id: `dapi-${f.ts}-${f.tokenId}-${i}`,
+      timestamp: String(f.ts),
+      side: f.takerSide === 'BUY' ? 'Buy' : 'Sell', // stays taker-perspective
+      size: String(Math.round(f.shares * 1e6)),
+      price: String(f.price),
+      market: { id: f.tokenId },
+      maker: { id: address.toLowerCase() },
+      taker: { id: '' },
+    }));
+
+    if (!apiKey && tail === null) {
+      return NextResponse.json(
+        { available: false, error: 'No fill source available (GRAPH_API_KEY unset, data-api unreachable)' },
+        { status: 200 }
+      );
+    }
+
+    const fills = baseFills.concat(tailFills);
     const { byMarket, realized, makerVolume, buyVolume, sellVolume, firstTs, lastTs, counted } =
       replayMakerFills(fills);
 
@@ -214,6 +242,8 @@ export async function GET(
       firstTs,
       lastTs,
       markets,
+      freshFills: tailFills.length,
+      tailTruncated: Boolean(tail?.truncated),
     };
 
     return NextResponse.json(body, {

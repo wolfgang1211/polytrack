@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import type { RecentTrade } from '@/types';
 import { fetchAllGraphFills, type GraphFill } from '@/lib/graphFills';
+import { fetchRecentFills } from '@/lib/dataApiFills';
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -171,7 +172,18 @@ export async function GET(
   // ── Path 1: The Graph — no offset ceiling ──────────────────────────────
   if (apiKey && mode !== 'fast') {
     try {
-      const fills = await fetchAllGraphFills(address, apiKey);
+      const fills: Array<GraphFill & { isTaker: boolean }> = await fetchAllGraphFills(address, apiKey);
+
+      // LH-D: the subgraph stopped indexing ~2026-04-25. When this wallet's
+      // graph history looks stale, append a fresh both-role tail from the
+      // data-api (same GraphFill shape, same taker-perspective sides) so the
+      // curve doesn't silently end months in the past.
+      const lastTs = fills.reduce((m, f) => Math.max(m, Number(f.timestamp)), 0);
+      if (lastTs > 0 && lastTs * 1000 < Date.now() - 3 * 86_400_000) {
+        const tail = await fetchRecentFills(address, lastTs + 1);
+        if (tail?.fills.length) fills.push(...tail.fills);
+      }
+
       if (fills.length > 0) {
         const { points: rawPoints, realized } = replayGraphFills(fills);
         const series = downsample(rawPoints, 300);
