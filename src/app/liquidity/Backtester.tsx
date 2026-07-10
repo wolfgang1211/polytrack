@@ -21,12 +21,17 @@ const WINDOWS = [
 /* Below this coverage, annualising observed earnings is extrapolation noise
    (2% coverage → 50× multiplier), so the APR is de-emphasised as an estimate. */
 const APR_MIN_COVERAGE = 25;
+/* Even with decent coverage, triple-digit-plus APRs come from tiny pools or
+   brief liquidity vacuums that never persist for a year — flag them too. */
+const APR_ABSURD = 500;
 
 function AprCell({ apr, coveragePct }: { apr: number; coveragePct: number }) {
-  if (coveragePct < APR_MIN_COVERAGE) {
+  if (coveragePct < APR_MIN_COVERAGE || apr >= APR_ABSURD) {
+    const why = coveragePct < APR_MIN_COVERAGE
+      ? `Only ${coveragePct.toFixed(0)}% of this window was observed — annualised figure is a rough extrapolation`
+      : 'Rate this high reflects a brief low-competition window — it will not persist for a year';
     return (
-      <span className="text-right text-xs font-bold tabular-nums text-white/25"
-        title={`Only ${coveragePct.toFixed(0)}% of this window was observed — annualised figure is a rough extrapolation`}>
+      <span className="text-right text-xs font-bold tabular-nums text-white/25" title={why}>
         ~{apr >= 1000 ? '>999' : apr.toFixed(0)}%
       </span>
     );
@@ -169,7 +174,7 @@ export default function Backtester() {
                   </p>
                   <span className="text-xs font-black text-amber-300">
                     {formatCurrency(sel.earned)}
-                    {sel.coveragePct >= APR_MIN_COVERAGE && <> · {sel.effApr.toFixed(1)}% APR</>}
+                    {sel.coveragePct >= APR_MIN_COVERAGE && sel.effApr < APR_ABSURD && <> · {sel.effApr.toFixed(1)}% APR</>}
                   </span>
                 </div>
                 <ResponsiveContainer width="100%" height={180}>

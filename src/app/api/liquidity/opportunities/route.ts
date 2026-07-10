@@ -47,6 +47,7 @@ export interface LPOpportunity {
 }
 
 interface ClobBook {
+  asset_id?: string;
   bids: { price: string; size: string }[];
   asks: { price: string; size: string }[];
 }
@@ -124,20 +125,45 @@ export async function GET() {
       .sort((a, b) => (b.volume24hrNum ?? Number(b.volume24hr ?? 0)) - (a.volume24hrNum ?? Number(a.volume24hr ?? 0)))
       .slice(0, 40);
 
-    // 3 — Enrich the top candidates with live orderbook depth (best-effort).
-    //     Only the first 15 get a live book fetch to bound response latency;
-    //     the rest fall back to gamma's published top-of-book.
-    const BOOK_LIMIT = 15;
-    const books = await Promise.allSettled(
-      candidates.map((m, i) => {
-        if (i >= BOOK_LIMIT) return Promise.resolve<ClobBook | null>(null);
-        const tokenId = parseJson(m.clobTokenIds)[0];
-        return fetch(`${CLOB_BASE}/book?token_id=${tokenId}`, {
-          headers: { Accept: 'application/json' },
-          cache: 'no-store',
-        }).then(r => (r.ok ? (r.json() as Promise<ClobBook>) : null)).catch(() => null);
-      })
-    );
+    // 3 — Enrich ALL candidates with live orderbook depth. One batched
+    //     POST /books call covers every market (the old per-market GETs only
+    //     reached the top 15 by volume, leaving most cards "orderbook n/a");
+    //     per-market GETs remain as a fallback if the batch endpoint fails.
+    const candidateTokenIds = candidates.map(m => parseJson(m.clobTokenIds)[0] ?? '');
+    const booksById = new Map<string, ClobBook>();
+    try {
+      const res = await fetch(`${CLOB_BASE}/books`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(candidateTokenIds.filter(Boolean).map(token_id => ({ token_id }))),
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const arr = (await res.json()) as ClobBook[];
+        for (const b of Array.isArray(arr) ? arr : []) {
+          if (b?.asset_id) booksById.set(String(b.asset_id), b);
+        }
+      }
+    } catch { /* batch endpoint down — fall back below */ }
+
+    if (booksById.size === 0) {
+      const BOOK_LIMIT = 15;
+      const settled = await Promise.allSettled(
+        candidates.map((m, i) => {
+          if (i >= BOOK_LIMIT) return Promise.resolve<ClobBook | null>(null);
+          const tokenId = parseJson(m.clobTokenIds)[0];
+          return fetch(`${CLOB_BASE}/book?token_id=${tokenId}`, {
+            headers: { Accept: 'application/json' },
+            cache: 'no-store',
+          }).then(r => (r.ok ? (r.json() as Promise<ClobBook>) : null)).catch(() => null);
+        })
+      );
+      settled.forEach((r, i) => {
+        if (r.status === 'fulfilled' && r.value && candidateTokenIds[i]) {
+          booksById.set(candidateTokenIds[i], r.value);
+        }
+      });
+    }
 
     const opportunities: LPOpportunity[] = candidates.map((m, i) => {
       const vol24h    = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
@@ -162,8 +188,7 @@ export async function GET() {
       }
 
       // Layer in live orderbook depth when we have it.
-      const bookResult = books[i];
-      const book = bookResult.status === 'fulfilled' ? bookResult.value : null;
+      const book = booksById.get(tokenId) ?? null;
       const parsed = book ? fromBook(book) : null;
 
       let bidDepth: number | null = null;

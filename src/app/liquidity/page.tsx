@@ -239,8 +239,9 @@ function LPLeaderboardSection() {
       .then(r => r.json())
       .then(d => {
         if (Array.isArray(d)) {
-          // Sort by volume (highest vol = most active traders/LPs)
-          setTraders([...d].sort((a, b) => (b.vol ?? 0) - (a.vol ?? 0)));
+          // Sort by volume (highest vol = most active traders/LPs). Upstream
+          // sometimes returns P&L-only rows with zero volume — hide those.
+          setTraders(d.filter(t => (t.vol ?? 0) > 0).sort((a, b) => (b.vol ?? 0) - (a.vol ?? 0)));
         }
       })
       .catch(() => {})
