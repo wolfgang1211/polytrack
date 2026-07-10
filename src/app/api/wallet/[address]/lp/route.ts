@@ -219,10 +219,17 @@ export async function GET(
 
     const titles = await resolveTokenTitles(ranked.map(([id]) => id));
 
+    // Fallback metadata: data-api tail fills already carry title/outcome, so
+    // fresh tokens don't have to wait on (or fail with) gamma lookups.
+    const tailMeta = new Map<string, { title: string | null; outcome: string | null }>();
+    for (const f of tail?.fills ?? []) {
+      if (!tailMeta.has(f.tokenId)) tailMeta.set(f.tokenId, { title: f.title, outcome: f.outcome });
+    }
+
     const markets: LpMarketBreakdown[] = ranked.map(([id, m]) => ({
       id,
-      title: titles.get(id)?.title ?? null,
-      outcome: titles.get(id)?.outcome ?? null,
+      title: titles.get(id)?.title ?? tailMeta.get(id)?.title ?? null,
+      outcome: titles.get(id)?.outcome ?? tailMeta.get(id)?.outcome ?? null,
       realized: r2(m.realized),
       volume: r2(m.volume),
       fills: m.fills,
