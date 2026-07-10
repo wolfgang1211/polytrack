@@ -119,24 +119,27 @@ async function resolveConditionIds(ids: string[]): Promise<Map<string, GammaMark
         closed: typeof m.closed === 'boolean' ? m.closed : null,
       });
     } catch { /* gamma failed — CLOB fallback below */ }
+  }));
 
-    // Fallback: the CLOB API knows markets gamma no longer serves.
-    if (!out.has(id)) {
-      try {
-        const res = await fetch(`https://clob.polymarket.com/markets/${id}`,
-          { headers: G_HEADERS, next: { revalidate: 21600 } });
-        if (!res.ok) return;
-        const m = (await res.json()) as Record<string, unknown>;
-        if (typeof m?.question !== 'string') return;
-        out.set(id, {
-          question: m.question,
-          slug: typeof m.market_slug === 'string' ? m.market_slug : null,
-          eventSlug: undefined,
-          image: typeof m.icon === 'string' ? m.icon : undefined,
-          closed: typeof m.closed === 'boolean' ? m.closed : null,
-        });
-      } catch { /* unresolved — UI falls back to the condition id */ }
-    }
+  // Fallback sweep: the gamma branch early-returns on misses, so any id still
+  // unresolved gets a second chance via the CLOB API, which keeps serving
+  // markets gamma has dropped.
+  const missing = ids.filter(id => !out.has(id));
+  await Promise.all(missing.map(async (id) => {
+    try {
+      const res = await fetch(`https://clob.polymarket.com/markets/${id}`,
+        { headers: G_HEADERS, next: { revalidate: 21600 } });
+      if (!res.ok) return;
+      const m = (await res.json()) as Record<string, unknown>;
+      if (typeof m?.question !== 'string') return;
+      out.set(id, {
+        question: m.question,
+        slug: typeof m.market_slug === 'string' ? m.market_slug : null,
+        eventSlug: undefined,
+        image: typeof m.image === 'string' ? m.image : (typeof m.icon === 'string' ? m.icon : undefined),
+        closed: typeof m.closed === 'boolean' ? m.closed : null,
+      });
+    } catch { /* unresolved — UI falls back to the condition id */ }
   }));
   return out;
 }
