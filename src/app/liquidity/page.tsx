@@ -226,26 +226,36 @@ function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; load
    2) LP LEADERBOARD
 ════════════════════════════════════════════════════════════════ */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface LeaderboardRow {
+  proxyWallet: string;
+  userName?: string | null;
+  vol?: number;
+  pnl?: number;
+}
+
 function LPLeaderboardSection() {
   const [period, setPeriod] = useState<LPPeriod>('DAY');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [traders, setTraders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [traders, setTraders] = useState<LeaderboardRow[]>([]);
+  // Loading is derived (no sync setState in the effect): the fetch records
+  // which period it answered; anything else means "still loading".
+  const [loadedPeriod, setLoadedPeriod] = useState<LPPeriod | null>(null);
+  const loading = loadedPeriod !== period;
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     fetch(`/api/leaderboard?window=${period === 'DAY' ? '1d' : period === 'WEEK' ? '1w' : '1m'}&limit=20`)
       .then(r => r.json())
       .then(d => {
+        if (cancelled) return;
         if (Array.isArray(d)) {
           // Sort by volume (highest vol = most active traders/LPs). Upstream
           // sometimes returns P&L-only rows with zero volume — hide those.
-          setTraders(d.filter(t => (t.vol ?? 0) > 0).sort((a, b) => (b.vol ?? 0) - (a.vol ?? 0)));
+          setTraders((d as LeaderboardRow[]).filter(t => (t.vol ?? 0) > 0).sort((a, b) => (b.vol ?? 0) - (a.vol ?? 0)));
         }
+        setLoadedPeriod(period);
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setLoadedPeriod(period); });
+    return () => { cancelled = true; };
   }, [period]);
 
   const labels: Record<LPPeriod, string> = { DAY: '24H', WEEK: '1W', MONTH: '1M' };
@@ -353,23 +363,21 @@ function DepthBar({ levels, best, side, maxTotal }: {
 }
 
 function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
-  const [selected, setSelected] = useState<LPOpportunity | null>(null);
-  const [depth, setDepth]       = useState<MarketDepth | null>(null);
-  const [loading, setLoading]   = useState(false);
-
-  useEffect(() => {
-    if (opps.length > 0 && !selected) setSelected(opps[0]);
-  }, [opps, selected]);
+  // Derived default (no setState-in-effect): top opportunity until user picks.
+  const [choice, setChoice] = useState<LPOpportunity | null>(null);
+  const selected = choice ?? opps[0] ?? null;
+  // Depth is keyed by token, so loading/depth are derived, not set in effects.
+  const [fetched, setFetched] = useState<{ tokenId: string; depth: MarketDepth | null } | null>(null);
+  const depth = fetched && fetched.tokenId === selected?.tokenId ? fetched.depth : null;
+  const loading = Boolean(selected?.tokenId) && fetched?.tokenId !== selected?.tokenId;
 
   useEffect(() => {
     if (!selected?.tokenId) return;
-    setLoading(true);
-    setDepth(null);
-    fetch(`/api/liquidity/depth?tokenId=${selected.tokenId}`)
+    const tokenId = selected.tokenId;
+    fetch(`/api/liquidity/depth?tokenId=${tokenId}`)
       .then(r => r.json())
-      .then(d => setDepth(d))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .then(d => setFetched({ tokenId, depth: d }))
+      .catch(() => setFetched({ tokenId, depth: null }));
   }, [selected]);
 
   const maxTotal = Math.max(
@@ -396,7 +404,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
         opps.length > 0 ? (
           <select
             value={selected?.conditionId ?? ''}
-            onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+            onChange={e => setChoice(opps.find(o => o.conditionId === e.target.value) ?? null)}
             className="rounded-xl glass px-3 py-1.5 text-xs text-white/70 outline-none max-w-xs truncate"
             style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
@@ -534,12 +542,10 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
 const MAKER_REBATE_RATE = 0.001;
 
 function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
-  const [selected, setSelected] = useState<LPOpportunity | null>(null);
+  // Derived default (no setState-in-effect): top opportunity until user picks.
+  const [choice, setChoice] = useState<LPOpportunity | null>(null);
+  const selected = choice ?? opps[0] ?? null;
   const [amount, setAmount]     = useState('1000');
-
-  useEffect(() => {
-    if (opps.length > 0 && !selected) setSelected(opps[0]);
-  }, [opps, selected]);
 
   const amt = parseFloat(amount) || 0;
   const totalLiquidity = (selected?.liquidity ?? 0) || 10_000;
@@ -565,7 +571,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
             <label className="block text-xs font-semibold text-white/50 mb-2">Select Market</label>
             <select
               value={selected?.conditionId ?? ''}
-              onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+              onChange={e => setChoice(opps.find(o => o.conditionId === e.target.value) ?? null)}
               className="w-full rounded-xl glass px-4 py-2.5 text-xs text-white/75 outline-none"
               style={{ border: '1px solid rgba(255,255,255,0.1)' }}
             >
@@ -670,24 +676,25 @@ const PH_WINDOWS = [
 type PHWindow = typeof PH_WINDOWS[number]['key'];
 
 function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
-  const [selected, setSelected] = useState<LPOpportunity | null>(null);
+  // Derived default (no setState-in-effect): top opportunity until user picks.
+  const [choice, setChoice] = useState<LPOpportunity | null>(null);
+  const selected = choice ?? opps[0] ?? null;
   const [win, setWin]           = useState<PHWindow>('1w');
-  const [hist, setHist]         = useState<PriceHistory | null>(null);
-  const [loading, setLoading]   = useState(false);
-  const [err, setErr]           = useState(false);
+  // History is keyed by token+window, so loading/err/hist are all derived.
+  const [fetched, setFetched]   = useState<{ key: string; hist: PriceHistory | null } | null>(null);
 
-  useEffect(() => {
-    if (opps.length > 0 && !selected) setSelected(opps[0]);
-  }, [opps, selected]);
+  const key = selected?.tokenId ? `${selected.tokenId}|${win}` : null;
+  const hist = fetched && fetched.key === key ? fetched.hist : null;
+  const loading = key != null && fetched?.key !== key;
+  const err = fetched != null && fetched.key === key && fetched.hist === null;
 
   useEffect(() => {
     if (!selected?.tokenId) return;
-    setLoading(true); setErr(false); setHist(null);
+    const k = `${selected.tokenId}|${win}`;
     fetch(`/api/liquidity/price-history?tokenId=${selected.tokenId}&interval=${win}`)
       .then(r => r.json())
-      .then(d => { if (d?.points) setHist(d); else setErr(true); })
-      .catch(() => setErr(true))
-      .finally(() => setLoading(false));
+      .then(d => setFetched({ key: k, hist: d?.points ? (d as PriceHistory) : null }))
+      .catch(() => setFetched({ key: k, hist: null }));
   }, [selected, win]);
 
   const data = useMemo(
@@ -721,7 +728,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
         {opps.length > 0 && (
           <select
             value={selected?.conditionId ?? ''}
-            onChange={e => setSelected(opps.find(o => o.conditionId === e.target.value) ?? null)}
+            onChange={e => setChoice(opps.find(o => o.conditionId === e.target.value) ?? null)}
             className="mb-3 w-full max-w-sm rounded-xl glass px-3 py-2 text-xs text-white/75 outline-none truncate"
             style={{ border: '1px solid rgba(255,255,255,0.1)' }}
           >
@@ -806,14 +813,12 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
 
 function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
   const [amount, setAmount] = useState('1000');
-  const [picked, setPicked] = useState<string[]>([]);
-
-  // Default-select the top 3 opportunities once they load.
-  useEffect(() => {
-    if (opps.length > 0 && picked.length === 0) {
-      setPicked(opps.slice(0, 3).map(o => o.conditionId));
-    }
-  }, [opps, picked.length]);
+  // Default = top 3 opportunities; becomes user-controlled after any toggle.
+  const [pickedState, setPicked] = useState<string[] | null>(null);
+  const picked = useMemo(
+    () => pickedState ?? opps.slice(0, 3).map(o => o.conditionId),
+    [pickedState, opps],
+  );
 
   const amt = parseFloat(amount) || 0;
 
@@ -839,7 +844,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
   const best = rows[0];
 
   function toggle(id: string) {
-    setPicked(p => p.includes(id) ? p.filter(x => x !== id) : [...p, id]);
+    setPicked(picked.includes(id) ? picked.filter(x => x !== id) : [...picked, id]);
   }
 
   return (
@@ -899,7 +904,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                 <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-white/30 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
               ))}
             </div>
-            {rows.map(({ o, yourShare, dailyReward, monthly, apr }, i) => {
+            {rows.map(({ o, yourShare, dailyReward, monthly, apr }) => {
               const isBest = best && o.conditionId === best.o.conditionId;
               return (
                 <div key={o.conditionId} className="grid grid-cols-[1fr_90px_90px_100px_80px] px-4 py-3 items-center"
@@ -968,10 +973,12 @@ export default function LiquidityPage() {
   const [opps, setOpps]     = useState<LPOpportunity[]>([]);
   const [oppsLoading, setOppsLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<number | null>(null);
-  const [now, setNow] = useState(Date.now());
+  // null until the first 1s tick — Date.now() during render is impure.
+  const [now, setNow] = useState<number | null>(null);
 
+  // No sync setState here (react-hooks/set-state-in-effect): initial loading
+  // starts true, and the manual Refresh button re-arms it in its handler.
   const loadOpps = useCallback(() => {
-    setOppsLoading(true);
     fetch('/api/liquidity/opportunities')
       .then(r => r.json())
       .then(d => {
@@ -993,7 +1000,7 @@ export default function LiquidityPage() {
     return () => { clearInterval(refresh); clearInterval(tick); };
   }, [loadOpps]);
 
-  const agoSec = updatedAt ? Math.max(0, Math.floor((now - updatedAt) / 1000)) : null;
+  const agoSec = updatedAt != null && now != null ? Math.max(0, Math.floor((now - updatedAt) / 1000)) : null;
 
   return (
     <div className="flex flex-col gap-8">
@@ -1017,7 +1024,7 @@ export default function LiquidityPage() {
           <span className="text-[11px] text-white/30">
             {agoSec == null ? 'Loading…' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
           </span>
-          <button onClick={loadOpps}
+          <button onClick={() => { setOppsLoading(true); loadOpps(); }}
             className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-white/50 transition-colors hover:text-white"
             style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <svg className={`h-3 w-3 ${oppsLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
