@@ -93,6 +93,44 @@ async function resolveTokenTitles(ids: string[]): Promise<Map<string, GammaToken
   return out;
 }
 
+interface ClobTokenInfo { title: string | null; outcome: string | null }
+
+/** Second sweep (mirrors the backtest fallback): tokens gamma has dropped are
+ * resolved via the CLOB API, which keeps serving delisted markets. Needs the
+ * conditionId carried by maker-query subgraph fills / data-api tail fills. */
+async function resolveViaClob(
+  entries: Array<{ tokenId: string; conditionId: string }>,
+): Promise<Map<string, ClobTokenInfo>> {
+  const out = new Map<string, ClobTokenInfo>();
+
+  const byCondition = new Map<string, string[]>();
+  for (const e of entries) {
+    const list = byCondition.get(e.conditionId) ?? [];
+    list.push(e.tokenId);
+    byCondition.set(e.conditionId, list);
+  }
+
+  await Promise.all([...byCondition.entries()].map(async ([conditionId, tokenIds]) => {
+    try {
+      const res = await fetch(`https://clob.polymarket.com/markets/${conditionId}`,
+        { headers: HEADERS, next: { revalidate: 86400 } });
+      if (!res.ok) return;
+      const m = (await res.json()) as Record<string, unknown>;
+      if (typeof m?.question !== 'string') return;
+      const tokens = Array.isArray(m.tokens) ? (m.tokens as Array<Record<string, unknown>>) : [];
+      for (const id of tokenIds) {
+        const tok = tokens.find(t => String(t.token_id) === id);
+        out.set(id, {
+          title: m.question as string,
+          outcome: tok && typeof tok.outcome === 'string' ? tok.outcome : null,
+        });
+      }
+    } catch { /* unresolved — UI falls back to the token id */ }
+  }));
+
+  return out;
+}
+
 interface MarketAgg {
   realized: number;
   volume: number;
@@ -237,6 +275,29 @@ export async function GET(
       invCost: r2(m.cost),
       lastTs: m.lastTs,
     }));
+
+    // Second sweep (backtest pattern): ranked tokens still unnamed after the
+    // gamma + tail-metadata passes get a CLOB lookup via their conditionId.
+    const conditionByToken = new Map<string, string>();
+    for (const f of baseFills) {
+      const c = f.market.condition?.id;
+      if (c && !conditionByToken.has(f.market.id)) conditionByToken.set(f.market.id, c);
+    }
+    for (const f of tail?.fills ?? []) {
+      if (!conditionByToken.has(f.tokenId)) conditionByToken.set(f.tokenId, f.conditionId);
+    }
+    const unnamed = markets.filter(m => m.title == null && conditionByToken.has(m.id));
+    if (unnamed.length) {
+      const clobMeta = await resolveViaClob(
+        unnamed.map(m => ({ tokenId: m.id, conditionId: conditionByToken.get(m.id) as string }))
+      );
+      for (const m of unnamed) {
+        const info = clobMeta.get(m.id);
+        if (!info) continue;
+        m.title = info.title;
+        m.outcome = m.outcome ?? info.outcome;
+      }
+    }
 
     const body: LpResponse = {
       available: true,

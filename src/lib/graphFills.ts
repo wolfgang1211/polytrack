@@ -13,7 +13,9 @@ export interface GraphFill {
   side: string;        // 'Buy' | 'Sell' — from taker's perspective
   size: string;        // micro-shares (÷ 1e6)
   price: string;       // decimal 0-1
-  market: { id: string };
+  /** `condition`/`outcomeIndex` only arrive on maker-query fills (LP route)
+   * — they feed the CLOB title fallback for tokens gamma has dropped. */
+  market: { id: string; condition?: { id: string }; outcomeIndex?: string };
   maker: { id: string };
   taker: { id: string };
 }
@@ -48,7 +50,7 @@ export const MAKER_QUERY = `
       orderDirection: asc
     ) {
       id timestamp side size price
-      market { id }
+      market { id condition { id } outcomeIndex }
       maker { id }
       taker { id }
     }
