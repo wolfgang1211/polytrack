@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const cutoff = Date.now() - hours * 3_600_000;
-    const snapshotsNewestFirst = await readLpSnapshots(1000);
+    const snapshotsNewestFirst = await readLpSnapshots(1100);
     const snaps = snapshotsNewestFirst
       .filter(s => s.ts >= cutoff)
       .sort((a, b) => a.ts - b.ts);

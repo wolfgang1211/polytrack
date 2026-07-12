@@ -60,7 +60,7 @@ export async function GET() {
   }
 
   try {
-    const snapsNewestFirst = await readLpSnapshots(1000);
+    const snapsNewestFirst = await readLpSnapshots(1100);
     if (snapsNewestFirst.length === 0) {
       return NextResponse.json(empty('empty', true));
     }

@@ -155,7 +155,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const [snapshotsNewestFirst, { farms }] = await Promise.all([
-      readLpSnapshots(1000),
+      readLpSnapshots(1100),
       scanRewardFarms().catch(() => ({ farms: [], scanned: 0 })),
     ]);
 
