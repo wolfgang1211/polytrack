@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
+import LanguageProvider from '@/components/LanguageProvider';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -63,8 +64,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} ${serifFont.variable} h-full`}>
-      <body className="min-h-full antialiased overflow-x-hidden">
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} ${serifFont.variable} h-full`}>
+      <body className="min-h-full w-full min-w-0 antialiased">
         {/* Fixed background — dot grid + ambient orbs */}
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none" aria-hidden>
           {/* Dot grid */}
@@ -100,15 +101,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }}
           />
         </div>
-        <Navbar />
+        <LanguageProvider>
+          <Navbar />
           {/* 1px violet scan-line beneath navbar */}
           <div className="h-px w-full pointer-events-none"
             style={{ background: 'linear-gradient(90deg,transparent 0%,var(--vi-border-xs) 20%,var(--vi-border-xs) 80%,transparent 100%)' }} />
-          <main className="mx-auto max-w-7xl px-3 py-5 sm:px-4 sm:py-8">
+          <main className="mx-auto w-full min-w-0 max-w-7xl px-3 py-5 sm:px-4 sm:py-8">
             <Breadcrumb />
             {children}
           </main>
           <Footer />
+        </LanguageProvider>
         <Script id="jsonld-org" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <Script id="jsonld-home" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
       </body>

@@ -4,18 +4,26 @@ import { useEffect, useState } from 'react';
 import { formatCurrency } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import type { HotMarket } from '@/app/api/markets/hot/route';
+import { useLanguage } from '@/components/LanguageProvider';
+import type { Locale } from '@/lib/i18n';
 
 const PERIODS = ['1H', '6H', '12H', '24H'] as const;
 type Period = typeof PERIODS[number];
 
-function timeAgo(ts: number): string {
+function timeAgo(ts: number, locale: Locale): string {
   const diff = Math.floor(Date.now() / 1000) - ts;
+  if (locale === 'tr') {
+    if (diff < 60)   return `${diff} sn önce`;
+    if (diff < 3600) return `${Math.floor(diff / 60)} dk önce`;
+    return `${Math.floor(diff / 3600)} sa önce`;
+  }
   if (diff < 60)   return `${diff}s ago`;
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   return `${Math.floor(diff / 3600)}h ago`;
 }
 
 function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
+  const { locale, t } = useLanguage();
   const href = marketUrl(market.eventSlug, market.slug);
 
   return (
@@ -53,7 +61,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
         className="flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black tabular-nums"
         style={{ background: 'rgba(251,191,36,0.12)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.2)' }}
       >
-        {market.tradeCount} trades
+        {market.tradeCount} {t('common.trades')}
       </span>
 
       {/* Volume */}
@@ -63,7 +71,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
 
       {/* Last trade */}
       <span className="flex-shrink-0 text-[10px] text-white/20 w-12 text-right hidden sm:block">
-        {timeAgo(market.lastTrade)}
+        {timeAgo(market.lastTrade, locale)}
       </span>
     </a>
   );
@@ -73,6 +81,7 @@ export default function HotBets() {
   const [period, setPeriod] = useState<Period>('24H');
   const [markets, setMarkets] = useState<HotMarket[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setLoading(true);
@@ -93,7 +102,7 @@ export default function HotBets() {
           <span className="inline-block h-1 w-6 rounded-full"
             style={{ background: 'linear-gradient(90deg,#f59e0b,#ef4444)' }} />
           <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
-            Hot Bets
+            {t('common.hotBets')}
           </h2>
           <span className="text-base leading-none">🔥</span>
         </div>
@@ -123,10 +132,10 @@ export default function HotBets() {
           style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
           <span className="w-5" />
           <span className="w-7" />
-          <span className="flex-1 text-[10px] uppercase tracking-widest text-white/20 font-semibold">Market</span>
-          <span className="text-[10px] uppercase tracking-widest text-white/20 font-semibold">Trades</span>
-          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold">Vol</span>
-          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold hidden sm:block">Last</span>
+          <span className="flex-1 text-[10px] uppercase tracking-widest text-white/20 font-semibold">{t('common.market')}</span>
+          <span className="text-[10px] uppercase tracking-widest text-white/20 font-semibold">{t('common.trades')}</span>
+          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold">{t('common.vol')}</span>
+          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold hidden sm:block">{t('common.last')}</span>
         </div>
 
         {loading ? (

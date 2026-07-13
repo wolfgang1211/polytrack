@@ -3,21 +3,24 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatCurrency, formatAddress } from '@/lib/utils';
+import { useLanguage } from '@/components/LanguageProvider';
 
 interface LbEntry { proxyWallet: string; userName?: string | null; profileImage?: string | null; pnl: number }
 
 export default function SmartMoneyCard() {
   const [rows, setRows] = useState<LbEntry[] | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetch('/api/leaderboard?window=allTime&limit=4')
       .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setRows(d.slice(0, 4)); })
-      .catch(() => {});
+      .then(d => { if (Array.isArray(d)) setRows(d.slice(0, 4)); else setRows([]); })
+      .catch(() => setRows([]));
   }, []);
 
   return (
-    <div className="w-full rounded-xl overflow-hidden"
+    <div className="w-full min-w-0 max-w-full rounded-xl overflow-hidden"
+      aria-busy={rows === null}
       style={{ border: '1px solid var(--vi-border)', background: 'rgba(255,255,255,0.015)' }}>
 
       {/* Terminal header */}
@@ -26,24 +29,32 @@ export default function SmartMoneyCard() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            Smart Money
+            {t('common.smartMoney')}
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>All-Time</span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>{t('common.allTime')}</span>
           <Link href="/leaderboard"
             className="font-mono text-[9px] uppercase tracking-[0.12em] text-violet-400 hover:text-violet-300 transition-colors">
-            View All →
+            {t('common.viewAll')}
           </Link>
         </div>
       </div>
 
-      <div className="flex flex-col">
-        {(rows ?? Array.from({ length: 4 })).map((e, i) => {
+      <div className="flex flex-col" data-testid={rows === null ? 'smart-money-loading' : undefined}>
+        {rows?.length === 0 ? (
+          <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-white/30">
+            {t('common.dataUnavailable')}
+          </div>
+        ) : (rows ?? Array.from({ length: 4 })).map((e, i) => {
           const entry = e as LbEntry | undefined;
           if (!entry) return (
-            <div key={i} className="h-11 animate-shimmer"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }} />
+            <div key={i} className="flex h-11 items-center gap-3 px-4"
+              style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              <span className="h-3 w-5 rounded animate-shimmer" />
+              <span className="h-3 min-w-0 flex-1 rounded animate-shimmer" />
+              <span className="h-3 w-16 rounded animate-shimmer" />
+            </div>
           );
           const name     = entry.userName || formatAddress(entry.proxyWallet);
           const isProfit = entry.pnl >= 0;

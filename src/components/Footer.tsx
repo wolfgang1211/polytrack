@@ -1,26 +1,30 @@
+'use client';
+
 import Link from 'next/link';
 import Logo from '@/components/Logo';
+import { useLanguage } from '@/components/LanguageProvider';
 
 const PRODUCT_LINKS = [
-  { href: '/worldcup',    label: 'World Cup' },
-  { href: '/leaderboard', label: 'Leaderboard' },
-  { href: '/markets',     label: 'Markets' },
-  { href: '/activity',    label: 'Activity' },
-  { href: '/liquidity',   label: 'Liquidity Hub' },
-  { href: '/insights',    label: 'Insights' },
-  { href: '/checker',     label: 'Wallet Checker' },
-  { href: '/compare',     label: 'Compare Traders' },
+  { href: '/worldcup',    labelKey: 'breadcrumb.worldcup' },
+  { href: '/leaderboard', labelKey: 'breadcrumb.leaderboard' },
+  { href: '/markets',     labelKey: 'breadcrumb.markets' },
+  { href: '/activity',    labelKey: 'breadcrumb.activity' },
+  { href: '/liquidity',   labelKey: 'footer.liquidityHub' },
+  { href: '/insights',    labelKey: 'breadcrumb.insights' },
+  { href: '/checker',     labelKey: 'breadcrumb.checker' },
+  { href: '/compare',     labelKey: 'breadcrumb.compare' },
 ];
 
 const LEGAL_LINKS = [
-  { href: '/privacy',    label: 'Privacy Policy' },
-  { href: '/terms',      label: 'Terms of Service' },
-  { href: '/disclaimer', label: 'Disclaimer' },
-  { href: '/about',      label: 'About' },
+  { href: '/privacy',    labelKey: 'footer.privacyPolicy' },
+  { href: '/terms',      labelKey: 'footer.termsOfService' },
+  { href: '/disclaimer', labelKey: 'breadcrumb.disclaimer' },
+  { href: '/about',      labelKey: 'breadcrumb.about' },
 ];
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="mt-20 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
@@ -37,12 +41,11 @@ export default function Footer() {
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
-                <span className="text-[9px] text-white/35 font-medium tracking-widest uppercase">Analytics</span>
+                <span className="text-[9px] text-white/35 font-medium tracking-widest uppercase">{t('brand.analytics')}</span>
               </div>
             </Link>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-white/30">
-              Real-time analytics and leaderboard for Polymarket. Track top traders,
-              monitor wallets and discover alpha, all in one place.
+              {t('footer.description')}
             </p>
             <div className="mt-5">
               <a
@@ -61,12 +64,12 @@ export default function Footer() {
 
           {/* Product */}
           <div>
-            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-4">Product</h3>
+            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-4">{t('footer.product')}</h3>
             <ul className="space-y-2">
-              {PRODUCT_LINKS.map(({ href, label }) => (
+              {PRODUCT_LINKS.map(({ href, labelKey }) => (
                 <li key={href}>
                   <Link href={href} className="text-xs text-white/30 transition-colors hover:text-white/60">
-                    {label}
+                    {t(labelKey)}
                   </Link>
                 </li>
               ))}
@@ -75,12 +78,12 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-4">Legal</h3>
+            <h3 className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-4">{t('footer.legal')}</h3>
             <ul className="space-y-2">
-              {LEGAL_LINKS.map(({ href, label }) => (
+              {LEGAL_LINKS.map(({ href, labelKey }) => (
                 <li key={href}>
                   <Link href={href} className="text-xs text-white/30 transition-colors hover:text-white/60">
-                    {label}
+                    {t(labelKey)}
                   </Link>
                 </li>
               ))}
@@ -92,12 +95,12 @@ export default function Footer() {
 
         <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
           <p className="text-[11px] text-white/20">
-            &copy; {year} AlphaBoard. All rights reserved.
+            &copy; {year} AlphaBoard. {t('footer.allRightsReserved')}
           </p>
           <p className="text-[10px] text-white/15 sm:text-right max-w-sm">
-            Independent analytics tool. Not affiliated with Polymarket. Not financial advice.{' '}
+            {t('footer.disclaimerPrefix')}{' '}
             <Link href="/disclaimer" className="underline underline-offset-2 hover:text-white/35 transition-colors">
-              Disclaimer
+              {t('footer.disclaimerLink')}
             </Link>
           </p>
         </div>

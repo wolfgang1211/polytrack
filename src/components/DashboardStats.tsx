@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatCurrency } from '@/lib/utils';
 import type { OverviewStats } from '@/app/api/stats/overview/route';
+import { useLanguage } from '@/components/LanguageProvider';
 
 const CAT_COLOR: Record<string, string> = {
   Crypto:        '#fbbf24',
@@ -18,7 +19,7 @@ function DataCell({ label, value, sub, accent, loading }: {
   label: string; value: string; sub?: string; accent?: string; loading: boolean;
 }) {
   return (
-    <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[130px]">
+    <div className="flex min-w-0 flex-col justify-center px-3 py-4 sm:px-5">
       <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
         {label}
       </p>
@@ -40,6 +41,7 @@ function DataCell({ label, value, sub, accent, loading }: {
 export default function DashboardStats() {
   const [stats, setStats]     = useState<OverviewStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     fetch('/api/stats/overview')
@@ -50,48 +52,28 @@ export default function DashboardStats() {
   }, []);
 
   const catColor = stats ? (CAT_COLOR[stats.topCategory] ?? '#94a3b8') : '#94a3b8';
+  const categoryLabel = stats ? t(`categories.${stats.topCategory}`, stats.topCategory) : '—';
 
   return (
-    <div className="flex animate-fade-in-up overflow-x-auto"
+    <div data-testid="dashboard-stats" className="grid min-w-0 grid-cols-2 overflow-hidden animate-fade-in-up sm:grid-cols-4"
       style={{
         background: 'rgba(255,255,255,0.02)',
         borderTop: '1px solid rgba(255,255,255,0.07)',
         borderBottom: '1px solid rgba(255,255,255,0.07)',
       }}>
 
-      <DataCell
-        label="Active Markets"
-        value={loading ? '—' : `${stats?.activeMarkets ?? 0}+`}
-        loading={loading}
-      />
-
-      <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-
-      <DataCell
-        label="24h Volume"
-        value={loading ? '—' : formatCurrency(stats?.volume24h ?? 0, true)}
-        accent="rgba(139,92,246,0.95)"
-        loading={loading}
-      />
-
-      <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-
-      <DataCell
-        label="Trades (1h)"
-        value={loading ? '—' : String(stats?.trades1h ?? 0)}
-        accent="rgba(251,191,36,0.88)"
-        loading={loading}
-      />
-
-      <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-
-      <DataCell
-        label="Top Category"
-        value={loading ? '—' : (stats?.topCategory ?? '—')}
-        sub={stats ? `${stats.topCategoryCount} trades` : undefined}
-        accent={catColor}
-        loading={loading}
-      />
+      <div className="min-w-0 border-b border-r sm:border-b-0" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <DataCell label={t('common.activeMarkets')} value={stats ? `${stats.activeMarkets}+` : '—'} loading={loading} />
+      </div>
+      <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <DataCell label={t('common.volume24h')} value={stats ? formatCurrency(stats.volume24h, true) : '—'} accent="rgba(139,92,246,0.95)" loading={loading} />
+      </div>
+      <div className="min-w-0 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+        <DataCell label={t('common.trades1h')} value={stats ? String(stats.trades1h) : '—'} accent="rgba(251,191,36,0.88)" loading={loading} />
+      </div>
+      <div className="min-w-0">
+        <DataCell label={t('common.topCategory')} value={loading ? '—' : categoryLabel} sub={stats ? `${stats.topCategoryCount} ${t('common.trades')}` : undefined} accent={catColor} loading={loading} />
+      </div>
     </div>
   );
 }

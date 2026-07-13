@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import WalletSearch from '@/components/WalletSearch';
+import { useLanguage } from '@/components/LanguageProvider';
 
 export default function WalletCheckerPage() {
   const [showExplainers, setShowExplainers] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <div className="flex flex-col gap-4">
@@ -18,10 +20,10 @@ export default function WalletCheckerPage() {
             <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket</span>
           </div>
           <h1 className="text-2xl font-black leading-none tracking-tight">
-            <span className="text-white">Wallet </span><span className="text-grad">Checker</span>
+            <span className="text-white">{t('checker.titlePrefix')} </span><span className="text-grad">{t('checker.titleAccent')}</span>
           </h1>
           <p className="mt-1 text-xs text-white/35">
-            Enter any EVM address to view P&amp;L, win rate, positions and full trade history.
+            {t('checker.subtitle')}
           </p>
         </div>
       </div>
@@ -43,7 +45,7 @@ export default function WalletCheckerPage() {
           >
             ?
           </span>
-          How to read these metrics
+          {t('checker.explainerToggle')}
           <svg
             className="h-3 w-3 transition-transform duration-200"
             style={{ transform: showExplainers ? 'rotate(180deg)' : 'rotate(0deg)' }}
@@ -56,17 +58,15 @@ export default function WalletCheckerPage() {
         {showExplainers && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
             <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
-              <p className="text-xs font-bold text-white/70 mb-1.5">What does P&amp;L mean?</p>
+              <p className="text-xs font-bold text-white/70 mb-1.5">{t('checker.pnlTitle')}</p>
               <p className="text-[11px] leading-relaxed text-white/35">
-                Net profit or loss from all Polymarket activity: realized gains from closed positions plus
-                unrealized mark-to-market on open ones. Read it alongside volume and position count.
+                {t('checker.pnlDescription')}
               </p>
             </div>
             <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
-              <p className="text-xs font-bold text-white/70 mb-1.5">How to read win rate</p>
+              <p className="text-xs font-bold text-white/70 mb-1.5">{t('checker.winRateTitle')}</p>
               <p className="text-[11px] leading-relaxed text-white/35">
-                Share of resolved positions that finished profitably. On its own it&apos;s not enough;
-                position size, odds paid and total P&amp;L together determine whether a strategy works.
+                {t('checker.winRateDescription')}
               </p>
             </div>
           </div>

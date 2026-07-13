@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { RecentTrade } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
+import { useLanguage } from '@/components/LanguageProvider';
 
 const REFRESH_MS = 15_000;
 const WHALE = 10_000;
@@ -24,6 +25,7 @@ function usdcSize(t: RecentTrade): number {
 }
 
 function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: boolean; maxAmount: number }) {
+  const { t } = useLanguage();
   const amount  = usdcSize(trade);
   const isBuy   = (trade.side ?? '').toUpperCase() === 'BUY';
   const ts      = trade.timestamp ?? trade.createdAt;
@@ -34,7 +36,7 @@ function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: bool
   const barPct  = maxAmount > 0 ? Math.min((amount / maxAmount) * 100, 100) : 0;
 
   return (
-    <div className={`group relative flex items-center gap-2 py-1.5 pl-3 pr-2 rounded-md transition-colors hover:bg-white/[0.03] ${fresh ? 'animate-flash' : 'animate-fade-in'}`}>
+    <div className={`group relative flex min-w-0 items-center gap-2 py-1.5 pl-3 pr-2 rounded-md transition-colors hover:bg-white/[0.03] ${fresh ? 'animate-flash' : 'animate-fade-in'}`}>
       {/* side strip */}
       <span className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: accent }} />
 
@@ -45,12 +47,12 @@ function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: bool
       {/* BUY / SELL badge */}
       <span className="relative flex-shrink-0 font-mono text-[9px] font-black uppercase w-9 text-center rounded px-1 py-0.5"
         style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}38` }}>
-        {isBuy ? 'BUY' : 'SELL'}
+        {isBuy ? t('common.buy').toUpperCase() : t('common.sell').toUpperCase()}
       </span>
 
       {/* Amount */}
       <span className="relative flex-shrink-0 flex items-center gap-1 w-[76px] justify-end text-right">
-        {isWhale && <span title="Whale" className="text-[10px]">🐋</span>}
+        {isWhale && <span title={t('common.whale')} className="text-[10px]">🐋</span>}
         <span className={`font-mono text-xs font-black tabular-nums ${isWhale ? 'text-grad' : ''}`}
           style={{ color: isWhale ? undefined : 'rgba(255,255,255,0.88)' }}>
           {formatCurrency(amount, true)}
@@ -85,6 +87,7 @@ export default function RecentBigTrades() {
   const [freshIds, setFreshIds]     = useState<Set<string>>(new Set());
   const seen       = useRef<Set<string>>(new Set());
   const firstLoad  = useRef(true);
+  const { t } = useLanguage();
 
   const keyOf = (t: RecentTrade, i: number) =>
     String(t.id ?? `${t.proxyWallet ?? ''}-${t.timestamp ?? t.createdAt ?? ''}-${i}`);
@@ -124,7 +127,7 @@ export default function RecentBigTrades() {
   const maxAmount = trades.reduce((m, t) => Math.max(m, usdcSize(t)), 0);
 
   return (
-    <section className="flex flex-col animate-fade-in-up" style={{ animationDelay: '150ms' }}>
+    <section className="flex min-w-0 max-w-full flex-col animate-fade-in-up" style={{ animationDelay: '150ms' }}>
 
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
@@ -132,10 +135,10 @@ export default function RecentBigTrades() {
           <span className="flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-bold"
             style={{ background: 'rgba(52,211,153,0.10)', color: '#34d399', border: '1px solid rgba(52,211,153,0.20)' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            Live
+            {t('common.live')}
           </span>
           <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Activity {belowThreshold ? '' : <span style={{ color: 'rgba(255,255,255,0.20)' }}>$1K+</span>}
+            {t('common.activity')} {belowThreshold ? '' : <span style={{ color: 'rgba(255,255,255,0.20)' }}>$1K+</span>}
           </span>
         </div>
         {lastUpdate && (
@@ -156,7 +159,7 @@ export default function RecentBigTrades() {
         ) : trades.length === 0 ? (
           <div className="py-10 text-center">
             <p className="text-2xl mb-2">📭</p>
-            <p className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.22)' }}>No recent trades</p>
+            <p className="font-mono text-[11px]" style={{ color: 'rgba(255,255,255,0.22)' }}>{t('common.noRecentTrades')}</p>
           </div>
         ) : (
           <div className="max-h-[400px] overflow-y-auto p-1.5">

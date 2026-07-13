@@ -7,6 +7,7 @@ import HotBets from '@/components/HotBets';
 import RecentBigTrades from '@/components/RecentBigTrades';
 import RisingTraders from '@/components/RisingTraders';
 import LiveTicker from '@/components/LiveTicker';
+import { useLanguage } from '@/components/LanguageProvider';
 
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
@@ -20,33 +21,36 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 }
 
 export default function DashboardPage() {
+  const { t } = useLanguage();
+
   return (
-    <div className="flex flex-col gap-8 sm:gap-10">
+    <div className="flex w-full min-w-0 max-w-full flex-col gap-8 sm:gap-10">
 
       {/* ── Live trade ticker ── */}
       <LiveTicker />
 
       {/* ── [01] Hero ── */}
-      <div className="animate-fade-in-up">
+      <div className="min-w-0 animate-fade-in-up">
         <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>[01]</span>
           <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.22)' }}>Terminal Intelligence</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.22)' }}>{t('home.terminalIntelligence')}</span>
         </div>
 
-        <div className="grid gap-6 sm:gap-10 lg:grid-cols-[1fr_minmax(280px,340px)] lg:items-start">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start">
+          <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <h1
               className="text-3xl font-black leading-[1.12] sm:text-4xl lg:text-5xl"
               style={{ fontFamily: 'var(--font-serif-display, Georgia, serif)' }}
             >
-              <span className="text-white">Real time</span>
-              {' '}
-              <span className="text-grad">alpha</span>
-              <span className="text-white"> from the best</span>
+              <span className="text-white">{t('home.hero.realTime')}</span>
+              <br className="sm:hidden" />
+              <span className="hidden sm:inline"> </span>
+              <span className="text-grad">{t('home.hero.alpha')}</span>
+              <span className="text-white"> {t('home.hero.fromTheBest')}</span>
             </h1>
             <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed sm:mt-5" style={{ color: 'rgba(255,255,255,0.46)' }}>
-              Discover, follow and copy the most profitable traders on Polymarket in real time.
+              {t('home.hero.subtitle')}
             </p>
           </div>
           <SmartMoneyCard />
@@ -54,31 +58,31 @@ export default function DashboardPage() {
       </div>
 
       {/* ── [02] Platform Stats ── */}
-      <div>
-        <SectionHeader index="[02]" label="Platform Stats" />
+      <div className="min-w-0">
+        <SectionHeader index="[02]" label={t('home.sections.platformStats')} />
         <DashboardStats />
       </div>
 
       {/* ── [03] Live Feed + Rising Traders ── */}
-      <div>
-        <SectionHeader index="[03]" label="Live Feed" />
-        <div className="grid gap-5 lg:grid-cols-[1fr_360px] items-start">
+      <div className="min-w-0">
+        <SectionHeader index="[03]" label={t('home.sections.liveFeed')} />
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
           <RecentBigTrades />
-          <div className="lg:sticky lg:top-4">
+          <div className="min-w-0 lg:sticky lg:top-4">
             <RisingTraders />
           </div>
         </div>
       </div>
 
       {/* ── [04] Top Markets ── */}
-      <div>
-        <SectionHeader index="[04]" label="Top Markets" />
+      <div className="min-w-0">
+        <SectionHeader index="[04]" label={t('home.sections.topMarkets')} />
         <TopMarkets limit={12} showViewAll />
       </div>
 
       {/* ── [05] Hot Bets ── */}
-      <div>
-        <SectionHeader index="[05]" label="Hot Bets" />
+      <div className="min-w-0">
+        <SectionHeader index="[05]" label={t('home.sections.hotBets')} />
         <HotBets />
       </div>
 
