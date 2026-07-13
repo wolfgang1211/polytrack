@@ -1,50 +1,42 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useLanguage } from '@/components/LanguageProvider';
 
-const BREADCRUMB_KEYS: Record<string, string> = {
-  '/': 'breadcrumb.home',
-  '/worldcup': 'breadcrumb.worldcup',
-  '/world-cup': 'breadcrumb.worldcup',
-  '/checker': 'breadcrumb.checker',
-  '/leaderboard': 'breadcrumb.leaderboard',
-  '/markets': 'breadcrumb.markets',
-  '/activity': 'breadcrumb.activity',
-  '/liquidity': 'breadcrumb.liquidity',
-  '/insights': 'breadcrumb.insights',
-  '/faq': 'breadcrumb.faq',
-  '/privacy': 'breadcrumb.privacy',
-  '/terms': 'breadcrumb.terms',
-  '/disclaimer': 'breadcrumb.disclaimer',
-  '/about': 'breadcrumb.about',
-  '/compare': 'breadcrumb.compare',
-  '/watchlist': 'breadcrumb.watchlist',
-  '/blog': 'breadcrumb.blog',
-  '/api-docs': 'breadcrumb.apiDocs',
-  '/wallet': 'breadcrumb.wallet',
+const BREADCRUMB_MAP: Record<string, string> = {
+  '/': 'Home',
+  '/checker': 'Wallet Checker',
+  '/leaderboard': 'Leaderboard',
+  '/markets': 'Markets',
+  '/activity': 'Activity',
+  '/liquidity': 'Liquidity',
+  '/insights': 'Insights',
+  '/faq': 'FAQ',
+  '/worldcup': 'World Cup',
+  '/api-docs': 'API Docs',
+  '/blog': 'Blog',
+  '/watchlist': 'Watchlist',
+  '/wallet': 'Wallet',
+  '/privacy': 'Privacy Policy',
+  '/terms': 'Terms of Service',
+  '/disclaimer': 'Disclaimer',
+  '/about': 'About',
 };
-
-function humanizeSegment(segment: string) {
-  return segment.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-}
 
 export default function Breadcrumb() {
   const pathname = usePathname();
-  const { t } = useLanguage();
   const segments = pathname.split('/').filter(Boolean);
 
-  const crumbs: Array<{ path: string; label: string }> = [{ path: '/', label: t('breadcrumb.home') }];
+  const crumbs: Array<{ path: string; label: string }> = [{ path: '/', label: 'Home' }];
 
   let acc = '';
   for (const seg of segments) {
     acc += `/${seg}`;
-    const key = BREADCRUMB_KEYS[acc];
-    crumbs.push({ path: acc, label: key ? t(key) : humanizeSegment(seg) });
+    const known = BREADCRUMB_MAP[acc];
+    crumbs.push({ path: acc, label: known ?? seg.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) });
   }
 
   return (
-    <nav aria-label={t('breadcrumb.aria')} className="mb-4 flex flex-wrap items-center gap-2">
+    <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2">
       {crumbs.map((c, i) => {
         const isLast = i === crumbs.length - 1;
         const textColor = isLast ? 'text-white/70' : 'text-white/30 hover:text-white/60';

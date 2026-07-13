@@ -1,13 +1,10 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useLanguage } from '@/components/LanguageProvider';
 
 const TELEGRAM_URL = 'https://t.me/polymarketTRalerts';
 
 export default function TelegramModal({ onClose }: { onClose: () => void }) {
-  const { t } = useLanguage();
-
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -50,9 +47,9 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Text */}
-        <h2 className="mb-2 text-lg font-black text-white">{t('telegram.title')}</h2>
+        <h2 className="mb-2 text-lg font-black text-white">Polymarket Alerts</h2>
         <p className="mb-6 text-sm leading-relaxed text-white/55">
-          {t('telegram.description')}
+          Get real-time alerts for $50K+ whale moves on Polymarket. Personal wallet alerts coming soon 🚀
         </p>
 
         {/* CTA */}
@@ -66,7 +63,7 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
           </svg>
-          {t('telegram.cta')}
+          Get Alerts
         </a>
       </div>
     </div>

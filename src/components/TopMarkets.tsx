@@ -5,7 +5,6 @@ import Link from 'next/link';
 import type { TopMarket } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
-import { useLanguage } from '@/components/LanguageProvider';
 
 function parseJson(s: string | undefined): string[] {
   if (!s) return [];
@@ -40,7 +39,6 @@ function isLive(m: TopMarket): boolean {
 }
 
 function MarketCard({ market, index }: { market: TopMarket; index: number }) {
-  const { t } = useLanguage();
   const price = yesPrice(market);
   const volume = vol24h(market);
   const href = marketUrl(market.eventSlug, market.slug);
@@ -80,13 +78,13 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
 
       <div className="flex items-end justify-between mt-auto">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-white/25">{t('common.yes')}</p>
+          <p className="text-[10px] uppercase tracking-widest text-white/25">YES</p>
           <p className={`text-xl font-black ${priceColor}`}>
             {price != null ? `${(price * 100).toFixed(0)}¢` : '—'}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest text-white/25">{t('common.volume24hShort')}</p>
+          <p className="text-[10px] uppercase tracking-widest text-white/25">24h Vol</p>
           <p className="text-sm font-bold text-white/60">{formatCurrency(volume, true)}</p>
         </div>
       </div>
@@ -104,7 +102,6 @@ interface TopMarketsProps {
 export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarketsProps) {
   const [markets, setMarkets] = useState<TopMarket[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
 
   useEffect(() => {
     fetch('/api/markets/top')
@@ -127,9 +124,9 @@ export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarket
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
             style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">{t('common.topMarkets')}</h2>
+          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Top Markets</h2>
         </div>
-        <span className="text-[10px] text-white/25 uppercase tracking-widest">{t('common.volume24h')}</span>
+        <span className="text-[10px] text-white/25 uppercase tracking-widest">24h Volume</span>
       </div>
 
       {loading ? (
@@ -149,7 +146,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarket
           <Link href="/markets"
             className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
             style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-md)' }}>
-            {t('common.viewAllMarkets')}
+            View All Markets →
           </Link>
         </div>
       )}

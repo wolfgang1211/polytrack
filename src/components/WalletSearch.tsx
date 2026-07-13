@@ -3,7 +3,6 @@
 import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { isValidAddress } from '@/lib/utils';
-import { useLanguage } from '@/components/LanguageProvider';
 
 interface Props {
   compact?: boolean;
@@ -13,7 +12,6 @@ export default function WalletSearch({ compact }: Props) {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
   const router = useRouter();
-  const { t } = useLanguage();
 
   const addr = value.trim();
   const isEmpty = addr.length === 0;
@@ -72,7 +70,7 @@ export default function WalletSearch({ compact }: Props) {
             onChange={e => setValue(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            placeholder={t('walletSearch.placeholder')}
+            placeholder="Enter wallet address (0x…)"
             spellCheck={false}
             autoComplete="off"
             className="w-full bg-transparent py-2.5 pl-9 pr-10 text-xs text-white/75 placeholder-white/20 outline-none font-mono"
@@ -98,12 +96,12 @@ export default function WalletSearch({ compact }: Props) {
       <div className="min-h-[16px]">
         {showError && (
           <p className="flex items-center gap-1 text-[11px] text-rose-400/80">
-            <span>{t('walletSearch.invalid')}</span>
+            <span>Must be a 0x address with 40 hex characters</span>
           </p>
         )}
         {isValid && (
           <p className="flex items-center gap-1 text-[11px] text-emerald-400/70">
-            <span>{t('walletSearch.valid')}</span>
+            <span>Valid address</span>
           </p>
         )}
       </div>
@@ -121,7 +119,7 @@ export default function WalletSearch({ compact }: Props) {
             boxShadow: isValid ? '0 4px 20px rgba(124,58,237,0.35)' : 'none',
           }}
         >
-          <span className="relative">{t('walletSearch.submit')}</span>
+          <span className="relative">Track Wallet →</span>
         </button>
       )}
     </form>

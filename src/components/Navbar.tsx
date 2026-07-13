@@ -5,25 +5,23 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TelegramModal from '@/components/TelegramModal';
 import Logo from '@/components/Logo';
-import LanguageToggle from '@/components/LanguageToggle';
-import { useLanguage } from '@/components/LanguageProvider';
 
 const NAV_LINKS = [
-  { href: '/worldcup',    labelKey: 'nav.worldcup', featured: true },
-  { href: '/leaderboard', labelKey: 'nav.leaderboard' },
-  { href: '/checker',     labelKey: 'nav.checker'     },
-  { href: '/markets',     labelKey: 'nav.markets'     },
-  { href: '/activity',    labelKey: 'nav.activity'    },
-  { href: '/liquidity',   labelKey: 'nav.liquidity'   },
-  { href: '/insights',    labelKey: 'nav.insights'    },
+  { href: '/worldcup',    label: 'World Cup 🏆', featured: true },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/checker',     label: 'Wallet Checker' },
+  { href: '/markets',     label: 'Markets'     },
+  { href: '/activity',    label: 'Activity'    },
+  { href: '/liquidity',   label: 'Liquidity'   },
+  { href: '/insights',    label: 'Insights'    },
 ];
 
 const MORE_LINKS = [
-  { href: '/compare',   labelKey: 'nav.compare' },
-  { href: '/watchlist', labelKey: 'nav.watchlist' },
-  { href: '/blog',      labelKey: 'nav.blog' },
-  { href: '/api-docs',  labelKey: 'nav.apiDocs' },
-  { href: '/faq',       labelKey: 'nav.faq' },
+  { href: '/compare',   label: 'Compare Traders' },
+  { href: '/watchlist', label: 'Watchlist' },
+  { href: '/blog',      label: 'Blog' },
+  { href: '/api-docs',  label: 'API Docs' },
+  { href: '/faq',       label: 'FAQ' },
 ];
 
 function WatchIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
@@ -37,7 +35,6 @@ function WatchIcon({ className = 'h-3.5 w-3.5' }: { className?: string }) {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { t } = useLanguage();
   const [showTelegram, setShowTelegram] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -68,15 +65,14 @@ export default function Navbar() {
               </div>
               <div className="flex flex-col leading-none">
                 <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
-                <span className="text-[9px] text-white/35 font-medium tracking-widest uppercase">{t('brand.analytics')}</span>
+                <span className="text-[9px] text-white/35 font-medium tracking-widest uppercase">Analytics</span>
               </div>
             </Link>
 
             {/* Desktop nav links */}
             <nav className="hidden items-center gap-0.5 lg:flex">
-              {NAV_LINKS.map(({ href, labelKey, featured }) => {
+              {NAV_LINKS.map(({ href, label, featured }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`);
-                const label = t(labelKey);
                 return (
                   <Link
                     key={href}
@@ -108,7 +104,7 @@ export default function Navbar() {
                       style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
                   )}
                   <span className="relative inline-flex items-center gap-1.5">
-                    {t('nav.more')}
+                    More
                     <svg className={`h-3 w-3 transition-transform ${moreOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 0 1 1.06.02L10 10.94l3.71-3.71a.75.75 0 1 1 1.06 1.06l-4.24 4.24a.75.75 0 0 1-1.06 0L5.21 8.29a.75.75 0 0 1 .02-1.08Z" clipRule="evenodd" />
                     </svg>
@@ -118,9 +114,8 @@ export default function Navbar() {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
                     <div className="absolute right-0 top-9 z-50 w-44 overflow-hidden rounded-2xl glass-strong p-1.5 shadow-2xl animate-scale-in">
-                      {MORE_LINKS.map(({ href, labelKey }) => {
+                      {MORE_LINKS.map(({ href, label }) => {
                         const active = pathname === href;
-                        const label = t(labelKey);
                         return (
                           <Link
                             key={href}
@@ -140,8 +135,6 @@ export default function Navbar() {
 
             {/* Right actions */}
             <div className="flex flex-shrink-0 items-center gap-2">
-              <LanguageToggle />
-
               {/* Telegram */}
               <button
                 onClick={() => setShowTelegram(true)}
@@ -151,14 +144,14 @@ export default function Navbar() {
                 <svg className="h-3.5 w-3.5 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                 </svg>
-                {t('nav.getAlerts')}
+                Get Alerts
               </button>
 
               {/* Watchlist — hidden on mobile (accessible via mobile menu) */}
               <Link
                 href="/watchlist"
-                title={t('nav.watchlist')}
-                aria-label={t('nav.watchlist')}
+                title="Watchlist"
+                aria-label="Watchlist"
                 className="hidden sm:flex h-8 w-8 items-center justify-center rounded-xl text-white/45 transition-all hover:scale-[1.08] hover:text-white/80"
                 style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)' }}
               >
@@ -168,7 +161,7 @@ export default function Navbar() {
               {/* Hamburger — mobile/tablet only */}
               <button
                 onClick={() => setMobileOpen(o => !o)}
-                aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
+                aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={mobileOpen}
                 className="lg:hidden flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-200"
                 style={{
@@ -207,9 +200,8 @@ export default function Navbar() {
 
               {/* Nav links */}
               <nav className="flex flex-col gap-0.5 mb-3">
-                {[...NAV_LINKS, ...MORE_LINKS].map(({ href, labelKey }) => {
+                {[...NAV_LINKS, ...MORE_LINKS].map(({ href, label }) => {
                   const active = pathname === href;
-                  const label = t(labelKey);
                   return (
                     <Link
                       key={href}
@@ -244,14 +236,14 @@ export default function Navbar() {
                   <svg className="h-3.5 w-3.5 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                   </svg>
-                  {t('nav.getAlerts')}
+                  Get Alerts
                 </button>
                 <Link
                   href="/watchlist"
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white"
                   style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)' }}
                 >
-                  <WatchIcon /> {t('nav.watchlist')}
+                  <WatchIcon /> Watchlist
                 </Link>
               </div>
 

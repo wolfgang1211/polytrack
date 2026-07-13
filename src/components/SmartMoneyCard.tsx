@@ -3,13 +3,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatCurrency, formatAddress } from '@/lib/utils';
-import { useLanguage } from '@/components/LanguageProvider';
 
 interface LbEntry { proxyWallet: string; userName?: string | null; profileImage?: string | null; pnl: number }
 
 export default function SmartMoneyCard() {
   const [rows, setRows] = useState<LbEntry[] | null>(null);
-  const { t } = useLanguage();
 
   useEffect(() => {
     fetch('/api/leaderboard?window=allTime&limit=4')
@@ -29,14 +27,14 @@ export default function SmartMoneyCard() {
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            {t('common.smartMoney')}
+            Smart Money
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>{t('common.allTime')}</span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>All-Time</span>
           <Link href="/leaderboard"
             className="font-mono text-[9px] uppercase tracking-[0.12em] text-violet-400 hover:text-violet-300 transition-colors">
-            {t('common.viewAll')}
+            View All →
           </Link>
         </div>
       </div>
@@ -44,7 +42,7 @@ export default function SmartMoneyCard() {
       <div className="flex flex-col" data-testid={rows === null ? 'smart-money-loading' : undefined}>
         {rows?.length === 0 ? (
           <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-white/30">
-            {t('common.dataUnavailable')}
+            Live data is temporarily unavailable
           </div>
         ) : (rows ?? Array.from({ length: 4 })).map((e, i) => {
           const entry = e as LbEntry | undefined;

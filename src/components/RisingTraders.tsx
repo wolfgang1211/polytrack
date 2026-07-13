@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { RisingTrader } from '@/types';
 import { formatCurrency, formatAddress } from '@/lib/utils';
-import { useLanguage } from '@/components/LanguageProvider';
 
 function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: number; maxPnl: number }) {
   const name  = trader.userName || (trader.xUsername ? `@${trader.xUsername}` : null) || formatAddress(trader.proxyWallet, 6);
@@ -70,7 +69,6 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
 export default function RisingTraders() {
   const [traders, setTraders] = useState<RisingTrader[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useLanguage();
 
   useEffect(() => {
     fetch('/api/traders/rising')
@@ -93,11 +91,11 @@ export default function RisingTraders() {
           <span className="inline-block h-1 w-5 rounded-full"
             style={{ background: 'linear-gradient(90deg,#f59e0b,#ef4444)' }} />
           <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            {t('common.risingTraders')}
+            Rising Traders
           </span>
         </div>
         <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.18)' }}>
-          {t('common.thisWeek')}
+          This Week
         </span>
       </div>
 
