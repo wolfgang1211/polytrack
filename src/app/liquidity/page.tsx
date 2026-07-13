@@ -12,6 +12,7 @@ import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
 import RewardFarms from './RewardFarms';
+import FarmChanges from './FarmChanges';
 import Backtester from './Backtester';
 import RecorderHealth from './RecorderHealth';
 import ModelValidation from './ModelValidation';
@@ -1090,6 +1091,7 @@ export default function LiquidityPage() {
 
       <LPOpportunitiesSection opps={opps} loading={oppsLoading} />
       <RewardFarms />
+      <FarmChanges />
       <PriceHistorySection opps={opps} />
       <LPCalculator opps={opps} />
       <MarketDepthSection opps={opps} />
