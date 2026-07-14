@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import SmartMoneyCard from '@/components/SmartMoneyCard';
 import DashboardStats from '@/components/DashboardStats';
 import TopMarkets from '@/components/TopMarkets';
@@ -49,6 +50,32 @@ export default function DashboardPage() {
             <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed sm:mt-5" style={{ color: 'rgba(255,255,255,0.46)' }}>
               Discover, follow and copy the most profitable traders on Polymarket in real time.
             </p>
+            <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:flex-row lg:justify-start">
+              <Link
+                href="/markets"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(124,58,237,0.95), rgba(147,51,234,0.88))',
+                  border: '1px solid rgba(196,181,253,0.35)',
+                  boxShadow: '0 12px 32px rgba(124,58,237,0.22)',
+                }}
+              >
+                Explore Markets
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14m-6-6 6 6-6 6" />
+                </svg>
+              </Link>
+              <Link
+                href="/checker"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white/75 transition-all hover:-translate-y-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
+                style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.12)' }}
+              >
+                <svg className="h-4 w-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
+                </svg>
+                Analyze a Wallet
+              </Link>
+            </div>
           </div>
           <SmartMoneyCard />
         </div>
