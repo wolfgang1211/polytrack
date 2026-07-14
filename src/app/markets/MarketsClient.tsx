@@ -5,6 +5,7 @@ import type { TopMarket } from '@/types';
 import { formatCurrency, resolveCategory } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import TopMarkets from '@/components/TopMarkets';
+import PolymarketTradeLink from '@/components/PolymarketTradeLink';
 
 /* ── helpers ───────────────────────────────────────────── */
 
@@ -77,10 +78,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
   const close     = closesIn(market.endDate);
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <article
       className="group glass glass-hover gradient-border rounded-2xl p-5 flex flex-col gap-4 animate-fade-in-up"
     >
       <div className="flex items-start gap-3">
@@ -149,11 +147,9 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
             <p className="text-sm font-bold text-white/70">{formatCurrency(liquidity, true)}</p>
           </div>
         )}
-        <svg className="h-4 w-4 text-white/20 group-hover:text-white/50 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
       </div>
-    </a>
+      <PolymarketTradeLink href={href} />
+    </article>
   );
 }
 

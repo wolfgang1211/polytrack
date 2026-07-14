@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { TopMarket } from '@/types';
 import { formatCurrency } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
+import PolymarketTradeLink from '@/components/PolymarketTradeLink';
 
 function parseJson(s: string | undefined): string[] {
   if (!s) return [];
@@ -50,10 +51,7 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
     : 'text-white';
 
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
+    <article
       className="group glass glass-hover gradient-border flex min-w-0 flex-col gap-3 rounded-2xl p-3 animate-fade-in-up sm:p-4"
       style={{ animationDelay: `${index * 60}ms` }}
     >
@@ -88,7 +86,8 @@ function MarketCard({ market, index }: { market: TopMarket; index: number }) {
           <p className="text-sm font-bold text-white/60">{formatCurrency(volume, true)}</p>
         </div>
       </div>
-    </a>
+      <PolymarketTradeLink href={href} compact />
+    </article>
   );
 }
 
