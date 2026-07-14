@@ -205,18 +205,50 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
   );
 }
 
+const INITIAL_OPPORTUNITY_COUNT = 3;
+
 function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; loading: boolean }) {
+  const [showAll, setShowAll] = useState(false);
+  const visibleOpps = showAll ? opps : opps.slice(0, INITIAL_OPPORTUNITY_COUNT);
+  const canExpand = opps.length > INITIAL_OPPORTUNITY_COUNT;
+
   return (
     <section>
       <SectionHeader index="[03]" label="LP Opportunities" />
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => <div key={i} className="glass rounded-2xl h-52 animate-shimmer" />)}
+          {Array.from({ length: INITIAL_OPPORTUNITY_COUNT }).map((_, i) => <div key={i} className="glass rounded-2xl h-52 animate-shimmer" />)}
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {opps.map((o, i) => <OpportunityCard key={o.conditionId} opp={o} rank={i + 1} />)}
-        </div>
+        <>
+          <div id="lp-opportunity-grid" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleOpps.map((o, i) => <OpportunityCard key={o.conditionId} opp={o} rank={i + 1} />)}
+          </div>
+
+          {canExpand && (
+            <div className="mt-5 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAll(current => !current)}
+                aria-expanded={showAll}
+                aria-controls="lp-opportunity-grid"
+                className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold text-white/65 transition-all hover:scale-[1.02] hover:text-white"
+                style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-md)' }}
+              >
+                {showAll ? 'Show fewer markets' : `View all ${opps.length} markets`}
+                <svg
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${showAll ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
