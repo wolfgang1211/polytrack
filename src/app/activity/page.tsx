@@ -212,7 +212,7 @@ export default function ActivityPage() {
       const u = usd(t);
       const a = map.get(title) ?? {
         title, icon: t.icon, total: 0, buy: 0, sell: 0,
-        outcome: t.outcome ?? '', href: marketUrl(t.eventSlug, t.slug),
+        outcome: t.outcome ?? '', href: marketUrl(t.eventSlug, t.slug, 'activity_feed'),
       };
       a.total += u;
       if (isBuy(t)) a.buy += u; else a.sell += u;
@@ -375,7 +375,7 @@ export default function ActivityPage() {
               return (
                 <div key={keyOf(t)} className={`grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] items-center px-3 py-2 text-xs transition-colors hover:bg-white/[0.03] ${flashing ? 'animate-flash' : ''}`}
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <a href={marketUrl(t.eventSlug, t.slug)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 min-w-0 hover:text-white">
+                  <a href={marketUrl(t.eventSlug, t.slug, 'activity_feed')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 min-w-0 hover:text-white">
                     {t.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded object-cover" />

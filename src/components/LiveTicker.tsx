@@ -18,7 +18,7 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
   const amount = usdcSize(trade);
   const isBuy  = (trade.side ?? '').toUpperCase() === 'BUY';
   const priceC = trade.price != null ? Math.round(Number(trade.price) * 100) : null;
-  const href   = marketUrl(trade.eventSlug, trade.slug);
+  const href   = marketUrl(trade.eventSlug, trade.slug, 'home_live_ticker');
   const time   = trade.timestamp
     ? new Date(Number(trade.timestamp) * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
     : null;

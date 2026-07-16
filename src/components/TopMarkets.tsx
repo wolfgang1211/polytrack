@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import type { TopMarket } from '@/types';
 import { formatCurrency } from '@/lib/utils';
-import { marketUrl } from '@/lib/builder';
+import { marketUrl, type MarketCampaignContext } from '@/lib/builder';
 import PolymarketTradeLink from '@/components/PolymarketTradeLink';
 
 function parseJson(s: string | undefined): string[] {
@@ -39,10 +39,10 @@ function isLive(m: TopMarket): boolean {
   return true;
 }
 
-function MarketCard({ market, index }: { market: TopMarket; index: number }) {
+function MarketCard({ market, index, campaignContext }: { market: TopMarket; index: number; campaignContext: MarketCampaignContext }) {
   const price = yesPrice(market);
   const volume = vol24h(market);
-  const href = marketUrl(market.eventSlug, market.slug);
+  const href = marketUrl(market.eventSlug, market.slug, campaignContext);
 
   const priceColor =
     price == null ? 'text-white/40'
@@ -96,9 +96,11 @@ interface TopMarketsProps {
   limit?: number;
   /** show a "View All Markets →" button under the grid */
   showViewAll?: boolean;
+  /** identifies the placement in outbound campaign parameters */
+  campaignContext: MarketCampaignContext;
 }
 
-export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarketsProps) {
+export default function TopMarkets({ limit = 5, showViewAll = false, campaignContext }: TopMarketsProps) {
   const [markets, setMarkets] = useState<TopMarket[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -136,7 +138,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false }: TopMarket
         </div>
       ) : (
         <div className={`grid grid-cols-2 gap-3 ${gridCols}`}>
-          {shown.map((m, i) => <MarketCard key={m.id ?? i} market={m} index={i} />)}
+          {shown.map((m, i) => <MarketCard key={m.id ?? i} market={m} index={i} campaignContext={campaignContext} />)}
         </div>
       )}
 

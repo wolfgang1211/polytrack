@@ -485,7 +485,7 @@ function ProsPicks({ team }: { team: string | null }) {
         {shown.map((p, i) => {
           const barPct = maxValue > 0 ? (p.totalValue / maxValue) * 100 : 0;
           return (
-            <a key={p.title + p.outcome + i} href={marketUrl(p.eventSlug, p.slug)} target="_blank" rel="noopener noreferrer"
+            <a key={p.title + p.outcome + i} href={marketUrl(p.eventSlug, p.slug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
               className="group relative flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.04]">
               <div className="absolute inset-y-1 left-0 rounded-xl pointer-events-none"
                 style={{ width: `${barPct}%`, background: 'linear-gradient(90deg, rgba(251,191,36,0.10), rgba(251,191,36,0.01))' }} />
@@ -634,7 +634,7 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
             {movers.map((m, i) => {
               const up = m.change > 0;
               return (
-                <a key={m.label + i} href={marketUrl(m.eventSlug, m.marketSlug)} target="_blank" rel="noopener noreferrer"
+                <a key={m.label + i} href={marketUrl(m.eventSlug, m.marketSlug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
                   <span title="Upset Score: odds move + volume" className="font-mono text-[10px] font-black rounded-md px-1.5 py-1 flex-shrink-0 w-11 text-center"
                     style={{ background: `${scoreColor(m.score)}1a`, color: scoreColor(m.score), border: `1px solid ${scoreColor(m.score)}40` }}>
@@ -659,7 +659,7 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
             <p className="text-[10px] text-white/30 mb-2">No big swings today — these low-odds nations are seeing the most action:</p>
             <div className="flex flex-col gap-1">
               {longshots.map(t => (
-                <a key={t.team} href={marketUrl('world-cup-winner', t.slug)} target="_blank" rel="noopener noreferrer"
+                <a key={t.team} href={marketUrl('world-cup-winner', t.slug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
                   <Flag team={t.team} size={18} />
                   <span className="flex-1 min-w-0 truncate text-xs font-semibold text-white/75 group-hover:text-white transition-colors">{t.team}</span>
@@ -684,7 +684,7 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
                 No $1K+ longshot buys right now — showing only $250+ ≤35¢-odds buys as a watchlist, not a whale signal.
               </p>
               {longshotWatch.map((t, i) => (
-                <a key={String(t.id ?? i)} href={marketUrl(t.eventSlug, t.slug)} target="_blank" rel="noopener noreferrer"
+                <a key={String(t.id ?? i)} href={marketUrl(t.eventSlug, t.slug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
                   <span className="font-mono text-xs font-black text-white/70 w-14 flex-shrink-0 text-right">{formatCurrency(usdcSize(t), true)}</span>
                   <div className="flex-1 min-w-0">
@@ -709,7 +709,7 @@ function UpsetRadar({ events, winner }: { events: WcEvent[]; winner: WinnerData 
         ) : (
           <div className="flex flex-col gap-1">
             {underdogMoney.map((t, i) => (
-              <a key={String(t.id ?? i)} href={marketUrl(t.eventSlug, t.slug)} target="_blank" rel="noopener noreferrer"
+              <a key={String(t.id ?? i)} href={marketUrl(t.eventSlug, t.slug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/[0.04]">
                 <span className="font-mono text-xs font-black text-grad w-14 flex-shrink-0 text-right">{formatCurrency(usdcSize(t), true)}</span>
                 <div className="flex-1 min-w-0">
@@ -842,7 +842,7 @@ function MatchDetail({ group, trades }: { group: MatchGroup; trades: RecentTrade
                 .sort((x, y) => (y.price ?? 0) - (x.price ?? 0))
                 .slice(0, 4);
               return (
-                <a key={e.id} href={marketUrl(e.slug, e.markets[0]?.slug)} target="_blank" rel="noopener noreferrer"
+                <a key={e.id} href={marketUrl(e.slug, e.markets[0]?.slug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                   className="group flex flex-wrap items-center gap-2 rounded-xl px-3 py-2 transition-colors hover:bg-white/[0.04]"
                   style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <span className="text-xs font-semibold text-white/70 group-hover:text-white transition-colors min-w-[120px]">{suffix}</span>
@@ -1100,7 +1100,7 @@ function OddsRow({ team, rank, maxPrice, highlight }: { team: WinnerTeam; rank: 
   const pct = team.price * 100;
   const barPct = maxPrice > 0 ? (team.price / maxPrice) * 100 : 0;
   const change = team.change24h * 100;
-  const href = marketUrl('world-cup-winner', team.slug);
+  const href = marketUrl('world-cup-winner', team.slug, 'world_cup_hub');
   const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
 
   return (
@@ -1208,7 +1208,7 @@ function MoversStrip({ teams }: { teams: WinnerTeam[] }) {
 /* ── match card ────────────────────────────────────────── */
 
 function MatchCard({ event }: { event: WcEvent }) {
-  const href = marketUrl(event.slug, event.markets[0]?.slug);
+  const href = marketUrl(event.slug, event.markets[0]?.slug, 'world_cup_hub');
   const kickoff = kickoffLabel(event.gameStartTime);
   const isLive = kickoff === 'LIVE';
   const teams = teamsFromEventTitle(event.title);
@@ -1380,7 +1380,7 @@ function TeamSpotlight({
         ) : (
           <div className="glass gradient-border rounded-2xl p-2 sm:p-3">
             {futures.map((f, i) => (
-              <a key={f.eventTitle + i} href={marketUrl(f.eventSlug, f.marketSlug)} target="_blank" rel="noopener noreferrer"
+              <a key={f.eventTitle + i} href={marketUrl(f.eventSlug, f.marketSlug, 'world_cup_hub')} target="_blank" rel="noopener noreferrer"
                 className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.04]">
                 <Flag team={team} size={18} />
                 <div className="flex-1 min-w-0">
@@ -1449,7 +1449,7 @@ function FlowStatCard({
 
 function ProConvictionCard({ pick, activeTeam }: { pick: ProPick; activeTeam: string | null }) {
   const colors = teamColors(activeTeam ?? '');
-  const href = marketUrl(pick.eventSlug, pick.slug);
+  const href = marketUrl(pick.eventSlug, pick.slug, 'world_cup_hub');
   const topWallet = pick.wallets?.[0];
 
   return (
@@ -1486,7 +1486,7 @@ function WcTradeRow({ trade, maxAmount }: { trade: RecentTrade; maxAmount: numbe
   const amount = usdcSize(trade);
   const isBuy = (trade.side ?? '').toUpperCase() === 'BUY';
   const ts = trade.timestamp ?? trade.createdAt;
-  const href = marketUrl(trade.eventSlug, trade.slug);
+  const href = marketUrl(trade.eventSlug, trade.slug, 'world_cup_hub');
   const wallet = trade.proxyWallet ? formatAddress(trade.proxyWallet, 6) : 'Unknown';
   const isWhale = amount >= 10_000;
   const accent = isBuy ? '#34d399' : '#fb7185';

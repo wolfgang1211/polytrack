@@ -25,7 +25,7 @@ function MoveRow({ trade }: { trade: RecentTrade }) {
   const amount = usdcSize(trade);
   const isBuy  = (trade.side ?? '').toUpperCase() === 'BUY';
   const ts     = trade.timestamp ?? trade.createdAt;
-  const href   = marketUrl(trade.eventSlug, trade.slug);
+  const href   = marketUrl(trade.eventSlug, trade.slug, 'wallet_latest_moves');
   const priceC = trade.price != null ? Math.round(Number(trade.price) * 100) : null;
   const isYes  = (trade.outcome ?? '').toLowerCase() === 'yes' || trade.outcomeIndex === 0;
   const outcomeColor = trade.outcome

@@ -71,7 +71,7 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
   const volume    = vol24h(market);
   const liquidity = market.liquidityNum ?? 0;
-  const href      = marketUrl(market.eventSlug, market.slug);
+  const href      = marketUrl(market.eventSlug, market.slug, 'markets_explorer');
   const outcomes  = parseJson(market.outcomes);
   const prices    = parseJson(market.outcomePrices);
   const cat       = categoryText(market);
@@ -249,7 +249,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
       {/* ── [02] Featured ── */}
       <div>
         <SectionHeader index="[02]" label="Featured" />
-        <TopMarkets />
+        <TopMarkets campaignContext="markets_featured" />
       </div>
 
       {/* ── [03] All Markets ── */}

@@ -120,7 +120,7 @@ export default function RewardFarms() {
           </p>
           <div className="flex flex-col gap-1.5">
             {vacancies.slice(0, 5).map(v => (
-              <a key={v.conditionId} href={marketUrl(v.eventSlug, v.slug)} target="_blank" rel="noopener noreferrer"
+              <a key={v.conditionId} href={marketUrl(v.eventSlug, v.slug, 'liquidity_reward_farms')} target="_blank" rel="noopener noreferrer"
                 className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs transition-opacity hover:opacity-80">
                 <span className="font-semibold text-white/75 truncate max-w-[50%]">{v.question}</span>
                 <span className="text-rose-400 font-bold tabular-nums">-{v.dropPct.toFixed(0)}% liq</span>
@@ -155,7 +155,7 @@ export default function RewardFarms() {
           </div>
         ) : shown.map(f => (
           <a key={f.conditionId}
-            href={marketUrl(f.eventSlug, f.slug)}
+            href={marketUrl(f.eventSlug, f.slug, 'liquidity_reward_farms')}
             target="_blank" rel="noopener noreferrer"
             className="grid grid-cols-2 sm:grid-cols-[1fr_90px_90px_90px_100px_90px_90px] gap-2 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
             style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

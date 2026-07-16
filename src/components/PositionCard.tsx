@@ -101,7 +101,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
       {/* Trade button — builder code dahil */}
       {!isClosed && (
         <a
-          href={marketUrl(position.eventSlug, position.slug)}
+          href={marketUrl(position.eventSlug, position.slug, 'wallet_positions')}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-[11px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"

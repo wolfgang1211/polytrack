@@ -39,7 +39,7 @@ type LPPeriod = typeof LP_PERIODS[number];
 ════════════════════════════════════════════════════════════════ */
 
 function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
-  const href = marketUrl(opp.eventSlug, opp.slug);
+  const href = marketUrl(opp.eventSlug, opp.slug, 'liquidity_opportunities');
   const sc   = opp.score;
 
   return (

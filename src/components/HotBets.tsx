@@ -16,7 +16,7 @@ function timeAgo(ts: number): string {
 }
 
 function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
-  const href = marketUrl(market.eventSlug, market.slug);
+  const href = marketUrl(market.eventSlug, market.slug, 'home_hot_bets');
 
   return (
     <a

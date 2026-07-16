@@ -27,7 +27,7 @@ function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: bool
   const amount  = usdcSize(trade);
   const isBuy   = (trade.side ?? '').toUpperCase() === 'BUY';
   const ts      = trade.timestamp ?? trade.createdAt;
-  const href    = marketUrl(trade.eventSlug, trade.slug);
+  const href    = marketUrl(trade.eventSlug, trade.slug, 'home_recent_trades');
   const wallet  = trade.proxyWallet ? formatAddress(trade.proxyWallet, 6) : '—';
   const isWhale = amount >= WHALE;
   const accent  = isBuy ? '#34d399' : '#fb7185';

@@ -256,7 +256,7 @@ export default function Backtester() {
 
             {/* CTA for the selected market */}
             {sel?.slug && sel.active && (
-              <a href={marketUrl(sel.eventSlug, sel.slug)} target="_blank" rel="noopener noreferrer"
+              <a href={marketUrl(sel.eventSlug, sel.slug, 'liquidity_backtester')} target="_blank" rel="noopener noreferrer"
                 className="inline-flex w-fit items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-white transition-all hover:scale-[1.02] hover:brightness-110"
                 style={{ background: 'var(--vi-grad-60)', border: '1px solid var(--vi-border-xl)' }}>
                 Quote this market on Polymarket →

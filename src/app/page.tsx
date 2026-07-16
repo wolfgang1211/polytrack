@@ -101,7 +101,7 @@ export default function DashboardPage() {
       {/* ── [04] Top Markets ── */}
       <div className="min-w-0">
         <SectionHeader index="[04]" label="Top Markets" />
-        <TopMarkets limit={12} showViewAll />
+        <TopMarkets limit={12} showViewAll campaignContext="home_top_markets" />
       </div>
 
       {/* ── [05] Hot Bets ── */}

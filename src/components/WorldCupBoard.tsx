@@ -636,7 +636,7 @@ function MarketChip({ market }: { market: WcMarket }) {
   const price = yesPrice(market);
   return (
     <a
-      href={marketUrl(market.eventSlug, market.slug)}
+      href={marketUrl(market.eventSlug, market.slug, 'world_cup_board')}
       target="_blank"
       rel="noopener noreferrer"
       className="inline-flex max-w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-[10px] font-bold text-white/48 transition hover:text-white/80"
@@ -701,7 +701,7 @@ function MatchDetails({ event, allEvents, selectedNation }: { event: WcEvent; al
         <div className="mb-2 font-mono text-[10px] font-black uppercase tracking-widest text-white/24">Money on this match</div>
         <div className="space-y-2">
           {moneyMarkets.map((market) => (
-            <a key={market.id} href={marketUrl(market.eventSlug, market.slug)} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[42px_1fr_70px] items-center gap-2 rounded-lg px-2 py-2 text-[10px] transition hover:bg-white/[0.035]">
+            <a key={market.id} href={marketUrl(market.eventSlug, market.slug, 'world_cup_board')} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[42px_1fr_70px] items-center gap-2 rounded-lg px-2 py-2 text-[10px] transition hover:bg-white/[0.035]">
               <span className="rounded-md border border-rose-400/40 bg-rose-500/10 px-1.5 py-1 text-center font-black text-rose-200">{yesPrice(market) >= 0.5 ? 'BUY' : 'SELL'}</span>
               <span className="truncate text-white/48"><span className="rounded bg-violet-500/35 px-1 py-0.5 font-black text-violet-100">YES</span> {market.question}</span>
               <span className="text-right font-black text-white/78">{metricMoney(market.volume24hrNum ?? market.volumeNum)}</span>
@@ -816,7 +816,7 @@ function OddsRace({ winnerMarkets, selected }: { winnerMarkets: WinnerMarket[]; 
         {winnerMarkets.slice(0, 2).map((item) => (
           <a
             key={item.market.id}
-            href={marketUrl(item.market.eventSlug, item.market.slug)}
+            href={marketUrl(item.market.eventSlug, item.market.slug, 'world_cup_board')}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-black text-emerald-200"
@@ -834,7 +834,7 @@ function OddsRace({ winnerMarkets, selected }: { winnerMarkets: WinnerMarket[]; 
             return (
               <a
                 key={item.market.id}
-                href={marketUrl(item.market.eventSlug, item.market.slug)}
+                href={marketUrl(item.market.eventSlug, item.market.slug, 'world_cup_board')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative grid min-h-[34px] grid-cols-[42px_1fr_96px_48px] items-center gap-2 overflow-hidden rounded-xl px-3 text-xs transition hover:bg-white/[0.04]"
@@ -879,7 +879,7 @@ function FlowList({ markets }: { markets: WcMarket[] }) {
           return (
             <a
               key={`${market.id}-${index}`}
-              href={marketUrl(market.eventSlug, market.slug)}
+              href={marketUrl(market.eventSlug, market.slug, 'world_cup_board')}
               target="_blank"
               rel="noopener noreferrer"
               className="group grid grid-cols-[42px_1fr_88px] items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-white/[0.05]"
@@ -923,7 +923,7 @@ function UpsetRadar({ winnerMarkets }: { winnerMarkets: WinnerMarket[] }) {
           </div>
           <div className="space-y-3">
             {longshots.map((item) => (
-              <a key={item.market.id} href={marketUrl(item.market.eventSlug, item.market.slug)} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[46px_1fr_54px] items-center gap-3 text-xs">
+              <a key={item.market.id} href={marketUrl(item.market.eventSlug, item.market.slug, 'world_cup_board')} target="_blank" rel="noopener noreferrer" className="grid grid-cols-[46px_1fr_54px] items-center gap-3 text-xs">
                 <span className="rounded-lg px-2 py-1 text-center font-mono font-black text-amber-200" style={{ background: 'rgba(251,191,36,0.10)', border: '1px solid rgba(251,191,36,0.28)' }}>
                   {item.nation.code}
                 </span>
@@ -980,7 +980,7 @@ function TournamentMarkets({ events, selected }: { events: WcEvent[]; selected: 
         {shown.map((event) => {
           const pair = nationsForEvent(event);
           return (
-            <a key={event.id} href={marketUrl(event.slug, event.markets[0]?.slug)} target="_blank" rel="noopener noreferrer" className="group rounded-2xl p-4 transition hover:-translate-y-0.5" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.10)' }}>
+            <a key={event.id} href={marketUrl(event.slug, event.markets[0]?.slug, 'world_cup_board')} target="_blank" rel="noopener noreferrer" className="group rounded-2xl p-4 transition hover:-translate-y-0.5" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.10)' }}>
               <div className="mb-3 flex items-center gap-2">
                 {pair[0] ? <FlagImage nation={pair[0]} square className="h-9 w-9" /> : <SoccerBallIcon className="h-9 w-9" />}
                 {pair[1] && <FlagImage nation={pair[1]} square className="h-9 w-9 -ml-3 ring-2 ring-black/70" />}
