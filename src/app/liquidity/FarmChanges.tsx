@@ -154,7 +154,7 @@ export default function FarmChanges() {
               const cls = 'flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-white/[0.03]';
               const style = { borderBottom: '1px solid rgba(255,255,255,0.04)' };
               return c.slug ? (
-                <a key={`${c.kind}-${c.conditionId}`} href={marketUrl(c.eventSlug, c.slug)}
+                <a key={`${c.kind}-${c.conditionId}`} href={marketUrl(c.eventSlug, c.slug, 'liquidity_farm_changes')}
                   target="_blank" rel="noopener noreferrer" className={cls} style={style}>
                   {inner}
                 </a>

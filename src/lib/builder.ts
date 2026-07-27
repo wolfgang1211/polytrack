@@ -12,6 +12,7 @@ export type MarketCampaignContext =
   | 'home_recent_trades'
   | 'home_top_markets'
   | 'liquidity_backtester'
+  | 'liquidity_farm_changes'
   | 'liquidity_opportunities'
   | 'liquidity_reward_farms'
   | 'markets_explorer'
