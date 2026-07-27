@@ -71,12 +71,8 @@ export function detectCategory(title: string): string {
   return 'Other';
 }
 
-export function isWorldCupMarketText(text: string): boolean {
-  return /(?:\bfifwc\b|fifa|world[-\s]?cup|worldcup)/i.test(text);
-}
-
 const API_CAT_MAP: Record<string, string> = {
-  'world cup': 'World Cup', fifwc: 'World Cup', fifa: 'World Cup',
+  'world cup': 'Sports', fifwc: 'Sports', fifa: 'Sports',
   crypto: 'Crypto', cryptocurrency: 'Crypto', defi: 'Crypto', web3: 'Crypto',
   politics: 'Politics', political: 'Politics', elections: 'Politics', government: 'Politics',
   sports: 'Sports', sport: 'Sports',
@@ -88,7 +84,6 @@ const API_CAT_MAP: Record<string, string> = {
 export function resolveCategory(apiCategory: string | undefined, title: string, extraText = ''): string {
   const combined = `${title} ${extraText}`;
 
-  if (isWorldCupMarketText(combined)) return 'World Cup';
 
   if (apiCategory) {
     const norm = apiCategory.toLowerCase().trim();

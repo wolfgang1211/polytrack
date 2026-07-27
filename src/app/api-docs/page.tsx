@@ -54,7 +54,7 @@ const ENDPOINTS = [
     "outcomePrices": "[\\"0.55\\",\\"0.45\\"]",
     "image": "https://…",
     "endDate": "2026-07-19T00:00:00Z",
-    "category": "World Cup"
+    "category": "Sports"
   }
 ]`,
   },

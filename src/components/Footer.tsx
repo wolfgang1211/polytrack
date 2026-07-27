@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Logo from '@/components/Logo';
 
 const PRODUCT_LINKS = [
-  { href: '/worldcup',    label: 'World Cup' },
   { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/markets',     label: 'Markets' },
   { href: '/activity',    label: 'Activity' },

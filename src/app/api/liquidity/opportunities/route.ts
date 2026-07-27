@@ -80,7 +80,7 @@ function fromBook(book: ClobBook): { bestBid: number; bestAsk: number; bidDepth:
 export async function GET() {
   try {
     // 1 — Wide candidate pool: top by 24h volume AND top by liquidity, deduped.
-    //     One hot event (e.g. World Cup) can monopolise the volume list, which
+    //     One hot event can monopolise the volume list, which
     //     would starve the simulator/calculator of non-event and reward markets.
     const fetchGamma = async (order: string) => {
       const res = await fetch(

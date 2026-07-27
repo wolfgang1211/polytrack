@@ -31,14 +31,6 @@ function eventSlugFrom(m: Record<string, unknown>): string | undefined {
   return undefined;
 }
 
-function marketCategory(m: Record<string, unknown>, question: string, slug?: string, eventSlug?: string): string | undefined {
-  const apiCategory = textField(m, 'category');
-  const text = `${question} ${slug ?? ''} ${eventSlug ?? ''}`;
-
-  if (/(?:\bfifwc\b|fifa|world[-\s]?cup|worldcup)/i.test(text)) return 'World Cup';
-  return apiCategory;
-}
-
 export async function fetchMarketsList(sortKey = 'vol24h', limit = 120): Promise<TopMarket[]> {
   const order = SORT_MAP[sortKey] ?? 'volume24hr';
   const cappedLimit = Math.min(limit || 120, 200);
@@ -82,7 +74,7 @@ export async function fetchMarketsList(sortKey = 'vol24h', limit = 120): Promise
         outcomes: m.outcomes,
         image: m.image ?? m.icon,
         endDate: m.endDate ?? m.endDateIso,
-        category: marketCategory(m, question, slug, eventSlug),
+        category: textField(m, 'category'),
       } as TopMarket;
     });
 }

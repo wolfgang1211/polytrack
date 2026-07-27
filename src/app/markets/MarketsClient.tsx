@@ -33,7 +33,7 @@ function closesIn(endDate?: string): string | null {
   return `${Math.max(1, Math.floor(ms / 60_000))}m`;
 }
 
-const CATS = ['All', 'World Cup', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Other'] as const;
+const CATS = ['All', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Other'] as const;
 type Cat = typeof CATS[number];
 
 const SORTS = [
@@ -46,7 +46,6 @@ const SORTS = [
 type SortKey = typeof SORTS[number]['key'];
 
 const CAT_COLOR: Record<string, string> = {
-  'World Cup': '#22c55e',
   Politics: '#fb7185', Crypto: '#fbbf24', Sports: '#34d399',
   Tech: '#38bdf8', World: '#a78bfa', Entertainment: '#f472b6', Other: '#94a3b8',
 };
@@ -162,7 +161,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
   const [cat, setCat] = useState<Cat>('All');
   const [q, setQ] = useState('');
   // Deep pool fetched once (top by total volume) so category filters aren't
-  // starved when one hot event (e.g. World Cup) dominates 24h volume.
+  // starved when one hot event dominates 24h volume.
   const [extra, setExtra] = useState<TopMarket[] | null>(null);
   const firstRun = useRef(true);
 
@@ -205,9 +204,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
         if (!isNaN(end) && end < nowMs - 3_600_000) return false;
       }
       const resolvedCat = categoryText(m);
-      if (cat === 'Sports') {
-        if (resolvedCat !== 'Sports' && resolvedCat !== 'World Cup') return false;
-      } else if (cat !== 'All' && resolvedCat !== cat) {
+      if (cat !== 'All' && resolvedCat !== cat) {
         return false;
       }
       const haystack = `${m.question ?? ''} ${m.slug ?? ''} ${m.eventSlug ?? ''} ${resolvedCat}`.toLowerCase();

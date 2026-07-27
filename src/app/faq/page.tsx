@@ -69,7 +69,7 @@ const QA: Record<string, QAItem[]> = {
   markets: [
     {
       q: 'What are the different market categories?',
-      a: 'AlphaBoard categorizes markets into: World Cup, Politics, Crypto, Sports, Tech, World, Entertainment, and Other. You can filter markets by any category using the tab bar.',
+      a: 'AlphaBoard categorizes markets into: Politics, Crypto, Sports, Tech, World, Entertainment, and Other. You can filter markets by any category using the tab bar.',
     },
     {
       q: 'What do YES/NO prices mean?',

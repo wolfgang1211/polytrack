@@ -11,7 +11,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/liquidity': 'Liquidity',
   '/insights': 'Insights',
   '/faq': 'FAQ',
-  '/worldcup': 'World Cup',
+
   '/api-docs': 'API Docs',
   '/blog': 'Blog',
   '/watchlist': 'Watchlist',
