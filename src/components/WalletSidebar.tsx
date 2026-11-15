@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { Position, RecentTrade } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, isPositionOpen } from '@/lib/utils';
 
 function Row({ label, value, valueClass = 'text-white/75' }: { label: string; value: string; valueClass?: string }) {
   return (
@@ -23,14 +23,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function WalletSidebar({
-  address, positions, openValue, officialPnl,
+  address, positions, openValue,
 }: { address: string; positions: Position[]; openValue: number; officialPnl?: number | null }) {
   const [trades, setTrades] = useState<RecentTrade[] | null>(null);
 
-  // Old / very large wallets can come back with an empty positions list from
-  // the data-api even though Polymarket's P&L history knows their lifetime
-  // PnL. Fall back to the official number instead of showing $0 everywhere.
-  const useOfficialFallback = positions.length === 0 && officialPnl != null;
 
   useEffect(() => {
     if (!address) return;
@@ -50,19 +46,17 @@ export default function WalletSidebar({
       // Only count cashPnl (unrealized mark-to-market) for OPEN positions —
       // closed/redeemed positions report cashPnl as -costBasis, which would
       // double-count losses if summed over everything.
-      const isOpen = p.currentValue > 0;
+      const isOpen = isPositionOpen(p);
       if (isOpen) unrealized += Number(p.cashPnl) || 0;
       invested += p.initialValue ?? 0;
       const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
       if (pnl > 0) wins++; else if (pnl < 0) losses++;
       if (p.conditionId) markets.add(p.conditionId);
     }
-    if (useOfficialFallback) {
-      realized = officialPnl as number;
-    }
+
     const avgBet = positions.length ? invested / positions.length : 0;
     const totalPnl = realized + unrealized;
-    const equity = openValue + realized;
+
 
     let buys = 0, sells = 0, buyVol = 0, sellVol = 0;
     if (trades) {
@@ -77,22 +71,22 @@ export default function WalletSidebar({
     const buyPct = totalSides ? (buys / totalSides) * 100 : 0;
 
     return {
-      realized, unrealized, totalPnl, equity, avgBet, wins, losses,
+      realized, unrealized, totalPnl, avgBet, wins, losses,
       positions: positions.length, markets: markets.size,
       buys, sells, buyPct, buyVol, sellVol, hasTrades: !!trades,
     };
-  }, [positions, openValue, trades, useOfficialFallback, officialPnl]);
+  }, [positions, trades]);
 
   const sign = (v: number) => (v >= 0 ? '+' : '');
   const cls = (v: number) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-white/50');
 
   return (
     <div className="flex flex-col gap-3">
-      <Section title="Portfolio Equity">
-        <p className={`text-2xl font-black leading-none ${stats.equity >= 0 ? 'text-grad-profit' : 'text-grad-loss'}`}>
-          {formatCurrency(stats.equity, true)}
+      <Section title="Position Value">
+        <p className="text-2xl font-black leading-none text-white/80">
+          {formatCurrency(openValue, true)}
         </p>
-        <p className="mt-1 text-[10px] text-white/30">Open value + realized P&amp;L</p>
+        <p className="mt-1 text-[10px] text-white/30">Current marked value · excludes cash</p>
       </Section>
 
       <Section title="PnL Breakdown">
@@ -101,23 +95,20 @@ export default function WalletSidebar({
         <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
         <Row label="Total P&L" value={`${sign(stats.totalPnl)}${formatCurrency(stats.totalPnl, true)}`} valueClass={cls(stats.totalPnl)} />
         <Row label="Position Value" value={formatCurrency(openValue, true)} />
-        {useOfficialFallback && (
-          <p className="mt-1.5 text-[10px] leading-relaxed text-white/25">
-            Position-level data isn&apos;t available for this wallet — P&amp;L shown is
-            Polymarket&apos;s official lifetime figure.
-          </p>
-        )}
+        <p className="mt-1.5 text-[10px] leading-relaxed text-white/25">
+          From loaded position records; may be incomplete. Not account equity.
+        </p>
       </Section>
 
       <Section title="Core Stats">
-        {useOfficialFallback ? (
+        {positions.length === 0 ? (
           <p className="text-[11px] leading-relaxed text-white/25">
-            Not available — the data API returns no position history for this wallet.
+            No position records were returned for this wallet.
           </p>
         ) : (
           <>
             <Row label="Avg Bet" value={formatCurrency(stats.avgBet, true)} />
-            <Row label="Win / Loss" value={`${stats.wins} / ${stats.losses}`} />
+            <Row label="Positive / Negative" value={`${stats.wins} / ${stats.losses}`} />
             <Row label="Positions" value={String(stats.positions)} />
             <Row label="Unique Markets" value={String(stats.markets)} />
           </>

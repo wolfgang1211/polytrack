@@ -1,55 +1,35 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import type { RecentTrade } from '@/types';
+import { dataFailure, isWallet, PublicDataUnavailable, readTrades } from '@/lib/publicDataApi';
 
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  Accept: 'application/json',
-};
+const MAX_PAGES = 20;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function tsOf(t: any): number {
-  return Number(t.timestamp ?? t.createdAt ?? 0);
-}
-
-// Full(ish) trade history for a wallet — powers the activity/behaviour analytics
-// (trades-by-hour, hold time, outcome bias, heatmap). Paginates the data-api
-// trades endpoint up to a sane cap so charts have enough sample to be meaningful.
-export async function GET(
-  _req: NextRequest,
-  ctx: RouteContext<'/api/wallet/[address]/activity'>
-) {
+export async function GET(req: NextRequest, ctx: RouteContext<'/api/wallet/[address]/activity'>) {
   const { address } = await ctx.params;
-
-  // Same 3,500-trade hard ceiling as the timeline endpoint.
-  const PAGE = 500;
-  const MAX_OFFSET = 3000;
-  const pageCount = MAX_OFFSET / PAGE + 1; // pages 0..6
-
+  if (!isWallet(address)) return NextResponse.json({ error: 'Invalid wallet address' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
   try {
-    const results = await Promise.all(
-      Array.from({ length: pageCount }, (_, p) =>
-        fetch(
-          `https://data-api.polymarket.com/trades?user=${address}&limit=${PAGE}&offset=${p * PAGE}`,
-          { headers: HEADERS, next: { revalidate: 3600 } }
-        ).then(r => r.ok ? r.json() : null).catch(() => null)
-      )
-    );
-
-    const trades: RecentTrade[] = [];
-    for (const json of results) {
-      if (!json) continue;
-      const batch: RecentTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
-      trades.push(...batch);
+    const trades = [];
+    const signal = AbortSignal.any([req.signal, AbortSignal.timeout(12_000)]);
+    const end = Math.floor(Date.now() / 1000);
+    const seen = new Set<string>();
+    let cursor: string | null = null;
+    let truncated = false;
+    for (let page = 0; page < MAX_PAGES; page += 1) {
+      const params = new URLSearchParams({ user: address, start: '1', end: String(end), limit: '1000', taker_only: 'false', filter_type: 'TOKENS', filter_amount: '0.000001' });
+      if (cursor) params.set('cursor', cursor);
+      const result = await readTrades(params, signal);
+      for (const trade of result.data) {
+        if (trade.proxyWallet.toLowerCase() !== address.toLowerCase() || trade.timestamp < 1 || trade.timestamp > end) throw new PublicDataUnavailable();
+        trades.push(trade);
+      }
+      if (!result.truncated) break;
+      if (!result.nextCursor || seen.has(result.nextCursor)) throw new PublicDataUnavailable();
+      seen.add(result.nextCursor); cursor = result.nextCursor;
+      if (page === MAX_PAGES - 1) truncated = true;
     }
-
-    trades.sort((a, b) => tsOf(b) - tsOf(a));
-
-    return NextResponse.json(
-      { trades, count: trades.length },
-      { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200' } }
-    );
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch activity' }, { status: 500 });
+    trades.sort((a, b) => (b.timestamp ?? 0) - (a.timestamp ?? 0));
+    return NextResponse.json({ trades, count: trades.length, truncated }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch (error) {
+    return dataFailure(error);
   }
 }

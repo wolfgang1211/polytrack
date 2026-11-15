@@ -5,11 +5,13 @@ export interface LeaderboardEntry {
   xUsername: string;
   verifiedBadge: boolean;
   vol: number;
+  volumeUnit?: 'shares';
   pnl: number;
   profileImage: string;
 }
 
 export interface Position {
+  status?: 'OPEN' | 'REDEEMABLE' | 'REDEEMABLE_LOST' | 'MERGEABLE' | 'CLOSED';
   proxyWallet: string;
   asset: string;
   conditionId: string;
@@ -66,6 +68,8 @@ export interface TopMarket {
 }
 
 export interface RecentTrade {
+  conditionId?: string;
+  transactionHash?: string;
   id?: string;
   proxyWallet?: string;
   side?: string;

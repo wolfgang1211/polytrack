@@ -1,42 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { dataFailure, isWindow, NO_STORE, readLeaderboard } from '@/lib/publicDataApi';
 
-// Map internal TimeWindow values → Polymarket API values
-const PERIOD_MAP: Record<string, string> = {
-  allTime: 'ALL',
-  '1d':    'DAY',
-  '1w':    'WEEK',
-  '1m':    'MONTH',
-};
-
-export async function GET(request: NextRequest) {
-  const timeWindow = request.nextUrl.searchParams.get('window') || 'allTime';
-  const limitParam = request.nextUrl.searchParams.get('limit') || '50';
-  const limit = Math.min(Number(limitParam), 50);
-  const timePeriod = PERIOD_MAP[timeWindow] ?? 'ALL';
-
-  try {
-    const res = await fetch(
-      `https://data-api.polymarket.com/v1/leaderboard?timePeriod=${timePeriod}&limit=${limit}`,
-      {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          Accept: 'application/json',
-        },
-        cache: 'no-store',
-      }
-    );
-
-    if (!res.ok) {
-      return NextResponse.json({ error: `Upstream error: ${res.status}` }, { status: res.status });
-    }
-
-    const json = await res.json();
-    const data = Array.isArray(json) ? json : (json.value ?? []);
-
-    return NextResponse.json(data, {
-      headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300' },
-    });
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 });
+export async function GET(req: NextRequest) {
+  const window = req.nextUrl.searchParams.get('window') ?? 'allTime';
+  const rawLimit = req.nextUrl.searchParams.get('limit') ?? '100';
+  const limit = Number(rawLimit);
+  if (!isWindow(window) || !/^\d+$/.test(rawLimit) || !Number.isSafeInteger(limit) || limit < 1 || limit > 1000) {
+    return NextResponse.json({ error: 'Invalid window or limit. Limit must be an integer from 1 to 1000.' }, { status: 400, headers: NO_STORE });
   }
+  try {
+    const result = await readLeaderboard(window, limit, req.signal);
+    return NextResponse.json(result.data, { headers: { ...NO_STORE, 'X-Data-Truncated': String(result.truncated), 'X-Volume-Unit': 'shares' } });
+  } catch (error) { return dataFailure(error); }
 }

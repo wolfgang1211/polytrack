@@ -3,7 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Position } from '@/types';
-import { formatCurrency, formatAddress } from '@/lib/utils';
+import { formatCurrency, formatAddress, isPositionOpen } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 
 /* ── derived wallet stats (same conventions as WalletSidebar) ── */
@@ -32,7 +32,7 @@ function computeStats(address: string, positions: Position[], openValue: number,
     realized += Number(p.realizedPnl) || 0;
     // Only count cashPnl (unrealized mark-to-market) for OPEN positions —
     // closed/redeemed positions report cashPnl as -costBasis.
-    const isOpen = p.currentValue > 0;
+    const isOpen = isPositionOpen(p);
     if (isOpen) unrealized += Number(p.cashPnl) || 0;
     invested += p.initialValue ?? 0;
     const pnl = (Number(p.realizedPnl) || 0) + (isOpen ? (Number(p.cashPnl) || 0) : 0);
@@ -82,20 +82,23 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 }
 
 function AddressInput({
-  label, value, onChange, error,
-}: { label: string; value: string; onChange: (v: string) => void; error?: string | null }) {
+  id, label, value, onChange, error,
+}: { id: string; label: string; value: string; onChange: (v: string) => void; error?: string | null }) {
   return (
     <div className="flex-1 min-w-[260px]">
-      <label className="block text-xs font-semibold text-white/50 mb-2">{label}</label>
+      <label htmlFor={id} className="block text-xs font-semibold text-white/50 mb-2">{label}</label>
       <input
+        id={id}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder="0x…"
         spellCheck={false}
         className="w-full rounded-xl glass px-4 py-2.5 text-sm font-mono text-white/80 placeholder-white/25 outline-none"
         style={{ border: `1px solid ${error ? 'rgba(251,113,133,0.4)' : 'var(--vi-border-md)'}` }}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? `${id}-error` : undefined}
       />
-      {error && <p className="mt-1 text-[10px] text-rose-400">{error}</p>}
+      {error && <p id={`${id}-error`} className="mt-1 text-[10px] text-rose-400">{error}</p>}
     </div>
   );
 }
@@ -181,8 +184,8 @@ function CompareInner() {
         <SectionHeader index="[02]" label="Pick Two Wallets" />
         <div className="glass rounded-2xl p-5 flex flex-col gap-4">
           <div className="flex flex-wrap gap-4">
-            <AddressInput label="Trader A" value={addrA} onChange={setAddrA} error={errA} />
-            <AddressInput label="Trader B" value={addrB} onChange={setAddrB} error={errB} />
+            <AddressInput id="trader-a" label="Trader A" value={addrA} onChange={setAddrA} error={errA} />
+            <AddressInput id="trader-b" label="Trader B" value={addrB} onChange={setAddrB} error={errB} />
           </div>
           <div>
             <button
@@ -259,7 +262,7 @@ function CompareInner() {
 
           {(statsA!.truncated || statsB!.truncated) && (
             <p className="mt-2 text-[10px] text-white/25">
-              * One of these wallets has more than 3,000 lifetime positions; stats are computed on the most recent 3,000.
+              * Position history is capped at up to 1,000 rows per lifecycle. These statistics cover the returned sample, not the complete lifetime history.
             </p>
           )}
 

@@ -43,7 +43,7 @@ export default function DashboardStats() {
 
   useEffect(() => {
     fetch('/api/stats/overview')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('Statistics unavailable'); return r.json(); })
       .then(d => setStats(d))
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -60,13 +60,13 @@ export default function DashboardStats() {
       }}>
 
       <div className="min-w-0 border-b border-r sm:border-b-0" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <DataCell label="Active Markets" value={stats ? `${stats.activeMarkets}+` : '—'} loading={loading} />
+        <DataCell label="Tracked Markets" value={stats ? String(stats.activeMarkets) : '—'} sub="Up to 200 active markets" loading={loading} />
       </div>
       <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <DataCell label="24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} accent="rgba(139,92,246,0.95)" loading={loading} />
+        <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="rgba(139,92,246,0.95)" loading={loading} />
       </div>
       <div className="min-w-0 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <DataCell label="Trades (1h)" value={stats ? String(stats.trades1h) : '—'} accent="rgba(251,191,36,0.88)" loading={loading} />
+        <DataCell label="Trades (1h sample)" value={stats ? String(stats.trades1h) : '—'} sub="From latest 500 trades" accent="rgba(251,191,36,0.88)" loading={loading} />
       </div>
       <div className="min-w-0">
         <DataCell label="Top Category" value={stats?.topCategory ?? '—'} sub={stats ? `${stats.topCategoryCount} trades` : undefined} accent={catColor} loading={loading} />

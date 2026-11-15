@@ -1,3 +1,8 @@
+/** Data API v2 leaderboard volumes are shares, never dollar amounts. */
+export function formatShares(value: number): string {
+  return `${new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(value)} shares`;
+}
+
 export function formatCurrency(value: number, compact = false): string {
   if (compact) {
     const abs = Math.abs(value);
@@ -13,6 +18,13 @@ export function formatCurrency(value: number, compact = false): string {
   }).format(value);
 }
 
+/** v2 lifecycle is authoritative: a held losing outcome can have a zero mark.
+ * Legacy callers without a status retain the previous value-based convention. */
+export function isPositionOpen(p: { status?: string; currentValue?: number } | null | undefined): boolean {
+  if (p?.status) return p.status !== 'CLOSED';
+  return (Number(p?.currentValue) || 0) > 0;
+}
+
 // True lifetime P&L for a position. Polymarket's data-api reports `cashPnl`
 // as the UNREALIZED mark-to-market of currently-held shares only (so a
 // redeemed winner reads as -costBasis), while `realizedPnl` holds the profit
@@ -25,7 +37,7 @@ export function positionPnl(p: { cashPnl?: number; realizedPnl?: number; current
   // Only include unrealized cashPnl while the position is OPEN. For closed/
   // redeemed positions the data-api reports cashPnl as -costBasis, which would
   // double-count the loss on top of realizedPnl.
-  const isOpen = (Number(p?.currentValue) || 0) > 0;
+  const isOpen = isPositionOpen(p);
   return realized + (isOpen ? cash : 0);
 }
 
@@ -95,9 +107,9 @@ export function resolveCategory(apiCategory: string | undefined, title: string, 
   return detectCategory(combined);
 }
 
-/** Risk-adjusted "Smart Score" (0–100) computed relative to a dataset.
- *  Blends P&L efficiency (ROI = pnl/vol) with absolute P&L magnitude via
- *  percentile ranking, so a consistent earner outranks a lucky high-volume punt. */
+/** Relative Smart Score (0–100): 60% P&L/share percentile + 40% P&L percentile.
+ * Shares are not invested capital. This is not ROI, risk adjustment or a
+ * measurement of consistency, diversification, win rate or future returns. */
 export function computeSmartScores<T extends { pnl: number; vol: number }>(
   rows: T[]
 ): Map<T, number> {

@@ -45,17 +45,17 @@ const QA: Record<string, QAItem[]> = {
     },
     {
       q: 'Do I need an account?',
-      a: 'No account is needed to browse leaderboards, markets, or activity feeds. You only need an account to use the Watchlist feature or configure custom alerts.',
+      a: 'No account is needed to browse leaderboards, markets, or activity feeds. The Watchlist is saved locally in your browser under the `polytrack_watchlist` storage key.',
     },
   ],
   traders: [
     {
       q: 'How does the Smart Score work?',
-      a: 'Smart Score is a proprietary metric (0–100) that combines multiple factors: P&L consistency, win rate, volume efficiency, market diversity, and recent performance trends. A higher score indicates a trader with more consistent and reliable performance.',
+      a: 'Smart Score is a relative 0–100 percentile blend computed over the current leaderboard dataset: 60% P&L/share efficiency and 40% P&L magnitude. It helps compare rows in that dataset; it does not prove consistency, diversification, win rate, or future performance.',
     },
     {
       q: 'Why does a trader have high volume but low P&L?',
-      a: 'High volume with lower P&L can mean a few things: the trader takes many small positions (scalping), they\'ve been active for longer and profits compound differently, or their strategy prioritizes market making over directional bets.',
+      a: 'Official v2 leaderboard volume is measured in shares. High share volume with lower P&L/share can reflect many small trades, different market exposure, or a strategy that prioritizes activity over directional gains.',
     },
     {
       q: 'How often is the leaderboard updated?',
@@ -95,7 +95,7 @@ const QA: Record<string, QAItem[]> = {
     },
     {
       q: 'What is APR and how is it calculated?',
-      a: 'APR (Annual Percentage Rate) estimates how much you could earn providing liquidity over a year. Our formula: pool_share × 24h_volume × 0.1% maker rebate rate. Actual rewards depend on spread fill rate and Polymarket\'s reward program.',
+      a: 'APR is only an estimate of potential liquidity-provider rewards over a year. Actual results depend on the applicable Polymarket program, qualifying liquidity, spread, fills, inventory, and market resolution; AlphaBoard does not promise a fixed rate.',
     },
     {
       q: 'Is LP risk-free?',
@@ -119,15 +119,15 @@ const QA: Record<string, QAItem[]> = {
   alerts: [
     {
       q: 'How do I set up alerts?',
-      a: 'Click the "Get Alerts" button in the navbar and follow the instructions to connect your Telegram account. You can configure alerts for whale trades, LP opportunities, and market moves.',
+      a: 'Click the "Get Alerts" button in the navbar to open the official AlphaBoard Telegram channel. The current implementation provides channel-wide alerts; personal wallet alert configuration is not implemented.',
     },
     {
       q: 'What types of alerts are available?',
-      a: 'Currently we offer: Whale trade alerts (large trades from top traders), LP opportunity alerts (high-score spread changes), and market move alerts (significant price movements).',
+      a: 'The Telegram channel publishes platform-wide updates such as whale-trade and market activity alerts. Personal wallet alerts are not currently available.',
     },
     {
       q: 'Is there a limit on alerts?',
-      a: 'No, you can set up multiple alert preferences. We recommend using Telegram for delivery as it provides the fastest and most reliable notifications.',
+      a: 'There are no personal alert preferences to configure yet. Follow the Telegram channel for the alerts it publishes.',
     },
   ],
 };

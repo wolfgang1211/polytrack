@@ -1,64 +1,16 @@
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import { DataApiUnavailable } from '@/lib/dataApiV2';
+import { isWallet, NO_STORE } from '@/lib/publicDataApi';
+import { readWalletShareStats } from '@/lib/walletShareStats';
 
-export const runtime = 'edge';
+// Use the same server runtime and upstream transport as the wallet adapter.
+// This also keeps controlled built-HTTP outage tests on the real fetch path.
+export const runtime = 'nodejs';
 
 const SIZE = { width: 1200, height: 630 };
 
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  Accept: 'application/json',
-};
-
-interface QuickStats {
-  totalPnl: number;
-  winRate: number;
-  positions: number;
-  openValue: number;
-}
-
-/* Quick stats from a single positions page — good enough for a share card. */
-async function quickStats(address: string): Promise<QuickStats | null> {
-  try {
-    const [posRes, valRes] = await Promise.all([
-      fetch(`https://data-api.polymarket.com/positions?user=${address}&limit=500&offset=0&sizeThreshold=0`,
-        { headers: HEADERS, next: { revalidate: 300 } }),
-      fetch(`https://data-api.polymarket.com/value?user=${address}`,
-        { headers: HEADERS, next: { revalidate: 300 } }),
-    ]);
-    if (!posRes.ok) return null;
-    const posJson = await posRes.json();
-    const positions: Record<string, unknown>[] = Array.isArray(posJson) ? posJson : (posJson.value ?? []);
-
-    let realized = 0, unrealized = 0, wins = 0, losses = 0;
-    for (const p of positions) {
-      const rp = Number(p.realizedPnl) || 0;
-      realized += rp;
-      const isOpen = (Number(p.currentValue) || 0) > 0;
-      const cp = isOpen ? (Number(p.cashPnl) || 0) : 0;
-      unrealized += cp;
-      const pnl = rp + cp;
-      if (pnl > 0) wins++; else if (pnl < 0) losses++;
-    }
-
-    let openValue = 0;
-    if (valRes.ok) {
-      const valJson = await valRes.json();
-      const val = Array.isArray(valJson) ? valJson[0] : valJson;
-      openValue = Number(val?.value) || 0;
-    }
-
-    const decided = wins + losses;
-    return {
-      totalPnl: realized + unrealized,
-      winRate: decided ? (wins / decided) * 100 : 0,
-      positions: positions.length,
-      openValue,
-    };
-  } catch {
-    return null;
-  }
-}
 
 function fmtUsd(v: number): string {
   const abs = Math.abs(v);
@@ -73,13 +25,21 @@ export async function GET(
   ctx: RouteContext<'/api/wallet/[address]/og'>
 ) {
   const { address } = await ctx.params;
+  if (!isWallet(address)) return NextResponse.json({ error: 'Invalid wallet address.' }, { status: 400, headers: NO_STORE });
   const addr = String(address).toLowerCase();
   const shortAddr = /^0x[a-fA-F0-9]{40}$/.test(addr)
     ? `${addr.slice(0, 6)}…${addr.slice(-4)}`
     : addr.slice(0, 16);
 
-  const stats = await quickStats(addr);
-  const pnl = stats?.totalPnl ?? 0;
+  let stats: Awaited<ReturnType<typeof readWalletShareStats>>;
+  try { stats = await readWalletShareStats(addr); }
+  catch (error) {
+    const retry = error instanceof DataApiUnavailable ? error.retryAfter : undefined;
+    return NextResponse.json({ error: 'Wallet share data is temporarily unavailable.' }, {
+      status: retry ? 503 : 502, headers: { ...NO_STORE, ...(retry ? { 'Retry-After': retry } : {}) },
+    });
+  }
+  const pnl = stats.totalPnl;
   const up = pnl >= 0;
   const pnlColor = up ? '#34d399' : '#fb7185';
 
@@ -114,7 +74,7 @@ export async function GET(
         {/* P&L hero */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 26, letterSpacing: 4, textTransform: 'uppercase' }}>
-            Lifetime P&amp;L — {shortAddr}
+            {stats.truncated ? 'Sample Position P&L' : 'Position P&L'} · {shortAddr}
           </span>
           <span style={{ color: pnlColor, fontSize: 120, fontWeight: 900, lineHeight: 1 }}>
             {up ? '+' : ''}{fmtUsd(pnl)}
@@ -124,7 +84,7 @@ export async function GET(
         {/* Stat strip */}
         <div style={{ display: 'flex', gap: 18 }}>
           {[
-            { label: 'Win Rate', value: stats ? `${stats.winRate.toFixed(1)}%` : '—' },
+            { label: 'Positive P&L', value: `${stats.winRate.toFixed(1)}%` },
             { label: 'Positions', value: stats ? String(stats.positions) : '—' },
             { label: 'Open Value', value: stats ? fmtUsd(stats.openValue) : '—' },
             { label: 'alphaboard.xyz', value: 'Track any wallet' },
@@ -142,6 +102,6 @@ export async function GET(
         </div>
       </div>
     ),
-    SIZE
+    { ...SIZE, headers: NO_STORE }
   );
 }

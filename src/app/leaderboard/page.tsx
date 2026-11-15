@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import LeaderboardTable from '@/components/LeaderboardTable';
 import type { LeaderboardEntry, TimeWindow } from '@/types';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, formatShares } from '@/lib/utils';
 
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
@@ -78,13 +78,13 @@ export default function LeaderboardPage() {
         <SectionHeader index="[02]" label="Session Stats" />
         <div className="flex overflow-x-auto animate-fade-in-up"
           style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <DataCell label="Traders" value={loading ? '—' : String(data.length)} accent="rgba(167,139,250,0.95)" loading={loading} />
+          <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(167,139,250,0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <DataCell label="Total Vol" value={loading ? '—' : formatCurrency(totalVol, true)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <DataCell label="Sample Volume" value={loading || error ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <DataCell
-            label="Net P&L"
-            value={loading ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
+            label="Sample P&L"
+            value={loading || error ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
             accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
             loading={loading}
           />

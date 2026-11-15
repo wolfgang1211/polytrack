@@ -48,7 +48,7 @@ export default function DashboardPage() {
               <span className="text-white"> from the best</span>
             </h1>
             <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed sm:mt-5" style={{ color: 'rgba(255,255,255,0.46)' }}>
-              Discover, follow and copy the most profitable traders on Polymarket in real time.
+              Discover and analyze notable Polymarket traders and market activity in real time.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:flex-row lg:justify-start">
               <Link

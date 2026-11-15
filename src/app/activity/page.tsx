@@ -99,6 +99,7 @@ function DataCell({ label, value, accent, dot }: { label: string; value: string;
 export default function ActivityPage() {
   const [trades, setTrades] = useState<RecentTrade[]>([]);
   const [loading, setLoading] = useState(true);
+  const [feedError, setFeedError] = useState<string | null>(null);
   const [paused, setPaused] = useState(false);
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('all');
   const [q, setQ] = useState('');
@@ -140,17 +141,16 @@ export default function ActivityPage() {
     }
   }, []);
 
-  // Initial seed + slow polling fallback (direct from data-api, no cache).
+  // Poll the validated same-origin v2 adapter. HTTP failures are not empty feeds.
   useEffect(() => {
     let live = true;
     const load = () => {
       if (pausedRef.current) return;
-      fetch('https://data-api.polymarket.com/trades?limit=500', { cache: 'no-store' })
-        .then(r => r.json())
-        .then(d => (Array.isArray(d) ? d : (d?.trades ?? [])))
-        .catch(() => fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' }).then(r => r.json()).then(d => d?.trades ?? []))
-        .then((rows: RecentTrade[]) => { if (live) { mergeTrades(rows); setLoading(false); } })
-        .catch(() => { if (live) setLoading(false); });
+      fetch(`/api/activity?t=${Date.now()}`, { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('Trade feed unavailable'); return r.json(); })
+        .then(d => { if (!Array.isArray(d?.trades)) throw new Error('Trade feed unavailable'); return d.trades; })
+        .then((rows: RecentTrade[]) => { if (live) { mergeTrades(rows); setFeedError(null); setLoading(false); } })
+        .catch(() => { if (live) { setFeedError('Trade feed temporarily unavailable. Previously received rows may be stale.'); setLoading(false); } });
     };
     load();
     const id = setInterval(load, REFRESH_MS);
@@ -243,7 +243,8 @@ export default function ActivityPage() {
         <h1 className="text-2xl font-black tracking-tight sm:text-3xl mb-2">
           <span className="text-white">Live Trading </span><span className="text-grad">Activity</span>
         </h1>
-        <p className="text-sm text-white/40">Real-time market trades and volume from Polymarket</p>
+        <p className="text-sm text-white/40">Observed Polymarket trade samples, not complete market-wide totals.</p>
+        {feedError && <p role="alert" className="mt-3 text-sm text-amber-300">{feedError}</p>}
       </div>
 
       {/* ── [02] Session Stats strip ── */}
@@ -251,9 +252,9 @@ export default function ActivityPage() {
         <SectionHeader index="[02]" label="Session Stats" />
         <div className="flex overflow-x-auto animate-fade-in-up" style={{ animationDelay: '60ms',
           background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <DataCell label="Status" value={paused ? 'Paused' : 'Live'} accent={paused ? '#fbbf24' : '#34d399'} dot={!paused} />
+          <DataCell label="Status" value={paused ? 'Paused' : feedError ? 'Unavailable' : loading ? 'Loading' : 'Polling + stream'} accent={paused || feedError ? '#fbbf24' : '#34d399'} dot={!paused && !feedError && !loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <DataCell label="Volume" value={formatCurrency(session.volume, true)} accent="rgba(139,92,246,0.95)" />
+          <DataCell label="Observed Volume" value={feedError && !trades.length ? '—' : formatCurrency(session.volume, true)} accent="rgba(139,92,246,0.95)" />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <DataCell label="Trades" value={session.trades.toLocaleString('en-US')} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />

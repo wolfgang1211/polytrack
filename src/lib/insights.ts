@@ -12,8 +12,8 @@ export interface PnlVolRow {
   vol: number;
 }
 
-/** Minimum volume for a trader to qualify for ROI ranking.
- *  Below this, ROI is statistically noisy (one lucky bet ≈ 500% ROI). */
+/** Minimum traded SHARES for the efficiency sample. Legacy export name;
+ *  the metric is P&L per share, not return on invested capital. */
 export const ROI_MIN_VOLUME = 100_000;
 
 /** Median of P&L values. Returns 0 for an empty dataset. */
@@ -24,22 +24,21 @@ export function medianPnl(rows: PnlVolRow[]): number {
   return sorted.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
 }
 
-/** ROI (return on volume) as a fraction. 0 when volume is 0. */
+/** USDC P&L per traded share. Legacy name, not a percentage ROI. */
 export function roi(row: PnlVolRow): number {
   return row.vol > 0 ? row.pnl / row.vol : 0;
 }
 
-/** Top-N traders by ROI, filtered by a minimum volume so tiny wallets
- *  with one lucky bet don't dominate. Keeps original objects. */
+/** Top-N by P&L/share within the returned sample, excluding small share counts. */
 export function roiLeaders<T extends PnlVolRow>(
   rows: T[],
   n = 3,
   minVolume = ROI_MIN_VOLUME
-): (T & { roiPct: number })[] {
+): (T & { pnlPerShare: number })[] {
   return rows
     .filter(r => r.vol >= minVolume)
-    .map(r => ({ ...r, roiPct: roi(r) * 100 }))
-    .sort((a, b) => b.roiPct - a.roiPct)
+    .map(r => ({ ...r, pnlPerShare: roi(r) }))
+    .sort((a, b) => b.pnlPerShare - a.pnlPerShare)
     .slice(0, n);
 }
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { dataFailure, NO_STORE, PublicDataUnavailable, readTrades, record } from '@/lib/publicDataApi';
 
 const HEADERS = {
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -27,63 +28,47 @@ export interface OverviewStats {
   trades1h: number;
   topCategory: string;
   topCategoryCount: number;
+  sampled: true;
+  marketSampleLimit: number;
+  tradeSampleSize: number;
+  truncated: boolean;
 }
 
 export async function GET() {
-  const since1h = Math.floor(Date.now() / 1000) - 3_600;
-
-  const [marketsRes, tradesRes] = await Promise.allSettled([
-    fetch(
-      'https://gamma-api.polymarket.com/markets?active=true&closed=false&order=volume24hr&ascending=false&limit=200',
-      { headers: HEADERS, next: { revalidate: 120 } }
-    ),
-    fetch(
-      'https://data-api.polymarket.com/trades?limit=500',
-      { headers: HEADERS, cache: 'no-store' }
-    ),
-  ]);
-
-  /* ── Markets ── */
-  let activeMarkets = 0;
-  let volume24h = 0;
-
-  if (marketsRes.status === 'fulfilled' && marketsRes.value.ok) {
-    const json = await marketsRes.value.json();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const markets: any[] = Array.isArray(json) ? json : (json.value ?? json.markets ?? []);
-    activeMarkets = markets.length;
-    for (const m of markets) {
-      const v = m.volume24hrNum ?? Number(m.volume24hr ?? 0);
-      if (!isNaN(v)) volume24h += v;
+  try {
+    const since1h = Math.floor(Date.now() / 1000) - 3_600;
+    const [response, tradePage] = await Promise.all([
+      fetch('https://gamma-api.polymarket.com/markets?active=true&closed=false&order=volume24hr&ascending=false&limit=200', {
+        headers: HEADERS, cache: 'no-store', signal: AbortSignal.timeout(8_000),
+      }),
+      readTrades(),
+    ]);
+    if (!response.ok) throw new PublicDataUnavailable();
+    const markets: unknown = await response.json();
+    if (!Array.isArray(markets)) throw new PublicDataUnavailable();
+    let volume24h = 0;
+    for (const value of markets) {
+      const market = record(value);
+      const raw = market.volume24hrNum ?? market.volume24hr;
+      // Gamma can legitimately omit 24h volume on a new market.
+      const volume = raw == null ? 0 : typeof raw === 'number' ? raw : typeof raw === 'string' && raw.trim() ? Number(raw) : NaN;
+      if (!Number.isFinite(volume) || volume < 0) throw new PublicDataUnavailable();
+      volume24h += volume;
     }
-  }
-
-  /* ── Trades ── */
-  let trades1h = 0;
-  let topCategory = 'Crypto';
-  let topCategoryCount = 0;
-
-  if (tradesRes.status === 'fulfilled' && tradesRes.value.ok) {
-    const json = await tradesRes.value.json();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const trades: any[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
-
-    const catMap: Record<string, number> = {};
-
-    for (const t of trades) {
-      const ts = Number(t.timestamp ?? 0);
-      if (ts >= since1h) trades1h++;
-
-      const cat = detectCat(t.title ?? '');
-      catMap[cat] = (catMap[cat] ?? 0) + 1;
+    const now = Math.floor(Date.now() / 1000);
+    const inWindow = tradePage.data.filter(t => (t.timestamp ?? 0) >= since1h && (t.timestamp ?? 0) <= now);
+    const categories = new Map<string, number>();
+    for (const trade of inWindow) {
+      const category = detectCat(trade.title ?? '');
+      categories.set(category, (categories.get(category) ?? 0) + 1);
     }
-
-    const top = Object.entries(catMap).sort((a, b) => b[1] - a[1])[0];
-    if (top) { topCategory = top[0]; topCategoryCount = top[1]; }
-  }
-
-  const stats: OverviewStats = { activeMarkets, volume24h, trades1h, topCategory, topCategoryCount };
-  return NextResponse.json(stats, {
-    headers: { 'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120' },
-  });
+    const top = [...categories].sort((a, b) => b[1] - a[1])[0];
+    const stats: OverviewStats = {
+      activeMarkets: markets.length, volume24h, trades1h: inWindow.length,
+      topCategory: top?.[0] ?? 'No trades', topCategoryCount: top?.[1] ?? 0,
+      sampled: true, marketSampleLimit: 200, tradeSampleSize: tradePage.data.length,
+      truncated: tradePage.truncated || markets.length === 200,
+    };
+    return NextResponse.json(stats, { headers: NO_STORE });
+  } catch (error) { return dataFailure(error); }
 }

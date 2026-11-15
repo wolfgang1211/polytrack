@@ -1,0 +1,6 @@
+# Keep source and test diffs stable across Windows and CI.
+*.json text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf

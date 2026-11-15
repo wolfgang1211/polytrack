@@ -102,7 +102,7 @@ export default function HomeLeaderboard() {
           <span className="flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.10)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-            Live · {secsAgo}s
+            {error ? 'Unavailable' : loading ? 'Loading' : `Updated · ${secsAgo}s ago`}
           </span>
         </div>
         <Link href="/leaderboard"

@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { fetchRecentMakerFills, type MakerFill } from '@/lib/dataApiFills';
 import { readLpSnapshots } from '@/lib/lpSnapshots';
 import { kvEnabled } from '@/lib/kv';
+import { NO_STORE } from '@/lib/publicDataApi';
 
 /* Model Validation bridge (LH-C) — does the backtest model line up with what
  * a real LP wallet actually did?
@@ -138,10 +139,10 @@ export async function GET(req: NextRequest) {
     ...(error ? { error } : {}),
   });
 
-  if (!kvEnabled) return NextResponse.json(empty());
   if (!/^0x[0-9a-f]{40}$/.test(address)) {
-    return NextResponse.json(empty('Provide a valid wallet address (?address=0x…)'), { status: 200 });
+    return NextResponse.json({ error: 'Provide a valid wallet address (?address=0x…)' }, { status: 400, headers: NO_STORE });
   }
+  if (!kvEnabled) return NextResponse.json(empty(), { headers: NO_STORE });
 
   try {
     const cutoff = Date.now() - hours * 3_600_000;
@@ -161,11 +162,7 @@ export async function GET(req: NextRequest) {
     const fills = fillsRes?.fills ?? null;
 
     if (fills === null) {
-      const body = empty('Fill feed (data-api) unreachable — try again shortly');
-      body.windowStart = windowStart;
-      body.snapshots = snaps.length;
-      body.historyHours = historyHours;
-      return NextResponse.json(body, { status: 200 });
+      return NextResponse.json({ error: 'Maker fill data is temporarily unavailable. Please try again.' }, { status: 503, headers: NO_STORE });
     }
 
     if (fills.length === 0) {
@@ -263,9 +260,9 @@ export async function GET(req: NextRequest) {
     };
 
     return NextResponse.json(body, {
-      headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200' },
+      headers: { 'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=1200', 'X-Role-Classification': 'inferred-stable-snapshots' },
     });
-  } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Model validation is temporarily unavailable. Please try again.' }, { status: 503, headers: NO_STORE });
   }
 }

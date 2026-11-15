@@ -61,11 +61,11 @@ const ENDPOINTS = [
   {
     method: 'GET',
     path: '/api/wallet/[address]',
-    desc: 'Wallet analytics: lifetime positions (including closed) and current portfolio value. Wallets with more than 3,000 positions are truncated (flagged in the response).',
+    desc: 'Wallet positions and current portfolio value from Data API v2. Reads up to 1,000 rows per lifecycle (open, redeemable losers, closed), with at most 3,000 before deduplication. Remaining history sets truncated=true. Upstream failures return 502/503, never a successful zero balance.',
     params: ['address (Ethereum, 0x…)'],
     example: '/api/wallet/0x1234…',
     sample: `{
-  "positions": [ { "…": "Polymarket data-api position object" } ],
+  "positions": [ { "…": "Normalized AlphaBoard position (camelCase + status)" } ],
   "totalValue": 10423.55,
   "truncated": false
 }`,

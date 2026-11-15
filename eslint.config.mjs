@@ -6,6 +6,11 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    files: ['tests/**/*.cjs'],
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    files: ['src/**/*.{ts,tsx}'],
     rules: {
       // React 19 compiler diagnostics are useful, but the current app intentionally
       // fetches client data in effects. Keep these as warnings so lint highlights

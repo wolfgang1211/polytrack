@@ -240,10 +240,10 @@ export async function GET(
       taker: { id: '' },
     }));
 
-    if (!apiKey && tail === null) {
+    if (tail === null) {
       return NextResponse.json(
-        { available: false, error: 'No fill source available (GRAPH_API_KEY unset, data-api unreachable)' },
-        { status: 200 }
+        { available: false, error: 'Current maker-fill data is unavailable. Historical data alone cannot establish current LP earnings.' },
+        { status: 503, headers: { 'Cache-Control': 'no-store' } }
       );
     }
 
@@ -315,7 +315,7 @@ export async function GET(
     };
 
     return NextResponse.json(body, {
-      headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600' },
+      headers: { 'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600', 'X-Role-Classification': 'inferred-stable-snapshots' },
     });
   } catch {
     return NextResponse.json({ error: 'Failed to compute LP earnings' }, { status: 500 });

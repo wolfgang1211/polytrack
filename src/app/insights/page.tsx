@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import type { LeaderboardEntry } from '@/types';
-import { formatCurrency, formatAddress } from '@/lib/utils';
+import { formatCurrency, formatShares, formatAddress } from '@/lib/utils';
 import { medianPnl, roiLeaders, pnlHistogram, concentration, ROI_MIN_VOLUME } from '@/lib/insights';
 import { profileUrl } from '@/lib/builder';
 import RisingTraders from '@/components/RisingTraders';
@@ -47,12 +47,13 @@ function HBar({ label, pct, detail, color }: { label: string; pct: number; detai
 export default function InsightsPage() {
   const [data, setData] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const load = useCallback(() => {
     fetch('/api/leaderboard?window=allTime&limit=50')
-      .then(r => r.json())
-      .then(d => { if (Array.isArray(d)) setData(d); })
-      .catch(() => {})
+      .then(r => { if (!r.ok) throw new Error('Unavailable'); return r.json(); })
+      .then(d => { if (!Array.isArray(d)) throw new Error('Invalid data'); setData(d); })
+      .catch(() => { setError(true); setData([]); })
       .finally(() => setLoading(false));
   }, []);
 
@@ -68,6 +69,14 @@ export default function InsightsPage() {
   const conc     = useMemo(() => concentration(data), [data]);
 
   const maxBucket = Math.max(1, ...hist.map(b => b.count));
+
+  if (error) return (
+    <section role="alert" className="glass rounded-2xl p-6">
+      <h1 className="text-2xl font-bold">Market Insights</h1>
+      <p className="mt-3 text-white/60">Trader data is temporarily unavailable. No financial metrics are shown.</p>
+      <button className="mt-4 text-violet-300 underline" onClick={() => { setLoading(true); setError(false); load(); }}>Try again</button>
+    </section>
+  );
 
   return (
     <div className="flex flex-col gap-10">
@@ -86,10 +95,10 @@ export default function InsightsPage() {
 
       {/* ── [02] Global Overview strip ── */}
       <section>
-        <SectionHeader index="[02]" label="Global Overview" />
+        <SectionHeader index="[02]" label="Top-50 Sample Overview" />
         <div className="flex overflow-x-auto animate-fade-in-up"
           style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <DataCell label="Total Volume" value={loading ? '—' : formatCurrency(totalVol, true)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <DataCell label="Sample Volume" value={loading ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <DataCell
             label="Total P&L"
@@ -122,7 +131,7 @@ export default function InsightsPage() {
       {/* ── [03] Efficiency Leaders (ROI) ── */}
       {!loading && roiTop.length > 0 && (
         <section>
-          <SectionHeader index="[03]" label="Efficiency Leaders — P&L per Dollar Traded" />
+          <SectionHeader index="[03]" label="Efficiency Leaders — P&L per Share Traded" />
           <div className="grid gap-4 sm:grid-cols-3">
             {roiTop.map((e, i) => {
               const rings = ['rgba(52,211,153,0.4)', 'rgba(52,211,153,0.25)', 'rgba(52,211,153,0.18)'];
@@ -138,10 +147,10 @@ export default function InsightsPage() {
                     </div>
                     <span className="font-mono text-[9px] uppercase tracking-wider rounded-full px-2 py-0.5"
                       style={{ background: 'rgba(52,211,153,0.08)', color: 'rgba(52,211,153,0.8)', border: '1px solid rgba(52,211,153,0.2)' }}>
-                      #{i + 1} ROI
+                      #{i + 1} P&amp;L/share
                     </span>
                   </div>
-                  <p className="text-3xl font-black text-grad-profit leading-none">{e.roiPct.toFixed(1)}%</p>
+                  <p className="text-3xl font-black text-grad-profit leading-none">${e.pnlPerShare.toFixed(4)}/share</p>
                   <div className="flex justify-between">
                     <div>
                       <p className="text-[10px] text-white/25 uppercase tracking-wider">P&L</p>
@@ -149,7 +158,7 @@ export default function InsightsPage() {
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] text-white/25 uppercase tracking-wider">Volume</p>
-                      <p className="text-sm font-bold text-white/60">{formatCurrency(e.vol, true)}</p>
+                      <p className="text-sm font-bold text-white/60">{formatShares(e.vol)}</p>
                     </div>
                   </div>
                   <a href={profileUrl(e.proxyWallet)} target="_blank" rel="noopener noreferrer"
@@ -232,9 +241,9 @@ export default function InsightsPage() {
 
       {/* ── Methodology note ── */}
       <p className="font-mono text-[10px] leading-relaxed max-w-2xl" style={{ color: 'rgba(255,255,255,0.22)' }}>
-        Methodology: all metrics are derived from the Polymarket all-time top-50 leaderboard (refreshed every 60s).
-        ROI = P&amp;L ÷ traded volume; wallets below {formatCurrency(ROI_MIN_VOLUME, true)} volume are excluded from ROI ranking.
-        Concentration percentages rank traders within each metric independently.
+        Methodology: a top-50 all-time leaderboard sample, fetched on page load, with lifetime realized P&amp;L.
+        Efficiency = USDC P&amp;L ÷ traded shares, not return on capital; wallets below {formatShares(ROI_MIN_VOLUME)} are excluded.
+        Concentration percentages describe this sample only and rank each metric independently.
       </p>
     </div>
   );

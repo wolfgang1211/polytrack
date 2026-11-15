@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const HEADERS = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-  Accept: 'application/json',
-};
+import { dataFailure, NO_STORE, readTrades } from '@/lib/publicDataApi';
 
 const PERIOD_SECONDS: Record<string, number> = {
   '1h':  3_600,
@@ -13,7 +9,9 @@ const PERIOD_SECONDS: Record<string, number> = {
 };
 
 export interface HotMarket {
-  conditionId: string;
+  conditionId?: string;
+  marketKey: string;
+  marketMetadataAvailable: boolean;
   title: string;
   slug?: string;
   eventSlug?: string;
@@ -23,41 +21,25 @@ export interface HotMarket {
   lastTrade: number;
 }
 
-interface PolymarketTrade {
-  timestamp?: number | string;
-  conditionId?: string;
-  title?: string;
-  asset?: string;
-  slug?: string;
-  eventSlug?: string;
-  icon?: string;
-  usdcSize?: number | string;
-  size?: number | string;
-  price?: number | string;
-}
-
 export async function GET(req: NextRequest) {
   const period = req.nextUrl.searchParams.get('period') ?? '24h';
-  const windowSec = PERIOD_SECONDS[period] ?? PERIOD_SECONDS['24h'];
+  if (!Object.hasOwn(PERIOD_SECONDS, period)) return NextResponse.json({ error: 'Invalid period.' }, { status: 400, headers: NO_STORE });
+  const windowSec = PERIOD_SECONDS[period];
   const since = Math.floor(Date.now() / 1000) - windowSec;
 
   try {
-    const res = await fetch(
-      'https://data-api.polymarket.com/trades?limit=500',
-      { headers: HEADERS, cache: 'no-store' }
-    );
-    if (!res.ok) return NextResponse.json({ error: `HTTP ${res.status}` }, { status: res.status });
-
-    const json = await res.json();
-    const raw: PolymarketTrade[] = Array.isArray(json) ? json : (json.value ?? json.data ?? []);
+    const result = await readTrades();
+    const raw = result.data;
 
     // Filter to the selected time window
-    const inWindow = raw.filter((t) => Number(t.timestamp ?? 0) >= since);
+    const now = Math.floor(Date.now() / 1000);
+    const inWindow = raw.filter(t => (t.timestamp ?? 0) >= since && (t.timestamp ?? 0) <= now);
 
-    // Group by conditionId (fall back to title)
+    // A missing validated CTF identifier falls back to the outcome token,
+    // never a nonunique title or a repaired/synthetic condition identifier.
     const map = new Map<string, HotMarket>();
     for (const t of inWindow) {
-      const key = t.conditionId ?? t.title ?? t.asset ?? 'unknown';
+      const key = t.conditionId ?? `token:${t.asset}`;
       const usdc = (t.usdcSize != null)
         ? Number(t.usdcSize)
         : Number(t.size ?? 0) * Number(t.price ?? 0);
@@ -69,7 +51,9 @@ export async function GET(req: NextRequest) {
         if (Number(t.timestamp) > m.lastTrade) m.lastTrade = Number(t.timestamp);
       } else {
         map.set(key, {
-          conditionId: t.conditionId ?? key,
+          conditionId: t.conditionId,
+          marketKey: key,
+          marketMetadataAvailable: t.marketMetadataAvailable,
           title:       t.title ?? t.asset ?? 'Unknown Market',
           slug:        t.slug,
           eventSlug:   t.eventSlug,
@@ -85,8 +69,6 @@ export async function GET(req: NextRequest) {
       .sort((a, b) => b.tradeCount - a.tradeCount)
       .slice(0, 10);
 
-    return NextResponse.json(hot);
-  } catch {
-    return NextResponse.json({ error: 'Failed to fetch hot markets' }, { status: 500 });
-  }
+    return NextResponse.json(hot, { headers: { ...NO_STORE, 'X-Data-Sample': 'latest-500-trades', 'X-Data-Truncated': String(result.truncated || map.size > hot.length) } });
+  } catch (error) { return dataFailure(error); }
 }

@@ -1,4 +1,4 @@
-import { formatCurrency, positionPnl } from '@/lib/utils';
+import { formatCurrency, positionPnl, isPositionOpen } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import type { Position } from '@/types';
 
@@ -11,7 +11,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
   const pnl = positionPnl(position);
   const isProfit = pnl > 0;
   const isLoss = pnl < 0;
-  const isClosed = position.currentValue === 0 && position.curPrice === 0;
+  const isClosed = !isPositionOpen(position);
   // API's percentPnl reflects unrealized-only (reads -100% for redeemed winners),
   // so derive a percent that stays consistent with the true P&L sign.
   const pctPnl = position.initialValue > 0 ? (pnl / position.initialValue) * 100 : position.percentPnl;

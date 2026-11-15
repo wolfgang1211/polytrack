@@ -3,7 +3,8 @@
 import { useEffect, useState, use, useMemo } from 'react';
 import Link from 'next/link';
 import type { WalletData, Position } from '@/types';
-import { formatCurrency, formatAddress, detectCategory, positionPnl } from '@/lib/utils';
+import type { TimelineResponse as TimelineData } from '@/app/api/wallet/[address]/timeline/route';
+import { formatCurrency, formatAddress, detectCategory, positionPnl, isPositionOpen } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import StatsCard from '@/components/StatsCard';
 import PositionCard from '@/components/PositionCard';
@@ -77,7 +78,7 @@ function computeInsights(positions: Position[]): Insights | null {
   return { winRate: (winCount / positions.length) * 100, winCount, totalTrades: positions.length, bestCategory, bestCategoryWinRate, bestCategoryCount, avgPositionSize, biggestWin, biggestLoss };
 }
 
-interface TimelineData { points: { t: number; pnl: number }[]; realized: number; trades: number; ceiling?: boolean; source?: 'user-pnl-api' | 'graph' | 'data-api' }
+
 
 export default function WalletPage({ params }: { params: Promise<{ address: string }> }) {
   const { address } = use(params);
@@ -117,8 +118,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   }, [address]);
 
   const all = data?.positions ?? [];
-  const open   = all.filter(p => p.currentValue > 0);
-  const closed = all.filter(p => !(p.currentValue > 0));
+  const open   = all.filter(isPositionOpen);
+  const closed = all.filter(p => !isPositionOpen(p));
   const shown  = tab === 'open' ? open : closed;
 
   // Single source of truth for P&L (matches WalletSidebar):
@@ -129,12 +130,12 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
   const realizedTotal  = all.reduce((s, p) => s + (Number(p.realizedPnl) || 0), 0);
   const unrealizedOpen = open.reduce((s, p) => s + (Number(p.cashPnl) || 0), 0);
   const cappedTotalPnl = realizedTotal + unrealizedOpen;
-  const officialTotalPnl = timelineData?.source === 'user-pnl-api' ? timelineData.realized : null;
+  const officialTotalPnl = timelineData?.metric === 'trade_pnl' ? timelineData.latestPnl : null;
   const totalPnl = officialTotalPnl ?? cappedTotalPnl;
   const invested   = all.reduce((s, p) => s + (p.initialValue ?? 0), 0);
   // ROI from capped positions is misleading on huge wallets, so hide it when
   // official full-history PnL is available but positions are capped.
-  const roi        = invested > 0 && !(officialTotalPnl != null && data?.truncated) ? (totalPnl / invested) * 100 : null;
+  const roi = invested > 0 && !data?.truncated && officialTotalPnl == null ? (totalPnl / invested) * 100 : null;
   const openVal    = data?.totalValue ?? 0;
   const shownPnl   = tab === 'open'
     ? open.reduce((s, p) => s + (Number(p.realizedPnl) || 0) + (Number(p.cashPnl) || 0), 0)
@@ -292,9 +293,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Stats ── */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatsCard
-              label={officialTotalPnl != null ? "Polymarket P&L" : "Total P&L"}
+              label={officialTotalPnl != null ? 'Trade P&L' : data?.truncated ? 'Sample Position P&L' : 'Position P&L'}
               value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-              sub={officialTotalPnl != null ? 'Polymarket official P&L' : (roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% ROI` : undefined)}
+              sub={officialTotalPnl != null ? 'Cumulative trade series, not net equity' : (roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% of position entry cost` : 'Returned position sample')}
               valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-white/50'}
               gradient={totalPnl >= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(251,113,133,0.15)'}
               icon={<svg style={{width:14,height:14}} className={totalPnl>=0?'text-emerald-400':'text-rose-400'} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}
@@ -316,13 +317,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               delay={120}
             />
             <StatsCard
-              label="Total Pos."
-              value={all.length > 0
-                ? String(all.length)
-                : timelineData && timelineData.trades > 0 ? `${timelineData.trades}` : '—'}
-              sub={all.length > 0
-                ? (data?.truncated ? `${all.length}+ (capped)` : 'all time')
-                : timelineData && timelineData.trades > 0 ? 'trades (from history)' : 'position data unavailable'}
+              label={data?.truncated ? 'Sample Positions' : 'Positions'}
+              value={String(all.length)}
+              sub={data?.truncated ? 'Returned history is capped' : 'Held + closed positions'}
               gradient="rgba(168,85,247,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
@@ -397,22 +394,18 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           <div className="grid gap-4 lg:grid-cols-[280px_1fr] items-start">
             {/* Left sidebar */}
             <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-              <WalletSidebar address={address} positions={all} openValue={openVal} officialPnl={officialTotalPnl} />
+              <WalletSidebar address={address} positions={all} openValue={openVal} />
             </div>
 
             {/* Main panel — everything fits in this column */}
             <div className="flex min-w-0 flex-col gap-4">
               <div className="animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-                {/* Anchor only when the curve comes from an incomplete trade replay
-                    AND we actually have position data to anchor to. The official
-                    user-pnl-api curve is already authoritative — anchoring it to a
-                    positions-derived total (which can be 0 for old wallets whose
-                    positions the data-api no longer returns) flattens the chart. */}
+                {/* Authoritative cumulative trade series; never shifted to a different metric. */}
                 <PnlTimeline
                   address={address}
                   data={timelineData}
                   loading={timelineLoading}
-                  anchor={timelineData?.source === 'user-pnl-api' || all.length === 0 ? null : realizedTotal}
+
                 />
               </div>
               <WalletCharts positions={all} />

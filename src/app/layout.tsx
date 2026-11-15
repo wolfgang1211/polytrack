@@ -5,6 +5,7 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
+import OutboundAnalytics from '@/components/OutboundAnalytics';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
     images: [
       {
-        url: '/opengraph-image',
+        url: '/opengraph-image.png',
         width: 1200,
         height: 630,
         alt: 'AlphaBoard: Real-time alpha from the best Polymarket traders',
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     creator: '@alphaboardxyz',
     title: 'AlphaBoard: Polymarket Leaderboard & Wallet Tracker',
     description: 'Track top Polymarket traders, monitor wallet performance, analyze market liquidity and discover alpha in real time.',
-    images: ['/opengraph-image'],
+    images: ['/opengraph-image.png'],
   },
   robots: {
     index: true,
@@ -101,6 +102,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         </div>
         <Navbar />
+        <OutboundAnalytics />
           {/* 1px violet scan-line beneath navbar */}
           <div className="h-px w-full pointer-events-none"
             style={{ background: 'linear-gradient(90deg,transparent 0%,var(--vi-border-xs) 20%,var(--vi-border-xs) 80%,transparent 100%)' }} />

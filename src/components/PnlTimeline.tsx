@@ -7,7 +7,13 @@ import {
 import { formatCurrency } from '@/lib/utils';
 
 interface TimelinePoint { t: number; pnl: number }
-interface TimelineResponse { points: TimelinePoint[]; realized: number; trades: number; ceiling?: boolean }
+interface TimelineResponse {
+  points: TimelinePoint[];
+  latestPnl?: number | null;
+  realized?: number;
+  trades?: number;
+  metric?: 'trade_pnl';
+}
 
 interface TipProps {
   active?: boolean;
@@ -38,9 +44,7 @@ export default function PnlTimeline({
   address: string;
   data?: TimelineResponse | null;
   loading?: boolean;
-  /** Authoritative realized P&L to anchor the curve's endpoint to. The trade
-   *  replay can be incomplete for very high-volume wallets, so when provided we
-   *  shift the whole curve so its last point equals this value. */
+  /** Deprecated compatibility prop; never shifts the authoritative v2 series. */
   anchor?: number | null;
 }) {
   const [internalData, setInternalData] = useState<TimelineResponse | null>(null);
@@ -64,11 +68,13 @@ export default function PnlTimeline({
   const loading = externalData !== undefined ? (externalLoading ?? false) : internalLoading;
 
   const rawPoints = [...(data?.points ?? [])].sort((a, b) => a.t - b.t);
-  const rawLast = rawPoints.length ? rawPoints[rawPoints.length - 1].pnl : 0;
-  const offset = (anchor != null && rawPoints.length) ? anchor - rawLast : 0;
-  const points = offset ? rawPoints.map(p => ({ ...p, pnl: p.pnl + offset })) : rawPoints;
-  const current = anchor != null ? anchor : (data?.realized ?? 0);
-  const positive = current >= 0;
+  // The v2 series is already authoritative cumulative Trade P&L. Do not shift
+  // it to a position-derived or caller-supplied estimate.
+  void anchor;
+  const points = rawPoints;
+  const current = data?.latestPnl ?? null;
+  const currentValue = current ?? 0;
+  const positive = current == null || current >= 0;
   const stroke = positive ? '#34d399' : '#fb7185';
 
   // Inactive wallets: the P&L series can be flat across the whole window the
@@ -77,28 +83,26 @@ export default function PnlTimeline({
   const isFlat = points.length > 1 && (() => {
     let min = points[0].pnl, max = points[0].pnl;
     for (const p of points) { if (p.pnl < min) min = p.pnl; if (p.pnl > max) max = p.pnl; }
-    return (max - min) <= Math.max(1, Math.abs(current) * 0.001);
+    return (max - min) <= Math.max(1, Math.abs(currentValue) * 0.001);
   })();
 
   return (
     <div className="glass rounded-2xl p-4">
       <div className="mb-3 flex items-end justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">PnL Timeline</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">Trade P&amp;L Timeline</p>
           <p className="text-[10px] text-white/25 mt-0.5">
             {isFlat
-              ? 'No P&L change in the period covered by available history — this wallet has been inactive'
-              : data?.ceiling
-                ? `Last 3,500 trades · public API limit`
-                : data?.trades
-                  ? `${data.trades.toLocaleString()} trades · full history`
-                  : 'Cumulative realized P&L from trade history'}
+              ? 'No Trade P&L change in the period covered by the available series'
+              : data?.metric === 'trade_pnl'
+                ? 'Cumulative Trade P&L · Data API v2'
+                : 'Cumulative Trade P&L'}
           </p>
         </div>
         <div className="text-right">
           <p className="text-[9px] uppercase tracking-wider text-white/25">Current</p>
           <p className={`text-lg font-black leading-none ${positive ? 'text-grad-profit' : 'text-grad-loss'}`}>
-            {positive ? '+' : ''}{formatCurrency(current, true)}
+            {current == null ? 'Unavailable' : `${positive ? '+' : ''}${formatCurrency(current, true)}`}
           </p>
         </div>
       </div>
@@ -113,7 +117,7 @@ export default function PnlTimeline({
         </div>
       ) : points.length < 2 ? (
         <div className="flex h-56 items-center justify-center text-xs text-white/25">
-          Not enough trade history to chart
+          {data == null ? 'Trade P&L data is unavailable' : 'Not enough trade history to chart'}
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={224}>

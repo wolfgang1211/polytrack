@@ -77,7 +77,9 @@ export async function fetchFillPage(
       if (!res.ok) continue;
       const json = await res.json();
       if (json?.errors?.length) continue;
-      return (json?.data?.enrichedOrderFilleds ?? []) as GraphFill[];
+      const rows = json?.data?.enrichedOrderFilleds;
+      if (!Array.isArray(rows) || rows.length > 1000) continue;
+      return rows as GraphFill[];
     } catch {
       // Retry transient Graph/indexer/network failures.
     }
@@ -104,17 +106,17 @@ export async function fetchSide(
 
     let shouldStop = false;
     for (const batch of pages) {
-      if (batch === null) continue;
+      if (batch === null) throw new Error('Graph fill history is incomplete.');
       for (const f of batch) out.push({ ...f, isTaker: !asMaker });
       if (batch.length < 1000) {
         shouldStop = true;
         break;
       }
     }
-    if (shouldStop) break;
+    if (shouldStop) return out;
   }
 
-  return out;
+  throw new Error('Graph fill history exceeds the verified page limit.');
 }
 
 /** Fetch every fill for a wallet (both maker and taker roles), deduped by id. */

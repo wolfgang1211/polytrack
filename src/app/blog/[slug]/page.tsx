@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 
 const POSTS: Record<string, { title: string; date: string; readTime: string; content: React.ReactNode }> = {
   'polymarket-lp-guide': {
@@ -24,8 +25,9 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">3. Estimating APR</h3>
         <p className="text-white/50">
-          Use AlphaBoard&apos;s formula: pool_share × 24h_volume × 0.1% maker rebate.
-          Compare this against DeFi alternatives to find the best risk-adjusted yield.
+          Use AlphaBoard&apos;s estimates as a starting point only: potential rewards depend on the
+          applicable Polymarket program, your share of qualifying liquidity, fills, and spread.
+          Compare the estimate against the risks before committing capital.
         </p>
       </div>
     ),
@@ -37,13 +39,15 @@ const POSTS: Record<string, { title: string; date: string; readTime: string; con
     content: (
       <div className="space-y-4">
         <p>
-          AlphaBoard&apos;s Smart Score combines consistency, efficiency, and diversification into a single metric.
-          Here&apos;s how we calculate it and why it matters.
+          AlphaBoard&apos;s Smart Score is a relative 0–100 ranking within the current dataset.
+          It blends P&amp;L/share efficiency with absolute P&amp;L magnitude using percentile ranks.
+          It is a comparison aid, not a guarantee of consistency or future performance.
         </p>
         <h3 className="text-sm font-semibold text-white/80 mt-6">Methodology</h3>
         <p className="text-white/50">
-          We score P&L stability, win rate, volume efficiency, market diversity, and recent performance. 
-          Each factor is weighted to reward sustainable edge over lucky streaks.
+          The score uses a 60% percentile blend for P&amp;L/share and a 40% percentile blend for
+          P&amp;L magnitude. Official v2 leaderboard volume is measured in shares, so the efficiency
+          ratio is P&amp;L per share rather than a capital return claim.
         </p>
       </div>
     ),
@@ -90,27 +94,25 @@ export async function generateStaticParams() {
   return Object.keys(POSTS).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = POSTS[params.slug];
-  if (!post) return { title: 'Post Not Found' };
+export const dynamicParams = false;
+
+type BlogParams = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: BlogParams): Promise<Metadata> {
+  const { slug } = await params;
+  const post = Object.hasOwn(POSTS, slug) ? POSTS[slug] : undefined;
+  if (!post) notFound();
   return {
     title: post.title,
     description: `AlphaBoard blog: ${post.title}`,
-    alternates: { canonical: `/blog/${params.slug}` },
+    alternates: { canonical: `/blog/${slug}` },
   };
 }
 
-export default function BlogPostPage({ params }: { params: { slug: string } }) {
-  const post = POSTS[params.slug];
-
-  if (!post) {
-    return (
-      <div className="mx-auto max-w-3xl py-8">
-        <h1 className="text-2xl font-bold text-white mb-2">Post Not Found</h1>
-        <Link href="/blog" className="text-xs text-purple-400 hover:text-purple-300">← Back to Blog</Link>
-      </div>
-    );
-  }
+export default async function BlogPostPage({ params }: BlogParams) {
+  const { slug } = await params;
+  const post = Object.hasOwn(POSTS, slug) ? POSTS[slug] : undefined;
+  if (!post) notFound();
 
   return (
     <article className="mx-auto max-w-3xl py-8">

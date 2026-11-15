@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import type { LeaderboardEntry, SortOrder, TimeWindow } from '@/types';
-import { formatCurrency, formatAddress, computeSmartScores, scoreTier } from '@/lib/utils';
+import { formatCurrency, formatShares, formatAddress, computeSmartScores, scoreTier } from '@/lib/utils';
 import { profileUrl } from '@/lib/builder';
 import { SkeletonRow } from './LoadingSpinner';
 import { useWatchlist } from '@/lib/useWatchlist';
@@ -225,7 +225,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                 </div>
                 <div className="rounded-xl p-2" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-white/30">Volume</p>
-                  <p className="mt-1 truncate text-xs font-bold tabular-nums text-white/60">{formatCurrency(entry.vol, true)}</p>
+                  <p className="mt-1 truncate text-xs font-bold tabular-nums text-white/60">{formatShares(entry.vol)}</p>
                 </div>
                 <div className="rounded-xl p-2" style={{ background: 'rgba(255,255,255,0.035)', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <p className="text-[9px] font-bold uppercase tracking-widest text-white/30">Smart</p>
@@ -292,9 +292,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
                   <p className="mb-1.5 text-xs font-bold text-white/80">Smart Score (0–100)</p>
                   <p className="text-[11px] leading-relaxed text-white/45 normal-case tracking-normal font-normal">
-                    Risk-adjusted ranking. Blends <span className="text-emerald-300">capital efficiency</span> (P&amp;L ÷ volume,
+                    Relative sample ranking. Blends <span className="text-emerald-300">P&amp;L per traded share</span> (
                     60%) with <span className="text-violet-300">absolute P&amp;L</span> (40%), scored by percentile across the list.
-                    A consistent earner outranks a lucky high-volume punt.
+                    Not capital ROI, risk adjustment, consistency or a forecast of returns.
                   </p>
                   <div className="mt-2.5 flex flex-wrap gap-2 text-[10px] normal-case tracking-normal font-normal">
                     <span style={{ color: '#fbbf24' }}>🔥 85+ Elite</span>
@@ -420,7 +420,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   {/* Volume */}
                   <div className="flex items-center justify-end">
                     <span className="text-xs font-semibold text-white/40 tabular-nums">
-                      {formatCurrency(entry.vol, true)}
+                      {formatShares(entry.vol)}
                     </span>
                   </div>
 

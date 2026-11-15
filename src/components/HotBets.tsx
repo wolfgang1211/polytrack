@@ -138,7 +138,7 @@ export default function HotBets() {
         ) : (
           <div>
             {markets.map((m, i) => (
-              <HotMarketRow key={m.conditionId} market={m} rank={i + 1} />
+              <HotMarketRow key={m.marketKey} market={m} rank={i + 1} />
             ))}
           </div>
         )}

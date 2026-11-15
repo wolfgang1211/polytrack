@@ -24,7 +24,7 @@ const POSTS = [
     date: '2026-05-24',
     readTime: '8 min',
     tags: ['LP', 'Yield', 'Guide'],
-    image: 'https://www.alphaboard.xyz/opengraph-image',
+    image: '/opengraph-image.png',
   },
   {
     slug: 'smart-score-explained',
@@ -33,7 +33,7 @@ const POSTS = [
     date: '2026-05-17',
     readTime: '6 min',
     tags: ['Smart Score', 'Traders', 'Analytics'],
-    image: 'https://www.alphaboard.xyz/opengraph-image',
+    image: '/opengraph-image.png',
   },
   {
     slug: 'detecting-whale-activity',
@@ -42,7 +42,7 @@ const POSTS = [
     date: '2026-05-10',
     readTime: '7 min',
     tags: ['Whales', 'Activity', 'Trading'],
-    image: 'https://www.alphaboard.xyz/opengraph-image',
+    image: '/opengraph-image.png',
   },
   {
     slug: 'market-microstructure',
@@ -51,7 +51,7 @@ const POSTS = [
     date: '2026-05-03',
     readTime: '9 min',
     tags: ['Trading', 'Markets', 'Strategy'],
-    image: 'https://www.alphaboard.xyz/opengraph-image',
+    image: '/opengraph-image.png',
   },
 ];
 

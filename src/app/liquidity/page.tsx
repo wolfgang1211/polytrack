@@ -6,7 +6,7 @@ import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis,
   Tooltip, CartesianGrid, ReferenceLine,
 } from 'recharts';
-import { formatCurrency, formatAddress } from '@/lib/utils';
+import { formatCurrency, formatAddress, formatShares } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
@@ -317,7 +317,7 @@ function LPLeaderboardSection() {
           style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">#</span>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-white/30">Trader</span>
-          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30">Volume</span>
+          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30">Volume (shares)</span>
           <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-white/30">P&amp;L</span>
         </div>
         <div>
@@ -345,7 +345,7 @@ function LPLeaderboardSection() {
                 </div>
               </div>
               <div className="flex items-center justify-end">
-                <span className="text-xs font-bold text-white/50">{formatCurrency(t.vol ?? 0, true)}</span>
+                <span className="text-xs font-bold text-white/50">{formatShares(t.vol ?? 0)}</span>
               </div>
               <div className="flex items-center justify-end">
                 <span className={`text-xs font-black ${(t.pnl ?? 0) >= 0 ? 'text-grad-profit' : 'text-grad-loss'}`}>

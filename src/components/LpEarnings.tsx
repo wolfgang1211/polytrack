@@ -32,7 +32,7 @@ interface LpData {
   lastTs: number | null;
   markets: LpMarketRow[];
   freshFills?: number;     // maker fills appended from the live data-api feed
-  tailTruncated?: boolean; // live tail hit the data-api offset ceiling
+  tailTruncated?: boolean; // live tail hit the bounded v2 cursor/page limit
 }
 
 function timeAgo(ts: number): string {
@@ -49,21 +49,34 @@ function pnlClass(v: number): string {
 export default function LpEarnings({ address }: { address: string }) {
   const [data, setData] = useState<LpData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     if (!address) return;
     let live = true;
     setLoading(true);
     setData(null);
+    setFailed(false);
 
     fetch(`/api/wallet/${address}/lp`)
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then((d: LpData) => { if (live && d?.available) setData(d); })
-      .catch(() => {})
+      .then((d: LpData) => {
+        if (!d?.available) throw new Error('LP data unavailable');
+        if (live) setData(d);
+      })
+      .catch(() => { if (live) setFailed(true); })
       .finally(() => { if (live) setLoading(false); });
 
     return () => { live = false; };
-  }, [address]);
+  }, [address, retry]);
+
+  if (!loading && failed) return (
+    <div role="alert" className="glass rounded-2xl p-5 text-sm text-white/60">
+      LP earnings are temporarily unavailable. No earnings estimate is shown.
+      <button className="ml-2 text-violet-300 underline" onClick={() => setRetry(value => value + 1)}>Try again</button>
+    </div>
+  );
 
   // No maker fills → not an LP wallet → keep the page clean.
   if (!loading && (!data || data.fills === 0)) return null;
@@ -77,7 +90,7 @@ export default function LpEarnings({ address }: { address: string }) {
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">LP Earnings</p>
           <p className="mt-0.5 text-[10px] text-white/25">
-            Realized spread from maker fills · excludes liquidity reward payouts
+            Maker-fill spread P&amp;L · v2 roles inferred · excludes reward payouts
           </p>
         </div>
         <div className="flex items-center gap-1.5">
