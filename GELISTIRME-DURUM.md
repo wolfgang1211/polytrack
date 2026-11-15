@@ -117,3 +117,13 @@ Kuzey yıldızı: haftalık Builder-attributed matched volume. Native order gön
 - Son parent gate: 137/137 test, 0 failed/skip; typecheck/build exit0; lint exit0, 0 hata/25 mevcut uyarı; git diff --check exit0. Yeni scoped analytics paketi 26/26; receipt paketi 6/6. Önceki 61/61 HTTP checkpoint ayrı tarihsel kanıttır, bu yeni 35/35'e eklenerek tek güncel toplam gibi sunulmaz.
 - Brave görsel/klavye kabulü startup consent nedeniyle açık. Parent mevcut profil iznini aşmadı; HTTP/hook/renderer testleri browser kabulü sayılmadı. Görev-owned preview tekrar stopped,3016/3017 kapalı. Commit/push/deploy, fon/wallet işlemi, public mesaj ve kalıcı silme yok.
 - Güncel kanıt dizini: `C:/Users/wolfgang/hermes_reports/alphaboard-funnel-followup/`.
+
+## 2026-11-15: Kullanıcı onaylı yayın paketi
+
+- Kullanıcı yerel sürümü görsel olarak onayladı, son kontrol, GitHub push ve canlı yayına açık izin verdi.
+- Kaynak commit: `a45781c12a4a105783b2eb1eb442990a8cd50f46` (`fix(data): migrate Polymarket APIs and harden financial analytics`).
+- Yayın öncesi son gate: 140/140 test, 0 failed/skipped; production build/typecheck exit 0; lint 0 hata/25 mevcut uyarı; staged diff ve yüksek-sinyalli secret kontrolü temiz.
+- Local-QA `/analytics` açık opt-in olmadan gerçek 404 döner; production sayacı/SQLite açılmaz. Test yolları geliştirici home dizinine bağımlı değildir. Production-shaped localhost kontrolünde ana sayfa/leaderboard/liquidity/compare/FAQ ve gerçek v2 leaderboard 200, geçersiz wallet 400, bilinmeyen blog ve analytics 404, disabled summary 503 doğrulandı.
+- GitHub/Vercel production entegrasyonu doğrulandı; bu kayıt canlı yayın başarı iddiası değildir, kesin deployment ve public readback kanıtı yayın raporuna yazılır.
+- `.hermes/` ve `DESIGN_AUDIT_TR.md` yayın dışında korundu. Eski boş Git index kilidi silinmeden kanıt dizinine taşındı; auth/secret dosyaları okunmadı.
+- Yayın kanıtları: `C:/Users/wolfgang/hermes_reports/alphaboard-release-current/`.
