@@ -1,14 +1,14 @@
 # AlphaBoard Geliştirme Durumu
 
-## 2026-11-15: Siyah-beyaz kurumsal tema, yerel önizleme
+## 2026-11-15: Siyah-beyaz kurumsal tema, yayınlandı
 
 - Kullanıcı siyah-beyaz tasarım önerisini onayladı; finansal veriden gelen orijinal kırmızı/yeşil ve diğer semantik renklerin korunmasını istedi.
-- Yerel branch: `design/monochrome`. Yayındaki taban commit: `0cacfa5`. Bu tasarım için henüz commit, push veya production deployment yok.
+- Kullanıcı gerçek yerel UI'yi inceleyip yayın onayı verdi. Tasarım commit'i `2aa9bc8d171164cf3d4ae0ff16f8614acc40303e`, GitHub `main` ve Vercel Production deployment `7804628249` üzerinden yayımlandı. Canonical domain smoke **14/14** geçti; canlı logo/ikon/OG byte hash'leri yeni kaynaklarla eşleşti.
 - Kömür siyahı `#111111`, kırık beyaz `#f2f0e9`, nötr gri yüzeyler; mor utility/inline renkler ve eski `--vi-*` tokenları aktif kaynaklardan kaldırıldı. Kâr/zarar ve BUY/SELL renkleri korunuyor; UI'ye grayscale filtresi uygulanmadı.
 - Onaylı editoryal hero, nötr navigasyon, sade yüzeyler ve daha keskin köşeler uygulandı. Logo geometrisi korunup beyaz varyant eklendi; orijinal artwork dosyaları değişmedi. Favicon, uygulama ikonları, manifest ve OG kartı da nötrleştirildi.
 - Son gate: **144/144 test**, build ve typecheck exit **0**, lint **0 hata / 25 uyarı**, gerçek yerel HTTP **43/43**. Veri adaptörleri ve finansal API davranışı değiştirilmedi. Mor renk, nötr kontrast ve semantik renk koruması için regresyon testleri eklendi.
 - Önizleme: `http://127.0.0.1:3016/`, mevcut PM2 `alphaboard-audit-preview` ile çalışıyor. Analytics hâlâ yalnız açık yerel opt-in ile erişilebilir.
-- Gerçek tarayıcıdaki responsive/klavye ve son görsel kabul **açık**; otomatik ekran görüntüsü veya tam tarayıcı kabulü iddia edilmiyor. Kullanıcı gerçek sayfaları incelemeden yayın yapılmayacak.
+- Kullanıcı görsel kabulü alındı. Otomatik gerçek tarayıcı responsive/klavye gate'i **açık**; ekran görüntüsü veya tam otomatik tarayıcı kabulü iddia edilmiyor. X banner/PFP taslakları ayrıca hazırlandı, hesaba henüz yüklenmedi; profil yazması için görsel onay ve mevcut tarayıcı erişimi gerekli.
 - Kanıtlar ve orijinal ikon yedekleri: `C:/Users/wolfgang/hermes_reports/alphaboard-monochrome-implementation/`.
 
 
