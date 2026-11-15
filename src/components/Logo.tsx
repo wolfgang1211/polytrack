@@ -24,7 +24,7 @@ export default function Logo({ size = 36, className }: LogoProps) {
       style={{ display: 'inline-flex', width: size, height: size, alignItems: 'center', justifyContent: 'center' }}
     >
       <Image
-        src="/alphaboard-logo-mark-purple-512.png"
+        src="/alphaboard-mark-white-512.png"
         alt="AlphaBoard"
         width={size}
         height={size}
@@ -39,7 +39,7 @@ export function WordmarkLogo({ height = 30, className }: WordmarkLogoProps) {
 
   return (
     <Image
-      src="/alphaboard-logo-wordmark.png"
+      src="/alphaboard-wordmark-white.png"
       alt="AlphaBoard"
       width={width}
       height={height}

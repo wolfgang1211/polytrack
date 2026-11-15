@@ -53,7 +53,7 @@ export async function GET(
           flexDirection: 'column',
           justifyContent: 'space-between',
           padding: '64px 72px',
-          background: 'linear-gradient(135deg, #0b0714 0%, #120a24 55%, #1a0f33 100%)',
+          background: '#111111',
           fontFamily: 'sans-serif',
         }}
       >
@@ -61,10 +61,10 @@ export async function GET(
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{
-              width: 40, height: 40, borderRadius: 12, display: 'flex',
+              width: 40, height: 40, borderRadius: 4, display: 'flex',
               alignItems: 'center', justifyContent: 'center',
-              background: 'linear-gradient(135deg, #7c3aed, #a78bfa)',
-              color: 'white', fontSize: 22, fontWeight: 900,
+              background: '#f2f0e9',
+              color: '#111111', fontSize: 22, fontWeight: 900,
             }}>α</div>
             <span style={{ color: 'rgba(255,255,255,0.9)', fontSize: 28, fontWeight: 800 }}>AlphaBoard</span>
           </div>
@@ -91,9 +91,9 @@ export async function GET(
           ].map(s => (
             <div key={s.label} style={{
               display: 'flex', flexDirection: 'column', gap: 6, flex: 1,
-              padding: '20px 24px', borderRadius: 18,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.10)',
+              padding: '20px 24px', borderRadius: 4,
+              background: '#191919',
+              border: '1px solid #464541',
             }}>
               <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: 18, textTransform: 'uppercase', letterSpacing: 2 }}>{s.label}</span>
               <span style={{ color: 'rgba(255,255,255,0.92)', fontSize: 30, fontWeight: 800 }}>{s.value}</span>

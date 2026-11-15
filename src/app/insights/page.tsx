@@ -12,9 +12,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -74,7 +74,7 @@ export default function InsightsPage() {
     <section role="alert" className="glass rounded-2xl p-6">
       <h1 className="text-2xl font-bold">Market Insights</h1>
       <p className="mt-3 text-white/60">Trader data is temporarily unavailable. No financial metrics are shown.</p>
-      <button className="mt-4 text-violet-300 underline" onClick={() => { setLoading(true); setError(false); load(); }}>Try again</button>
+      <button className="mt-4 text-white/70 underline" onClick={() => { setLoading(true); setError(false); load(); }}>Try again</button>
     </section>
   );
 
@@ -110,7 +110,7 @@ export default function InsightsPage() {
           <DataCell
             label="Avg P&L / Trader"
             value={loading ? '—' : (avgPnl >= 0 ? '+' : '') + formatCurrency(avgPnl, true)}
-            accent="rgba(167,139,250,0.95)"
+            accent="rgba(255,255,255,0.95)"
             loading={loading}
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
@@ -190,7 +190,7 @@ export default function InsightsPage() {
                     label={b.label}
                     pct={(b.count / maxBucket) * 100}
                     detail={`${b.count} trader${b.count === 1 ? '' : 's'}`}
-                    color="linear-gradient(90deg, rgba(167,139,250,0.55), rgba(96,165,250,0.55))"
+                    color="linear-gradient(90deg, rgba(255,255,255,0.55), rgba(96,165,250,0.55))"
                   />
                 ))}
               </div>
@@ -231,7 +231,7 @@ export default function InsightsPage() {
               <p className="text-sm font-bold text-white mb-1">{title}</p>
               <p className="text-xs text-white/35 leading-relaxed">{desc}</p>
               <span className="mt-3 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
-                style={{ background: 'var(--vi-tint)', color: 'rgba(167,139,250,0.7)', border: '1px solid var(--vi-border-xs)' }}>
+                style={{ background: 'var(--accent-tint)', color: 'rgba(255,255,255,0.7)', border: '1px solid var(--accent-border-xs)' }}>
                 Coming Soon
               </span>
             </div>

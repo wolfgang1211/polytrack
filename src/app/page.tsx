@@ -12,10 +12,10 @@ import LiveTicker from '@/components/LiveTicker';
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <span className="font-mono text-[10px] font-medium tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
+      <div className="h-px w-8" style={{ background: 'var(--accent-border)' }} />
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>{label}</span>
+      <div className="h-px flex-1" style={{ background: 'var(--accent-border)' }} />
     </div>
   );
 }
@@ -30,34 +30,31 @@ export default function DashboardPage() {
       {/* ── [01] Hero ── */}
       <div className="min-w-0 animate-fade-in-up">
         <div className="flex items-center gap-3 mb-5 sm:mb-8">
-          <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>[01]</span>
-          <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.22)' }}>Terminal Intelligence</span>
+          <span className="font-mono text-[10px] font-medium tracking-widest" style={{ color: 'var(--text-muted)' }}>[01]</span>
+          <div className="h-px w-8" style={{ background: 'var(--accent-border)' }} />
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-secondary)' }}>Polymarket Intelligence</span>
         </div>
 
         <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 sm:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:items-start">
           <div className="flex min-w-0 flex-col items-center text-center lg:items-start lg:text-left">
             <h1
-              className="text-3xl font-black leading-[1.12] sm:text-4xl lg:text-5xl"
+              className="text-4xl font-normal leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl"
               style={{ fontFamily: 'var(--font-serif-display, Georgia, serif)' }}
             >
-              <span className="text-white">Real time</span>
-              <br className="sm:hidden" />
-              <span className="hidden sm:inline"> </span>
-              <span className="text-grad">alpha</span>
-              <span className="text-white"> from the best</span>
+              <span>Real time alpha.</span>
+              <br />
+              <span className="italic">Without the noise.</span>
             </h1>
-            <p className="mt-4 max-w-sm text-sm font-medium leading-relaxed sm:mt-5" style={{ color: 'rgba(255,255,255,0.46)' }}>
+            <p className="mt-5 max-w-md text-sm font-normal leading-relaxed sm:text-base" style={{ color: 'var(--text-secondary)' }}>
               Discover and analyze notable Polymarket traders and market activity in real time.
             </p>
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:flex-row lg:justify-start">
               <Link
                 href="/markets"
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-[#111111] transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-neutral-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(124,58,237,0.95), rgba(147,51,234,0.88))',
-                  border: '1px solid rgba(196,181,253,0.35)',
-                  boxShadow: '0 12px 32px rgba(124,58,237,0.22)',
+                  background: 'var(--text-primary)',
+                  border: '1px solid var(--text-primary)',
                 }}
               >
                 Explore Markets
@@ -67,10 +64,10 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/checker"
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold text-white/75 transition-all hover:-translate-y-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70"
-                style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.12)' }}
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-neutral-300"
+                style={{ border: '1px solid var(--accent-border)' }}
               >
-                <svg className="h-4 w-4 text-violet-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z" />
                 </svg>
                 Analyze a Wallet

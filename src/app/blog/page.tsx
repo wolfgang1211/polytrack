@@ -59,7 +59,7 @@ function Tag({ label }: { label: string }) {
   return (
     <span
       className="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-      style={{ background: 'rgba(168,85,247,0.12)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.25)' }}
+      style={{ background: 'rgba(255,255,255,0.12)', color: '#b1afa8', border: '1px solid rgba(255,255,255,0.25)' }}
     >
       {label}
     </span>
@@ -106,7 +106,7 @@ export default function BlogPage() {
               </span>
             </div>
 
-            <h2 className="text-sm font-semibold text-white/85 mb-1.5 leading-snug group-hover:text-purple-200 transition-colors">
+            <h2 className="text-sm font-semibold text-white/85 mb-1.5 leading-snug group-hover:text-white/80 transition-colors">
               {post.title}
             </h2>
             <p className="text-xs text-white/35 leading-relaxed line-clamp-2">
@@ -118,7 +118,7 @@ export default function BlogPage() {
                 {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               <span
-                className="text-[10px] font-semibold text-purple-400 opacity-0 transition-opacity group-hover:opacity-100"
+                className="text-[10px] font-semibold text-white/60 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 Read more →
               </span>

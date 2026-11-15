@@ -139,7 +139,7 @@ function AccordionItem({ q, a }: { id: string; q: string; a: React.ReactNode }) 
       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
     >
       <summary
-        className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white/80 transition-colors group-open:text-purple-300"
+        className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white/80 transition-colors group-open:text-white"
       >
         {q}
         <svg
@@ -162,7 +162,7 @@ function CategorySection({ id, items }: { id: string; items: QAItem[] }) {
     <section id={id} className="scroll-mt-24">
       <h2 className="mb-4 flex items-center gap-3">
         <span className="inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-              style={{ background: 'rgba(168,85,247,0.15)', color: '#a855f7', border: '1px solid rgba(168,85,247,0.25)' }}>
+              style={{ background: 'rgba(255,255,255,0.15)', color: '#b1afa8', border: '1px solid rgba(255,255,255,0.25)' }}>
           {label}
         </span>
       </h2>

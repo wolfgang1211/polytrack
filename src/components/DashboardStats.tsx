@@ -10,7 +10,7 @@ const CAT_COLOR: Record<string, string> = {
   Sports:        '#34d399',
   Entertainment: '#f472b6',
   Tech:          '#38bdf8',
-  World:         '#a78bfa',
+  World:         '#b1afa8',
   Other:         '#94a3b8',
 };
 
@@ -63,7 +63,7 @@ export default function DashboardStats() {
         <DataCell label="Tracked Markets" value={stats ? String(stats.activeMarkets) : '—'} sub="Up to 200 active markets" loading={loading} />
       </div>
       <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="rgba(139,92,246,0.95)" loading={loading} />
+        <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="rgba(242,240,233,0.95)" loading={loading} />
       </div>
       <div className="min-w-0 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
         <DataCell label="Trades (1h sample)" value={stats ? String(stats.trades1h) : '—'} sub="From latest 500 trades" accent="rgba(251,191,36,0.88)" loading={loading} />

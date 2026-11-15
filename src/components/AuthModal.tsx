@@ -43,7 +43,7 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
         <div className="mb-5 flex flex-col items-center text-center">
           <div className="mb-3 flex items-center gap-2">
             <Logo size={30} />
-            <span className="text-lg font-bold text-[#a855f7]">AlphaBoard</span>
+            <span className="text-lg font-bold text-[#f2f0e9]">AlphaBoard</span>
           </div>
           <h2 className="text-xl font-black text-white">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
           <p className="mt-1 text-xs text-white/40">
@@ -56,20 +56,20 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
             <div>
               <label className="mb-1 block text-xs font-semibold text-white/70">Name</label>
               <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name"
-                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-violet-500/40"
+                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
                 style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
             </div>
           )}
           <div>
             <label className="mb-1 block text-xs font-semibold text-white/70">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"
-              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-violet-500/40"
+              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
               style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold text-white/70">Password</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
-              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-violet-500/40"
+              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
               style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
           </div>
 
@@ -79,8 +79,8 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
           )}
 
           <button type="submit" disabled={busy}
-            className="mt-1 w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all hover:brightness-110 disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#7c3aed,#9333ea)', boxShadow: '0 4px 20px rgba(124,58,237,0.35)' }}>
+            className="mt-1 w-full rounded-xl py-2.5 text-sm font-bold text-[#111111] transition-all hover:brightness-110 disabled:opacity-60"
+            style={{ background: '#f2f0e9', boxShadow: 'none' }}>
             {busy ? 'Please wait…' : mode === 'signup' ? 'Sign up' : 'Sign in'}
           </button>
         </form>
@@ -88,7 +88,7 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
         <p className="mt-4 text-center text-xs text-white/40">
           {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); }}
-            className="font-bold text-violet-300 hover:text-violet-200">
+            className="font-bold text-[#b1afa8] hover:text-[#f2f0e9]">
             {mode === 'signup' ? 'Sign in' : 'Sign up'}
           </button>
         </p>

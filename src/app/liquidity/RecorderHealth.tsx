@@ -21,9 +21,9 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
   );
@@ -122,7 +122,7 @@ export default function RecorderHealth() {
           <>
             {/* Key stats */}
             <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
-              <Stat label="Snapshots" value={data.snapshots.toLocaleString()} sub={`${data.marketsLatest} markets tracked`} color="#a78bfa" />
+              <Stat label="Snapshots" value={data.snapshots.toLocaleString()} sub={`${data.marketsLatest} markets tracked`} color="#b1afa8" />
               <Stat label="History Span" value={span(data.historyHours)} sub={`${span(data.coveredHours)} replayable`} color="#60a5fa" />
               <Stat label="Last Recorded" value={ago(data.lastAgeMin)}
                 sub={data.status === 'healthy' ? 'on schedule' : data.status === 'delayed' ? 'a beat behind' : 'recorder may be down'}
@@ -172,7 +172,7 @@ export default function RecorderHealth() {
                       axisLine={false} tickLine={false} minTickGap={48} interval="preserveStartEnd" />
                     <Tooltip
                       cursor={{ fill: 'rgba(255,255,255,0.04)' }}
-                      contentStyle={{ background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
                       labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
                       labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit' })}
                       formatter={(v) => [`${v} snapshot${Number(v) === 1 ? '' : 's'}`, 'Recorded'] as [string, string]} />

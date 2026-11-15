@@ -74,7 +74,7 @@ export default function LpEarnings({ address }: { address: string }) {
   if (!loading && failed) return (
     <div role="alert" className="glass rounded-2xl p-5 text-sm text-white/60">
       LP earnings are temporarily unavailable. No earnings estimate is shown.
-      <button className="ml-2 text-violet-300 underline" onClick={() => setRetry(value => value + 1)}>Try again</button>
+      <button className="ml-2 text-[#b1afa8] underline" onClick={() => setRetry(value => value + 1)}>Try again</button>
     </div>
   );
 
@@ -84,7 +84,7 @@ export default function LpEarnings({ address }: { address: string }) {
   const bps = data && data.makerVolume > 0 ? (data.realized / data.makerVolume) * 10000 : null;
 
   return (
-    <div className="glass gradient-border animate-fade-in-up rounded-2xl p-5" style={{ animationDelay: '160ms' }}>
+    <div className="glass animate-fade-in-up rounded-2xl p-5" style={{ animationDelay: '160ms' }}>
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>

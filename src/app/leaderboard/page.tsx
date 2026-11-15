@@ -9,9 +9,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -78,7 +78,7 @@ export default function LeaderboardPage() {
         <SectionHeader index="[02]" label="Session Stats" />
         <div className="flex overflow-x-auto animate-fade-in-up"
           style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(167,139,250,0.95)" loading={loading} />
+          <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(255,255,255,0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <DataCell label="Sample Volume" value={loading || error ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />

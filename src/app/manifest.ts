@@ -7,16 +7,16 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Track top Polymarket traders, monitor wallet performance and discover alpha in real time.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0a0a0b',
-    theme_color: '#a855f7',
+    background_color: '#111111',
+    theme_color: '#111111',
     icons: [
       {
-        src: '/alphaboard-logo-mark-purple-192.png',
+        src: '/alphaboard-icon-192.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/alphaboard-logo-mark-purple-512.png',
+        src: '/alphaboard-icon-512.png',
         sizes: '512x512',
         type: 'image/png',
       },

@@ -34,7 +34,7 @@ interface ChangesResponse {
 
 const KIND_META: Record<FarmChangeKind, { label: string; color: string; hint: string }> = {
   new:       { label: 'NEW POOL',   color: '#34d399', hint: 'reward program started' },
-  liq_out:   { label: 'LIQ DRAIN',  color: '#a78bfa', hint: 'competitors left — your share grows' },
+  liq_out:   { label: 'LIQ DRAIN',  color: '#b1afa8', hint: 'competitors left — your share grows' },
   rate_up:   { label: 'POOL ↑',     color: '#fbbf24', hint: 'daily reward pool raised' },
   rate_down: { label: 'POOL ↓',     color: '#fb923c', hint: 'daily reward pool cut' },
   liq_in:    { label: 'LIQ CROWD',  color: '#60a5fa', hint: 'competitors piled in' },
@@ -65,9 +65,9 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
   );
@@ -100,7 +100,7 @@ export default function FarmChanges() {
                 ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
               {win === w.key && (
                 <span className="absolute inset-0 rounded-lg"
-                  style={{ background: 'linear-gradient(135deg,rgba(167,139,250,0.4),rgba(139,92,246,0.4))', border: '1px solid rgba(167,139,250,0.3)' }} />
+                  style={{ background: 'var(--accent-fill)', border: '1px solid rgba(255,255,255,0.3)' }} />
               )}
               <span className="relative">{w.label}</span>
             </button>

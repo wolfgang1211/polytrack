@@ -174,12 +174,9 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Hero header ── */}
           <div className="animate-fade-in-up relative overflow-hidden rounded-3xl p-6 sm:p-8"
             style={{
-              background: 'linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(147,51,234,0.08) 50%, rgba(168,85,247,0.06) 100%)',
+              background: 'var(--surface-1)',
               border: '1px solid rgba(255,255,255,0.08)',
             }}>
-            {/* glow behind avatar */}
-            <div className="absolute top-0 left-0 h-48 w-48 pointer-events-none"
-              style={{ background: 'radial-gradient(circle at 40% 40%, rgba(124,58,237,0.25), transparent 70%)', filter:'blur(30px)' }} />
             {/* grid texture */}
             <div className="pointer-events-none absolute inset-0 opacity-[0.3]"
               style={{
@@ -195,13 +192,11 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                 <div className="relative flex-shrink-0">
                   <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
                     style={{
-                      background: 'linear-gradient(135deg, #7c3aed, #9333ea)',
-                      boxShadow: '0 0 0 2px var(--vi-border-xl), 0 0 40px rgba(124,58,237,0.35)',
+                      background: 'var(--accent-grad)',
+                      boxShadow: '0 0 0 2px var(--accent-border-xl)',
                     }}>
                     {short[0]?.toUpperCase()}
                   </div>
-                  <div className="absolute -inset-1 rounded-2xl pointer-events-none animate-glow-pulse"
-                    style={{ background: 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.2))', filter:'blur(8px)', zIndex:-1 }} />
                 </div>
 
                 <div>
@@ -304,8 +299,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             <StatsCard
               label="Open Value"
               value={formatCurrency(openVal, true)}
-              gradient="var(--vi-tint)"
-              icon={<svg style={{width:14,height:14}} className="text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>}
+              gradient="var(--accent-tint)"
+              icon={<svg style={{width:14,height:14}} className="text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>}
               delay={60}
             />
             <StatsCard
@@ -320,7 +315,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               label={data?.truncated ? 'Sample Positions' : 'Positions'}
               value={String(all.length)}
               sub={data?.truncated ? 'Returned history is capped' : 'Held + closed positions'}
-              gradient="rgba(168,85,247,0.15)"
+              gradient="rgba(255,255,255,0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
             />
@@ -358,8 +353,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   label="Avg Position"
                   value={formatCurrency(insights.avgPositionSize, true)}
                   sub="per trade"
-                  gradient="rgba(99,102,241,0.15)"
-                  icon={<svg style={{width:14,height:14}} className="text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
+                  gradient="rgba(255,255,255,0.12)"
+                  icon={<svg style={{width:14,height:14}} className="text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
                   delay={120}
                 />
 
@@ -429,7 +424,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   >
                     {tab === t && (
                       <span className="absolute inset-0 rounded-xl"
-                        style={{ background:'linear-gradient(135deg,rgba(124,58,237,0.55),rgba(147,51,234,0.55))', border:'1px solid var(--vi-border-xl)' }} />
+                        style={{ background:'var(--accent-fill)', border:'1px solid var(--accent-border-xl)' }} />
                     )}
                     <span className="relative">
                       {t === 'open' ? `Open (${open.length})` : `Closed (${closed.length})`}

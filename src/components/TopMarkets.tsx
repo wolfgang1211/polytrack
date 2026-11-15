@@ -52,7 +52,7 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
 
   return (
     <article
-      className="group glass glass-hover gradient-border flex min-w-0 flex-col gap-3 rounded-2xl p-3 animate-fade-in-up sm:p-4"
+      className="group glass glass-hover flex min-w-0 flex-col gap-3 rounded-2xl p-3 animate-fade-in-up sm:p-4"
       style={{ animationDelay: `${index * 60}ms` }}
     >
       <div className="flex items-start gap-3">
@@ -65,7 +65,7 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
           />
         ) : (
           <div className="h-9 w-9 rounded-xl flex-shrink-0 flex items-center justify-center text-sm"
-            style={{ background: 'var(--vi-grad-30)', border: '1px solid var(--vi-border-xs)' }}>
+            style={{ background: 'var(--accent-grad-30)', border: '1px solid var(--accent-border-xs)' }}>
             📈
           </div>
         )}
@@ -124,7 +124,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false, campaignCon
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
+            style={{ background: '#f2f0e9' }} />
           <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Top Markets</h2>
         </div>
         <span className="text-[10px] text-white/25 uppercase tracking-widest">24h Volume</span>
@@ -146,7 +146,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false, campaignCon
         <div className="mt-4 flex justify-center">
           <Link href="/markets"
             className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
-            style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-md)' }}>
+            style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border-md)' }}>
             View All Markets →
           </Link>
         </div>

@@ -19,20 +19,10 @@ export default function NotFoundPage() {
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-4 text-center">
       {/* ── Large '404' with glow ── */}
       <div className="relative mb-8 select-none">
-        <div
-          className="absolute inset-0 mx-auto h-32 w-32 rounded-full opacity-60"
-          style={{
-            background: 'radial-gradient(circle, rgba(124,58,237,0.35), transparent 70%)',
-            filter: 'blur(24px)',
-          }}
-        />
         <h1
           className="relative text-8xl font-black tracking-tight"
           style={{
-            background: 'linear-gradient(135deg, #7c3aed, #c084fc)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            color: 'transparent',
+            color: 'var(--text-primary)',
           }}
         >
           404
@@ -69,8 +59,7 @@ export default function NotFoundPage() {
           href="/"
           className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white transition-all hover:brightness-110"
           style={{
-            background: 'linear-gradient(135deg,#7c3aed,#9333ea)',
-            boxShadow: '0 4px 24px rgba(124,58,237,0.35)',
+            background: 'var(--accent-grad)',
           }}
         >
           ← Back to Home

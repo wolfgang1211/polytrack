@@ -20,11 +20,11 @@ export default function WalletSearch({ compact }: Props) {
   const showError = !isEmpty && !isValid && addr.length >= 10;
 
   const borderColor = isValid
-    ? 'rgba(124,58,237,0.5)'
+    ? 'rgba(52,211,153,0.5)'
     : showError
       ? 'rgba(244,63,94,0.4)'
       : focused
-        ? 'rgba(124,58,237,0.35)'
+        ? 'rgba(242,240,233,0.45)'
         : 'rgba(255,255,255,0.07)';
 
   function handleSubmit(e: FormEvent) {
@@ -37,19 +37,6 @@ export default function WalletSearch({ compact }: Props) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <div className="relative">
-        {/* focus / valid glow */}
-        {(focused || isValid) && (
-          <div
-            className="absolute inset-0 rounded-xl pointer-events-none transition-opacity duration-300"
-            style={{
-              background: isValid
-                ? 'linear-gradient(135deg,rgba(124,58,237,0.25),rgba(147,51,234,0.2))'
-                : 'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(147,51,234,0.1))',
-              filter: 'blur(8px)',
-              transform: 'scale(1.03)',
-            }}
-          />
-        )}
 
         <div
           className="relative flex items-center rounded-xl glass transition-all duration-200"
@@ -58,7 +45,7 @@ export default function WalletSearch({ compact }: Props) {
           {/* Search icon */}
           <svg
             className={`absolute left-3.5 h-3.5 w-3.5 flex-shrink-0 transition-colors duration-200 ${
-              isValid ? 'text-violet-400' : focused ? 'text-violet-400/60' : 'text-white/25'
+              isValid ? 'text-neutral-200' : focused ? 'text-neutral-200/60' : 'text-white/60'
             }`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
@@ -73,7 +60,7 @@ export default function WalletSearch({ compact }: Props) {
             placeholder="Enter wallet address (0x…)"
             spellCheck={false}
             autoComplete="off"
-            className="w-full bg-transparent py-2.5 pl-9 pr-10 text-xs text-white/75 placeholder-white/20 outline-none font-mono"
+            className="w-full bg-transparent py-2.5 pl-9 pr-10 text-xs text-white/75 placeholder-white/55 outline-none font-mono"
           />
 
           {/* Inline validation badge */}
@@ -113,10 +100,10 @@ export default function WalletSearch({ compact }: Props) {
           className="relative w-full overflow-hidden rounded-xl py-2.5 text-xs font-bold text-white transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-35 disabled:cursor-not-allowed disabled:scale-100"
           style={{
             background: isValid
-              ? 'linear-gradient(135deg,#7c3aed,#9333ea)'
-              : 'rgba(124,58,237,0.2)',
-            border: '1px solid rgba(124,58,237,0.3)',
-            boxShadow: isValid ? '0 4px 20px rgba(124,58,237,0.35)' : 'none',
+              ? 'var(--text-primary)'
+              : 'var(--accent-fill)',
+            border: '1px solid var(--accent-border)',
+            color: isValid ? '#111111' : 'var(--text-muted)',
           }}
         >
           <span className="relative">Track Wallet →</span>

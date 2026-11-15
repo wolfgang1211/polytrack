@@ -10,7 +10,7 @@ import { detectCategory, formatCurrency, isPositionOpen } from '@/lib/utils';
 
 const CAT_COLORS: Record<string, string> = {
   Crypto: '#f59e0b',
-  Politics: '#7c3aed',
+  Politics: '#f2f0e9',
   Sports: '#10b981',
   Entertainment: '#ec4899',
   Tech: '#38bdf8',
@@ -68,7 +68,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
 
     const splitData = [
       { name: 'Realized', value: realized, fill: '#34d399' },
-      { name: 'Unrealized', value: unrealized, fill: '#a78bfa' },
+      { name: 'Unrealized', value: unrealized, fill: '#b1afa8' },
     ].filter(d => Math.abs(d.value) > 0.01);
 
     return { catData, splitData, hasData: positions.length >= 2 };

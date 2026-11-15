@@ -104,10 +104,10 @@ export default function LatestMoves({ address }: { address: string }) {
     <div className="animate-fade-in-up" style={{ animationDelay: '160ms' }}>
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
+          <span className="inline-block h-1 w-6 rounded-full" style={{ background: '#f2f0e9' }} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Latest Moves</h2>
           <span className="rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
-            style={{ background: 'var(--vi-bg)', color: '#a78bfa', border: '1px solid var(--vi-border-xs)' }}>
+            style={{ background: 'var(--accent-bg)', color: '#b1afa8', border: '1px solid var(--accent-border-xs)' }}>
             Copy-trade signal
           </span>
         </div>

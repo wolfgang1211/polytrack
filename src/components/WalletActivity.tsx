@@ -33,7 +33,7 @@ function fmtDuration(seconds: number): string {
 
 const CAT_COLOR: Record<string, string> = {
   Politics: '#60a5fa', Crypto: '#fbbf24', Sports: '#34d399',
-  Tech: '#a78bfa', World: '#f472b6', Entertainment: '#fb923c', Other: '#94a3b8',
+  Tech: '#b1afa8', World: '#f472b6', Entertainment: '#fb923c', Other: '#94a3b8',
 };
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -60,7 +60,7 @@ function Panel({ accent, title, sub, children }: {
 }
 
 const tooltipStyle = {
-  background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)',
+  background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(255,255,255,0.1)',
   borderRadius: 12, fontSize: 12,
 };
 
@@ -173,7 +173,7 @@ export default function WalletActivity({ address, positions }: { address: string
   return (
     <div className="animate-fade-in-up flex flex-col gap-2.5" style={{ animationDelay: '180ms' }}>
       <div className="flex items-center gap-2">
-        <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
+        <span className="inline-block h-1 w-6 rounded-full" style={{ background: '#f2f0e9' }} />
         <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Behaviour &amp; Activity</h2>
         <span className="text-[10px] text-white/25">{trades.length} trades analyzed</span>
       </div>
@@ -228,7 +228,7 @@ export default function WalletActivity({ address, positions }: { address: string
         </Panel>
 
         {/* 3 — Avg hold time */}
-        <Panel accent="#a78bfa" title="Avg Hold Time"
+        <Panel accent="#b1afa8" title="Avg Hold Time"
           sub="How long positions are held from first buy to last sell (closed round-trips)">
           {!holdStats ? (
             <p className="flex h-36 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
@@ -240,7 +240,7 @@ export default function WalletActivity({ address, positions }: { address: string
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
-                  { label: 'Median', value: fmtDuration(holdStats.median), color: '#a78bfa' },
+                  { label: 'Median', value: fmtDuration(holdStats.median), color: '#b1afa8' },
                   { label: 'Shortest', value: fmtDuration(holdStats.shortest), color: '#34d399' },
                   { label: 'Longest', value: fmtDuration(holdStats.longest), color: '#fb7185' },
                 ].map(s => (

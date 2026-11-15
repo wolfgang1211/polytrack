@@ -47,7 +47,7 @@ type SortKey = typeof SORTS[number]['key'];
 
 const CAT_COLOR: Record<string, string> = {
   Politics: '#fb7185', Crypto: '#fbbf24', Sports: '#34d399',
-  Tech: '#38bdf8', World: '#a78bfa', Entertainment: '#f472b6', Other: '#94a3b8',
+  Tech: '#38bdf8', World: '#b1afa8', Entertainment: '#f472b6', Other: '#94a3b8',
 };
 
 function categoryText(m: Pick<TopMarket, 'category' | 'question' | 'slug' | 'eventSlug'>): string {
@@ -58,9 +58,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -87,7 +87,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
             onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         ) : (
           <div className="h-10 w-10 rounded-xl flex-shrink-0 flex items-center justify-center text-base"
-            style={{ background: 'var(--vi-grad-25)', border: '1px solid var(--vi-border-xs)' }}>
+            style={{ background: 'var(--accent-grad-25)', border: '1px solid var(--accent-border-xs)' }}>
             📈
           </div>
         )}
@@ -276,7 +276,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
                 key={s.key}
                 onClick={() => setSort(s.key)}
                 className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all ${sort === s.key ? 'text-white' : 'text-white/40 hover:text-white/70'}`}
-                style={sort === s.key ? { background: 'var(--vi-fill)', border: '1px solid var(--vi-border-md)' } : { border: '1px solid transparent' }}
+                style={sort === s.key ? { background: 'var(--accent-fill)', border: '1px solid var(--accent-border-md)' } : { border: '1px solid transparent' }}
               >
                 {s.label}
               </button>
@@ -293,7 +293,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
             onClick={() => setCat(c)}
             className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${cat === c ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
             style={cat === c
-              ? { background: 'var(--vi-fill)', border: '1px solid var(--vi-border-lg)' }
+              ? { background: 'var(--accent-fill)', border: '1px solid var(--accent-border-lg)' }
               : { background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             {c}

@@ -76,9 +76,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -254,7 +254,7 @@ export default function ActivityPage() {
           background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
           <DataCell label="Status" value={paused ? 'Paused' : feedError ? 'Unavailable' : loading ? 'Loading' : 'Polling + stream'} accent={paused || feedError ? '#fbbf24' : '#34d399'} dot={!paused && !feedError && !loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <DataCell label="Observed Volume" value={feedError && !trades.length ? '—' : formatCurrency(session.volume, true)} accent="rgba(139,92,246,0.95)" />
+          <DataCell label="Observed Volume" value={feedError && !trades.length ? '—' : formatCurrency(session.volume, true)} accent="rgba(255,255,255,0.95)" />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <DataCell label="Trades" value={session.trades.toLocaleString('en-US')} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
@@ -273,9 +273,9 @@ export default function ActivityPage() {
             value={sizeFilter}
             onChange={e => setSizeFilter(e.target.value as SizeFilter)}
             className="appearance-none rounded-xl glass py-2 pl-3 pr-8 text-[11px] font-semibold text-white/70 outline-none cursor-pointer"
-            style={{ border: '1px solid var(--vi-border)' }}>
+            style={{ border: '1px solid var(--accent-border)' }}>
             {SIZE_FILTERS.map(s => (
-              <option key={s.key} value={s.key} style={{ background: '#0f0a1e', color: '#fff' }}>{s.label}</option>
+              <option key={s.key} value={s.key} style={{ background: '#191919', color: '#fff' }}>{s.label}</option>
             ))}
           </select>
           <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,7 +385,7 @@ export default function ActivityPage() {
                   </a>
                   <div className="flex items-center gap-1 min-w-0">
                     <a href={t.proxyWallet ? `/wallet/${t.proxyWallet.toLowerCase()}` : undefined}
-                      className="truncate font-mono text-[11px] text-white/45 hover:text-violet-300">{name}</a>
+                      className="truncate font-mono text-[11px] text-white/45 hover:text-white/70">{name}</a>
                     {t.proxyWallet && <CopyAddress address={t.proxyWallet} />}
                   </div>
                   <span className="truncate text-white/55">{t.outcome ?? '—'}</span>

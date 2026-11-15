@@ -14,7 +14,7 @@ export default function WalletCheckerPage() {
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="inline-block h-0.5 w-5 rounded-full"
-              style={{ background: 'linear-gradient(90deg,#7c3aed,#9333ea)' }} />
+              style={{ background: 'var(--text-secondary)' }} />
             <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Polymarket</span>
           </div>
           <h1 className="text-2xl font-black leading-none tracking-tight">
@@ -39,7 +39,7 @@ export default function WalletCheckerPage() {
         >
           <span
             className="flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-black"
-            style={{ background: 'rgba(124,58,237,0.15)', border: '1px solid rgba(124,58,237,0.25)', color: '#a78bfa' }}
+            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.25)', color: '#b1afa8' }}
           >
             ?
           </span>
@@ -55,14 +55,14 @@ export default function WalletCheckerPage() {
 
         {showExplainers && (
           <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
+            <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
               <p className="text-xs font-bold text-white/70 mb-1.5">What does P&amp;L mean?</p>
               <p className="text-[11px] leading-relaxed text-white/35">
                 Net profit or loss from all Polymarket activity: realized gains from closed positions plus
                 unrealized mark-to-market on open ones. Read it alongside volume and position count.
               </p>
             </div>
-            <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(124,58,237,0.12)' }}>
+            <div className="glass rounded-xl p-4" style={{ border: '1px solid rgba(255,255,255,0.12)' }}>
               <p className="text-xs font-bold text-white/70 mb-1.5">How to read win rate</p>
               <p className="text-[11px] leading-relaxed text-white/35">
                 Share of resolved positions that finished profitably. On its own it&apos;s not enough;

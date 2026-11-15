@@ -74,9 +74,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -94,7 +94,7 @@ function AddressInput({
         placeholder="0x…"
         spellCheck={false}
         className="w-full rounded-xl glass px-4 py-2.5 text-sm font-mono text-white/80 placeholder-white/25 outline-none"
-        style={{ border: `1px solid ${error ? 'rgba(251,113,133,0.4)' : 'var(--vi-border-md)'}` }}
+        style={{ border: `1px solid ${error ? 'rgba(251,113,133,0.4)' : 'var(--accent-border-md)'}` }}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
       />
@@ -192,7 +192,7 @@ function CompareInner() {
               onClick={() => compare(addrA, addrB)}
               disabled={loading}
               className="rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-[1.02] disabled:opacity-50"
-              style={{ background: 'var(--vi-fill)', border: '1px solid var(--vi-border-lg)' }}
+              style={{ background: 'var(--accent-fill)', border: '1px solid var(--accent-border-lg)' }}
             >
               {loading ? 'Comparing…' : 'Compare →'}
             </button>

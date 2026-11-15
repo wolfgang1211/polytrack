@@ -43,9 +43,9 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
   );
@@ -194,7 +194,7 @@ export default function Backtester() {
                       tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 10 }}
                       axisLine={false} tickLine={false} width={46} />
                     <Tooltip
-                      contentStyle={{ background: 'rgba(13,13,26,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 12, fontSize: 12 }}
                       labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
                       labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       formatter={(v) => [formatCurrency(Number(v)), 'Earned'] as [string, string]} />
@@ -258,7 +258,7 @@ export default function Backtester() {
             {sel?.slug && sel.active && (
               <a href={marketUrl(sel.eventSlug, sel.slug, 'liquidity_backtester')} target="_blank" rel="noopener noreferrer"
                 className="inline-flex w-fit items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold text-white transition-all hover:scale-[1.02] hover:brightness-110"
-                style={{ background: 'var(--vi-grad-60)', border: '1px solid var(--vi-border-xl)' }}>
+                style={{ background: 'var(--accent-grad-60)', border: '1px solid var(--accent-border-xl)' }}>
                 Quote this market on Polymarket →
               </a>
             )}

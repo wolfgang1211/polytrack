@@ -24,7 +24,7 @@ export default function AboutPage() {
         <Logo size={48} />
         <div>
           <h1 className="text-3xl font-bold text-white">About AlphaBoard</h1>
-          <p className="text-sm text-purple-400/70 font-medium">Real-time alpha from the best</p>
+          <p className="text-sm text-white/50 font-medium">Real-time alpha from the best</p>
         </div>
       </div>
       <p className="text-xs text-white/30 mb-10">Independent Polymarket Analytics Platform</p>
@@ -105,9 +105,9 @@ export default function AboutPage() {
           </p>
           <p>
             For more information, please read our{' '}
-            <a href="/disclaimer" className="underline text-purple-400 hover:text-purple-300">Disclaimer</a>,{' '}
-            <a href="/terms" className="underline text-purple-400 hover:text-purple-300">Terms of Service</a>, and{' '}
-            <a href="/privacy" className="underline text-purple-400 hover:text-purple-300">Privacy Policy</a>.
+            <a href="/disclaimer" className="underline text-white/60 hover:text-white">Disclaimer</a>,{' '}
+            <a href="/terms" className="underline text-white/60 hover:text-white">Terms of Service</a>, and{' '}
+            <a href="/privacy" className="underline text-white/60 hover:text-white">Privacy Policy</a>.
           </p>
         </section>
       </div>

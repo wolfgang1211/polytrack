@@ -49,8 +49,7 @@ export default function Navbar() {
 
       <header className="sticky top-0 z-50 w-full min-w-0 max-w-full">
         <div
-          className="glass"
-          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)' }}
+          style={{ background: 'var(--color-background)', borderBottom: '1px solid var(--border-default)' }}
         >
           {/* ── Main nav row ── */}
           <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-3 px-4 py-3">
@@ -58,13 +57,11 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="group flex items-center gap-2.5 flex-shrink-0">
               <div className="relative">
-                <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
-                  style={{ background: 'radial-gradient(circle, rgba(124,58,237,0.36), transparent 70%)', filter: 'blur(10px)' }} />
-                <Logo size={38} className="relative transition-transform duration-300 group-hover:scale-105" />
+                <Logo size={38} />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-sm font-bold text-[#a855f7]">AlphaBoard</span>
-                <span className="text-[9px] text-white/35 font-medium tracking-widest uppercase">Analytics</span>
+                <span className="text-sm font-bold text-[#f2f0e9]">AlphaBoard</span>
+                <span className="text-[9px] text-white/60 font-medium tracking-widest uppercase">Analytics</span>
               </div>
             </Link>
 
@@ -77,11 +74,11 @@ export default function Navbar() {
                     key={href}
                     href={href}
                     className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200
-                      ${active ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
+                      ${active ? 'text-white' : 'text-white/65 hover:text-white/75'}`}
                   >
                     {active && (
                       <span className="absolute inset-0 rounded-lg"
-                        style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
+                        style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)' }} />
                     )}
                     <span className="relative">{label}</span>
                   </Link>
@@ -91,13 +88,13 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMoreOpen(o => !o)}
-                  className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${moreActive || moreOpen ? 'text-white' : 'text-white/45 hover:text-white/75'}`}
+                  className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${moreActive || moreOpen ? 'text-white' : 'text-white/65 hover:text-white/75'}`}
                   aria-expanded={moreOpen}
                   aria-haspopup="menu"
                 >
                   {(moreActive || moreOpen) && (
                     <span className="absolute inset-0 rounded-lg"
-                      style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }} />
+                      style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)' }} />
                   )}
                   <span className="relative inline-flex items-center gap-1.5">
                     More
@@ -116,8 +113,8 @@ export default function Navbar() {
                           <Link
                             key={href}
                             href={href}
-                            className={`block rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${active ? 'text-white' : 'text-white/45 hover:bg-white/[0.04] hover:text-white/75'}`}
-                            style={active ? { background: 'var(--vi-bg)', border: '1px solid var(--vi-border)' } : {}}
+                            className={`block rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${active ? 'text-white' : 'text-white/65 hover:bg-white/[0.04] hover:text-white/75'}`}
+                            style={active ? { background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' } : {}}
                           >
                             {label}
                           </Link>
@@ -135,9 +132,9 @@ export default function Navbar() {
               <button
                 onClick={() => setShowTelegram(true)}
                 className="hidden sm:inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
-                style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border)', boxShadow: '0 0 24px rgba(124,58,237,0.08)' }}
+                style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
               >
-                <svg className="h-3.5 w-3.5 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-3.5 w-3.5 text-neutral-200" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                 </svg>
                 Get Alerts
@@ -148,7 +145,7 @@ export default function Navbar() {
                 href="/watchlist"
                 title="Watchlist"
                 aria-label="Watchlist"
-                className="hidden sm:flex h-8 w-8 items-center justify-center rounded-xl text-white/45 transition-all hover:scale-[1.08] hover:text-white/80"
+                className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl text-white/65 transition-all hover:scale-[1.08] hover:text-white/80"
                 style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)' }}
               >
                 <WatchIcon />
@@ -159,10 +156,10 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(o => !o)}
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={mobileOpen}
-                className="lg:hidden flex h-8 w-8 items-center justify-center rounded-xl transition-all duration-200"
+                className="lg:hidden flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
                 style={{
-                  background: mobileOpen ? 'var(--vi-tint)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${mobileOpen ? 'var(--vi-border-lg)' : 'rgba(255,255,255,0.1)'}`,
+                  background: mobileOpen ? 'var(--accent-tint)' : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${mobileOpen ? 'var(--accent-border-lg)' : 'rgba(255,255,255,0.1)'}`,
                 }}
               >
                 <div className="flex h-4 w-4 flex-col items-center justify-center gap-[5px]">
@@ -205,14 +202,14 @@ export default function Navbar() {
                       className={`relative flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200
                         ${active ? 'text-white' : 'text-white/55 hover:text-white/85 hover:bg-white/[0.03]'}`}
                       style={active ? {
-                        background: 'var(--vi-bg)',
-                        border: '1px solid var(--vi-border)',
+                        background: 'var(--accent-bg)',
+                        border: '1px solid var(--accent-border)',
                       } : {}}
                     >
                       <span>{label}</span>
                       {active && (
                         <span className="h-1.5 w-1.5 rounded-full"
-                          style={{ background: 'rgba(139,92,246,0.9)', boxShadow: '0 0 6px rgba(139,92,246,0.8)' }} />
+                          style={{ background: 'var(--text-primary)' }} />
                       )}
                     </Link>
                   );
@@ -227,9 +224,9 @@ export default function Navbar() {
                 <button
                   onClick={() => { setShowTelegram(true); setMobileOpen(false); }}
                   className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white"
-                  style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border)' }}
+                  style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
                 >
-                  <svg className="h-3.5 w-3.5 text-emerald-300" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-3.5 w-3.5 text-neutral-200" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                   </svg>
                   Get Alerts
@@ -247,8 +244,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="h-px w-full"
-          style={{ background: 'linear-gradient(90deg,transparent,var(--vi-border-xl),rgba(59,130,246,0.4),transparent)' }} />
+
       </header>
     </>
   );

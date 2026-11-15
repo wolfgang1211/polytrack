@@ -1,5 +1,17 @@
 # AlphaBoard Geliştirme Durumu
 
+## 2026-11-15: Siyah-beyaz kurumsal tema, yerel önizleme
+
+- Kullanıcı siyah-beyaz tasarım önerisini onayladı; finansal veriden gelen orijinal kırmızı/yeşil ve diğer semantik renklerin korunmasını istedi.
+- Yerel branch: `design/monochrome`. Yayındaki taban commit: `0cacfa5`. Bu tasarım için henüz commit, push veya production deployment yok.
+- Kömür siyahı `#111111`, kırık beyaz `#f2f0e9`, nötr gri yüzeyler; mor utility/inline renkler ve eski `--vi-*` tokenları aktif kaynaklardan kaldırıldı. Kâr/zarar ve BUY/SELL renkleri korunuyor; UI'ye grayscale filtresi uygulanmadı.
+- Onaylı editoryal hero, nötr navigasyon, sade yüzeyler ve daha keskin köşeler uygulandı. Logo geometrisi korunup beyaz varyant eklendi; orijinal artwork dosyaları değişmedi. Favicon, uygulama ikonları, manifest ve OG kartı da nötrleştirildi.
+- Son gate: **144/144 test**, build ve typecheck exit **0**, lint **0 hata / 25 uyarı**, gerçek yerel HTTP **43/43**. Veri adaptörleri ve finansal API davranışı değiştirilmedi. Mor renk, nötr kontrast ve semantik renk koruması için regresyon testleri eklendi.
+- Önizleme: `http://127.0.0.1:3016/`, mevcut PM2 `alphaboard-audit-preview` ile çalışıyor. Analytics hâlâ yalnız açık yerel opt-in ile erişilebilir.
+- Gerçek tarayıcıdaki responsive/klavye ve son görsel kabul **açık**; otomatik ekran görüntüsü veya tam tarayıcı kabulü iddia edilmiyor. Kullanıcı gerçek sayfaları incelemeden yayın yapılmayacak.
+- Kanıtlar ve orijinal ikon yedekleri: `C:/Users/wolfgang/hermes_reports/alphaboard-monochrome-implementation/`.
+
+
 Kaynaklar:
 
 - `GELISTIRME-RAPORU-2026-07-13.md`, ürün, büyüme ve hacim raporu

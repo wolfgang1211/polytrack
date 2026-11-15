@@ -102,7 +102,7 @@ export default function TermsPage() {
             that any asset, security, or prediction market position should be bought, sold, or held by you.
           </p>
           <p>
-            Please read our full <a href="/disclaimer" className="underline text-purple-400 hover:text-purple-300">Disclaimer</a>.
+            Please read our full <a href="/disclaimer" className="underline text-white/60 hover:text-white">Disclaimer</a>.
           </p>
         </section>
 

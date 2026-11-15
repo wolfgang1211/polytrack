@@ -15,10 +15,10 @@ export default function PolymarketTradeLink({ href, compact = false }: Polymarke
         rel="noopener noreferrer sponsored"
         aria-label="Trade on Polymarket (opens external site)"
         data-polymarket-trade-link
-        className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg font-bold text-violet-200 transition-all hover:-translate-y-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/70 ${
+        className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg font-bold text-[#f2f0e9] transition-all hover:-translate-y-0.5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b1afa8]/70 ${
           compact ? 'min-h-8 px-2 text-[10px]' : 'min-h-10 px-3 text-xs'
         }`}
-        style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-md)' }}
+        style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border-md)' }}
       >
         <span>Trade on Polymarket</span>
         <svg className="h-3.5 w-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

@@ -39,7 +39,7 @@ const GRID = 'grid-cols-[40px_1fr_96px_104px_92px_84px_56px]';
 
 function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
   return (
-    <span className={`ml-1 text-[10px] transition-colors ${active ? 'text-violet-400' : 'text-white/15'}`}>
+    <span className={`ml-1 text-[10px] transition-colors ${active ? 'text-[#b1afa8]' : 'text-white/15'}`}>
       {active && order === 'asc' ? '↑' : '↓'}
     </span>
   );
@@ -100,7 +100,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             >
               {window === tw.value && (
                 <span className="absolute inset-0 rounded-xl"
-                  style={{ background: 'var(--vi-grad-60)', border: '1px solid var(--vi-border-xl)' }} />
+                  style={{ background: 'var(--accent-grad-60)', border: '1px solid var(--accent-border-xl)' }} />
               )}
               <span className="relative">{tw.label}</span>
             </button>
@@ -120,9 +120,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           </button>
           <button
             onClick={() => setVerifiedOnly(v => !v)}
-            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-violet-300' : 'text-white/35 hover:text-white/60'}`}
+            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-[#b1afa8]' : 'text-white/35 hover:text-white/60'}`}
             style={verifiedOnly
-              ? { background: 'var(--vi-bg)', border: '1px solid var(--vi-border-lg)' }
+              ? { background: 'var(--accent-bg)', border: '1px solid var(--accent-border-lg)' }
               : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
           >
             ✓ Verified
@@ -137,7 +137,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Name or address…"
-              className="glass w-full rounded-xl py-2 pl-8 pr-3 text-xs text-white/70 outline-none transition-colors placeholder-white/20 focus:border-violet-500/40 sm:w-52"
+              className="glass w-full rounded-xl py-2 pl-8 pr-3 text-xs text-white/70 outline-none transition-colors placeholder-white/20 focus:border-[#b1afa8]/40 sm:w-52"
             />
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
-                    style={{ background: isTop3 ? rs.bg : 'var(--vi-grad)', boxShadow: isTop3 ? `0 0 0 1px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
+                    style={{ background: isTop3 ? rs.bg : 'var(--accent-grad)', boxShadow: isTop3 ? `0 0 0 1px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
                     {isTop3 ? rs.badge : `#${rank}`}
                   </div>
                   <div className="min-w-0">
@@ -242,8 +242,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={e => e.stopPropagation()}
-                  className="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-[10px] font-bold text-violet-300"
-                  style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }}
+                  className="inline-flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-[10px] font-bold text-[#b1afa8]"
+                  style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)' }}
                 >
                   Poly
                   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -279,7 +279,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
             </button>
             <button
               onClick={() => setShowScoreInfo(v => !v)}
-              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-white/30 hover:text-violet-300 transition-colors"
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-white/30 hover:text-[#b1afa8] transition-colors"
               style={{ border: '1px solid rgba(255,255,255,0.15)' }}
               aria-label="What is Smart Score?"
             >
@@ -293,13 +293,13 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   <p className="mb-1.5 text-xs font-bold text-white/80">Smart Score (0–100)</p>
                   <p className="text-[11px] leading-relaxed text-white/45 normal-case tracking-normal font-normal">
                     Relative sample ranking. Blends <span className="text-emerald-300">P&amp;L per traded share</span> (
-                    60%) with <span className="text-violet-300">absolute P&amp;L</span> (40%), scored by percentile across the list.
+                    60%) with <span className="text-[#b1afa8]">absolute P&amp;L</span> (40%), scored by percentile across the list.
                     Not capital ROI, risk adjustment, consistency or a forecast of returns.
                   </p>
                   <div className="mt-2.5 flex flex-wrap gap-2 text-[10px] normal-case tracking-normal font-normal">
                     <span style={{ color: '#fbbf24' }}>🔥 85+ Elite</span>
                     <span style={{ color: '#34d399' }}>⚡ 65+ Sharp</span>
-                    <span style={{ color: '#a855f7' }}>• 40+ Solid</span>
+                    <span style={{ color: '#f2f0e9' }}>• 40+ Solid</span>
                     <span style={{ color: '#fb7185' }}>• &lt;40 Risky</span>
                   </div>
                 </div>
@@ -381,19 +381,19 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                         <img src={entry.profileImage} alt="" className="h-8 w-8 rounded-full object-cover" style={{ boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}` : '0 0 0 1px rgba(255,255,255,0.1)' }} />
                       ) : (
                         <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-black text-white"
-                          style={{ background: `linear-gradient(135deg, #7c3aed, #9333ea)`, boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}, 0 0 16px ${rs.bg}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
+                          style={{ background: '#f2f0e9', boxShadow: isTop3 ? `0 0 0 2px ${rs.ring}, 0 0 16px ${rs.bg}` : '0 0 0 1px rgba(255,255,255,0.08)' }}>
                           {displayName[0]?.toUpperCase()}
                         </div>
                       )}
                       {entry.verifiedBadge && (
                         <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[7px]"
-                          style={{ background: 'linear-gradient(135deg, #9333ea, #7c3aed)' }}>
+                          style={{ background: '#b1afa8' }}>
                           ✓
                         </span>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className={`text-sm font-semibold truncate transition-colors duration-150 group-hover:text-violet-300
+                      <p className={`text-sm font-semibold truncate transition-colors duration-150 group-hover:text-[#b1afa8]
                         ${isTop3 ? rs.text : 'text-white/85'}`}>
                         {displayName}
                       </p>
@@ -457,9 +457,9 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                       onClick={e => e.stopPropagation()}
                       title="Open on Polymarket"
                       className="flex h-6 w-6 items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-                      style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border)' }}
+                      style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border)' }}
                     >
-                      <svg className="h-3 w-3 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-3 w-3 text-[#b1afa8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                           d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                       </svg>

@@ -80,7 +80,7 @@ export default function WatchlistPage() {
             onKeyDown={e => e.key === 'Enter' && add()}
             placeholder="0x… wallet address"
             className="flex-1 rounded-xl glass px-4 py-2.5 text-sm text-white/80 placeholder-white/20 outline-none"
-            style={{ border: error ? '1px solid rgba(251,113,133,0.4)' : '1px solid var(--vi-border-xs)' }}
+            style={{ border: error ? '1px solid rgba(251,113,133,0.4)' : '1px solid var(--accent-border-xs)' }}
           />
           <input
             value={label}
@@ -118,7 +118,7 @@ export default function WatchlistPage() {
             >
               {/* Avatar */}
               <div className="flex-shrink-0 h-10 w-10 rounded-xl flex items-center justify-center text-sm font-black text-white"
-                style={{ background: 'var(--vi-grad)', boxShadow: '0 0 0 1px var(--vi-border-md)' }}>
+                style={{ background: 'var(--accent-grad)', boxShadow: '0 0 0 1px var(--accent-border-md)' }}>
                 {(w.label?.[0] ?? w.address[2])?.toUpperCase()}
               </div>
 
@@ -139,7 +139,7 @@ export default function WatchlistPage() {
                 <Link
                   href={`/wallet/${w.address}`}
                   className="rounded-xl px-3 py-1.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
-                  style={{ background: 'var(--vi-bg)', border: '1px solid var(--vi-border)' }}
+                  style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
                 >
                   View
                 </Link>

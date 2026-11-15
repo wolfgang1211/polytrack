@@ -54,9 +54,9 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--vi-border)' }} />
+      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--vi-border), transparent)' }} />
+      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
 }
@@ -166,7 +166,7 @@ export default function RewardFarms() {
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ) : (
                 <div className="h-7 w-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs"
-                  style={{ background: 'var(--vi-grad-25)' }}>💰</div>
+                  style={{ background: 'var(--accent-grad-25)' }}>💰</div>
               )}
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-white/75 truncate">

@@ -38,7 +38,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
           onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
       ) : (
         <div className="h-7 w-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs"
-          style={{ background: 'var(--vi-tint)', border: '1px solid var(--vi-border-xs)' }}>
+          style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border-xs)' }}>
           🔥
         </div>
       )}
@@ -91,7 +91,7 @@ export default function HotBets() {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#f59e0b,#ef4444)' }} />
+            style={{ background: '#fbbf24' }} />
           <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
             Hot Bets
           </h2>
@@ -109,7 +109,7 @@ export default function HotBets() {
             >
               {period === p && (
                 <span className="absolute inset-0 rounded-lg"
-                  style={{ background: 'linear-gradient(135deg,rgba(245,158,11,0.5),rgba(239,68,68,0.5))', border: '1px solid rgba(245,158,11,0.35)' }} />
+                  style={{ background: 'rgba(251,191,36,0.12)', border: '1px solid rgba(245,158,11,0.35)' }} />
               )}
               <span className="relative">{p}</span>
             </button>

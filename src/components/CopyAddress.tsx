@@ -34,7 +34,7 @@ export default function CopyAddress({ address, className = '' }: Props) {
         title="Copy address"
         aria-label="Copy address"
         className={`flex items-center justify-center rounded transition-all duration-150 ${
-          copied ? 'text-violet-400' : 'text-white/25 hover:text-violet-400'
+          copied ? 'text-[#b1afa8]' : 'text-white/25 hover:text-[#b1afa8]'
         }`}
         style={{ width: 16, height: 16 }}
       >
@@ -51,11 +51,11 @@ export default function CopyAddress({ address, className = '' }: Props) {
       </button>
       {copied && (
         <span
-          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-white pointer-events-none select-none"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 whitespace-nowrap rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-[#111111] pointer-events-none select-none"
           style={{
-            background: 'rgba(109,40,217,0.95)',
-            border: '1px solid rgba(139,92,246,0.5)',
-            boxShadow: '0 2px 10px rgba(124,58,237,0.5)',
+            background: '#f2f0e9',
+            border: '1px solid #464541',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.35)',
             zIndex: 100,
           }}
         >

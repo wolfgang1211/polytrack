@@ -19,11 +19,11 @@ export default function SmartMoneyCard() {
   return (
     <div className="w-full min-w-0 max-w-full rounded-xl overflow-hidden"
       aria-busy={rows === null}
-      style={{ border: '1px solid var(--vi-border)', background: 'rgba(255,255,255,0.015)' }}>
+      style={{ border: '1px solid var(--accent-border)', background: 'rgba(255,255,255,0.015)' }}>
 
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2.5"
-        style={{ borderBottom: '1px solid var(--vi-border-xs)', background: 'rgba(139,92,246,0.06)' }}>
+        style={{ borderBottom: '1px solid var(--accent-border-xs)', background: 'rgba(242,240,233,0.06)' }}>
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>
@@ -33,7 +33,7 @@ export default function SmartMoneyCard() {
         <div className="flex items-center gap-3">
           <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>All-Time</span>
           <Link href="/leaderboard"
-            className="font-mono text-[9px] uppercase tracking-[0.12em] text-violet-400 hover:text-violet-300 transition-colors">
+            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#b1afa8] hover:text-[#b1afa8] transition-colors">
             View All →
           </Link>
         </div>
@@ -70,7 +70,7 @@ export default function SmartMoneyCard() {
                 style={{ background: strip, opacity: stripOp }} />
 
               <span className="w-5 flex-shrink-0 text-center font-mono text-[10px] font-black tabular-nums"
-                style={{ color: i < 3 ? 'rgba(139,92,246,0.80)' : 'rgba(255,255,255,0.22)' }}>
+                style={{ color: i < 3 ? 'rgba(242,240,233,0.80)' : 'rgba(255,255,255,0.22)' }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
 

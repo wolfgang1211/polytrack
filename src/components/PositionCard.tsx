@@ -23,7 +23,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
 
   return (
     <div
-      className="glass glass-hover gradient-border rounded-2xl p-4 animate-fade-in-up"
+      className="glass glass-hover rounded-2xl p-4 animate-fade-in-up"
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Top row */}
@@ -106,9 +106,9 @@ export default function PositionCard({ position, delay = 0 }: Props) {
           rel="noopener noreferrer"
           className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-[11px] font-bold transition-all duration-200 hover:opacity-90 active:scale-[0.98]"
           style={{
-            background: 'var(--vi-grad-25)',
-            border: '1px solid var(--vi-border-md)',
-            color: '#a78bfa',
+            background: 'var(--accent-grad-25)',
+            border: '1px solid var(--accent-border-md)',
+            color: '#b1afa8',
           }}
         >
           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

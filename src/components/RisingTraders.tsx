@@ -24,7 +24,7 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
       <div className="flex items-center gap-2.5">
         {/* Rank */}
         <span className="flex-shrink-0 font-mono text-[11px] font-black tabular-nums w-5 text-right"
-          style={{ color: isTop ? 'rgba(139,92,246,0.85)' : 'rgba(255,255,255,0.22)' }}>
+          style={{ color: isTop ? 'rgba(242,240,233,0.85)' : 'rgba(255,255,255,0.22)' }}>
           {String(rank).padStart(2, '0')}
         </span>
 
@@ -57,7 +57,7 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
             style={{
               width: `${barW}%`,
               background: isTop
-                ? 'linear-gradient(90deg, rgba(139,92,246,0.75), rgba(139,92,246,0.30))'
+                ? 'rgba(242,240,233,0.75)'
                 : 'linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08))',
             }} />
         </div>
@@ -89,7 +89,7 @@ export default function RisingTraders() {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-1 w-5 rounded-full"
-            style={{ background: 'linear-gradient(90deg,#f59e0b,#ef4444)' }} />
+            style={{ background: '#fbbf24' }} />
           <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Rising Traders
           </span>
