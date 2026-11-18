@@ -39,11 +39,11 @@ export default function Breadcrumb() {
     <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2">
       {crumbs.map((c, i) => {
         const isLast = i === crumbs.length - 1;
-        const textColor = isLast ? 'text-white/70' : 'text-white/30 hover:text-white/60';
+        const textColor = isLast ? 'text-ink/70' : 'text-ink/30 hover:text-ink/60';
         const base = `text-[11px] font-medium transition-colors ${textColor}`;
         const content = (
           <span className="inline-flex items-center gap-2">
-            {i > 0 && <span className="text-white/15 text-[10px]">/</span>}
+            {i > 0 && <span className="text-ink/15 text-[10px]">/</span>}
             {isLast ? (
               <span className={base}>{c.label}</span>
             ) : (

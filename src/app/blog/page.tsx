@@ -59,7 +59,7 @@ function Tag({ label }: { label: string }) {
   return (
     <span
       className="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest"
-      style={{ background: 'rgba(255,255,255,0.12)', color: '#b1afa8', border: '1px solid rgba(255,255,255,0.25)' }}
+      style={{ background: 'rgba(var(--ink-rgb),0.12)', color: 'var(--text-secondary)', border: '1px solid rgba(var(--ink-rgb),0.25)' }}
     >
       {label}
     </span>
@@ -70,8 +70,8 @@ export default function BlogPage() {
   return (
     <div className="mx-auto max-w-4xl py-8">
       <div className="mb-10">
-        <h1 className="text-3xl font-bold text-white mb-2">Blog</h1>
-        <p className="text-xs text-white/35">
+        <h1 className="text-3xl font-bold text-ink mb-2">Blog</h1>
+        <p className="text-xs text-ink/35">
           AlphaBoard research, guides, and market intelligence for Polymarket traders.
         </p>
       </div>
@@ -83,8 +83,8 @@ export default function BlogPage() {
             href={`/blog/${post.slug}`}
             className="group flex flex-col rounded-2xl p-5 transition-all hover:scale-[1.01]"
             style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.06)',
+              background: 'rgba(var(--ink-rgb),0.03)',
+              border: '1px solid rgba(var(--ink-rgb),0.06)',
             }}
           >
             <div
@@ -101,24 +101,24 @@ export default function BlogPage() {
               {post.tags.map((tag) => (
                 <Tag key={tag} label={tag} />
               ))}
-              <span className="text-[10px] text-white/25 ml-auto font-mono">
+              <span className="text-[10px] text-ink/25 ml-auto font-mono">
                 {post.readTime}
               </span>
             </div>
 
-            <h2 className="text-sm font-semibold text-white/85 mb-1.5 leading-snug group-hover:text-white/80 transition-colors">
+            <h2 className="text-sm font-semibold text-ink/85 mb-1.5 leading-snug group-hover:text-ink/80 transition-colors">
               {post.title}
             </h2>
-            <p className="text-xs text-white/35 leading-relaxed line-clamp-2">
+            <p className="text-xs text-ink/35 leading-relaxed line-clamp-2">
               {post.excerpt}
             </p>
 
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-white/20">
+              <span className="text-[10px] font-mono text-ink/20">
                 {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               <span
-                className="text-[10px] font-semibold text-white/60 opacity-0 transition-opacity group-hover:opacity-100"
+                className="text-[10px] font-semibold text-ink/60 opacity-0 transition-opacity group-hover:opacity-100"
               >
                 Read more →
               </span>

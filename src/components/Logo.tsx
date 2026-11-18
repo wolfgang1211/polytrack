@@ -12,6 +12,13 @@ interface WordmarkLogoProps {
 }
 
 /**
+ * The original artwork is white. In the light theme only the logo image itself is
+ * inverted to black (scoped to this element; never a whole-UI filter). Artwork,
+ * shape and alt text are unchanged.
+ */
+const LIGHT_THEME_INVERT = '[[data-theme=light]_&]:invert';
+
+/**
  * AlphaBoard logo mark sourced from the uploaded AlphaBoard-04 artwork.
  */
 export default function Logo({ size = 36, className }: LogoProps) {
@@ -28,6 +35,7 @@ export default function Logo({ size = 36, className }: LogoProps) {
         alt="AlphaBoard"
         width={size}
         height={size}
+        className={LIGHT_THEME_INVERT}
         style={{ width: '84%', height: '84%', objectFit: 'contain' }}
       />
     </span>
@@ -43,7 +51,7 @@ export function WordmarkLogo({ height = 30, className }: WordmarkLogoProps) {
       alt="AlphaBoard"
       width={width}
       height={height}
-      className={className}
+      className={`${LIGHT_THEME_INVERT}${className ? ` ${className}` : ''}`}
       style={{ width, height, objectFit: 'contain' }}
     />
   );

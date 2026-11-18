@@ -136,20 +136,20 @@ function AccordionItem({ q, a }: { id: string; q: string; a: React.ReactNode }) 
   return (
     <details
       className="group rounded-xl"
-      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+      style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}
     >
       <summary
-        className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-white/80 transition-colors group-open:text-white"
+        className="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 text-sm font-semibold text-ink/80 transition-colors group-open:text-ink"
       >
         {q}
         <svg
-          className="h-4 w-4 flex-shrink-0 text-white/30 transition-transform group-open:rotate-180"
+          className="h-4 w-4 flex-shrink-0 text-ink/30 transition-transform group-open:rotate-180"
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
         >
           <path d="M6 9l6 6 6-6" />
         </svg>
       </summary>
-      <div className="px-5 pb-4 text-xs leading-relaxed text-white/40">
+      <div className="px-5 pb-4 text-xs leading-relaxed text-ink/40">
         {a}
       </div>
     </details>
@@ -162,7 +162,7 @@ function CategorySection({ id, items }: { id: string; items: QAItem[] }) {
     <section id={id} className="scroll-mt-24">
       <h2 className="mb-4 flex items-center gap-3">
         <span className="inline-flex items-center rounded-lg px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-              style={{ background: 'rgba(255,255,255,0.15)', color: '#b1afa8', border: '1px solid rgba(255,255,255,0.25)' }}>
+              style={{ background: 'rgba(var(--ink-rgb),0.15)', color: 'var(--text-secondary)', border: '1px solid rgba(var(--ink-rgb),0.25)' }}>
           {label}
         </span>
       </h2>
@@ -180,8 +180,8 @@ const faqAreas = Object.entries(QA) as Array<[string, QAItem[]]>;
 export default function FAQPage() {
   return (
     <article className="mx-auto max-w-3xl py-8">
-      <h1 className="text-3xl font-bold text-white mb-2">FAQ</h1>
-      <p className="text-xs text-white/30 mb-8">
+      <h1 className="text-3xl font-bold text-ink mb-2">FAQ</h1>
+      <p className="text-xs text-ink/30 mb-8">
         Find answers to the most common questions about AlphaBoard.
       </p>
 

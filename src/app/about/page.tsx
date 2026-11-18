@@ -23,11 +23,11 @@ export default function AboutPage() {
       <div className="flex items-center gap-4 mb-3">
         <Logo size={48} />
         <div>
-          <h1 className="text-3xl font-bold text-white">About AlphaBoard</h1>
-          <p className="text-sm text-white/50 font-medium">Real-time alpha from the best</p>
+          <h1 className="text-3xl font-bold text-ink">About AlphaBoard</h1>
+          <p className="text-sm text-ink/50 font-medium">Real-time alpha from the best</p>
         </div>
       </div>
-      <p className="text-xs text-white/30 mb-10">Independent Polymarket Analytics Platform</p>
+      <p className="text-xs text-ink/30 mb-10">Independent Polymarket Analytics Platform</p>
 
       <div className="prose-custom space-y-8">
         <section>
@@ -59,13 +59,13 @@ export default function AboutPage() {
                 key={title}
                 className="rounded-xl p-4"
                 style={{
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.06)',
+                  background: 'rgba(var(--ink-rgb),0.03)',
+                  border: '1px solid rgba(var(--ink-rgb),0.06)',
                 }}
               >
                 <span className="text-xl">{icon}</span>
-                <h3 className="mt-2 text-sm font-semibold text-white/80">{title}</h3>
-                <p className="mt-1 text-xs text-white/40 leading-relaxed">{desc}</p>
+                <h3 className="mt-2 text-sm font-semibold text-ink/80">{title}</h3>
+                <p className="mt-1 text-xs text-ink/40 leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -105,9 +105,9 @@ export default function AboutPage() {
           </p>
           <p>
             For more information, please read our{' '}
-            <a href="/disclaimer" className="underline text-white/60 hover:text-white">Disclaimer</a>,{' '}
-            <a href="/terms" className="underline text-white/60 hover:text-white">Terms of Service</a>, and{' '}
-            <a href="/privacy" className="underline text-white/60 hover:text-white">Privacy Policy</a>.
+            <a href="/disclaimer" className="underline text-ink/60 hover:text-ink">Disclaimer</a>,{' '}
+            <a href="/terms" className="underline text-ink/60 hover:text-ink">Terms of Service</a>, and{' '}
+            <a href="/privacy" className="underline text-ink/60 hover:text-ink">Privacy Policy</a>.
           </p>
         </section>
       </div>

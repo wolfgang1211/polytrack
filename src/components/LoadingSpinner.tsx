@@ -3,11 +3,11 @@ export default function LoadingSpinner({ text = 'Loading…' }: { text?: string 
     <div className="flex flex-col items-center justify-center gap-4 py-24">
       <div className="relative h-12 w-12">
         <div className="absolute inset-0 rounded-full animate-spin"
-          style={{ border: '2px solid transparent', borderTopColor: '#f2f0e9', borderRightColor: 'rgba(242,240,233,0.3)' }} />
+          style={{ border: '2px solid transparent', borderTopColor: 'var(--text-primary)', borderRightColor: 'rgba(242,240,233,0.3)' }} />
         <div className="absolute inset-2 rounded-full animate-spin"
-          style={{ border: '2px solid transparent', borderTopColor: '#b1afa8', animationDirection: 'reverse', animationDuration: '0.7s' }} />
+          style={{ border: '2px solid transparent', borderTopColor: 'var(--text-secondary)', animationDirection: 'reverse', animationDuration: '0.7s' }} />
       </div>
-      <p className="text-sm text-white/30 tracking-wide">{text}</p>
+      <p className="text-sm text-ink/30 tracking-wide">{text}</p>
     </div>
   );
 }

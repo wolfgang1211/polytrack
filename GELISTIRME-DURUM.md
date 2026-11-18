@@ -1,5 +1,16 @@
 # AlphaBoard Geliştirme Durumu
 
+## 2026-11-15: Dark / Light / System, yerelde hazır
+
+- Son kullanıcı düzeltmesi: sürekli görünen üst çubuk seçimi kaldırıldı. Masaüstünde More > Appearance, mobilde menü > Appearance altında; menü kapalıyken picker DOM'da render edilmez. Mobil panel kapalıyken inert, açıkken viewport ile sınırlı kaydırılabilir. Yerel tam gate 166/166 test, build/typecheck exit 0; menü aç/kapa yerleşim regresyonları gerçek Navbar renderer'ında geçti. Browser görsel/klavye kabulü ayrıca açık; yayın yok.
+
+- Üst menüye Dark / Light / System (Auto) seçimi eklendi. Varsayılan System; açık seçim `alphaboard-theme` ile best-effort saklanır. Storage engelliyken de tema uygulanır.
+- İlk boya öncesi head script'i, OS/sekme değişimleri ve explicit temayla açılıp System'e geçiş test edildi. Site geneli nötr metin/yüzeyler light tokenlarına uyarlandı; semantik veri renk envanterinde drift yok. Logo şekli korunur, light'ta yalnız logo siyaha çevrilir.
+- Yerel gate: 163/163 test; build/typecheck/diff-check exit 0; lint 0 hata / 25 uyarı. Aynı build üzerinde 15/15 HTTP sayfasında üçlü kontrol/erken script ve derlenmiş light/ink/logo selector doğrulandı.
+- Önizleme: http://127.0.0.1:3016/; yalnız mevcut alphaboard-audit-preview PM2 süreci restart edildi. Diğer işler değiştirilmedi.
+- Gerçek otomatik browser görsel/klavye kabulü mevcut Brave consent engeli nedeniyle açık; izole browser açılmadı. Kullanıcı yerelde menü içindeki son sürümü görsel olarak onayladı ve "tamamdır güzel olmuş yolla" diyerek GitHub/yayın izni verdi. Son yayın öncesi kontrol 166/166 test; push/deployment doğrulaması yayın raporunda ayrıca tutulacak.
+- Kanıt: C:/Users/wolfgang/hermes_reports/alphaboard-theme-switch/VERIFIED-LOCAL.md.
+
 ## 2026-11-15: Siyah-beyaz kurumsal tema, yayınlandı
 
 - Kullanıcı siyah-beyaz tasarım önerisini onayladı; finansal veriden gelen orijinal kırmızı/yeşil ve diğer semantik renklerin korunmasını istedi.

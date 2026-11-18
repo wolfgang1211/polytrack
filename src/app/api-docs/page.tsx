@@ -88,7 +88,7 @@ function MethodBadge({ method }: { method: string }) {
   return (
     <span
       className="inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-black uppercase tracking-widest"
-      style={{ background: 'rgba(255,255,255,0.04)', color, border: `1px solid ${color}33` }}
+      style={{ background: 'rgba(var(--ink-rgb),0.04)', color, border: `1px solid ${color}33` }}
     >
       {method}
     </span>
@@ -98,31 +98,31 @@ function MethodBadge({ method }: { method: string }) {
 export default function ApiDocsPage() {
   return (
     <div className="mx-auto max-w-3xl py-8">
-      <h1 className="text-3xl font-bold text-white mb-2">API Documentation</h1>
-      <p className="text-xs text-white/35 mb-8">
+      <h1 className="text-3xl font-bold text-ink mb-2">API Documentation</h1>
+      <p className="text-xs text-ink/35 mb-8">
         Public endpoints for traders, markets, wallets, and trades. All responses are JSON.
       </p>
 
       {/* General info */}
       <div className="rounded-xl p-5 mb-6 space-y-2"
-        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <p className="text-xs text-white/45">
-          <strong className="text-white/70">Base URL:</strong>{' '}
-          <code className="font-mono text-white/60">https://www.alphaboard.xyz</code>
+        style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+        <p className="text-xs text-ink/45">
+          <strong className="text-ink/70">Base URL:</strong>{' '}
+          <code className="font-mono text-ink/60">https://www.alphaboard.xyz</code>
         </p>
-        <p className="text-xs text-white/45">
-          <strong className="text-white/70">Authentication:</strong> none — all endpoints are public and read-only.
+        <p className="text-xs text-ink/45">
+          <strong className="text-ink/70">Authentication:</strong> none — all endpoints are public and read-only.
         </p>
-        <p className="text-xs text-white/45">
-          <strong className="text-white/70">Fair use:</strong> responses are edge-cached (typically 1–2 minutes); please keep polling intervals ≥ 30s.
+        <p className="text-xs text-ink/45">
+          <strong className="text-ink/70">Fair use:</strong> responses are edge-cached (typically 1–2 minutes); please keep polling intervals ≥ 30s.
           Heavy or abusive usage may be rate-limited.
         </p>
-        <p className="text-xs text-white/45">
-          <strong className="text-white/70">Errors:</strong> non-200 responses return{' '}
-          <code className="font-mono text-white/60">{'{ "error": "message" }'}</code> with an appropriate HTTP status.
+        <p className="text-xs text-ink/45">
+          <strong className="text-ink/70">Errors:</strong> non-200 responses return{' '}
+          <code className="font-mono text-ink/60">{'{ "error": "message" }'}</code> with an appropriate HTTP status.
         </p>
-        <p className="text-xs text-white/45">
-          <strong className="text-white/70">Data source:</strong> aggregated from Polymarket public APIs; schemas may evolve with upstream changes.
+        <p className="text-xs text-ink/45">
+          <strong className="text-ink/70">Data source:</strong> aggregated from Polymarket public APIs; schemas may evolve with upstream changes.
         </p>
       </div>
 
@@ -131,26 +131,26 @@ export default function ApiDocsPage() {
           <div
             key={ep.path}
             className="rounded-xl p-5"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}
+            style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}
           >
             <div className="flex items-center gap-2 mb-2">
               <MethodBadge method={ep.method} />
-              <code className="text-xs font-mono text-white/70">{ep.path}</code>
+              <code className="text-xs font-mono text-ink/70">{ep.path}</code>
             </div>
-            <p className="text-xs text-white/45 mb-3">{ep.desc}</p>
+            <p className="text-xs text-ink/45 mb-3">{ep.desc}</p>
             <div className="flex flex-wrap gap-2 mb-3">
               {ep.params.map((p) => (
-                <span key={p} className="text-[10px] font-mono text-white/30" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', padding: '2px 6px', borderRadius: 6 }}>
+                <span key={p} className="text-[10px] font-mono text-ink/30" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)', padding: '2px 6px', borderRadius: 6 }}>
                   {p}
                 </span>
               ))}
             </div>
-            <p className="text-[11px] font-mono text-white/25 mb-3">
+            <p className="text-[11px] font-mono text-ink/25 mb-3">
               Example: {ep.example}
             </p>
             {ep.sample && (
-              <pre className="text-[10px] font-mono text-white/40 leading-relaxed overflow-x-auto rounded-lg p-3"
-                style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <pre className="text-[10px] font-mono text-ink/40 leading-relaxed overflow-x-auto rounded-lg p-3"
+                style={{ background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(var(--ink-rgb),0.05)' }}>
                 {ep.sample}
               </pre>
             )}

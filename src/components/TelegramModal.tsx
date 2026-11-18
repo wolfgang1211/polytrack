@@ -22,7 +22,7 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
       <div
         className="relative w-full max-w-sm rounded-3xl p-7 animate-scale-in"
         style={{
-          background: '#191919',
+          background: 'var(--surface-1)',
           border: '1px solid rgba(34,197,94,0.25)',
           boxShadow: '0 0 60px rgba(34,197,94,0.12), 0 25px 50px rgba(0,0,0,0.6)',
         }}
@@ -31,7 +31,7 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/25 hover:text-white/60 transition-colors"
+          className="absolute top-4 right-4 text-ink/25 hover:text-ink/60 transition-colors"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -47,8 +47,8 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* Text */}
-        <h2 className="mb-2 text-lg font-black text-white">Polymarket Alerts</h2>
-        <p className="mb-6 text-sm leading-relaxed text-white/55">
+        <h2 className="mb-2 text-lg font-black text-ink">Polymarket Alerts</h2>
+        <p className="mb-6 text-sm leading-relaxed text-ink/55">
           Get real-time alerts for $50K+ whale moves on Polymarket. Personal wallet alerts coming soon 🚀
         </p>
 
@@ -57,7 +57,7 @@ export default function TelegramModal({ onClose }: { onClose: () => void }) {
           href={TELEGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] hover:brightness-110"
+          className="flex w-full items-center justify-center gap-2 rounded-2xl py-3 text-sm font-bold text-ink transition-all hover:scale-[1.02] hover:brightness-110"
           style={{ background: '#22c55e', boxShadow: 'none' }}
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">

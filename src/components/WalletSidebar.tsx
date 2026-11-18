@@ -4,10 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Position, RecentTrade } from '@/types';
 import { formatCurrency, isPositionOpen } from '@/lib/utils';
 
-function Row({ label, value, valueClass = 'text-white/75' }: { label: string; value: string; valueClass?: string }) {
+function Row({ label, value, valueClass = 'text-ink/75' }: { label: string; value: string; valueClass?: string }) {
   return (
     <div className="flex items-center justify-between py-1">
-      <span className="text-[11px] text-white/35">{label}</span>
+      <span className="text-[11px] text-ink/35">{label}</span>
       <span className={`text-xs font-bold ${valueClass}`}>{value}</span>
     </div>
   );
@@ -16,7 +16,7 @@ function Row({ label, value, valueClass = 'text-white/75' }: { label: string; va
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass rounded-2xl p-3.5">
-      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/35">{title}</p>
+      <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/35">{title}</p>
       {children}
     </div>
   );
@@ -78,31 +78,31 @@ export default function WalletSidebar({
   }, [positions, trades]);
 
   const sign = (v: number) => (v >= 0 ? '+' : '');
-  const cls = (v: number) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-white/50');
+  const cls = (v: number) => (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-ink/50');
 
   return (
     <div className="flex flex-col gap-3">
       <Section title="Position Value">
-        <p className="text-2xl font-black leading-none text-white/80">
+        <p className="text-2xl font-black leading-none text-ink/80">
           {formatCurrency(openValue, true)}
         </p>
-        <p className="mt-1 text-[10px] text-white/30">Current marked value · excludes cash</p>
+        <p className="mt-1 text-[10px] text-ink/30">Current marked value · excludes cash</p>
       </Section>
 
       <Section title="PnL Breakdown">
         <Row label="Position Realized" value={`${sign(stats.realized)}${formatCurrency(stats.realized, true)}`} valueClass={cls(stats.realized)} />
         <Row label="Unrealized" value={`${sign(stats.unrealized)}${formatCurrency(stats.unrealized, true)}`} valueClass={cls(stats.unrealized)} />
-        <div className="my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+        <div className="my-1 h-px" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
         <Row label="Total P&L" value={`${sign(stats.totalPnl)}${formatCurrency(stats.totalPnl, true)}`} valueClass={cls(stats.totalPnl)} />
         <Row label="Position Value" value={formatCurrency(openValue, true)} />
-        <p className="mt-1.5 text-[10px] leading-relaxed text-white/25">
+        <p className="mt-1.5 text-[10px] leading-relaxed text-ink/25">
           From loaded position records; may be incomplete. Not account equity.
         </p>
       </Section>
 
       <Section title="Core Stats">
         {positions.length === 0 ? (
-          <p className="text-[11px] leading-relaxed text-white/25">
+          <p className="text-[11px] leading-relaxed text-ink/25">
             No position records were returned for this wallet.
           </p>
         ) : (
@@ -119,10 +119,10 @@ export default function WalletSidebar({
         {!stats.hasTrades ? (
           <div className="h-2 w-full rounded-full animate-shimmer" />
         ) : stats.buys + stats.sells === 0 ? (
-          <p className="text-[11px] text-white/25">No trade data</p>
+          <p className="text-[11px] text-ink/25">No trade data</p>
         ) : (
           <>
-            <div className="flex h-2.5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.06)' }}>
+            <div className="flex h-2.5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(var(--ink-rgb),0.06)' }}>
               <div style={{ width: `${stats.buyPct}%`, background: '#34d399' }} />
               <div style={{ width: `${100 - stats.buyPct}%`, background: '#fb7185' }} />
             </div>

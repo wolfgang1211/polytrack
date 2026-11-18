@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import OutboundAnalytics from '@/components/OutboundAnalytics';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
+import { THEME_INIT_SCRIPT } from '@/lib/theme';
 
 const geistSans = Inter({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = JetBrains_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
@@ -64,7 +65,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} ${serifFont.variable} h-full`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${displayFont.variable} ${serifFont.variable} h-full`} suppressHydrationWarning>
+      <head>
+        {/* Runs before first paint: applies the saved/system theme without a flash. */}
+        <script id="theme-init" dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full w-full min-w-0 antialiased">
         <Navbar />
         <OutboundAnalytics />

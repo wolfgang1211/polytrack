@@ -43,7 +43,7 @@ function timeAgo(ts: number): string {
 }
 
 function pnlClass(v: number): string {
-  return v > 0 ? 'text-grad-profit' : v < 0 ? 'text-grad-loss' : 'text-white/40';
+  return v > 0 ? 'text-grad-profit' : v < 0 ? 'text-grad-loss' : 'text-ink/40';
 }
 
 export default function LpEarnings({ address }: { address: string }) {
@@ -72,9 +72,9 @@ export default function LpEarnings({ address }: { address: string }) {
   }, [address, retry]);
 
   if (!loading && failed) return (
-    <div role="alert" className="glass rounded-2xl p-5 text-sm text-white/60">
+    <div role="alert" className="glass rounded-2xl p-5 text-sm text-ink/60">
       LP earnings are temporarily unavailable. No earnings estimate is shown.
-      <button className="ml-2 text-[#b1afa8] underline" onClick={() => setRetry(value => value + 1)}>Try again</button>
+      <button className="ml-2 text-[var(--text-secondary)] underline" onClick={() => setRetry(value => value + 1)}>Try again</button>
     </div>
   );
 
@@ -88,8 +88,8 @@ export default function LpEarnings({ address }: { address: string }) {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-white/35">LP Earnings</p>
-          <p className="mt-0.5 text-[10px] text-white/25">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/35">LP Earnings</p>
+          <p className="mt-0.5 text-[10px] text-ink/25">
             Maker-fill spread P&amp;L · v2 roles inferred · excludes reward payouts
           </p>
         </div>
@@ -109,8 +109,8 @@ export default function LpEarnings({ address }: { address: string }) {
             </span>
           )}
           {data?.lastTs != null && (
-            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-white/45"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-ink/45"
+              style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
               last fill {timeAgo(data.lastTs)} ago
             </span>
           )}
@@ -120,7 +120,7 @@ export default function LpEarnings({ address }: { address: string }) {
       {loading && (
         <div className="flex flex-col gap-2">
           {[0, 1, 2].map(i => (
-            <div key={i} className="h-10 animate-pulse rounded-xl bg-white/[0.04]" />
+            <div key={i} className="h-10 animate-pulse rounded-xl bg-ink/[0.04]" />
           ))}
         </div>
       )}
@@ -129,48 +129,48 @@ export default function LpEarnings({ address }: { address: string }) {
         <>
           {/* Summary stats */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-white/30">Spread P&L</p>
+            <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <p className="text-[10px] uppercase tracking-wider text-ink/30">Spread P&L</p>
               <p className={`mt-1 text-lg font-black tabular-nums ${pnlClass(data.realized)}`}>
                 {data.realized >= 0 ? '+' : ''}{formatCurrency(data.realized, true)}
               </p>
               {bps != null && (
-                <p className="text-[10px] text-white/25">{bps >= 0 ? '+' : ''}{bps.toFixed(1)} bps of volume</p>
+                <p className="text-[10px] text-ink/25">{bps >= 0 ? '+' : ''}{bps.toFixed(1)} bps of volume</p>
               )}
             </div>
-            <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-white/30">Maker Volume</p>
-              <p className="mt-1 text-lg font-black tabular-nums text-white">{formatCurrency(data.makerVolume, true)}</p>
-              <p className="text-[10px] text-white/25">
+            <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <p className="text-[10px] uppercase tracking-wider text-ink/30">Maker Volume</p>
+              <p className="mt-1 text-lg font-black tabular-nums text-ink">{formatCurrency(data.makerVolume, true)}</p>
+              <p className="text-[10px] text-ink/25">
                 {formatCurrency(data.buyVolume, true)} buy · {formatCurrency(data.sellVolume, true)} sell
               </p>
             </div>
-            <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-white/30">Maker Fills</p>
-              <p className="mt-1 text-lg font-black tabular-nums text-white">{data.fills.toLocaleString()}</p>
-              <p className="text-[10px] text-white/25">orders filled as maker</p>
+            <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <p className="text-[10px] uppercase tracking-wider text-ink/30">Maker Fills</p>
+              <p className="mt-1 text-lg font-black tabular-nums text-ink">{data.fills.toLocaleString()}</p>
+              <p className="text-[10px] text-ink/25">orders filled as maker</p>
             </div>
-            <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-white/30">Markets</p>
-              <p className="mt-1 text-lg font-black tabular-nums text-white">{data.marketCount.toLocaleString()}</p>
-              <p className="text-[10px] text-white/25">quoted with resting orders</p>
+            <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <p className="text-[10px] uppercase tracking-wider text-ink/30">Markets</p>
+              <p className="mt-1 text-lg font-black tabular-nums text-ink">{data.marketCount.toLocaleString()}</p>
+              <p className="text-[10px] text-ink/25">quoted with resting orders</p>
             </div>
           </div>
 
           {/* Per-market breakdown */}
           {data.markets.length > 0 && (
             <div className="mt-4">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-white/25">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/25">
                 Top markets by maker volume
               </p>
               <div className="flex flex-col gap-1">
                 {data.markets.map(m => {
                   const share = data.makerVolume > 0 ? (m.volume / data.makerVolume) * 100 : 0;
                   return (
-                    <div key={m.id} className="rounded-xl px-3 py-2.5 transition-colors hover:bg-white/[0.035]">
+                    <div key={m.id} className="rounded-xl px-3 py-2.5 transition-colors hover:bg-ink/[0.035]">
                       <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-xs font-medium text-white/75">
+                          <p className="truncate text-xs font-medium text-ink/75">
                             {m.title ?? `Token …${m.id.slice(-8)}`}
                             {m.outcome && (
                               <span className="ml-1.5 font-semibold"
@@ -179,7 +179,7 @@ export default function LpEarnings({ address }: { address: string }) {
                               </span>
                             )}
                           </p>
-                          <div className="mt-1 flex items-center gap-2 text-[10px] text-white/30">
+                          <div className="mt-1 flex items-center gap-2 text-[10px] text-ink/30">
                             <span>{m.fills.toLocaleString()} fills</span>
                             <span>·</span>
                             <span>{formatCurrency(m.volume, true)} vol</span>
@@ -197,11 +197,11 @@ export default function LpEarnings({ address }: { address: string }) {
                           <p className={`text-sm font-black tabular-nums ${pnlClass(m.realized)}`}>
                             {m.realized >= 0 ? '+' : ''}{formatCurrency(m.realized, true)}
                           </p>
-                          <p className="mt-0.5 text-[10px] text-white/25">{share.toFixed(0)}% of vol</p>
+                          <p className="mt-0.5 text-[10px] text-ink/25">{share.toFixed(0)}% of vol</p>
                         </div>
                       </div>
                       {/* volume share bar */}
-                      <div className="mt-1.5 h-1 overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                      <div className="mt-1.5 h-1 overflow-hidden rounded-full" style={{ background: 'rgba(var(--ink-rgb),0.05)' }}>
                         <div className="h-full rounded-full"
                           style={{
                             width: `${Math.max(2, share)}%`,

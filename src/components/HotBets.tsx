@@ -24,10 +24,10 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
       target="_blank"
       rel="noopener noreferrer"
       className="group flex items-center gap-3 py-2.5 border-b last:border-0 transition-opacity hover:opacity-80 animate-fade-in"
-      style={{ borderColor: 'rgba(255,255,255,0.05)' }}
+      style={{ borderColor: 'rgba(var(--ink-rgb),0.05)' }}
     >
       {/* Rank */}
-      <span className="flex-shrink-0 w-5 text-center text-[11px] font-black text-white/20 tabular-nums">
+      <span className="flex-shrink-0 w-5 text-center text-[11px] font-black text-ink/20 tabular-nums">
         {rank}
       </span>
 
@@ -44,7 +44,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
       )}
 
       {/* Title */}
-      <span className="flex-1 min-w-0 text-xs text-white/70 truncate group-hover:text-white transition-colors">
+      <span className="flex-1 min-w-0 text-xs text-ink/70 truncate group-hover:text-ink transition-colors">
         {market.title}
       </span>
 
@@ -57,12 +57,12 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
       </span>
 
       {/* Volume */}
-      <span className="flex-shrink-0 text-xs font-bold text-white/50 tabular-nums w-16 text-right">
+      <span className="flex-shrink-0 text-xs font-bold text-ink/50 tabular-nums w-16 text-right">
         {formatCurrency(market.volume, true)}
       </span>
 
       {/* Last trade */}
-      <span className="flex-shrink-0 text-[10px] text-white/20 w-12 text-right hidden sm:block">
+      <span className="flex-shrink-0 text-[10px] text-ink/20 w-12 text-right hidden sm:block">
         {timeAgo(market.lastTrade)}
       </span>
     </a>
@@ -92,7 +92,7 @@ export default function HotBets() {
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
             style={{ background: '#fbbf24' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">
+          <h2 className="text-sm font-bold text-ink/70 uppercase tracking-wider">
             Hot Bets
           </h2>
           <span className="text-base leading-none">🔥</span>
@@ -105,7 +105,7 @@ export default function HotBets() {
               key={p}
               onClick={() => setPeriod(p)}
               className={`relative rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all duration-150
-                ${period === p ? 'text-white' : 'text-white/30 hover:text-white/60'}`}
+                ${period === p ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}
             >
               {period === p && (
                 <span className="absolute inset-0 rounded-lg"
@@ -120,13 +120,13 @@ export default function HotBets() {
       {/* Table header */}
       <div className="glass rounded-2xl px-4 py-1">
         <div className="flex items-center gap-3 py-2 border-b"
-          style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+          style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
           <span className="w-5" />
           <span className="w-7" />
-          <span className="flex-1 text-[10px] uppercase tracking-widest text-white/20 font-semibold">Market</span>
-          <span className="text-[10px] uppercase tracking-widest text-white/20 font-semibold">Trades</span>
-          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold">Vol</span>
-          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-white/20 font-semibold hidden sm:block">Last</span>
+          <span className="flex-1 text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Market</span>
+          <span className="text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Trades</span>
+          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Vol</span>
+          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-ink/20 font-semibold hidden sm:block">Last</span>
         </div>
 
         {loading ? (

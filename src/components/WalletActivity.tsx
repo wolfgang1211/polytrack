@@ -33,7 +33,7 @@ function fmtDuration(seconds: number): string {
 
 const CAT_COLOR: Record<string, string> = {
   Politics: '#60a5fa', Crypto: '#fbbf24', Sports: '#34d399',
-  Tech: '#b1afa8', World: '#f472b6', Entertainment: '#fb923c', Other: '#94a3b8',
+  Tech: 'var(--text-secondary)', World: '#f472b6', Entertainment: '#fb923c', Other: '#94a3b8',
 };
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -46,12 +46,12 @@ function Panel({ accent, title, sub, children }: {
   accent: string; title: string; sub: string; children: React.ReactNode;
 }) {
   return (
-    <div className="glass rounded-2xl p-3.5" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+    <div className="glass rounded-2xl p-3.5" style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
       <div className="mb-2.5 flex items-start gap-2">
         <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: accent }} />
         <div>
-          <h3 className="text-xs font-black text-white">{title}</h3>
-          <p className="text-[10px] text-white/35 mt-0.5 leading-snug">{sub}</p>
+          <h3 className="text-xs font-black text-ink">{title}</h3>
+          <p className="text-[10px] text-ink/35 mt-0.5 leading-snug">{sub}</p>
         </div>
       </div>
       {children}
@@ -60,7 +60,7 @@ function Panel({ accent, title, sub, children }: {
 }
 
 const tooltipStyle = {
-  background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(255,255,255,0.1)',
+  background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)',
   borderRadius: 12, fontSize: 12,
 };
 
@@ -173,9 +173,9 @@ export default function WalletActivity({ address, positions }: { address: string
   return (
     <div className="animate-fade-in-up flex flex-col gap-2.5" style={{ animationDelay: '180ms' }}>
       <div className="flex items-center gap-2">
-        <span className="inline-block h-1 w-6 rounded-full" style={{ background: '#f2f0e9' }} />
-        <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Behaviour &amp; Activity</h2>
-        <span className="text-[10px] text-white/25">{trades.length} trades analyzed</span>
+        <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'var(--text-primary)' }} />
+        <h2 className="text-sm font-bold uppercase tracking-wider text-ink/70">Behaviour &amp; Activity</h2>
+        <span className="text-[10px] text-ink/25">{trades.length} trades analyzed</span>
       </div>
 
       <div className="grid gap-2.5 lg:grid-cols-2">
@@ -186,11 +186,11 @@ export default function WalletActivity({ address, positions }: { address: string
           <div className="h-36">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={byHour} margin={{ top: 4, right: 4, left: -18, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
-                <XAxis dataKey="hour" tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }}
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--ink-rgb),0.05)" vertical={false} />
+                <XAxis dataKey="hour" tick={{ fill: 'rgba(var(--ink-rgb),0.3)', fontSize: 9 }}
                   axisLine={false} tickLine={false} interval={2} />
-                <YAxis tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                <YAxis tick={{ fill: 'rgba(var(--ink-rgb),0.3)', fontSize: 9 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(var(--ink-rgb),0.04)' }}
                   labelFormatter={(h) => `${h}:00–${h}:59`} formatter={(v) => [v, 'Trades'] as [number, string]} />
                 <Bar dataKey="count" radius={[3, 3, 0, 0]}>
                   {byHour.map((b, i) => (
@@ -206,17 +206,17 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#34d399" title="Win Rate by Category"
           sub="Profitable position share per market category (min 3 positions)">
           {byCategory.length === 0 ? (
-            <p className="flex h-36 items-center justify-center text-sm text-white/25">Not enough data per category</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/25">Not enough data per category</p>
           ) : (
             <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCategory} layout="vertical" margin={{ top: 4, right: 28, left: 8, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
-                  <XAxis type="number" domain={[0, 100]} tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 9 }}
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(var(--ink-rgb),0.05)" horizontal={false} />
+                  <XAxis type="number" domain={[0, 100]} tick={{ fill: 'rgba(var(--ink-rgb),0.3)', fontSize: 9 }}
                     axisLine={false} tickLine={false} tickFormatter={v => `${v}%`} />
-                  <YAxis type="category" dataKey="cat" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10 }}
+                  <YAxis type="category" dataKey="cat" tick={{ fill: 'rgba(var(--ink-rgb),0.5)', fontSize: 10 }}
                     axisLine={false} tickLine={false} width={84} />
-                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(255,255,255,0.04)' }}
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(var(--ink-rgb),0.04)' }}
                     formatter={(v, _n, p) => [`${v}% (${p.payload.total} pos)`, 'Win rate'] as [string, string]} />
                   <Bar dataKey="winRate" radius={[0, 4, 4, 0]}>
                     {byCategory.map((c, i) => <Cell key={i} fill={CAT_COLOR[c.cat] ?? CAT_COLOR.Other} />)}
@@ -228,26 +228,26 @@ export default function WalletActivity({ address, positions }: { address: string
         </Panel>
 
         {/* 3 — Avg hold time */}
-        <Panel accent="#b1afa8" title="Avg Hold Time"
+        <Panel accent="var(--text-secondary)" title="Avg Hold Time"
           sub="How long positions are held from first buy to last sell (closed round-trips)">
           {!holdStats ? (
-            <p className="flex h-36 items-center justify-center text-sm text-white/25">No closed round-trips found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/25">No closed round-trips found</p>
           ) : (
             <div className="flex h-36 flex-col justify-center gap-3">
               <div className="text-center">
                 <p className="text-2xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
-                <p className="mt-0.5 text-[10px] text-white/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
+                <p className="mt-0.5 text-[10px] text-ink/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
-                  { label: 'Median', value: fmtDuration(holdStats.median), color: '#b1afa8' },
+                  { label: 'Median', value: fmtDuration(holdStats.median), color: 'var(--text-secondary)' },
                   { label: 'Shortest', value: fmtDuration(holdStats.shortest), color: '#34d399' },
                   { label: 'Longest', value: fmtDuration(holdStats.longest), color: '#fb7185' },
                 ].map(s => (
                   <div key={s.label} className="rounded-lg px-2 py-1.5 text-center"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
                     <p className="text-xs font-black" style={{ color: s.color }}>{s.value}</p>
-                    <p className="text-[8px] text-white/30 uppercase tracking-wider mt-0.5">{s.label}</p>
+                    <p className="text-[8px] text-ink/30 uppercase tracking-wider mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -259,7 +259,7 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#fbbf24" title="Outcome Bias"
           sub="Yes vs No share of buy orders: does this wallet lean optimistic or contrarian?">
           {bias.totalN === 0 ? (
-            <p className="flex h-36 items-center justify-center text-sm text-white/25">No buy orders found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/25">No buy orders found</p>
           ) : (
             <div className="flex h-36 flex-col justify-center gap-3.5">
               {/* split bar */}
@@ -268,7 +268,7 @@ export default function WalletActivity({ address, positions }: { address: string
                   <span className="text-emerald-400">YES {bias.yesPct.toFixed(0)}%</span>
                   <span className="text-rose-400">NO {(100 - bias.yesPct).toFixed(0)}%</span>
                 </div>
-                <div className="flex h-5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                <div className="flex h-5 w-full overflow-hidden rounded-full" style={{ background: 'rgba(var(--ink-rgb),0.05)' }}>
                   <div style={{ width: `${bias.yesPct}%`, background: 'linear-gradient(90deg,#10b981,#34d399)' }} />
                   <div style={{ width: `${100 - bias.yesPct}%`, background: 'linear-gradient(90deg,#fb7185,#f43f5e)' }} />
                 </div>
@@ -277,12 +277,12 @@ export default function WalletActivity({ address, positions }: { address: string
                 <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
                   <p className="text-[9px] uppercase tracking-wider text-emerald-300/70">Yes buys</p>
                   <p className="text-base font-black text-emerald-300">{bias.yesN}</p>
-                  <p className="text-[9px] text-white/30">{formatCurrency(bias.yesUsd, true)}</p>
+                  <p className="text-[9px] text-ink/30">{formatCurrency(bias.yesUsd, true)}</p>
                 </div>
                 <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
                   <p className="text-[9px] uppercase tracking-wider text-rose-300/70">No buys</p>
                   <p className="text-base font-black text-rose-300">{bias.noN}</p>
-                  <p className="text-[9px] text-white/30">{formatCurrency(bias.noUsd, true)}</p>
+                  <p className="text-[9px] text-ink/30">{formatCurrency(bias.noUsd, true)}</p>
                 </div>
               </div>
             </div>
@@ -298,12 +298,12 @@ export default function WalletActivity({ address, positions }: { address: string
             {/* hour axis */}
             <div className="mb-1 flex pl-7">
               {HOURS.map(h => (
-                <div key={h} className="flex-1 text-center text-[8px] text-white/25">{h % 3 === 0 ? h : ''}</div>
+                <div key={h} className="flex-1 text-center text-[8px] text-ink/25">{h % 3 === 0 ? h : ''}</div>
               ))}
             </div>
             {heat.grid.map((row, ri) => (
               <div key={ri} className="mb-0.5 flex items-center">
-                <span className="w-7 text-[8px] font-semibold uppercase text-white/35">{DAY_LABELS[ri]}</span>
+                <span className="w-7 text-[8px] font-semibold uppercase text-ink/35">{DAY_LABELS[ri]}</span>
                 <div className="flex flex-1 gap-px">
                   {row.map((c, ci) => {
                     const intensity = heat.max > 0 ? c / heat.max : 0;
@@ -311,7 +311,7 @@ export default function WalletActivity({ address, positions }: { address: string
                       <div key={ci} title={`${DAY_LABELS[ri]} ${ci}:00, ${c} trade${c === 1 ? '' : 's'}`}
                         className="aspect-square flex-1 rounded-sm"
                         style={{
-                          background: c === 0 ? 'rgba(255,255,255,0.03)'
+                          background: c === 0 ? 'rgba(var(--ink-rgb),0.03)'
                             : `rgba(244,114,182,${0.18 + intensity * 0.8})`,
                         }} />
                     );
@@ -321,12 +321,12 @@ export default function WalletActivity({ address, positions }: { address: string
             ))}
             {/* legend */}
             <div className="mt-2 flex items-center justify-end gap-1.5 pr-1">
-              <span className="text-[9px] text-white/25">Less</span>
+              <span className="text-[9px] text-ink/25">Less</span>
               {[0.03, 0.25, 0.5, 0.75, 1].map((v, i) => (
                 <span key={i} className="h-2.5 w-2.5 rounded-sm"
-                  style={{ background: v <= 0.03 ? 'rgba(255,255,255,0.03)' : `rgba(244,114,182,${0.18 + v * 0.8})` }} />
+                  style={{ background: v <= 0.03 ? 'rgba(var(--ink-rgb),0.03)' : `rgba(244,114,182,${0.18 + v * 0.8})` }} />
               ))}
-              <span className="text-[9px] text-white/25">More</span>
+              <span className="text-[9px] text-ink/25">More</span>
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@ const CAT_COLOR: Record<string, string> = {
   Sports:        '#34d399',
   Entertainment: '#f472b6',
   Tech:          '#38bdf8',
-  World:         '#b1afa8',
+  World:         'var(--text-secondary)',
   Other:         '#94a3b8',
 };
 
@@ -19,19 +19,19 @@ function DataCell({ label, value, sub, accent, loading }: {
 }) {
   return (
     <div className="flex min-w-0 flex-col justify-center px-3 py-4 sm:px-5">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>
         {label}
       </p>
       {loading ? (
         <div className="h-6 w-20 rounded animate-shimmer" />
       ) : (
         <p className="font-mono text-xl font-black tabular-nums leading-none"
-          style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>
+          style={{ color: accent ?? 'rgba(var(--ink-rgb),0.88)' }}>
           {value}
         </p>
       )}
       {sub && !loading && (
-        <p className="font-mono text-[9px] mt-1 truncate" style={{ color: 'rgba(255,255,255,0.20)' }}>{sub}</p>
+        <p className="font-mono text-[9px] mt-1 truncate" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{sub}</p>
       )}
     </div>
   );
@@ -54,18 +54,18 @@ export default function DashboardStats() {
   return (
     <div data-testid="dashboard-stats" className="grid min-w-0 grid-cols-2 overflow-hidden animate-fade-in-up sm:grid-cols-4"
       style={{
-        background: 'rgba(255,255,255,0.02)',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
-        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        background: 'rgba(var(--ink-rgb),0.02)',
+        borderTop: '1px solid rgba(var(--ink-rgb),0.07)',
+        borderBottom: '1px solid rgba(var(--ink-rgb),0.07)',
       }}>
 
-      <div className="min-w-0 border-b border-r sm:border-b-0" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="min-w-0 border-b border-r sm:border-b-0" style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
         <DataCell label="Tracked Markets" value={stats ? String(stats.activeMarkets) : '—'} sub="Up to 200 active markets" loading={loading} />
       </div>
-      <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
         <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="rgba(242,240,233,0.95)" loading={loading} />
       </div>
-      <div className="min-w-0 border-r" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="min-w-0 border-r" style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
         <DataCell label="Trades (1h sample)" value={stats ? String(stats.trades1h) : '—'} sub="From latest 500 trades" accent="rgba(251,191,36,0.88)" loading={loading} />
       </div>
       <div className="min-w-0">

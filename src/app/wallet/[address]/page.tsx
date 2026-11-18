@@ -150,7 +150,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
     <div className="flex flex-col gap-5">
 
       {/* Back */}
-      <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors w-fit animate-fade-in">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-xs text-ink/30 hover:text-ink/60 transition-colors w-fit animate-fade-in">
         <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
@@ -163,7 +163,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
         <div className="animate-scale-in rounded-2xl p-8 text-center"
           style={{ background: 'rgba(244,63,94,0.07)', border: '1px solid rgba(244,63,94,0.2)' }}>
           <p className="text-sm text-rose-400">{error}</p>
-          <Link href="/" className="mt-4 inline-block text-xs text-white/40 hover:text-white/70">
+          <Link href="/" className="mt-4 inline-block text-xs text-ink/40 hover:text-ink/70">
             ← Go back
           </Link>
         </div>
@@ -175,12 +175,12 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           <div className="animate-fade-in-up relative overflow-hidden rounded-3xl p-6 sm:p-8"
             style={{
               background: 'var(--surface-1)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              border: '1px solid rgba(var(--ink-rgb),0.08)',
             }}>
             {/* grid texture */}
             <div className="pointer-events-none absolute inset-0 opacity-[0.3]"
               style={{
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+                backgroundImage: 'linear-gradient(rgba(var(--ink-rgb),0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--ink-rgb),0.04) 1px, transparent 1px)',
                 backgroundSize: '32px 32px',
                 maskImage: 'radial-gradient(ellipse at 80% 50%, #000 0%, transparent 70%)',
                 WebkitMaskImage: 'radial-gradient(ellipse at 80% 50%, #000 0%, transparent 70%)',
@@ -190,7 +190,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               <div className="flex items-center gap-5">
                 {/* Avatar */}
                 <div className="relative flex-shrink-0">
-                  <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white"
+                  <div className="h-16 w-16 rounded-2xl flex items-center justify-center text-2xl font-black text-ink"
                     style={{
                       background: 'var(--accent-grad)',
                       boxShadow: '0 0 0 2px var(--accent-border-xl)',
@@ -201,11 +201,11 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] uppercase tracking-widest text-white/30 font-semibold">Wallet</span>
+                    <span className="text-[10px] uppercase tracking-widest text-ink/30 font-semibold">Wallet</span>
                   </div>
-                  <h1 className="text-xl font-black text-white sm:text-2xl">{short}</h1>
+                  <h1 className="text-xl font-black text-ink sm:text-2xl">{short}</h1>
                   <div className="flex items-start gap-1.5 mt-0.5">
-                    <p className="font-mono text-[11px] text-white/25 break-all max-w-xs">{address}</p>
+                    <p className="font-mono text-[11px] text-ink/25 break-all max-w-xs">{address}</p>
                     <CopyAddress address={address} className="mt-0.5" />
                   </div>
 
@@ -219,13 +219,13 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                       {roi != null && <span className="opacity-70"> · {roi >= 0 ? '+' : ''}{roi.toFixed(0)}%</span>}
                     </span>
                     {insights && (
-                      <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-white/55"
-                        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-ink/55"
+                        style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
                         {insights.winRate.toFixed(0)}% win rate
                       </span>
                     )}
-                    <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-white/55"
-                      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                    <span className="rounded-full px-2.5 py-1 text-[11px] font-semibold text-ink/55"
+                      style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
                       {open.length} open · {formatCurrency(openVal, true)}
                     </span>
                   </div>
@@ -238,8 +238,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   href={profileUrl(address)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
-                  style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)' }}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink hover:scale-[1.02]"
+                  style={{ background:'rgba(var(--ink-rgb),0.06)', border:'1px solid rgba(var(--ink-rgb),0.1)' }}
                 >
                   <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -251,8 +251,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`${short} on Polymarket — tracked with @alphaboardxyz`)}&url=${encodeURIComponent(`https://www.alphaboard.xyz/wallet/${address}`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
-                  style={{ background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)' }}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink hover:scale-[1.02]"
+                  style={{ background:'rgba(var(--ink-rgb),0.06)', border:'1px solid rgba(var(--ink-rgb),0.1)' }}
                 >
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -265,7 +265,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all hover:scale-[1.02]"
                   style={isWatched(address)
                     ? { background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.35)', color:'#fbbf24' }
-                    : { background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.55)' }}
+                    : { background:'rgba(var(--ink-rgb),0.06)', border:'1px solid rgba(var(--ink-rgb),0.1)', color:'rgba(var(--ink-rgb),0.55)' }}
                 >
                   <span className="text-sm leading-none">{isWatched(address) ? '⭐' : '☆'}</span>
                   {isWatched(address) ? 'Watching' : 'Add to Watchlist'}
@@ -273,7 +273,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
                 <button
                   onClick={() => setShowTelegram(true)}
-                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink hover:scale-[1.02]"
                   style={{ background:'rgba(34,197,94,0.10)', border:'1px solid rgba(34,197,94,0.3)' }}
                 >
                   <svg className="h-3.5 w-3.5 text-green-400" viewBox="0 0 24 24" fill="currentColor">
@@ -291,7 +291,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               label={officialTotalPnl != null ? 'Trade P&L' : data?.truncated ? 'Sample Position P&L' : 'Position P&L'}
               value={(totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
               sub={officialTotalPnl != null ? 'Cumulative trade series, not net equity' : (roi != null ? `${roi >= 0 ? '+' : ''}${roi.toFixed(1)}% of position entry cost` : 'Returned position sample')}
-              valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-white/50'}
+              valueClass={totalPnl > 0 ? 'text-grad-profit' : totalPnl < 0 ? 'text-grad-loss' : 'text-ink/50'}
               gradient={totalPnl >= 0 ? 'rgba(52,211,153,0.15)' : 'rgba(251,113,133,0.15)'}
               icon={<svg style={{width:14,height:14}} className={totalPnl>=0?'text-emerald-400':'text-rose-400'} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>}
               delay={0}
@@ -300,7 +300,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               label="Open Value"
               value={formatCurrency(openVal, true)}
               gradient="var(--accent-tint)"
-              icon={<svg style={{width:14,height:14}} className="text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>}
+              icon={<svg style={{width:14,height:14}} className="text-ink/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>}
               delay={60}
             />
             <StatsCard
@@ -315,7 +315,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
               label={data?.truncated ? 'Sample Positions' : 'Positions'}
               value={String(all.length)}
               sub={data?.truncated ? 'Returned history is capped' : 'Held + closed positions'}
-              gradient="rgba(255,255,255,0.15)"
+              gradient="rgba(var(--ink-rgb),0.15)"
               icon={<svg style={{width:14,height:14}} className="text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>}
               delay={180}
             />
@@ -324,7 +324,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
           {/* ── Trading Insights ── */}
           {insights && (
             <div className="animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/25">Trading Insights</p>
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/25">Trading Insights</p>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
 
                 {/* Win Rate */}
@@ -353,8 +353,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   label="Avg Position"
                   value={formatCurrency(insights.avgPositionSize, true)}
                   sub="per trade"
-                  gradient="rgba(255,255,255,0.12)"
-                  icon={<svg style={{width:14,height:14}} className="text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
+                  gradient="rgba(var(--ink-rgb),0.12)"
+                  icon={<svg style={{width:14,height:14}} className="text-ink/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>}
                   delay={120}
                 />
 
@@ -363,20 +363,20 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   className="glass glass-hover gradient-border rounded-2xl p-5 animate-fade-in-up"
                   style={{ animationDelay: '180ms' }}
                 >
-                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/35">Best / Worst</p>
+                  <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/35">Best / Worst</p>
                   <div className="flex flex-col gap-2.5">
                     <div>
-                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestWin) > 0 ? 'text-grad-profit' : 'text-white/40'}`}>
+                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestWin) > 0 ? 'text-grad-profit' : 'text-ink/40'}`}>
                         {positionPnl(insights.biggestWin) >= 0 ? '+' : ''}{formatCurrency(positionPnl(insights.biggestWin), true)}
                       </p>
-                      <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestWin.title}</p>
+                      <p className="mt-0.5 text-[10px] text-ink/25 line-clamp-1">{insights.biggestWin.title}</p>
                     </div>
-                    <div className="h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div className="h-px" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
                     <div>
-                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestLoss) < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
+                      <p className={`text-base font-black leading-none ${positionPnl(insights.biggestLoss) < 0 ? 'text-grad-loss' : 'text-ink/40'}`}>
                         {positionPnl(insights.biggestLoss) >= 0 ? '+' : ''}{formatCurrency(positionPnl(insights.biggestLoss), true)}
                       </p>
-                      <p className="mt-0.5 text-[10px] text-white/25 line-clamp-1">{insights.biggestLoss.title}</p>
+                      <p className="mt-0.5 text-[10px] text-ink/25 line-clamp-1">{insights.biggestLoss.title}</p>
                     </div>
                   </div>
                 </div>
@@ -420,7 +420,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                     key={t}
                     onClick={() => setTab(t)}
                     className={`relative rounded-xl px-5 py-1.5 text-xs font-bold transition-all duration-200
-                      ${tab === t ? 'text-white' : 'text-white/30 hover:text-white/55'}`}
+                      ${tab === t ? 'text-ink' : 'text-ink/30 hover:text-ink/55'}`}
                   >
                     {tab === t && (
                       <span className="absolute inset-0 rounded-xl"
@@ -435,8 +435,8 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
 
               {shown.length > 0 && (
                 <div className="text-right">
-                  <p className="text-[10px] text-white/25 uppercase tracking-wider">Tab P&L</p>
-                  <p className={`text-sm font-black ${shownPnl > 0 ? 'text-grad-profit' : shownPnl < 0 ? 'text-grad-loss' : 'text-white/40'}`}>
+                  <p className="text-[10px] text-ink/25 uppercase tracking-wider">Tab P&L</p>
+                  <p className={`text-sm font-black ${shownPnl > 0 ? 'text-grad-profit' : shownPnl < 0 ? 'text-grad-loss' : 'text-ink/40'}`}>
                     {shownPnl >= 0 ? '+' : ''}{formatCurrency(shownPnl, true)}
                   </p>
                 </div>
@@ -447,7 +447,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
             {shown.length === 0 ? (
               <div className="glass rounded-2xl py-20 text-center">
                 <p className="text-3xl mb-3">{tab === 'open' ? '📭' : '📂'}</p>
-                <p className="text-sm text-white/25">
+                <p className="text-sm text-ink/25">
                   {tab === 'open' ? 'No open positions' : 'No closed positions'}
                 </p>
               </div>

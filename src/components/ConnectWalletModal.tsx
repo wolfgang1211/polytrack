@@ -33,7 +33,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
       <div
         className="relative w-full max-w-sm rounded-3xl p-7 animate-scale-in"
         style={{
-          background: '#191919',
+          background: 'var(--surface-1)',
           border: '1px solid var(--accent-border-md)',
           boxShadow: '0 30px 60px rgba(0,0,0,0.7)',
         }}
@@ -41,7 +41,7 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white/25 hover:text-white/60 transition-colors"
+          className="absolute top-4 right-4 text-ink/25 hover:text-ink/60 transition-colors"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -53,14 +53,14 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
           className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl"
           style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border-md)' }}
         >
-          <svg className="h-7 w-7 text-[#b1afa8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-7 w-7 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
               d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
           </svg>
         </div>
 
-        <h2 className="mb-1 text-lg font-black text-white">Track Your Wallet</h2>
-        <p className="mb-6 text-sm leading-relaxed text-white/40">
+        <h2 className="mb-1 text-lg font-black text-ink">Track Your Wallet</h2>
+        <p className="mb-6 text-sm leading-relaxed text-ink/40">
           Paste any Polymarket wallet address to view positions, P&amp;L, and trading insights.
         </p>
 
@@ -70,20 +70,20 @@ export default function ConnectWalletModal({ onClose }: { onClose: () => void })
             onChange={e => { setValue(e.target.value); setError(false); }}
             placeholder="0x… wallet address"
             autoFocus
-            className="w-full rounded-xl glass px-4 py-3 text-sm text-white/80 placeholder-white/25 outline-none"
+            className="w-full rounded-xl glass px-4 py-3 text-sm text-ink/80 placeholder-ink/25 outline-none"
             style={{ border: error ? '1px solid rgba(251,113,133,0.5)' : '1px solid var(--accent-border-xs)' }}
           />
           {error && <p className="text-xs text-rose-400 -mt-1">Invalid Ethereum address</p>}
           <button
             type="submit"
-            className="w-full rounded-xl py-3 text-sm font-bold text-[#111111] transition-all hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]"
-            style={{ background: '#f2f0e9', boxShadow: 'none' }}
+            className="w-full rounded-xl py-3 text-sm font-bold text-on-primary transition-all hover:scale-[1.02] hover:brightness-110 active:scale-[0.98]"
+            style={{ background: 'var(--text-primary)', boxShadow: 'none' }}
           >
             View Wallet
           </button>
         </form>
 
-        <p className="mt-4 text-center text-[10px] text-white/18">Web3 wallet connection, coming soon</p>
+        <p className="mt-4 text-center text-[10px] text-ink/18">Web3 wallet connection, coming soon</p>
       </div>
     </div>
   );

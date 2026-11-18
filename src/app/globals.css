@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
-@theme inline {
+/* Theme-reactive colors: non-inline @theme so utilities reference var(--color-*)
+   and the light block below can override them at runtime. `static` always emits
+   the variables, since some are only consumed via inline style var(). */
+@theme static {
   --color-background: #111111;
   --color-foreground: #f2f0e9;
+  --color-canvas: #111111;
+  --color-ink: #f2f0e9;
+  --color-on-primary: #111111;
+}
+
+@theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-syne);
@@ -44,7 +53,48 @@
   --danger: #fb7185;
   --warning: #fbbf24;
   --info: #60a5fa;
+
+  /* Ink = neutral foreground for legacy white/alpha utilities: rgba(var(--ink-rgb),a) */
+  --ink-rgb: 242,240,233;
 }
+
+/* Light theme: neutral monochrome tokens. Semantic --success/--danger/--warning/--info
+   are intentionally inherited unchanged. Explicit on-solid white stays white. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-background: #f7f6f2;
+  --color-foreground: #161614;
+  --color-canvas: #f7f6f2;
+  --color-ink: #161614;
+  --color-on-primary: #f7f6f2;
+  --ink-rgb: 22,22,20;
+
+  --accent-bg: rgba(22,22,20,0.04);
+  --accent-tint: rgba(22,22,20,0.06);
+  --accent-fill: rgba(22,22,20,0.08);
+  --accent-border-xs: rgba(22,22,20,0.10);
+  --accent-border: #cfccc3;
+  --accent-border-md: rgba(22,22,20,0.22);
+  --accent-border-lg: rgba(22,22,20,0.32);
+  --accent-border-xl: rgba(22,22,20,0.44);
+  --accent-grad: #e2e0d9;
+  --accent-grad-25: rgba(22,22,20,0.04);
+  --accent-grad-30: rgba(22,22,20,0.06);
+  --accent-grad-60: rgba(22,22,20,0.10);
+
+  --surface-1: #ffffff;
+  --surface-2: #f1f0eb;
+  --surface-3: #e8e6df;
+  --border-subtle: #e2e0d9;
+  --border-default: #cfccc3;
+  --text-primary: #161614;
+  --text-secondary: #4a4843;
+  --text-tertiary: #55534d;
+  --text-muted: #67655e;
+}
+
+/* Zero P&L keeps the shared formatter class and readable neutral ink on light. */
+:root[data-theme="light"] .text-zinc-400 { color:var(--text-muted); }
 
 html {
   scroll-behavior: smooth;
@@ -95,13 +145,13 @@ html {
   100% { transform:translateX(-50%); }
 }
 @keyframes flash-row {
-  0%   { background-color:rgba(242,240,233,0.10); }
-  100% { background-color:rgba(242,240,233,0); }
+  0%   { background-color:rgba(var(--ink-rgb),0.10); }
+  100% { background-color:rgba(var(--ink-rgb),0); }
 }
 
 /* utility classes */
 @utility animate-shimmer {
-  background:linear-gradient(90deg,rgba(255,255,255,.03) 0%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.03) 100%);
+  background:linear-gradient(90deg,rgba(var(--ink-rgb),.03) 0%,rgba(var(--ink-rgb),.09) 50%,rgba(var(--ink-rgb),.03) 100%);
   background-size:200% 100%;
   animation:shimmer 1.6s ease-in-out infinite;
 }
@@ -156,9 +206,9 @@ html {
 }
 
 @utility data-strip {
-  background:rgba(255,255,255,.02);
-  border-top:1px solid rgba(255,255,255,.07);
-  border-bottom:1px solid rgba(255,255,255,.07);
+  background:rgba(var(--ink-rgb),.02);
+  border-top:1px solid rgba(var(--ink-rgb),.07);
+  border-bottom:1px solid rgba(var(--ink-rgb),.07);
 }
 
 .scrollbar-hide {
@@ -231,8 +281,8 @@ html {
 
 /* base */
 body {
-  background:#111111;
-  color:#f2f0e9;
+  background:var(--color-background);
+  color:var(--text-primary);
   font-family:var(--font-geist-sans),ui-sans-serif,system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;
   letter-spacing:-.01em;
@@ -246,22 +296,22 @@ body {
 
 /* prose */
 .prose-custom h2 { font-size:1.25rem; font-weight:700; color:var(--text-primary); margin-bottom:.75rem; }
-.prose-custom h3 { font-size:1rem; font-weight:600; color:rgba(255,255,255,.72); margin-top:1rem; margin-bottom:.5rem; }
+.prose-custom h3 { font-size:1rem; font-weight:600; color:rgba(var(--ink-rgb),.72); margin-top:1rem; margin-bottom:.5rem; }
 .prose-custom p  { font-size:.875rem; line-height:1.75; color:var(--text-secondary); margin-bottom:.75rem; }
 .prose-custom ul { list-style:disc; padding-left:1.25rem; margin-bottom:.75rem; }
 .prose-custom li { font-size:.875rem; line-height:1.75; color:var(--text-secondary); margin-bottom:.25rem; }
-.prose-custom strong { color:rgba(255,255,255,.78); }
+.prose-custom strong { color:rgba(var(--ink-rgb),.78); }
 .prose-custom a { color:var(--text-primary); text-decoration:underline; text-underline-offset:3px; transition:color .2s; }
-.prose-custom a:hover { color:white; }
+.prose-custom a:hover { color:var(--color-ink); }
 
 /* FAQ pills */
 .faq-pill {
   display:inline-block;
   padding:4px 14px;
   border-radius:4px;
-  border:1px solid rgba(255,255,255,.08);
-  color:rgba(255,255,255,.45);
-  background:rgba(255,255,255,.04);
+  border:1px solid rgba(var(--ink-rgb),.10);
+  color:var(--text-muted);
+  background:rgba(var(--ink-rgb),.04);
   font-size:11px;
   font-weight:600;
   transition:all .2s ease;
@@ -270,7 +320,7 @@ body {
 .faq-pill:hover { border-color:var(--accent-border-lg); color:var(--text-primary); background:var(--surface-2); }
 
 :focus-visible { outline:2px solid var(--text-primary); outline-offset:3px; }
-::selection { background:#f2f0e9; color:#111111; }
+::selection { background:var(--text-primary); color:var(--color-canvas); }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior:auto; }

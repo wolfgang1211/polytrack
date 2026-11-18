@@ -35,18 +35,18 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
       style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
       onClick={onClose}>
       <div className="relative w-full max-w-sm rounded-2xl glass-strong p-6 animate-scale-in"
-        style={{ border: '1px solid rgba(255,255,255,0.1)' }}
+        style={{ border: '1px solid rgba(var(--ink-rgb),0.1)' }}
         onClick={e => e.stopPropagation()}>
         <button onClick={onClose} aria-label="Close"
-          className="absolute right-4 top-4 text-white/40 transition-colors hover:text-white">✕</button>
+          className="absolute right-4 top-4 text-ink/40 transition-colors hover:text-ink">✕</button>
 
         <div className="mb-5 flex flex-col items-center text-center">
           <div className="mb-3 flex items-center gap-2">
             <Logo size={30} />
-            <span className="text-lg font-bold text-[#f2f0e9]">AlphaBoard</span>
+            <span className="text-lg font-bold text-[var(--text-primary)]">AlphaBoard</span>
           </div>
-          <h2 className="text-xl font-black text-white">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
-          <p className="mt-1 text-xs text-white/40">
+          <h2 className="text-xl font-black text-ink">{mode === 'signup' ? 'Create your account' : 'Welcome back'}</h2>
+          <p className="mt-1 text-xs text-ink/40">
             {mode === 'signup' ? 'Sign up to track wallets and save your watchlist.' : 'Sign in to access your watchlist and alerts.'}
           </p>
         </div>
@@ -54,23 +54,23 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
         <form onSubmit={submit} className="flex flex-col gap-3">
           {mode === 'signup' && (
             <div>
-              <label className="mb-1 block text-xs font-semibold text-white/70">Name</label>
+              <label className="mb-1 block text-xs font-semibold text-ink/70">Name</label>
               <input value={name} onChange={e => setName(e.target.value)} placeholder="Your name"
-                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
-                style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
+                className="w-full rounded-xl glass px-3 py-2.5 text-sm text-ink/80 placeholder-ink/25 outline-none focus:border-[var(--text-secondary)]/40"
+                style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }} />
             </div>
           )}
           <div>
-            <label className="mb-1 block text-xs font-semibold text-white/70">Email</label>
+            <label className="mb-1 block text-xs font-semibold text-ink/70">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"
-              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
-              style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
+              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-ink/80 placeholder-ink/25 outline-none focus:border-[var(--text-secondary)]/40"
+              style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }} />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-semibold text-white/70">Password</label>
+            <label className="mb-1 block text-xs font-semibold text-ink/70">Password</label>
             <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••"
-              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-white/80 placeholder-white/25 outline-none focus:border-[#b1afa8]/40"
-              style={{ border: '1px solid rgba(255,255,255,0.08)' }} />
+              className="w-full rounded-xl glass px-3 py-2.5 text-sm text-ink/80 placeholder-ink/25 outline-none focus:border-[var(--text-secondary)]/40"
+              style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }} />
           </div>
 
           {error && (
@@ -79,16 +79,16 @@ export default function AuthModal({ initialMode = 'signin', onClose }: { initial
           )}
 
           <button type="submit" disabled={busy}
-            className="mt-1 w-full rounded-xl py-2.5 text-sm font-bold text-[#111111] transition-all hover:brightness-110 disabled:opacity-60"
-            style={{ background: '#f2f0e9', boxShadow: 'none' }}>
+            className="mt-1 w-full rounded-xl py-2.5 text-sm font-bold text-on-primary transition-all hover:brightness-110 disabled:opacity-60"
+            style={{ background: 'var(--text-primary)', boxShadow: 'none' }}>
             {busy ? 'Please wait…' : mode === 'signup' ? 'Sign up' : 'Sign in'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs text-white/40">
+        <p className="mt-4 text-center text-xs text-ink/40">
           {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}{' '}
           <button onClick={() => { setMode(mode === 'signup' ? 'signin' : 'signup'); setError(''); }}
-            className="font-bold text-[#b1afa8] hover:text-[#f2f0e9]">
+            className="font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             {mode === 'signup' ? 'Sign in' : 'Sign up'}
           </button>
         </p>

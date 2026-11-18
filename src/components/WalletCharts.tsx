@@ -10,7 +10,7 @@ import { detectCategory, formatCurrency, isPositionOpen } from '@/lib/utils';
 
 const CAT_COLORS: Record<string, string> = {
   Crypto: '#f59e0b',
-  Politics: '#f2f0e9',
+  Politics: 'var(--text-primary)',
   Sports: '#10b981',
   Entertainment: '#ec4899',
   Tech: '#38bdf8',
@@ -21,7 +21,7 @@ const CAT_COLORS: Record<string, string> = {
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass rounded-2xl p-3.5">
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/35">{title}</p>
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/35">{title}</p>
       {children}
     </div>
   );
@@ -39,7 +39,7 @@ function MoneyTooltip({ active, payload }: TipProps) {
   const value = (p.value ?? p.payload?.value ?? 0) as number;
   return (
     <div className="glass-strong rounded-lg px-3 py-2 text-xs">
-      <p className="text-white/70 font-semibold">{name}</p>
+      <p className="text-ink/70 font-semibold">{name}</p>
       <p className={value >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
         {value >= 0 ? '+' : ''}{formatCurrency(value, true)}
       </p>
@@ -68,7 +68,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
 
     const splitData = [
       { name: 'Realized', value: realized, fill: '#34d399' },
-      { name: 'Unrealized', value: unrealized, fill: '#b1afa8' },
+      { name: 'Unrealized', value: unrealized, fill: 'var(--text-secondary)' },
     ].filter(d => Math.abs(d.value) > 0.01);
 
     return { catData, splitData, hasData: positions.length >= 2 };
@@ -78,17 +78,17 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
 
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-white/25">Performance Breakdown</p>
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/25">Performance Breakdown</p>
       <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
 
         {/* P&L by category */}
         <ChartCard title="P&L by Category">
           <ResponsiveContainer width="100%" height={168}>
             <BarChart data={catData} margin={{ top: 4, right: 8, left: -8, bottom: 0 }}>
-              <XAxis dataKey="name" tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: 'rgba(255,255,255,0.25)', fontSize: 10 }} axisLine={false} tickLine={false}
+              <XAxis dataKey="name" tick={{ fill: 'rgba(var(--ink-rgb),0.35)', fontSize: 11 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: 'rgba(var(--ink-rgb),0.25)', fontSize: 10 }} axisLine={false} tickLine={false}
                 tickFormatter={(v) => formatCurrency(v as number, true)} width={56} />
-              <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<MoneyTooltip />} />
+              <Tooltip cursor={{ fill: 'rgba(var(--ink-rgb),0.04)' }} content={<MoneyTooltip />} />
               <Bar dataKey="value" radius={[6, 6, 0, 0]}>
                 {catData.map((d) => (
                   <Cell key={d.name} fill={d.value >= 0 ? (CAT_COLORS[d.name] ?? '#64748b') : '#f43f5e'} />
@@ -118,13 +118,13 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[168px] items-center justify-center text-xs text-white/25">No data</div>
+            <div className="flex h-[168px] items-center justify-center text-xs text-ink/25">No data</div>
           )}
           <div className="mt-2 flex justify-center gap-4">
             {splitData.map(d => (
               <div key={d.name} className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full" style={{ background: d.fill }} />
-                <span className="text-[10px] text-white/40">{d.name}</span>
+                <span className="text-[10px] text-ink/40">{d.name}</span>
               </div>
             ))}
           </div>

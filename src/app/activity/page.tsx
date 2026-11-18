@@ -75,9 +75,9 @@ interface MarketAgg {
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -87,11 +87,11 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function DataCell({ label, value, accent, dot }: { label: string; value: string; accent?: string; dot?: boolean }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[110px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>
         {dot && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />}
         {label}
       </p>
-      <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
+      <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(var(--ink-rgb),0.88)' }}>{value}</p>
     </div>
   );
 }
@@ -241,9 +241,9 @@ export default function ActivityPage() {
       <div className="animate-fade-in-up">
         <SectionHeader index="[01]" label="Live Activity" />
         <h1 className="text-2xl font-black tracking-tight sm:text-3xl mb-2">
-          <span className="text-white">Live Trading </span><span className="text-grad">Activity</span>
+          <span className="text-ink">Live Trading </span><span className="text-grad">Activity</span>
         </h1>
-        <p className="text-sm text-white/40">Observed Polymarket trade samples, not complete market-wide totals.</p>
+        <p className="text-sm text-ink/40">Observed Polymarket trade samples, not complete market-wide totals.</p>
         {feedError && <p role="alert" className="mt-3 text-sm text-amber-300">{feedError}</p>}
       </div>
 
@@ -251,17 +251,17 @@ export default function ActivityPage() {
       <div>
         <SectionHeader index="[02]" label="Session Stats" />
         <div className="flex overflow-x-auto animate-fade-in-up" style={{ animationDelay: '60ms',
-          background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          background: 'rgba(var(--ink-rgb),0.02)', borderTop: '1px solid rgba(var(--ink-rgb),0.07)', borderBottom: '1px solid rgba(var(--ink-rgb),0.07)' }}>
           <DataCell label="Status" value={paused ? 'Paused' : feedError ? 'Unavailable' : loading ? 'Loading' : 'Polling + stream'} accent={paused || feedError ? '#fbbf24' : '#34d399'} dot={!paused && !feedError && !loading} />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
-          <DataCell label="Observed Volume" value={feedError && !trades.length ? '—' : formatCurrency(session.volume, true)} accent="rgba(255,255,255,0.95)" />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
+          <DataCell label="Observed Volume" value={feedError && !trades.length ? '—' : formatCurrency(session.volume, true)} accent="rgba(var(--ink-rgb),0.95)" />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell label="Trades" value={session.trades.toLocaleString('en-US')} />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell label="Buys" value={session.buys.toLocaleString('en-US')} accent="#34d399" />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell label="Sells" value={session.sells.toLocaleString('en-US')} accent="#fb7185" />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell label="Session" value={fmtClock(elapsed)} />
         </div>
       </div>
@@ -272,22 +272,22 @@ export default function ActivityPage() {
           <select
             value={sizeFilter}
             onChange={e => setSizeFilter(e.target.value as SizeFilter)}
-            className="appearance-none rounded-xl glass py-2 pl-3 pr-8 text-[11px] font-semibold text-white/70 outline-none cursor-pointer"
+            className="appearance-none rounded-xl glass py-2 pl-3 pr-8 text-[11px] font-semibold text-ink/70 outline-none cursor-pointer"
             style={{ border: '1px solid var(--accent-border)' }}>
             {SIZE_FILTERS.map(s => (
-              <option key={s.key} value={s.key} style={{ background: '#191919', color: '#fff' }}>{s.label}</option>
+              <option key={s.key} value={s.key} style={{ background: 'var(--surface-1)', color: 'var(--text-primary)' }}>{s.label}</option>
             ))}
           </select>
-          <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
         <button onClick={() => setPaused(p => !p)}
-          className="flex items-center gap-1.5 rounded-xl glass px-3 py-2 text-[11px] font-semibold text-white/60 transition-colors hover:text-white"
-          style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+          className="flex items-center gap-1.5 rounded-xl glass px-3 py-2 text-[11px] font-semibold text-ink/60 transition-colors hover:text-ink"
+          style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
           {paused ? '▶ Resume' : '❚❚ Pause'}
         </button>
-        <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-white/35">
+        <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink/35">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           {lastUpdate ? `Updated ${lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : `Updating every ${REFRESH_MS / 1000}s`}
         </span>
@@ -296,7 +296,7 @@ export default function ActivityPage() {
       {/* ── [03] Heatmap ── */}
       <section className="glass rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
         <SectionHeader index="[03]" label="Market Heatmap" />
-        <p className="mb-3 text-[11px] text-white/35" style={{ marginTop: '-12px' }}>Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
+        <p className="mb-3 text-[11px] text-ink/35" style={{ marginTop: '-12px' }}>Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
 
         {loading ? (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
@@ -319,21 +319,21 @@ export default function ActivityPage() {
               return (
                 <a key={m.title} href={m.href} target="_blank" rel="noopener noreferrer"
                   className={`group relative flex flex-col justify-between overflow-hidden rounded-xl p-2.5 transition-transform hover:scale-[1.02] ${span}`}
-                  style={{ background: bg, border: '1px solid rgba(255,255,255,0.08)' }}>
+                  style={{ background: bg, border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
                   <div className="flex items-start gap-1.5">
                     {m.icon && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.icon} alt="" className="h-5 w-5 flex-shrink-0 rounded object-cover" />
                     )}
-                    <p className="text-[11px] font-semibold leading-tight text-white line-clamp-2 drop-shadow">{m.title}</p>
+                    <p className="text-[11px] font-semibold leading-tight text-ink line-clamp-2 drop-shadow">{m.title}</p>
                   </div>
                   <div>
                     {m.outcome && (
-                      <p className="truncate text-[9px] font-bold uppercase tracking-wide text-white/80">
+                      <p className="truncate text-[9px] font-bold uppercase tracking-wide text-ink/80">
                         {buyDom ? 'BUY' : 'SELL'} {m.outcome}
                       </p>
                     )}
-                    <p className="text-sm font-black tabular-nums text-white drop-shadow">{formatCurrency(m.total, true)}</p>
+                    <p className="text-sm font-black tabular-nums text-ink drop-shadow">{formatCurrency(m.total, true)}</p>
                   </div>
                 </a>
               );
@@ -347,21 +347,21 @@ export default function ActivityPage() {
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <SectionHeader index="[04]" label="Trade Feed" />
-            <p className="text-[11px] text-white/30" style={{ marginTop: '-12px' }}>Last {filtered.length} trades</p>
+            <p className="text-[11px] text-ink/30" style={{ marginTop: '-12px' }}>Last {filtered.length} trades</p>
           </div>
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-white/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search trades…"
-              className="glass rounded-xl pl-8 pr-3 py-2 text-xs text-white/70 placeholder-white/20 outline-none w-full sm:w-56" />
+              className="glass rounded-xl pl-8 pr-3 py-2 text-xs text-ink/70 placeholder-ink/20 outline-none w-full sm:w-56" />
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <div className="min-w-[680px]">
-            <div className="grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-white/30"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-ink/30"
+              style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
               <span>Market</span><span>Trader</span><span>Outcome</span><span className="text-center">Side</span>
               <span className="text-right">Price</span><span className="text-right">Size</span><span className="text-right">Time</span>
             </div>
@@ -374,30 +374,30 @@ export default function ActivityPage() {
               const price = t.price != null ? `${(Number(t.price) * 100).toFixed(1)}%` : '—';
               const flashing = flashKeys.has(keyOf(t));
               return (
-                <div key={keyOf(t)} className={`grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] items-center px-3 py-2 text-xs transition-colors hover:bg-white/[0.03] ${flashing ? 'animate-flash' : ''}`}
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <a href={marketUrl(t.eventSlug, t.slug, 'activity_feed')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 min-w-0 hover:text-white">
+                <div key={keyOf(t)} className={`grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] items-center px-3 py-2 text-xs transition-colors hover:bg-ink/[0.03] ${flashing ? 'animate-flash' : ''}`}
+                  style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
+                  <a href={marketUrl(t.eventSlug, t.slug, 'activity_feed')} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 min-w-0 hover:text-ink">
                     {t.icon ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={t.icon} alt="" className="h-6 w-6 flex-shrink-0 rounded object-cover" />
-                    ) : <span className="h-6 w-6 flex-shrink-0 rounded bg-white/5" />}
-                    <span className="truncate text-white/70">{t.title ?? t.asset ?? '—'}</span>
+                    ) : <span className="h-6 w-6 flex-shrink-0 rounded bg-ink/5" />}
+                    <span className="truncate text-ink/70">{t.title ?? t.asset ?? '—'}</span>
                   </a>
                   <div className="flex items-center gap-1 min-w-0">
                     <a href={t.proxyWallet ? `/wallet/${t.proxyWallet.toLowerCase()}` : undefined}
-                      className="truncate font-mono text-[11px] text-white/45 hover:text-white/70">{name}</a>
+                      className="truncate font-mono text-[11px] text-ink/45 hover:text-ink/70">{name}</a>
                     {t.proxyWallet && <CopyAddress address={t.proxyWallet} />}
                   </div>
-                  <span className="truncate text-white/55">{t.outcome ?? '—'}</span>
+                  <span className="truncate text-ink/55">{t.outcome ?? '—'}</span>
                   <span className="flex justify-center">
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase"
                       style={buy ? { background: 'rgba(16,185,129,0.14)', color: '#34d399' } : { background: 'rgba(244,63,94,0.14)', color: '#fb7185' }}>
                       {buy ? 'BUY' : 'SELL'}
                     </span>
                   </span>
-                  <span className="text-right tabular-nums text-white/55">{price}</span>
-                  <span className="text-right font-bold tabular-nums text-white/80">{formatCurrency(usd(t), true)}</span>
-                  <span className="text-right text-[10px] text-white/30">{timeAgo(tsOf(t))}</span>
+                  <span className="text-right tabular-nums text-ink/55">{price}</span>
+                  <span className="text-right font-bold tabular-nums text-ink/80">{formatCurrency(usd(t), true)}</span>
+                  <span className="text-right text-[10px] text-ink/30">{timeAgo(tsOf(t))}</span>
                 </div>
               );
             })}

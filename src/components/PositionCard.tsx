@@ -39,7 +39,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
         )}
 
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-semibold text-white/80 line-clamp-2 leading-snug">{position.title}</p>
+          <p className="text-xs font-semibold text-ink/80 line-clamp-2 leading-snug">{position.title}</p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {/* Outcome badge */}
             <span
@@ -51,8 +51,8 @@ export default function PositionCard({ position, delay = 0 }: Props) {
               {position.outcome}
             </span>
             {isClosed && (
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-white/35"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-ink/35"
+                style={{ background: 'rgba(var(--ink-rgb),0.06)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
                 Closed
               </span>
             )}
@@ -62,16 +62,16 @@ export default function PositionCard({ position, delay = 0 }: Props) {
                 Redeemable ✓
               </span>
             )}
-            {endDate && <span className="text-[10px] text-white/25">{endDate}</span>}
+            {endDate && <span className="text-[10px] text-ink/25">{endDate}</span>}
           </div>
         </div>
 
         {/* PnL */}
         <div className="flex-shrink-0 text-right">
-          <p className={`text-base font-black leading-none ${isProfit ? 'text-grad-profit' : isLoss ? 'text-grad-loss' : 'text-white/40'}`}>
+          <p className={`text-base font-black leading-none ${isProfit ? 'text-grad-profit' : isLoss ? 'text-grad-loss' : 'text-ink/40'}`}>
             {pnl >= 0 ? '+' : ''}{formatCurrency(pnl)}
           </p>
-          <p className={`mt-0.5 text-[11px] font-semibold ${isProfit ? 'text-emerald-500/70' : isLoss ? 'text-rose-500/70' : 'text-white/25'}`}>
+          <p className={`mt-0.5 text-[11px] font-semibold ${isProfit ? 'text-emerald-500/70' : isLoss ? 'text-rose-500/70' : 'text-ink/25'}`}>
             {pctPnl >= 0 ? '+' : ''}{pctPnl.toFixed(1)}%
           </p>
         </div>
@@ -79,20 +79,20 @@ export default function PositionCard({ position, delay = 0 }: Props) {
 
       {/* Stats row */}
       <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5"
-        style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(255,255,255,0.04)' }}>
+        style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(var(--ink-rgb),0.04)' }}>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Size</p>
-          <p className="text-xs font-bold text-white/70">
+          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Size</p>
+          <p className="text-xs font-bold text-ink/70">
             {position.size.toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Avg Price</p>
-          <p className="text-xs font-bold text-white/70">${position.avgPrice.toFixed(3)}</p>
+          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Avg Price</p>
+          <p className="text-xs font-bold text-ink/70">${position.avgPrice.toFixed(3)}</p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-white/25 mb-0.5">Current</p>
-          <p className="text-xs font-bold text-white/70">
+          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Current</p>
+          <p className="text-xs font-bold text-ink/70">
             {position.curPrice > 0 ? `$${position.curPrice.toFixed(3)}` : '—'}
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
           style={{
             background: 'var(--accent-grad-25)',
             border: '1px solid var(--accent-border-md)',
-            color: '#b1afa8',
+            color: 'var(--text-secondary)',
           }}
         >
           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

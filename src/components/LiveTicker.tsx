@@ -28,8 +28,8 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2.5 px-4 py-2 transition-colors hover:bg-white/[0.04]"
-      style={{ borderRight: '1px solid rgba(255,255,255,0.05)' }}
+      className="flex items-center gap-2.5 px-4 py-2 transition-colors hover:bg-ink/[0.04]"
+      style={{ borderRight: '1px solid rgba(var(--ink-rgb),0.05)' }}
     >
       <span className="text-[10px] font-black uppercase tracking-wide"
         style={{ color: isBuy ? '#34d399' : '#fb7185' }}>
@@ -39,7 +39,7 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img src={trade.icon} alt="" className="h-4 w-4 rounded object-cover" />
       )}
-      <span className="max-w-[200px] truncate text-xs text-white/55">
+      <span className="max-w-[200px] truncate text-xs text-ink/55">
         {trade.title ?? trade.asset ?? 'Market'}
       </span>
       {trade.outcome && (
@@ -48,9 +48,9 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
           {trade.outcome}{priceC != null ? ` ${priceC}¢` : ''}
         </span>
       )}
-      <span className="text-xs font-black tabular-nums text-white">{formatCurrency(amount, true)}</span>
+      <span className="text-xs font-black tabular-nums text-ink">{formatCurrency(amount, true)}</span>
       {time && (
-        <span className="text-[10px] tabular-nums text-white/25">{time}</span>
+        <span className="text-[10px] tabular-nums text-ink/25">{time}</span>
       )}
     </a>
   );
@@ -84,7 +84,7 @@ export default function LiveTicker() {
         role="status"
         aria-label="Loading live data"
         className="relative flex h-[42px] w-full min-w-0 max-w-full items-stretch overflow-hidden rounded-2xl glass"
-        style={{ border: '1px solid rgba(255,255,255,0.07)' }}
+        style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}
       >
         <div className="flex flex-shrink-0 items-center gap-1.5 px-4"
           style={{ background: 'rgba(52,211,153,0.08)', borderRight: '1px solid rgba(52,211,153,0.2)' }}>
@@ -103,7 +103,7 @@ export default function LiveTicker() {
 
   return (
     <div className="relative flex w-full min-w-0 max-w-full items-stretch overflow-hidden rounded-2xl glass"
-      style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
       {/* Live label */}
       <div className="flex flex-shrink-0 items-center gap-1.5 px-4"
         style={{ background: 'rgba(52,211,153,0.08)', borderRight: '1px solid rgba(52,211,153,0.2)' }}>

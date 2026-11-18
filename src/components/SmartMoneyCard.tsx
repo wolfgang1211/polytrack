@@ -19,21 +19,21 @@ export default function SmartMoneyCard() {
   return (
     <div className="w-full min-w-0 max-w-full rounded-xl overflow-hidden"
       aria-busy={rows === null}
-      style={{ border: '1px solid var(--accent-border)', background: 'rgba(255,255,255,0.015)' }}>
+      style={{ border: '1px solid var(--accent-border)', background: 'rgba(var(--ink-rgb),0.015)' }}>
 
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2.5"
         style={{ borderBottom: '1px solid var(--accent-border-xs)', background: 'rgba(242,240,233,0.06)' }}>
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(var(--ink-rgb),0.55)' }}>
             Smart Money
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.22)' }}>All-Time</span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>All-Time</span>
           <Link href="/leaderboard"
-            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[#b1afa8] hover:text-[#b1afa8] transition-colors">
+            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors">
             View All →
           </Link>
         </div>
@@ -41,14 +41,14 @@ export default function SmartMoneyCard() {
 
       <div className="flex flex-col" data-testid={rows === null ? 'smart-money-loading' : undefined}>
         {rows?.length === 0 ? (
-          <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-white/30">
+          <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-ink/30">
             Live data is temporarily unavailable
           </div>
         ) : (rows ?? Array.from({ length: 4 })).map((e, i) => {
           const entry = e as LbEntry | undefined;
           if (!entry) return (
             <div key={i} className="flex h-11 items-center gap-3 px-4"
-              style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+              style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
               <span className="h-3 w-5 rounded animate-shimmer" />
               <span className="h-3 min-w-0 flex-1 rounded animate-shimmer" />
               <span className="h-3 w-16 rounded animate-shimmer" />
@@ -62,20 +62,20 @@ export default function SmartMoneyCard() {
           return (
             <Link key={entry.proxyWallet}
               href={`/wallet/${entry.proxyWallet.toLowerCase()}`}
-              className="relative flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-white/[0.035] group"
-              style={{ borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
+              className="relative flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-ink/[0.035] group"
+              style={{ borderBottom: i < 3 ? '1px solid rgba(var(--ink-rgb),0.04)' : 'none' }}>
 
               {/* Colored left-edge strip */}
               <span className="absolute left-0 top-0 bottom-0 w-[3px]"
                 style={{ background: strip, opacity: stripOp }} />
 
               <span className="w-5 flex-shrink-0 text-center font-mono text-[10px] font-black tabular-nums"
-                style={{ color: i < 3 ? 'rgba(242,240,233,0.80)' : 'rgba(255,255,255,0.22)' }}>
+                style={{ color: i < 3 ? 'rgba(242,240,233,0.80)' : 'rgba(var(--ink-rgb),0.22)' }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
 
               <span className="flex-1 truncate text-xs font-semibold transition-colors"
-                style={{ color: 'rgba(255,255,255,0.62)' }}>
+                style={{ color: 'rgba(var(--ink-rgb),0.62)' }}>
                 {name}
               </span>
 

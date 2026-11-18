@@ -97,8 +97,8 @@ export default function HomeLeaderboard() {
       <div className="mb-4 flex items-end justify-between">
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-1 w-8 rounded-full"
-            style={{ background: '#f2f0e9' }} />
-          <h2 className="text-sm font-bold uppercase tracking-wider text-white/70">Trader Leaderboard</h2>
+            style={{ background: 'var(--text-primary)' }} />
+          <h2 className="text-sm font-bold uppercase tracking-wider text-ink/70">Trader Leaderboard</h2>
           <span className="flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.10)', border: '1px solid rgba(52,211,153,0.25)', color: '#34d399' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -106,7 +106,7 @@ export default function HomeLeaderboard() {
           </span>
         </div>
         <Link href="/leaderboard"
-          className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#b1afa8] transition-colors hover:text-[#f2f0e9]"
+          className="rounded-full px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-secondary)] transition-colors hover:text-[var(--text-primary)]"
           style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}>
           View full board →
         </Link>

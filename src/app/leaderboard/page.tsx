@@ -8,9 +8,9 @@ import { formatCurrency, formatShares } from '@/lib/utils';
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -19,11 +19,11 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function DataCell({ label, value, accent, loading }: { label: string; value: string; accent?: string; loading?: boolean }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[130px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(255,255,255,0.28)' }}>{label}</p>
+      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>{label}</p>
       {loading ? (
         <div className="h-6 w-20 rounded animate-shimmer" />
       ) : (
-        <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(255,255,255,0.88)' }}>{value}</p>
+        <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(var(--ink-rgb),0.88)' }}>{value}</p>
       )}
     </div>
   );
@@ -65,10 +65,10 @@ export default function LeaderboardPage() {
       <div className="animate-fade-in-up">
         <SectionHeader index="[01]" label="Leaderboard" />
         <h1 className="text-4xl font-black leading-none tracking-tight sm:text-5xl mb-3">
-          <span className="text-white">Trader</span>{' '}
+          <span className="text-ink">Trader</span>{' '}
           <span className="text-grad">Leaderboard</span>
         </h1>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-ink/40 max-w-lg">
           Top prediction market traders ranked by P&amp;L, volume and Smart Score.
         </p>
       </div>
@@ -77,18 +77,18 @@ export default function LeaderboardPage() {
       <div>
         <SectionHeader index="[02]" label="Session Stats" />
         <div className="flex overflow-x-auto animate-fade-in-up"
-          style={{ background: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.07)', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-          <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(255,255,255,0.95)" loading={loading} />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          style={{ background: 'rgba(var(--ink-rgb),0.02)', borderTop: '1px solid rgba(var(--ink-rgb),0.07)', borderBottom: '1px solid rgba(var(--ink-rgb),0.07)' }}>
+          <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(var(--ink-rgb),0.95)" loading={loading} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell label="Sample Volume" value={loading || error ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Sample P&L"
             value={loading || error ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
             accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
             loading={loading}
           />
-          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(255,255,255,0.06)' }} />
+          <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Top Earner"
             value={loading || !topTrader ? '—' : '+' + formatCurrency(topTrader.pnl, true)}

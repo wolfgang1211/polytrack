@@ -24,18 +24,18 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
       <div className="flex items-center gap-2.5">
         {/* Rank */}
         <span className="flex-shrink-0 font-mono text-[11px] font-black tabular-nums w-5 text-right"
-          style={{ color: isTop ? 'rgba(242,240,233,0.85)' : 'rgba(255,255,255,0.22)' }}>
+          style={{ color: isTop ? 'rgba(242,240,233,0.85)' : 'rgba(var(--ink-rgb),0.22)' }}>
           {String(rank).padStart(2, '0')}
         </span>
 
         {/* Name */}
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold truncate transition-colors"
-            style={{ color: 'rgba(255,255,255,0.72)' }}>
+            style={{ color: 'rgba(var(--ink-rgb),0.72)' }}>
             {name}
           </p>
           {(trader.userName || trader.xUsername) && (
-            <p className="font-mono text-[9px] truncate" style={{ color: 'rgba(255,255,255,0.22)' }}>
+            <p className="font-mono text-[9px] truncate" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>
               {formatAddress(trader.proxyWallet, 6)}
             </p>
           )}
@@ -44,7 +44,7 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
         {/* PnL */}
         <div className="flex-shrink-0 text-right">
           <p className={`text-xs font-black tabular-nums font-mono ${pnl > 0 ? 'text-grad-profit' : pnl < 0 ? 'text-grad-loss' : ''}`}
-            style={pnl === 0 ? { color: 'rgba(255,255,255,0.35)' } : undefined}>
+            style={pnl === 0 ? { color: 'rgba(var(--ink-rgb),0.35)' } : undefined}>
             {pnl >= 0 ? '+' : ''}{formatCurrency(pnl, true)}
           </p>
         </div>
@@ -52,13 +52,13 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
 
       {/* PnL performance bar */}
       {barW > 0 && (
-        <div className="mt-1.5 ml-7 h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div className="mt-1.5 ml-7 h-0.5 rounded-full overflow-hidden" style={{ background: 'rgba(var(--ink-rgb),0.06)' }}>
           <div className="h-full rounded-full transition-all duration-700"
             style={{
               width: `${barW}%`,
               background: isTop
                 ? 'rgba(242,240,233,0.75)'
-                : 'linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08))',
+                : 'linear-gradient(90deg, rgba(var(--ink-rgb),0.25), rgba(var(--ink-rgb),0.08))',
             }} />
         </div>
       )}
@@ -90,17 +90,17 @@ export default function RisingTraders() {
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-1 w-5 rounded-full"
             style={{ background: '#fbbf24' }} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(var(--ink-rgb),0.35)' }}>
             Rising Traders
           </span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.18)' }}>
+        <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.18)' }}>
           This Week
         </span>
       </div>
 
       <div className="rounded-xl px-4 py-1"
-        style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.02)' }}>
+        style={{ border: '1px solid rgba(var(--ink-rgb),0.07)', background: 'rgba(var(--ink-rgb),0.02)' }}>
         {loading ? (
           <div className="flex flex-col gap-3 py-3">
             {Array.from({ length: 5 }).map((_, i) => (

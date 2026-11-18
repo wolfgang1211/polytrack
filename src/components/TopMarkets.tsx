@@ -45,10 +45,10 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
   const href = marketUrl(market.eventSlug, market.slug, campaignContext);
 
   const priceColor =
-    price == null ? 'text-white/40'
+    price == null ? 'text-ink/40'
     : price >= 0.7  ? 'text-grad-profit'
     : price <= 0.3  ? 'text-grad-loss'
-    : 'text-white';
+    : 'text-ink';
 
   return (
     <article
@@ -69,21 +69,21 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
             📈
           </div>
         )}
-        <p className="min-w-0 flex-1 text-xs font-semibold leading-relaxed text-white/80 line-clamp-2 transition-colors group-hover:text-white">
+        <p className="min-w-0 flex-1 text-xs font-semibold leading-relaxed text-ink/80 line-clamp-2 transition-colors group-hover:text-ink">
           {market.question}
         </p>
       </div>
 
       <div className="flex items-end justify-between mt-auto">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-white/25">YES</p>
+          <p className="text-[10px] uppercase tracking-widest text-ink/25">YES</p>
           <p className={`text-xl font-black ${priceColor}`}>
             {price != null ? `${(price * 100).toFixed(0)}¢` : '—'}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest text-white/25">24h Vol</p>
-          <p className="text-sm font-bold text-white/60">{formatCurrency(volume, true)}</p>
+          <p className="text-[10px] uppercase tracking-widest text-ink/25">24h Vol</p>
+          <p className="text-sm font-bold text-ink/60">{formatCurrency(volume, true)}</p>
         </div>
       </div>
       <PolymarketTradeLink href={href} compact />
@@ -124,10 +124,10 @@ export default function TopMarkets({ limit = 5, showViewAll = false, campaignCon
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full"
-            style={{ background: '#f2f0e9' }} />
-          <h2 className="text-sm font-bold text-white/70 uppercase tracking-wider">Top Markets</h2>
+            style={{ background: 'var(--text-primary)' }} />
+          <h2 className="text-sm font-bold text-ink/70 uppercase tracking-wider">Top Markets</h2>
         </div>
-        <span className="text-[10px] text-white/25 uppercase tracking-widest">24h Volume</span>
+        <span className="text-[10px] text-ink/25 uppercase tracking-widest">24h Volume</span>
       </div>
 
       {loading ? (
@@ -145,7 +145,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false, campaignCon
       {showViewAll && !loading && (
         <div className="mt-4 flex justify-center">
           <Link href="/markets"
-            className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-white/80 transition-all hover:text-white hover:scale-[1.02]"
+            className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5 text-xs font-bold text-ink/80 transition-all hover:text-ink hover:scale-[1.02]"
             style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border-md)' }}>
             View All Markets →
           </Link>

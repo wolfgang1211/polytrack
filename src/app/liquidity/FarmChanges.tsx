@@ -34,7 +34,7 @@ interface ChangesResponse {
 
 const KIND_META: Record<FarmChangeKind, { label: string; color: string; hint: string }> = {
   new:       { label: 'NEW POOL',   color: '#34d399', hint: 'reward program started' },
-  liq_out:   { label: 'LIQ DRAIN',  color: '#b1afa8', hint: 'competitors left — your share grows' },
+  liq_out:   { label: 'LIQ DRAIN',  color: 'var(--text-secondary)', hint: 'competitors left — your share grows' },
   rate_up:   { label: 'POOL ↑',     color: '#fbbf24', hint: 'daily reward pool raised' },
   rate_down: { label: 'POOL ↓',     color: '#fb923c', hint: 'daily reward pool cut' },
   liq_in:    { label: 'LIQ CROWD',  color: '#60a5fa', hint: 'competitors piled in' },
@@ -64,9 +64,9 @@ function changeText(c: FarmChange): string {
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
@@ -97,10 +97,10 @@ export default function FarmChanges() {
           {WINDOWS.map(w => (
             <button key={w.key} onClick={() => setWin(w.key)}
               className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                ${win === w.key ? 'text-white' : 'text-white/30 hover:text-white/60'}`}>
+                ${win === w.key ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}>
               {win === w.key && (
                 <span className="absolute inset-0 rounded-lg"
-                  style={{ background: 'var(--accent-fill)', border: '1px solid rgba(255,255,255,0.3)' }} />
+                  style={{ background: 'var(--accent-fill)', border: '1px solid rgba(var(--ink-rgb),0.3)' }} />
               )}
               <span className="relative">{w.label}</span>
             </button>
@@ -108,7 +108,7 @@ export default function FarmChanges() {
         </div>
       } />
 
-      <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+      <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
         {loading && (
           <div className="flex flex-col gap-2 p-4">
             {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-9 rounded-lg animate-shimmer" />)}
@@ -116,13 +116,13 @@ export default function FarmChanges() {
         )}
 
         {!loading && data && changes.length === 0 && (
-          <p className="text-center text-sm text-white/25 py-8">
+          <p className="text-center text-sm text-ink/25 py-8">
             No farm changes in the last {data.effectiveHours ? Math.round(data.effectiveHours) : win}h — pools, rates and competition all held steady.
           </p>
         )}
 
         {!loading && !data && (
-          <p className="text-center text-sm text-white/25 py-8">Farm change feed unavailable.</p>
+          <p className="text-center text-sm text-ink/25 py-8">Farm change feed unavailable.</p>
         )}
 
         {!loading && data && changes.length > 0 && (
@@ -136,23 +136,23 @@ export default function FarmChanges() {
                     title={meta.hint}>
                     {meta.label}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-white/70">
+                  <span className="min-w-0 flex-1 truncate text-xs font-semibold text-ink/70">
                     {c.question ?? `${c.conditionId.slice(0, 10)}…`}
                   </span>
-                  <span className="flex-shrink-0 text-xs font-bold tabular-nums text-white/55">{changeText(c)}</span>
+                  <span className="flex-shrink-0 text-xs font-bold tabular-nums text-ink/55">{changeText(c)}</span>
                   {c.pct != null && (
                     <span className="w-14 flex-shrink-0 text-right text-[11px] font-black tabular-nums"
                       style={{ color: meta.color }}>
                       {c.pct > 0 ? '+' : ''}{Math.round(c.pct)}%
                     </span>
                   )}
-                  <span className="w-16 flex-shrink-0 text-right text-[10px] text-white/25 tabular-nums">
+                  <span className="w-16 flex-shrink-0 text-right text-[10px] text-ink/25 tabular-nums">
                     {data.updatedAt ? agoLabel(Math.max(0, data.updatedAt - c.ts)) : ''}
                   </span>
                 </>
               );
-              const cls = 'flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-white/[0.03]';
-              const style = { borderBottom: '1px solid rgba(255,255,255,0.04)' };
+              const cls = 'flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-ink/[0.03]';
+              const style = { borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' };
               return c.slug ? (
                 <a key={`${c.kind}-${c.conditionId}`} href={marketUrl(c.eventSlug, c.slug, 'liquidity_farm_changes')}
                   target="_blank" rel="noopener noreferrer" className={cls} style={style}>
@@ -165,7 +165,7 @@ export default function FarmChanges() {
           </div>
         )}
 
-        <p className="px-4 py-3 text-[10px] text-white/25 leading-relaxed" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <p className="px-4 py-3 text-[10px] text-ink/25 leading-relaxed" style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.05)' }}>
           Diffed from our own 10-minute snapshot history ({data ? `${data.snapshots} snapshots` : '…'}) — pools opening/ending,
           reward-rate moves ≥20%, and competing-liquidity swings ≥30%. A liquidity drain means your pool share is growing.
         </p>

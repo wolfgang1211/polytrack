@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <article className="mx-auto max-w-3xl py-8">
-      <h1 className="text-3xl font-bold text-white mb-2">Terms of Service</h1>
-      <p className="text-xs text-white/30 mb-10">Last updated: June 1, 2026</p>
+      <h1 className="text-3xl font-bold text-ink mb-2">Terms of Service</h1>
+      <p className="text-xs text-ink/30 mb-10">Last updated: June 1, 2026</p>
 
       <div className="prose-custom space-y-8">
         <section>
@@ -102,7 +102,7 @@ export default function TermsPage() {
             that any asset, security, or prediction market position should be bought, sold, or held by you.
           </p>
           <p>
-            Please read our full <a href="/disclaimer" className="underline text-white/60 hover:text-white">Disclaimer</a>.
+            Please read our full <a href="/disclaimer" className="underline text-ink/60 hover:text-ink">Disclaimer</a>.
           </p>
         </section>
 

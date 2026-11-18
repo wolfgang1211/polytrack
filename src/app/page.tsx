@@ -51,7 +51,7 @@ export default function DashboardPage() {
             <div className="mt-6 flex w-full max-w-sm flex-col gap-3 sm:flex-row lg:justify-start">
               <Link
                 href="/markets"
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-[#111111] transition-colors hover:bg-white focus-visible:ring-2 focus-visible:ring-neutral-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111111]"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ink/60 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas"
                 style={{
                   background: 'var(--text-primary)',
                   border: '1px solid var(--text-primary)',
@@ -64,7 +64,7 @@ export default function DashboardPage() {
               </Link>
               <Link
                 href="/checker"
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-white/85 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-neutral-300"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold text-ink/85 transition-colors hover:bg-ink/5 hover:text-ink focus-visible:ring-2 focus-visible:ring-ink/60"
                 style={{ border: '1px solid var(--accent-border)' }}
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

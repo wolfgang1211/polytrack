@@ -73,9 +73,9 @@ async function loadWallet(address: string): Promise<WalletStats> {
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(255,255,255,0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(255,255,255,0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -86,14 +86,14 @@ function AddressInput({
 }: { id: string; label: string; value: string; onChange: (v: string) => void; error?: string | null }) {
   return (
     <div className="flex-1 min-w-[260px]">
-      <label htmlFor={id} className="block text-xs font-semibold text-white/50 mb-2">{label}</label>
+      <label htmlFor={id} className="block text-xs font-semibold text-ink/50 mb-2">{label}</label>
       <input
         id={id}
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder="0x…"
         spellCheck={false}
-        className="w-full rounded-xl glass px-4 py-2.5 text-sm font-mono text-white/80 placeholder-white/25 outline-none"
+        className="w-full rounded-xl glass px-4 py-2.5 text-sm font-mono text-ink/80 placeholder-ink/25 outline-none"
         style={{ border: `1px solid ${error ? 'rgba(251,113,133,0.4)' : 'var(--accent-border-md)'}` }}
         aria-invalid={Boolean(error)}
         aria-describedby={error ? `${id}-error` : undefined}
@@ -171,10 +171,10 @@ function CompareInner() {
       <div className="animate-fade-in-up">
         <SectionHeader index="[01]" label="Compare Traders" />
         <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl mb-3">
-          <span className="text-white">Trader</span>{' '}
+          <span className="text-ink">Trader</span>{' '}
           <span className="text-grad">Comparison</span>
         </h1>
-        <p className="text-sm text-white/40 max-w-lg">
+        <p className="text-sm text-ink/40 max-w-lg">
           Put two Polymarket wallets side by side — P&amp;L, win rate, portfolio value and betting style — and see who you should really be copying.
         </p>
       </div>
@@ -191,7 +191,7 @@ function CompareInner() {
             <button
               onClick={() => compare(addrA, addrB)}
               disabled={loading}
-              className="rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-all hover:scale-[1.02] disabled:opacity-50"
+              className="rounded-xl px-5 py-2.5 text-sm font-bold text-ink transition-all hover:scale-[1.02] disabled:opacity-50"
               style={{ background: 'var(--accent-fill)', border: '1px solid var(--accent-border-lg)' }}
             >
               {loading ? 'Comparing…' : 'Compare →'}
@@ -211,11 +211,11 @@ function CompareInner() {
           <div className="glass rounded-2xl overflow-hidden">
             {/* header row */}
             <div className="grid grid-cols-[1.2fr_1fr_1fr] px-5 py-3"
-              style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-[10px] uppercase tracking-widest text-white/30 self-center">Metric</span>
+              style={{ background: 'rgba(var(--ink-rgb),0.03)', borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <span className="text-[10px] uppercase tracking-widest text-ink/30 self-center">Metric</span>
               {[statsA, statsB].map((s, i) => (
                 <a key={i} href={profileUrl(s!.address)} target="_blank" rel="noopener noreferrer"
-                  className="text-xs font-mono font-bold text-white/70 hover:text-white transition-colors text-right sm:text-left">
+                  className="text-xs font-mono font-bold text-ink/70 hover:text-ink transition-colors text-right sm:text-left">
                   {formatAddress(s!.address, 6)} ↗
                 </a>
               ))}
@@ -227,7 +227,7 @@ function CompareInner() {
               const better = row.higherIsBetter === false ? (va < vb ? 'a' : vb < va ? 'b' : null) : (va > vb ? 'a' : vb > va ? 'b' : null);
               const cell = (v: number, side: 'a' | 'b') => {
                 const isBetter = better === side;
-                const signCls = row.signed ? (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-white/50') : 'text-white/70';
+                const signCls = row.signed ? (v > 0 ? 'text-emerald-400' : v < 0 ? 'text-rose-400' : 'text-ink/50') : 'text-ink/70';
                 return (
                   <span className={`text-sm font-bold tabular-nums text-right sm:text-left ${signCls}`}
                     style={isBetter ? { textShadow: '0 0 14px rgba(52,211,153,0.35)' } : { opacity: better && !isBetter ? 0.55 : 1 }}>
@@ -238,16 +238,16 @@ function CompareInner() {
               };
               return (
                 <div key={row.label} className="grid grid-cols-[1.2fr_1fr_1fr] px-5 py-2.5"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <span className="text-xs text-white/40 self-center">
+                  style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
+                  <span className="text-xs text-ink/40 self-center">
                     {row.label === 'Wins / Losses'
                       ? 'Wins / Losses'
                       : row.label}
                   </span>
                   {row.label === 'Wins / Losses' ? (
                     <>
-                      <span className="text-sm font-bold text-white/70 tabular-nums text-right sm:text-left">{statsA!.wins} / {statsA!.losses}</span>
-                      <span className="text-sm font-bold text-white/70 tabular-nums text-right sm:text-left">{statsB!.wins} / {statsB!.losses}</span>
+                      <span className="text-sm font-bold text-ink/70 tabular-nums text-right sm:text-left">{statsA!.wins} / {statsA!.losses}</span>
+                      <span className="text-sm font-bold text-ink/70 tabular-nums text-right sm:text-left">{statsB!.wins} / {statsB!.losses}</span>
                     </>
                   ) : (
                     <>
@@ -261,16 +261,16 @@ function CompareInner() {
           </div>
 
           {(statsA!.truncated || statsB!.truncated) && (
-            <p className="mt-2 text-[10px] text-white/25">
+            <p className="mt-2 text-[10px] text-ink/25">
               * Position history is capped at up to 1,000 rows per lifecycle. These statistics cover the returned sample, not the complete lifetime history.
             </p>
           )}
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <a href={`/wallet/${statsA!.address}`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
+            <a href={`/wallet/${statsA!.address}`} className="text-xs text-ink/40 hover:text-ink/70 transition-colors">
               Full profile: {formatAddress(statsA!.address, 6)} →
             </a>
-            <a href={`/wallet/${statsB!.address}`} className="text-xs text-white/40 hover:text-white/70 transition-colors">
+            <a href={`/wallet/${statsB!.address}`} className="text-xs text-ink/40 hover:text-ink/70 transition-colors">
               Full profile: {formatAddress(statsB!.address, 6)} →
             </a>
           </div>
@@ -279,8 +279,8 @@ function CompareInner() {
 
       {/* Hint */}
       {!ready && !loading && (
-        <p className="text-xs text-white/25">
-          Tip: grab wallet addresses from the <a href="/leaderboard" className="underline hover:text-white/50">Leaderboard</a> and paste them above.
+        <p className="text-xs text-ink/25">
+          Tip: grab wallet addresses from the <a href="/leaderboard" className="underline hover:text-ink/50">Leaderboard</a> and paste them above.
           The comparison is shareable — the URL updates with both addresses.
         </p>
       )}

@@ -25,7 +25,7 @@ export default function WalletSearch({ compact }: Props) {
       ? 'rgba(244,63,94,0.4)'
       : focused
         ? 'rgba(242,240,233,0.45)'
-        : 'rgba(255,255,255,0.07)';
+        : 'rgba(var(--ink-rgb),0.07)';
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -45,7 +45,7 @@ export default function WalletSearch({ compact }: Props) {
           {/* Search icon */}
           <svg
             className={`absolute left-3.5 h-3.5 w-3.5 flex-shrink-0 transition-colors duration-200 ${
-              isValid ? 'text-neutral-200' : focused ? 'text-neutral-200/60' : 'text-white/60'
+              isValid ? 'text-ink' : focused ? 'text-ink/60' : 'text-ink/60'
             }`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
@@ -60,7 +60,7 @@ export default function WalletSearch({ compact }: Props) {
             placeholder="Enter wallet address (0x…)"
             spellCheck={false}
             autoComplete="off"
-            className="w-full bg-transparent py-2.5 pl-9 pr-10 text-xs text-white/75 placeholder-white/55 outline-none font-mono"
+            className="w-full bg-transparent py-2.5 pl-9 pr-10 text-xs text-ink/75 placeholder-ink/55 outline-none font-mono"
           />
 
           {/* Inline validation badge */}
@@ -97,13 +97,13 @@ export default function WalletSearch({ compact }: Props) {
         <button
           type="submit"
           disabled={!isValid}
-          className="relative w-full overflow-hidden rounded-xl py-2.5 text-xs font-bold text-white transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-35 disabled:cursor-not-allowed disabled:scale-100"
+          className="relative w-full overflow-hidden rounded-xl py-2.5 text-xs font-bold text-ink transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-35 disabled:cursor-not-allowed disabled:scale-100"
           style={{
             background: isValid
               ? 'var(--text-primary)'
               : 'var(--accent-fill)',
             border: '1px solid var(--accent-border)',
-            color: isValid ? '#111111' : 'var(--text-muted)',
+            color: isValid ? 'var(--color-background)' : 'var(--text-muted)',
           }}
         >
           <span className="relative">Track Wallet →</span>

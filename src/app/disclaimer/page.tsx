@@ -18,8 +18,8 @@ export const metadata: Metadata = {
 export default function DisclaimerPage() {
   return (
     <article className="mx-auto max-w-3xl py-8">
-      <h1 className="text-3xl font-bold text-white mb-2">Disclaimer</h1>
-      <p className="text-xs text-white/30 mb-10">Last updated: June 1, 2026</p>
+      <h1 className="text-3xl font-bold text-ink mb-2">Disclaimer</h1>
+      <p className="text-xs text-ink/30 mb-10">Last updated: June 1, 2026</p>
 
       {/* ── Prominent warning box ── */}
       <div
@@ -33,7 +33,7 @@ export default function DisclaimerPage() {
           <span className="text-2xl flex-shrink-0">⚠️</span>
           <div>
             <h2 className="text-sm font-bold text-amber-300 mb-2">Important Notice</h2>
-            <p className="text-sm text-white/70 leading-relaxed">
+            <p className="text-sm text-ink/70 leading-relaxed">
               AlphaBoard is an <strong>independent analytics tool</strong> for informational purposes only.
               Nothing on this website constitutes financial advice, investment advice, or a recommendation
               to buy, sell, or hold any position in any prediction market. <strong>You could lose all of

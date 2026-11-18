@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import TelegramModal from '@/components/TelegramModal';
 import Logo from '@/components/Logo';
+import ThemeSelect from '@/components/ThemeSelect';
 
 const NAV_LINKS = [
   { href: '/leaderboard', label: 'Leaderboard' },
@@ -60,13 +61,13 @@ export default function Navbar() {
                 <Logo size={38} />
               </div>
               <div className="flex flex-col leading-none">
-                <span className="text-sm font-bold text-[#f2f0e9]">AlphaBoard</span>
-                <span className="text-[9px] text-white/60 font-medium tracking-widest uppercase">Analytics</span>
+                <span className="text-sm font-bold text-ink">AlphaBoard</span>
+                <span className="text-[9px] text-ink/60 font-medium tracking-widest uppercase">Analytics</span>
               </div>
             </Link>
 
             {/* Desktop nav links */}
-            <nav className="hidden items-center gap-0.5 lg:flex">
+            <nav className="hidden items-center gap-0.5 xl:flex">
               {NAV_LINKS.map(({ href, label }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`);
                 return (
@@ -74,7 +75,7 @@ export default function Navbar() {
                     key={href}
                     href={href}
                     className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200
-                      ${active ? 'text-white' : 'text-white/65 hover:text-white/75'}`}
+                      ${active ? 'text-ink' : 'text-ink/65 hover:text-ink/75'}`}
                   >
                     {active && (
                       <span className="absolute inset-0 rounded-lg"
@@ -88,7 +89,7 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setMoreOpen(o => !o)}
-                  className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${moreActive || moreOpen ? 'text-white' : 'text-white/65 hover:text-white/75'}`}
+                  className={`relative rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${moreActive || moreOpen ? 'text-ink' : 'text-ink/65 hover:text-ink/75'}`}
                   aria-expanded={moreOpen}
                   aria-haspopup="menu"
                 >
@@ -106,20 +107,24 @@ export default function Navbar() {
                 {moreOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setMoreOpen(false)} />
-                    <div className="absolute right-0 top-9 z-50 w-44 overflow-hidden rounded-2xl glass-strong p-1.5 shadow-2xl animate-scale-in">
+                    <div className="absolute right-0 top-9 z-50 w-52 overflow-hidden rounded-2xl glass-strong p-1.5 shadow-2xl animate-scale-in">
                       {MORE_LINKS.map(({ href, label }) => {
                         const active = pathname === href;
                         return (
                           <Link
                             key={href}
                             href={href}
-                            className={`block rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${active ? 'text-white' : 'text-white/65 hover:bg-white/[0.04] hover:text-white/75'}`}
+                            className={`block rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${active ? 'text-ink' : 'text-ink/65 hover:bg-ink/[0.04] hover:text-ink/75'}`}
                             style={active ? { background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' } : {}}
                           >
                             {label}
                           </Link>
                         );
                       })}
+                      <div className="mt-1 flex items-center justify-between gap-2 border-t border-ink/10 px-2 pt-2 pb-1">
+                        <span className="text-xs font-medium text-ink/65">Appearance</span>
+                        <ThemeSelect />
+                      </div>
                     </div>
                   </>
                 )}
@@ -131,10 +136,10 @@ export default function Navbar() {
               {/* Telegram */}
               <button
                 onClick={() => setShowTelegram(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white/70 transition-all hover:text-white hover:scale-[1.02]"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink hover:scale-[1.02]"
                 style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
               >
-                <svg className="h-3.5 w-3.5 text-neutral-200" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="h-3.5 w-3.5 text-ink/85" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                 </svg>
                 Get Alerts
@@ -145,8 +150,8 @@ export default function Navbar() {
                 href="/watchlist"
                 title="Watchlist"
                 aria-label="Watchlist"
-                className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl text-white/65 transition-all hover:scale-[1.08] hover:text-white/80"
-                style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)' }}
+                className="hidden sm:flex h-11 w-11 items-center justify-center rounded-xl text-ink/65 transition-all hover:scale-[1.08] hover:text-ink/80"
+                style={{ background: 'rgba(var(--ink-rgb),0.045)', border: '1px solid rgba(var(--ink-rgb),0.09)' }}
               >
                 <WatchIcon />
               </Link>
@@ -156,23 +161,23 @@ export default function Navbar() {
                 onClick={() => setMobileOpen(o => !o)}
                 aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={mobileOpen}
-                className="lg:hidden flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
+                className="xl:hidden flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200"
                 style={{
-                  background: mobileOpen ? 'var(--accent-tint)' : 'rgba(255,255,255,0.05)',
-                  border: `1px solid ${mobileOpen ? 'var(--accent-border-lg)' : 'rgba(255,255,255,0.1)'}`,
+                  background: mobileOpen ? 'var(--accent-tint)' : 'rgba(var(--ink-rgb),0.05)',
+                  border: `1px solid ${mobileOpen ? 'var(--accent-border-lg)' : 'rgba(var(--ink-rgb),0.1)'}`,
                 }}
               >
                 <div className="flex h-4 w-4 flex-col items-center justify-center gap-[5px]">
                   <span
-                    className="block h-px w-4 rounded-full bg-white/70 transition-all duration-300 origin-center"
+                    className="block h-px w-4 rounded-full bg-ink/70 transition-all duration-300 origin-center"
                     style={{ transform: mobileOpen ? 'rotate(45deg) translate(0px, 6px)' : 'none' }}
                   />
                   <span
-                    className="block h-px w-4 rounded-full bg-white/70 transition-all duration-300"
+                    className="block h-px w-4 rounded-full bg-ink/70 transition-all duration-300"
                     style={{ opacity: mobileOpen ? 0 : 1, transform: mobileOpen ? 'scaleX(0)' : 'scaleX(1)' }}
                   />
                   <span
-                    className="block h-px w-4 rounded-full bg-white/70 transition-all duration-300 origin-center"
+                    className="block h-px w-4 rounded-full bg-ink/70 transition-all duration-300 origin-center"
                     style={{ transform: mobileOpen ? 'rotate(-45deg) translate(0px, -6px)' : 'none' }}
                   />
                 </div>
@@ -182,14 +187,15 @@ export default function Navbar() {
 
           {/* ── Mobile menu panel ── */}
           <div
-            className="lg:hidden overflow-hidden transition-[max-height,opacity] duration-300 ease-in-out"
+            className="xl:hidden overflow-y-auto transition-[max-height,opacity] duration-300 ease-in-out"
+            inert={!mobileOpen}
             style={{
-              maxHeight: mobileOpen ? '580px' : '0px',
+              maxHeight: mobileOpen ? 'calc(100dvh - 70px)' : '0px',
               opacity: mobileOpen ? 1 : 0,
             }}
           >
             <div className="mx-auto max-w-7xl px-4 pb-4 pt-2"
-              style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.06)' }}>
 
               {/* Nav links */}
               <nav className="flex flex-col gap-0.5 mb-3">
@@ -200,7 +206,7 @@ export default function Navbar() {
                       key={href}
                       href={href}
                       className={`relative flex items-center justify-between rounded-xl px-4 py-2.5 text-sm font-semibold transition-all duration-200
-                        ${active ? 'text-white' : 'text-white/55 hover:text-white/85 hover:bg-white/[0.03]'}`}
+                        ${active ? 'text-ink' : 'text-ink/55 hover:text-ink/85 hover:bg-ink/[0.03]'}`}
                       style={active ? {
                         background: 'var(--accent-bg)',
                         border: '1px solid var(--accent-border)',
@@ -217,28 +223,35 @@ export default function Navbar() {
               </nav>
 
               {/* Divider */}
-              <div className="my-3 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+              <div className="my-3 h-px" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
 
               {/* Quick actions */}
               <div className="mb-3 flex gap-2">
                 <button
                   onClick={() => { setShowTelegram(true); setMobileOpen(false); }}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink"
                   style={{ background: 'var(--accent-bg)', border: '1px solid var(--accent-border)' }}
                 >
-                  <svg className="h-3.5 w-3.5 text-neutral-200" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="h-3.5 w-3.5 text-ink/85" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.478 13.9l-2.95-.924c-.643-.204-.657-.643.136-.953l11.57-4.46c.537-.194 1.006.131.66.658z"/>
                   </svg>
                   Get Alerts
                 </button>
                 <Link
                   href="/watchlist"
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-white/70 transition-all hover:text-white"
-                  style={{ background: 'rgba(255,255,255,0.045)', border: '1px solid rgba(255,255,255,0.09)' }}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-semibold text-ink/70 transition-all hover:text-ink"
+                  style={{ background: 'rgba(var(--ink-rgb),0.045)', border: '1px solid rgba(var(--ink-rgb),0.09)' }}
                 >
                   <WatchIcon /> Watchlist
                 </Link>
               </div>
+
+              {mobileOpen && (
+                <div className="flex items-center justify-between gap-3 border-t border-ink/10 px-3 pt-3 pb-1">
+                  <span className="text-sm font-medium text-ink/65">Appearance</span>
+                  <ThemeSelect />
+                </div>
+              )}
 
             </div>
           </div>
