@@ -19,7 +19,7 @@ export default function PrivacyPage() {
   return (
     <article className="mx-auto max-w-3xl py-8">
       <h1 className="text-3xl font-bold text-ink mb-2">Privacy Policy</h1>
-      <p className="text-xs text-ink/30 mb-10">Last updated: June 1, 2026</p>
+      <p className="text-xs text-ink/30 mb-10">Last updated: November 21, 2026</p>
 
       <div className="prose-custom space-y-8">
         <section>
@@ -45,6 +45,12 @@ export default function PrivacyPage() {
             <li><strong>Usage Data:</strong> Pages visited, features used, time spent, referral source.</li>
             <li><strong>Device Data:</strong> Browser type, operating system, screen resolution.</li>
             <li><strong>Cookies:</strong> We use essential cookies for authentication and session management.</li>
+            <li>
+              <strong>Visitor analytics:</strong> We use Vercel Web Analytics (cookieless, aggregated page views and
+              referrers) and Microsoft Clarity (heatmaps and session replays of clicks, scrolling and page
+              navigation). Clarity may set its own cookies. Text you type into form fields is masked and never
+              recorded. Clarity does not load if your browser sends Do Not Track or Global Privacy Control.
+            </li>
           </ul>
         </section>
 
@@ -63,7 +69,7 @@ export default function PrivacyPage() {
           <h2>4. Data Sharing</h2>
           <p>We do <strong>not</strong> sell your personal information. We may share data with:</p>
           <ul>
-            <li><strong>Service Providers:</strong> Hosting (Vercel), analytics, and email services that help us operate.</li>
+            <li><strong>Service Providers:</strong> Hosting and web analytics (Vercel), session analytics (Microsoft Clarity), and email services that help us operate.</li>
             <li><strong>Legal Requirements:</strong> If required by law, subpoena, or government request.</li>
             <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets.</li>
           </ul>

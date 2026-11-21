@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import { Inter, JetBrains_Mono, Syne, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import OutboundAnalytics from '@/components/OutboundAnalytics';
+import ClarityScript from '@/components/ClarityScript';
 import { organizationJsonLd, websiteJsonLd } from '@/lib/schema';
 import { THEME_INIT_SCRIPT } from '@/lib/theme';
 
@@ -80,6 +82,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Footer />
         <Script id="jsonld-org" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
         <Script id="jsonld-home" type="application/ld+json" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+        <Analytics />
+        <ClarityScript />
       </body>
     </html>
   );
