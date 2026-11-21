@@ -361,7 +361,9 @@ test('Discover groups: ExplorerCard articles, 12-group and 4-row caps with count
 
 // ======================= MU4: readability, long labels, More filters on back/forward =======================
 test('source guard: owned explorer views keep essential text at >= text-xs and >= text-ink/55', () => {
-  for (const f of ['MarketsClient', 'KalshiDiscoveryClient', 'KalshiMarketsClient', 'KalshiEventsClient']) {
+  for (const f of ['MarketsClient', 'KalshiDiscoveryClient', 'KalshiMarketsClient', 'KalshiEventsClient',
+    // Browser acceptance 2026-11-21 measured 2.5-3.0:1 contrast on these Kalshi quote/detail texts at 375px; keep them guarded too.
+    'KalshiQuoteSummary', 'KalshiHistoryClient', 'page', 'kalshi/[ticker]/page', 'kalshi/events/[eventTicker]/page']) {
     const s = src(`src/app/markets/${f}.tsx`);
     assert.doesNotMatch(s, /text-\[(9|10|11)px\]/, `${f}: sub-12px text`);
     // The only remaining faint ink is the decorative search icon svg (MarketsClient), which carries no text.

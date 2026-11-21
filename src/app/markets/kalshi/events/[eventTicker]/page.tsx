@@ -30,7 +30,7 @@ const mutualLabel = (v: boolean | null) => (v === null ? 'Unavailable' : v ? 'Ye
 
 function Back() {
   return (
-    <Link href={EVENTS_HREF} className="inline-flex items-center gap-1.5 text-xs text-ink/40 hover:text-ink/70 transition-colors w-fit">
+    <Link href={EVENTS_HREF} className="inline-flex items-center gap-1.5 text-xs text-ink/55 hover:text-ink/70 transition-colors w-fit">
       ← Back to Kalshi events
     </Link>
   );
@@ -39,7 +39,7 @@ function Back() {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="rounded-xl p-3" style={panel}>
-      <dt className="text-[10px] uppercase tracking-wider text-ink/35">{label}</dt>
+      <dt className="text-xs uppercase tracking-wider text-ink/55">{label}</dt>
       <dd className="mt-1 text-sm font-semibold text-ink/80 break-all">{children}</dd>
     </div>
   );
@@ -79,10 +79,10 @@ export default async function KalshiEventPage({ params }: { params: Promise<{ ev
     <div className="flex flex-col gap-5">
       <Back />
       <header className="rounded-2xl p-5" style={panel}>
-        <p className="text-[10px] uppercase tracking-widest text-ink/35">Kalshi event · read-only</p>
+        <p className="text-xs uppercase tracking-widest text-ink/55">Kalshi event · read-only</p>
         <h1 className="mt-1 text-xl font-black text-ink sm:text-2xl">{event.title}</h1>
         {event.subTitle && <p className="mt-1 text-sm text-ink/55">{event.subTitle}</p>}
-        <p className="mt-1 font-mono text-[11px] text-ink/40 break-all">{event.eventTicker}</p>
+        <p className="mt-1 font-mono text-xs text-ink/55 break-all">{event.eventTicker}</p>
       </header>
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Event metadata">
@@ -91,7 +91,7 @@ export default async function KalshiEventPage({ params }: { params: Promise<{ ev
         <Field label="Strike date">{formatUtc(event.strikeDate)}</Field>
         <Field label="Mutually exclusive">{mutualLabel(event.mutuallyExclusive)}</Field>
       </dl>
-      <p className="text-[11px] text-ink/35">
+      <p className="text-xs text-ink/55">
         Mutually exclusive is shown as published by Kalshi; it is not verified here. Event record updated {formatUtc(event.updatedTime)}.
         Metadata retrieved {formatUtc(receivedAt)} (retrieval time only).
       </p>

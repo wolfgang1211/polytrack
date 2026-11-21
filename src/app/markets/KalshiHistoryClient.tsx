@@ -60,15 +60,15 @@ function Candles({ h }: { h: KalshiHistory }) {
   return (
     <div className="flex flex-col gap-2">
       <Chart points={points} window={h.window} range={h.range} />
-      <p className="text-[11px] text-ink/40">
+      <p className="text-xs text-ink/55">
         {`Last candle ends ${utc(last.endTs)}. Line breaks mark periods without a trade or without a candle; nothing is interpolated.`}
       </p>
       <details className="text-xs">
         <summary className="cursor-pointer text-ink/50">Chart data table</summary>
         <div className="overflow-x-auto">
           <table className="mt-2 w-full text-xs">
-            <caption className="text-left text-ink/40">Yes trade close by interval (UTC)</caption>
-            <thead><tr className="text-ink/35"><th className="text-left font-normal">Interval end</th><th className="text-right font-normal">Yes close</th><th className="text-right font-normal">Volume</th></tr></thead>
+            <caption className="text-left text-ink/55">Yes trade close by interval (UTC)</caption>
+            <thead><tr className="text-ink/55"><th className="text-left font-normal">Interval end</th><th className="text-right font-normal">Yes close</th><th className="text-right font-normal">Volume</th></tr></thead>
             <tbody>
               {points.map(p => (
                 <tr key={p.endTs} className="text-ink/75">
@@ -92,12 +92,12 @@ function Trades({ h }: { h: KalshiHistory }) {
   const latest = trades.reduce((a: KalshiTrade, t) => (Date.parse(t.createdTime) > Date.parse(a.createdTime) ? t : a));
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-[11px] text-ink/40">{`Latest trade ${formatUtc(latest.createdTime)}.`}</p>
+      <p className="text-xs text-ink/55">{`Latest trade ${formatUtc(latest.createdTime)}.`}</p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] text-xs">
-          <caption className="text-left text-ink/40">Recent public trades (one page, UTC). Quantities are contracts, not dollars.</caption>
+          <caption className="text-left text-ink/55">Recent public trades (one page, UTC). Quantities are contracts, not dollars.</caption>
           <thead>
-            <tr className="text-ink/35">
+            <tr className="text-ink/55">
               <th className="text-left font-normal">Time</th><th className="text-right font-normal">Yes price</th>
               <th className="text-right font-normal">No price</th><th className="text-right font-normal">Contracts</th>
               <th className="text-left font-normal">Taker outcome</th><th className="text-left font-normal">Type</th>
@@ -118,7 +118,7 @@ function Trades({ h }: { h: KalshiHistory }) {
         </table>
       </div>
       {hasMore && (
-        <p className="text-[11px] text-ink/50">{`More trades exist in this window; showing the ${trades.length} returned on one page (max 50).`}</p>
+        <p className="text-xs text-ink/50">{`More trades exist in this window; showing the ${trades.length} returned on one page (max 50).`}</p>
       )}
     </div>
   );
@@ -170,7 +170,7 @@ export default function KalshiHistoryClient({ ticker, initialRange, initial, ini
     }
   }
 
-  const btn = 'rounded-full px-2.5 py-1 text-[11px] font-semibold text-ink/70';
+  const btn = 'rounded-full px-2.5 py-1 text-xs font-semibold text-ink/70';
   const btnStyle = (active: boolean) => ({ background: active ? 'rgba(var(--ink-rgb),0.14)' : 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.1)' });
 
   return (
@@ -182,7 +182,7 @@ export default function KalshiHistoryClient({ ticker, initialRange, initial, ini
           ))}
         </div>
         <button type="button" className={btn} style={btnStyle(false)} onClick={() => load(range)}>Refresh</button>
-        {busy && <span className="text-[11px] text-ink/40" aria-live="polite">{`Loading ${range} history…`}</span>}
+        {busy && <span className="text-xs text-ink/55" aria-live="polite">{`Loading ${range} history…`}</span>}
       </div>
 
       {error && (
@@ -194,7 +194,7 @@ export default function KalshiHistoryClient({ ticker, initialRange, initial, ini
 
       {data && (
         <>
-          <p className="text-[11px] text-ink/40">
+          <p className="text-xs text-ink/55">
             {`Window ${utc(data.window.startTs)} – ${utc(data.window.endTs)} · Interval: ${data.window.periodMinutes === 1 ? '1 minute' : '1 hour'} · Retrieved ${formatUtc(data.retrievedAt)}. `}
             Retrieval time is not a source timestamp; the latest candle may lag recent trades.
           </p>

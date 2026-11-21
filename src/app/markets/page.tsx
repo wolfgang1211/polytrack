@@ -70,7 +70,7 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
           <input type="hidden" name="platform" value="kalshi" />
           <input type="hidden" name="view" value="events" />
           <label className="flex flex-col gap-1">
-            <span className="text-[10px] uppercase tracking-widest text-ink/35">Series ticker</span>
+            <span className="text-xs uppercase tracking-widest text-ink/55">Series ticker</span>
             <input name="series" defaultValue={series ?? ''} placeholder="e.g. KXFEDDECISION" autoComplete="off"
               className="rounded-xl glass bg-transparent px-3 py-2 text-sm font-mono text-ink/80 placeholder-ink/25 outline-none" />
           </label>
@@ -78,7 +78,7 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
             style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.1)' }}>
             Apply
           </button>
-          {ignoredSeries && <p className="w-full text-[11px] text-ink/45">Series filter ignored: not a valid single Kalshi ticker. Showing all open events.</p>}
+          {ignoredSeries && <p className="w-full text-xs text-ink/55">Series filter ignored: not a valid single Kalshi ticker. Showing all open events.</p>}
         </form>
         <KalshiEventsClient key={series ?? '*'} initial={initial} initialError={initialError} seriesTicker={series} />
       </div>

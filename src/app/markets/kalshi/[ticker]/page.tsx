@@ -31,7 +31,7 @@ const panel = { background: 'var(--surface-1)', border: '1px solid rgba(var(--in
 
 function Back() {
   return (
-    <Link href="/markets?platform=kalshi" className="inline-flex items-center gap-1.5 text-xs text-ink/40 hover:text-ink/70 transition-colors w-fit">
+    <Link href="/markets?platform=kalshi" className="inline-flex items-center gap-1.5 text-xs text-ink/55 hover:text-ink/70 transition-colors w-fit">
       ← Back to Kalshi markets
     </Link>
   );
@@ -40,7 +40,7 @@ function Back() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xl p-3" style={panel}>
-      <p className="text-[10px] uppercase tracking-wider text-ink/35">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-ink/55">{label}</p>
       <p className="mt-1 text-sm font-semibold text-ink/80">{value}</p>
     </div>
   );
@@ -50,12 +50,12 @@ function Levels({ title, rows, derived }: { title: string; rows: (KalshiLevel | 
   return (
     <div className="rounded-xl p-3" style={panel}>
       <p className="text-xs font-semibold text-ink/70">{title}</p>
-      {derived && <p className="text-[10px] text-ink/35">{derived}</p>}
+      {derived && <p className="text-xs text-ink/55">{derived}</p>}
       {rows.length === 0 ? (
-        <p className="mt-2 text-xs text-ink/35">No levels (unknown, not zero)</p>
+        <p className="mt-2 text-xs text-ink/55">No levels (unknown, not zero)</p>
       ) : (
         <table className="mt-2 w-full text-xs">
-          <thead><tr className="text-ink/35"><th className="text-left font-normal">Price</th><th className="text-right font-normal">Contracts</th></tr></thead>
+          <thead><tr className="text-ink/55"><th className="text-left font-normal">Price</th><th className="text-right font-normal">Contracts</th></tr></thead>
           <tbody>
             {rows.slice(0, DEPTH).map((r, i) => (
               <tr key={`${r.price}-${i}`} className="text-ink/75"><td>{formatCents(r.price)}</td><td className="text-right">{r.size.toLocaleString('en-US')}</td></tr>
@@ -84,7 +84,7 @@ function Book({ market, book, bookError }: { market: KalshiMarket; book: KalshiO
         <KalshiQuoteSummary source="book" partial={!book.complete}
           yesBid={book.yesBids[0]?.price ?? null} yesBidSize={book.yesBids[0]?.size ?? null}
           yesAsk={book.yesAsks[0]?.price ?? null} yesAskSize={book.yesAsks[0]?.size ?? null} />
-        <p className="text-[10px] text-ink/35">Yes ask derived from No bids (1 − price), as in the table below.</p>
+        <p className="text-xs text-ink/55">Yes ask derived from No bids (1 − price), as in the table below.</p>
         <KalshiQuotePolicyNote />
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -93,7 +93,7 @@ function Book({ market, book, bookError }: { market: KalshiMarket; book: KalshiO
         <Levels title={`No bids (${no})`} rows={book.noBids} />
         <Levels title="No asks" rows={book.noAsks} derived="Derived from Yes bids (1 − price)" />
       </div>
-      <p className="text-[11px] text-ink/35">Top {DEPTH} levels per side. Quotes are informational, not execution-ready.</p>
+      <p className="text-xs text-ink/55">Top {DEPTH} levels per side. Quotes are informational, not execution-ready.</p>
     </div>
   );
 }
@@ -136,15 +136,15 @@ export default async function KalshiMarketPage({ params }: { params: Promise<{ t
     <div className="flex flex-col gap-5">
       <Back />
       <header className="rounded-2xl p-5" style={panel}>
-        <p className="text-[10px] uppercase tracking-widest text-ink/35">Kalshi · read-only</p>
+        <p className="text-xs uppercase tracking-widest text-ink/55">Kalshi · read-only</p>
         <h1 className="mt-1 text-xl font-black text-ink sm:text-2xl">{market.title ?? market.ticker}</h1>
-        <p className="mt-1 font-mono text-[11px] text-ink/40 break-all">
+        <p className="mt-1 font-mono text-xs text-ink/55 break-all">
           {market.ticker} · event{' '}
           <Link href={`/markets/kalshi/events/${encodeURIComponent(market.eventTicker)}`} className="underline underline-offset-2 hover:text-ink/70">
             {market.eventTicker}
           </Link>
         </p>
-        <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+        <div className="mt-3 flex flex-wrap gap-2 text-xs">
           <span className="rounded-full px-2.5 py-1 font-semibold text-ink/70" style={{ background: 'rgba(var(--ink-rgb),0.06)', border: '1px solid rgba(var(--ink-rgb),0.1)' }}>
             Status: {market.status}
           </span>
@@ -186,7 +186,7 @@ export default async function KalshiMarketPage({ params }: { params: Promise<{ t
         )}
       </section>
 
-      <p className="text-[11px] text-ink/35">
+      <p className="text-xs text-ink/55">
         Metadata retrieved {formatUtc(receivedAt)}{book ? `; order book retrieved ${formatUtc(book.receivedAt)}` : ''}. These are retrieval times only;
         Kalshi provides no quote timestamp, so data may be older than shown.
       </p>

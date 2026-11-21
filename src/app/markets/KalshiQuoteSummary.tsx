@@ -31,7 +31,7 @@ function contracts(n: number | null): string {
 /** Visible policy text for touch users (title/sr-only are not visible there). Render ONCE per surface, outside links. */
 export function KalshiQuotePolicyNote({ className = '' }: { className?: string }) {
   return (
-    <p data-quote-policy="" className={`text-[11px] text-ink/35 ${className}`}>
+    <p data-quote-policy="" className={`text-xs text-ink/55 ${className}`}>
       Quote flags: wide spread = {WIDE_SPREAD_CENTS}¢ or more; small displayed size = under {SMALL_DISPLAYED_SIZE_CONTRACTS} contracts
       on a displayed side. These are AlphaBoard UI heuristics, not Kalshi rules. Sizes are displayed levels, not full depth;
       quote freshness is unknown.
@@ -42,8 +42,8 @@ export function KalshiQuotePolicyNote({ className = '' }: { className?: string }
 function Value({ label, value }: { label: string; value: string }) {
   return (
     <span className="whitespace-nowrap">
-      <span className="text-ink/35">{label}</span>{' '}
-      <span className={`font-semibold ${value === 'Unavailable' ? 'text-ink/35' : 'text-ink/70'}`}>{value}</span>
+      <span className="text-ink/55">{label}</span>{' '}
+      <span className={`font-semibold ${value === 'Unavailable' ? 'text-ink/55' : 'text-ink/70'}`}>{value}</span>
     </span>
   );
 }
@@ -52,11 +52,11 @@ export default function KalshiQuoteSummary({ yesBid, yesAsk, yesBidSize, yesAskS
   KalshiQuoteInput & { partial?: boolean; source?: 'market' | 'book'; className?: string }) {
   const q = analyzeKalshiQuotes({ yesBid, yesAsk, yesBidSize, yesAskSize });
   return (
-    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] ${className}`}
+    <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-xs ${className}`}
       data-quote-status={q.status} data-quote-warnings={q.warnings.join(' ')} data-quote-source={source}
       data-quote-partial={partial ? 'true' : undefined} title={DISCLAIMER}>
       <span className="sr-only">{DISCLAIMER}</span>
-      <span className="uppercase tracking-wider text-ink/30">{source === 'book' ? 'Order book top' : 'Listed quote'}</span>
+      <span className="uppercase tracking-wider text-ink/55">{source === 'book' ? 'Order book top' : 'Listed quote'}</span>
       <Value label="Spread" value={formatSpreadCents(q.spreadCents)} />
       <Value label="Bid size" value={contracts(q.bidSize)} />
       <Value label="Ask size" value={contracts(q.askSize)} />
