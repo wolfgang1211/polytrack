@@ -1,5 +1,12 @@
 # AlphaBoard Geliştirme Durumu
 
+## 2026-11-21: Ortak market arayüzü, gerçek tarayıcı kabulü geçti (branch `cowork/kalshi`)
+
+- Yerel Kalshi/ortak UI çalışması `cowork/kalshi` branch'ine alındı (`b2aabee`), Vercel preview'da gerçek tarayıcıyla test edildi. Hydration, geri-ileri filtre senkronu ve 375px mobil taşma **geçti**.
+- Kalshi quote/detay metinlerinde 2.5–3.0:1 kontrast bulundu; `9464e80` ile `text-ink/55` ve `text-xs` seviyesine çıkarıldı, okunabilirlik koruma testi genişletildi (RED → GREEN). 545/545 test, tsc/lint/diff-check temiz, Vercel build READY.
+- Dilim dışı açık: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı, Polymarket CTA 32px, açık tema ölçümü. Main/production değişmedi.
+- Kanıt: `C:/Users/wolfgang/hermes_reports/alphaboard-market-ui-20261119/BROWSER-ACCEPTANCE-20261121.md`.
+
 ## 2026-11-20: Ortak market arayüzü, yerel teknik kabul tamamlandı; görsel kabul açık
 
 - Polymarket ve Kalshi için ortak header/toolbar/kart/native disclosure bileşenleri eklendi. İlk ekran sadeleştirildi; Featured, teknik kotasyon ve gelişmiş filtreler açılır alanlarda. Kalshi bağlantısı Discover'a gider; raw Markets/Events rotaları korunur. Events kartları mevcut Link çerçevesini korur, ortak header/toolbar ve aynı tema dilini kullanır.
