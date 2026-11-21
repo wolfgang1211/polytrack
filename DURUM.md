@@ -1,9 +1,9 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-21T16:40+03:00
+- Güncelleme: 2026-11-21T17:00+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (sıradaki iş: ziyaretçi analitiği, `cowork/analytics`).
+- Çalışma sırası: **ONAY BEKLİYOR** (Clarity proje ID'si ve yayın onayı bekleniyor).
 
 ## Şu anki aşama
 Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (kontrast düzeltmesiyle). Kod `cowork/kalshi` branch'inde; main ve production değişmedi.
@@ -21,10 +21,16 @@ Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (
 - Preview: https://polytrack-git-cowork-kalshi-wolfgang37s-projects.vercel.app/markets?platform=kalshi&view=discover (Vercel korumalı; Yusuf'un Vercel oturumuyla açılır).
 - Yerel çalışma kopyası düzeltmeyle güncellendi; yerel main'e commit atılmadı.
 
+## Ziyaretçi analitiği (2026-11-21, branch `cowork/analytics`, main tabanlı)
+- Commit `9f593f0`: `@vercel/analytics` 2.0.1 + kök layout'ta `<Analytics />`; `ClarityScript` yalnız production build'de ve `NEXT_PUBLIC_CLARITY_ID` geçerliyse yüklenir, ID koda yazılmadı. Do Not Track / GPC açıksa Clarity yüklenmez. Unmask/identify/custom tag yok, Clarity'nin varsayılan metin girişi maskelemesi açık kalır. Gizlilik sayfasına iki araç ve maskeleme eklendi.
+- Test: yeni `tests/visitor-analytics.test.cjs` önce RED (5 fail), sonra tüm suite 172/172 (main tabanı). tsc exit 0, lint 0 hata/25 uyarı, diff-check exit 0, Vercel build READY. package-lock yalnız yeni paket girdisiyle güncellendi (`npm ci` geçti).
+- Preview: https://polytrack-git-cowork-analytics-wolfgang37s-projects.vercel.app — gerçek tarayıcıda Vercel Analytics script'i 200, `/view` beacon 200 (Web Analytics projede açık görünüyor). Clarity yüklenmedi: beklenen, çünkü ID henüz yok.
+- Yerel Windows kopyasına uygulanmadı (yerel main + Kalshi değişiklikleri ayrı; yeni paket yerelde kurulu değil).
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Ziyaretçi analitiği** (Vercel Web Analytics + Microsoft Clarity) → `cowork/analytics`. Clarity proje ID'si Yusuf'tan gelecek.
+1. **Clarity doğrulaması**: Yusuf ID'yi verince Vercel'de `NEXT_PUBLIC_CLARITY_ID` (Preview + Production) eklenip preview yeniden deploy edilecek ve Clarity script'i tarayıcıda doğrulanacak.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **Yayın**: `cowork/kalshi` → main merge ve production, yalnız "yayına al" onayıyla.
+3. **Yayın**: `cowork/kalshi` ve `cowork/analytics` → main merge ve production, yalnız "yayına al" onayıyla.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
