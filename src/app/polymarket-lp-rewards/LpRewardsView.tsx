@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { marketUrl } from '@/lib/builder';
-import { closesLabel, formatUsd, formatUtc, LP_REWARDS_FAQ, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
+import { closesLabel, formatUsd, formatUtc, LP_REWARDS_FAQ, LP_REWARDS_LONG_TERM_DAYS, type LpRewardsRow, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
 import SnapshotAge from '@/app/polymarket-lp-rewards/SnapshotAge';
 
 const PAGE_URL = 'https://www.alphaboard.xyz/polymarket-lp-rewards';
@@ -11,6 +11,47 @@ const num = (n: number | null, fmt: (v: number) => string) => (n === null ? dash
 
 function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }} />;
+}
+
+function RewardsTable({ rows, generatedAt, caption }: { rows: LpRewardsRow[]; generatedAt: string; caption: string }) {
+  return (
+    <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
+      <table className="w-full min-w-[640px] text-left text-sm">
+        <caption className="sr-only">{caption}</caption>
+        <thead className="text-xs uppercase tracking-wider text-ink/55">
+          <tr>
+            <th scope="col" className="px-3 py-2 font-medium">#</th>
+            <th scope="col" className="px-3 py-2 font-medium">Market</th>
+            <th scope="col" className="px-3 py-2 text-right font-medium">Daily reward</th>
+            <th scope="col" className="px-3 py-2 text-right font-medium">Max spread</th>
+            <th scope="col" className="px-3 py-2 text-right font-medium">Min size</th>
+            <th scope="col" className="px-3 py-2 text-right font-medium">Liquidity</th>
+            <th scope="col" className="px-3 py-2 text-right font-medium">Closes / starts</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map(r => (
+            <tr key={r.conditionId} style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+              <td className="px-3 py-2 text-ink/55">{r.rank}</td>
+              <td className="px-3 py-2">
+                {r.question && (r.eventSlug || r.slug) ? (
+                  <a href={marketUrl(r.eventSlug, r.slug, 'lp_rewards_page')} target="_blank" rel="noopener noreferrer sponsored"
+                    className="font-medium text-ink/90 hover:text-ink hover:underline">{r.question}</a>
+                ) : (
+                  <span className="text-ink/70">{r.question ?? 'Market details unavailable'} <span className="font-mono text-xs text-ink/55">{r.conditionId.slice(0, 10)}…</span></span>
+                )}
+              </td>
+              <td className="px-3 py-2 text-right font-semibold text-ink">{formatUsd(r.dailyRate)}</td>
+              <td className="px-3 py-2 text-right text-ink/80">{num(r.maxSpread, v => `${v}¢`)}</td>
+              <td className="px-3 py-2 text-right text-ink/80">{num(r.minSize, v => `${v.toLocaleString('en-US')} shares`)}</td>
+              <td className="px-3 py-2 text-right text-ink/80">{num(r.liquidity, formatUsd)}</td>
+              <td className="whitespace-nowrap px-3 py-2 text-right text-ink/80">{closesLabel(r.endDate, generatedAt, r.gameStart)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapshot }) {
@@ -67,46 +108,34 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
       {ok && (
         <section aria-labelledby="top-heading" className="mb-10">
           <h2 id="top-heading" className="mb-3 text-xl font-semibold text-ink">Top {ok.rows.length} Polymarket markets by daily liquidity reward</h2>
-          <div className="overflow-x-auto rounded-xl" style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
-            <table className="w-full min-w-[640px] text-left text-sm">
-              <caption className="sr-only">Polymarket markets ranked by daily liquidity-reward pool, as of {formatUtc(ok.generatedAt)}</caption>
-              <thead className="text-xs uppercase tracking-wider text-ink/55">
-                <tr>
-                  <th scope="col" className="px-3 py-2 font-medium">#</th>
-                  <th scope="col" className="px-3 py-2 font-medium">Market</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Daily reward</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Max spread</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Min size</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Liquidity</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Closes / starts</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ok.rows.map(r => (
-                  <tr key={r.conditionId} style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                    <td className="px-3 py-2 text-ink/55">{r.rank}</td>
-                    <td className="px-3 py-2">
-                      {r.question && (r.eventSlug || r.slug) ? (
-                        <a href={marketUrl(r.eventSlug, r.slug, 'lp_rewards_page')} target="_blank" rel="noopener noreferrer sponsored"
-                          className="font-medium text-ink/90 hover:text-ink hover:underline">{r.question}</a>
-                      ) : (
-                        <span className="text-ink/70">{r.question ?? 'Market details unavailable'} <span className="font-mono text-xs text-ink/55">{r.conditionId.slice(0, 10)}…</span></span>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 text-right font-semibold text-ink">{formatUsd(r.dailyRate)}</td>
-                    <td className="px-3 py-2 text-right text-ink/80">{num(r.maxSpread, v => `${v}¢`)}</td>
-                    <td className="px-3 py-2 text-right text-ink/80">{num(r.minSize, v => `${v.toLocaleString('en-US')} shares`)}</td>
-                    <td className="px-3 py-2 text-right text-ink/80">{num(r.liquidity, formatUsd)}</td>
-                    <td className="whitespace-nowrap px-3 py-2 text-right text-ink/80">{closesLabel(r.endDate, ok.generatedAt, r.gameStart)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <RewardsTable rows={ok.rows} generatedAt={ok.generatedAt} caption={`Polymarket markets ranked by daily liquidity-reward pool, as of ${formatUtc(ok.generatedAt)}`} />
           <p className="mt-2 text-xs text-ink/55">
             Showing the {ok.rows.length} largest of {ok.marketCount.toLocaleString('en-US')} pools. &ldquo;Closes / starts&rdquo; is relative to this snapshot (for games, the kick-off time);
             &ldquo;—&rdquo; means Polymarket did not publish the value. Market links open Polymarket. External link · Referral may apply.
           </p>
+        </section>
+      )}
+
+      {ok && (
+        <section aria-labelledby="long-term-heading" className="mb-10">
+          <h2 id="long-term-heading" className="mb-1 text-xl font-semibold text-ink">Longer-term markets</h2>
+          <p className="mb-3 text-sm text-ink/80">
+            Markets that stay open for more than {LP_REWARDS_LONG_TERM_DAYS} days after this snapshot, ranked by daily reward. Games are left out.
+          </p>
+          {ok.longTerm.rows.length > 0 ? (
+            <>
+              <RewardsTable rows={ok.longTerm.rows} generatedAt={ok.generatedAt}
+                caption={`Polymarket markets open for more than ${LP_REWARDS_LONG_TERM_DAYS} days, ranked by daily liquidity-reward pool, as of ${formatUtc(ok.generatedAt)}`} />
+              <p className="mt-2 text-xs text-ink/55">
+                Top {ok.longTerm.rows.length} found among the {ok.longTerm.checked.toLocaleString('en-US')} largest pools checked
+                {ok.longTerm.capped ? ' (search stops there, so smaller long-term pools may be missing)' : ''}.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-ink/80">
+              No market among the {ok.longTerm.checked.toLocaleString('en-US')} largest pools checked stays open for more than {LP_REWARDS_LONG_TERM_DAYS} days.
+            </p>
+          )}
         </section>
       )}
 

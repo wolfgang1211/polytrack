@@ -2,6 +2,12 @@
 import type { MarketMeta, RewardUniverse } from '@/lib/rewardsUniverse';
 
 export const LP_REWARDS_TOP_N = 50;
+/** Second table: markets that stay open for more than this many days after the snapshot. */
+export const LP_REWARDS_LONG_TERM_DAYS = 7;
+export const LP_REWARDS_LONG_TERM_N = 25;
+/** How far down the ranked list we look for long-term markets (metadata is fetched in batches). */
+export const LP_REWARDS_LONG_TERM_MAX_CHECK = 1000;
+export const LP_REWARDS_META_BATCH = 50;
 /** Shown to visitors when the rendered snapshot is older than this. */
 export const LP_REWARDS_STALE_MINUTES = 60;
 /** Polymarket does not pay out daily amounts below $1, so smaller pools are not real opportunities. */
@@ -34,7 +40,24 @@ export type LpRewardsSnapshot =
       top10Daily: number;
       rows: LpRewardsRow[];
       summary: string;
+      longTerm: { rows: LpRewardsRow[]; checked: number; capped: boolean };
     };
+
+/** Open for more than 7 days after the snapshot. Games (kick-off driven) and markets without a known end date never count. */
+export function isLongTerm(info: Pick<MarketMeta, 'endDate' | 'gameStart'> | undefined, snapshotIso: string): boolean {
+  if (!info || info.gameStart || !info.endDate) return false;
+  const end = new Date(info.endDate).getTime();
+  const now = new Date(snapshotIso).getTime();
+  return Number.isFinite(end) && Number.isFinite(now) && end - now > LP_REWARDS_LONG_TERM_DAYS * 86_400_000;
+}
+
+/** Ids after the main table, in ranked order, chunked for metadata requests; capped at LP_REWARDS_LONG_TERM_MAX_CHECK. */
+export function longTermCandidateBatches(rankedIds: string[], batchSize = LP_REWARDS_META_BATCH): string[][] {
+  const pool = rankedIds.slice(LP_REWARDS_TOP_N, LP_REWARDS_TOP_N + LP_REWARDS_LONG_TERM_MAX_CHECK);
+  const out: string[][] = [];
+  for (let i = 0; i < pool.length; i += batchSize) out.push(pool.slice(i, i + batchSize));
+  return out;
+}
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -80,6 +103,7 @@ export function buildLpRewardsSnapshot(
   universe: RewardUniverse | null,
   meta: Map<string, MarketMeta>,
   generatedAt: Date,
+  longTermScan?: { checked: number; capped: boolean },
 ): LpRewardsSnapshot {
   const at = generatedAt.toISOString();
   if (!universe || universe.pages === 0) return { status: 'unavailable', generatedAt: at };
@@ -87,7 +111,7 @@ export function buildLpRewardsSnapshot(
   if (!paying.length) return { status: 'empty', generatedAt: at, universe: universe.markets.length };
 
   const sorted = [...paying].sort((a, b) => b.dailyRate - a.dailyRate || a.conditionId.localeCompare(b.conditionId));
-  const rows: LpRewardsRow[] = sorted.slice(0, LP_REWARDS_TOP_N).map((m, i) => {
+  const toRow = (m: (typeof sorted)[number], i: number): LpRewardsRow => {
     const info = meta.get(m.conditionId);
     return {
       rank: i + 1,
@@ -102,7 +126,14 @@ export function buildLpRewardsSnapshot(
       endDate: info?.endDate ?? null,
       gameStart: info?.gameStart ?? null,
     };
-  });
+  };
+  const rows = sorted.slice(0, LP_REWARDS_TOP_N).map(toRow);
+  const longTermRows = sorted.filter(m => isLongTerm(meta.get(m.conditionId), at)).slice(0, LP_REWARDS_LONG_TERM_N).map(toRow);
+  const longTerm = {
+    rows: longTermRows,
+    checked: longTermScan?.checked ?? sorted.filter(m => meta.has(m.conditionId)).length,
+    capped: longTermScan?.capped ?? false,
+  };
   const totalDaily = sorted.reduce((s, m) => s + m.dailyRate, 0);
   const top10Daily = sorted.slice(0, 10).reduce((s, m) => s + m.dailyRate, 0);
   const n = sorted.length;
@@ -115,7 +146,7 @@ export function buildLpRewardsSnapshot(
     + `worth ${atLeast}${formatUsd(totalDaily)} per day in total. `
     + `The largest pool is ${formatUsd(first.dailyRate)} per day${firstName}`
     + (n > 1 ? `; the top ${Math.min(10, n)} pools total ${formatUsd(top10Daily)} per day.` : '.');
-  return { status: 'ok', generatedAt: at, complete: universe.complete, universe: universe.markets.length, marketCount: n, totalDaily, top10Daily, rows, summary };
+  return { status: 'ok', generatedAt: at, complete: universe.complete, universe: universe.markets.length, marketCount: n, totalDaily, top10Daily, rows, summary, longTerm };
 }
 
 export interface FaqItem { q: string; a: string }

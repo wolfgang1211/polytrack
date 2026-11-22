@@ -111,6 +111,72 @@ test('snapshot: incomplete paging is disclosed as a lower bound; failure is "una
   assert.equal(s.rows[0].question, null, 'no metadata stays unknown');
 });
 
+test('longer-term table: open > 7 days after the snapshot, games and unknown dates excluded, by daily reward, top 25', () => {
+  const { buildLpRewardsSnapshot, LP_REWARDS_LONG_TERM_N } = lib();
+  const markets = [
+    rm('nfl', 15000), rm('soon', 900), rm('far', 800), rm('nodate', 700), rm('futuregame', 650), rm('eightd', 600), rm('sixd', 500),
+    ...Array.from({ length: 30 }, (_, i) => rm(`lt${i}`, 100 - i)),
+  ];
+  const m = meta([
+    ['nfl', { endDate: '2026-11-22T18:00:00Z', gameStart: '2026-11-22T18:00:00.000Z' }],
+    ['soon', { endDate: '2026-11-25T00:00:00Z' }],
+    ['far', { endDate: '2027-06-01T00:00:00Z' }],
+    ['nodate', { endDate: null }],
+    ['futuregame', { endDate: '2027-01-10T00:00:00Z', gameStart: '2027-01-10T00:00:00.000Z' }],
+    ['eightd', { endDate: '2026-11-30T18:00:00Z' }],
+    ['sixd', { endDate: '2026-11-28T17:00:00Z' }],
+    ...Array.from({ length: 30 }, (_, i) => [`lt${i}`, { endDate: '2027-12-31T00:00:00Z' }]),
+  ]);
+  const s = buildLpRewardsSnapshot(universe(markets), m, AT, { checked: 37, capped: false });
+  assert.equal(LP_REWARDS_LONG_TERM_N, 25);
+  assert.equal(s.longTerm.rows.length, 25);
+  assert.deepEqual(s.longTerm.rows.slice(0, 3).map(r => r.question), ['SYNTHETIC market far?', 'SYNTHETIC market eightd?', 'SYNTHETIC market lt0?']);
+  assert.deepEqual(s.longTerm.rows.map(r => r.rank).slice(0, 3), [1, 2, 3]);
+  assert.equal(s.longTerm.checked, 37);
+  assert.equal(s.rows[0].question, 'SYNTHETIC market nfl?', 'main table unchanged: still all markets by daily reward');
+});
+
+test('long-term candidates: walks the ranked list in batches until 25 qualify or the cap is reached', () => {
+  const { isLongTerm, longTermCandidateBatches } = lib();
+  const at = AT.toISOString();
+  assert.equal(isLongTerm({ endDate: '2026-11-29T17:46:00Z', gameStart: null }, at), true);
+  assert.equal(isLongTerm({ endDate: '2026-11-29T17:45:00Z', gameStart: null }, at), false, 'exactly 7 days is not longer than 7 days');
+  assert.equal(isLongTerm({ endDate: '2027-01-01T00:00:00Z', gameStart: '2027-01-01T00:00:00.000Z' }, at), false, 'games never count');
+  assert.equal(isLongTerm({ endDate: null, gameStart: null }, at), false);
+  assert.equal(isLongTerm(undefined, at), false);
+  const ids = Array.from({ length: 1200 }, (_, i) => `0x${i}`);
+  const batches = longTermCandidateBatches(ids, 50);
+  assert.equal(batches.length, 20, 'cap: 1000 markets past the first 50');
+  assert.equal(batches[0][0], '0x50');
+  assert.ok(batches.every(b => b.length === 50));
+});
+
+test('view: second table "Longer-term markets" sits after the main table with its own heading and note', () => {
+  const { buildLpRewardsSnapshot } = lib();
+  const html = view(buildLpRewardsSnapshot(
+    universe([rm('nfl', 1000), rm('far', 80)]),
+    meta([['nfl', { endDate: '2026-11-22T18:00:00Z', gameStart: '2026-11-22T17:00:00.000Z' }], ['far', { endDate: '2027-06-01T00:00:00Z' }]]),
+    AT, { checked: 2, capped: false },
+  ));
+  assert.equal((html.match(/<table\b/g) || []).length, 2);
+  const main = html.indexOf('id="top-heading"');
+  const lt = html.indexOf('id="long-term-heading"');
+  assert.ok(main > 0 && lt > main);
+  assert.match(html, /<h2 id="long-term-heading"[^>]*>Longer-term markets<\/h2>/);
+  const ltSection = html.slice(lt, html.indexOf('</section>', lt));
+  assert.match(ltSection, /more than 7 days after this snapshot/);
+  assert.match(ltSection, /SYNTHETIC market far\?/);
+  assert.doesNotMatch(ltSection, /SYNTHETIC market nfl\?/);
+  assert.match(ltSection, />2027-06-01</);
+});
+
+test('view: no long-term table when none qualify, with a plain sentence instead', () => {
+  const { buildLpRewardsSnapshot } = lib();
+  const html = view(buildLpRewardsSnapshot(universe([rm('a', 10)]), meta([['a', { endDate: '2026-11-23T00:00:00Z' }]]), AT, { checked: 1, capped: false }));
+  assert.equal((html.match(/<table\b/g) || []).length, 1);
+  assert.match(html, /No market among the 1 largest pools checked stays open for more than 7 days/);
+});
+
 test('closes label is relative to the snapshot time and never invents a date', () => {
   const { closesLabel } = lib();
   const at = AT.toISOString();
@@ -190,6 +256,7 @@ test('page is server-rendered with ISR, scans the full reward list and is wired 
   assert.doesNotMatch(page, /'use client'/);
   assert.match(page, /export const revalidate = 900/);
   assert.match(page, /fetchRewardUniverse\(\)/);
+  assert.match(page, /longTermCandidateBatches\(/);
   assert.doesNotMatch(page, /scanRewardFarms/);
   assert.match(page, /canonical: '\/polymarket-lp-rewards'/);
   const urls = createLoader()('src/app/sitemap.ts').default().map(e => e.url);
