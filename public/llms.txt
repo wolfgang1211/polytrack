@@ -8,6 +8,7 @@ Data is fetched from public Polymarket and Kalshi APIs. Pages show when their da
 
 - [Polymarket liquidity rewards: highest-paying markets](https://www.alphaboard.xyz/polymarket-lp-rewards): server-rendered ranking of every Polymarket market with an active liquidity-reward pool, by daily reward, with max spread, min size, close time and a UTC timestamp; refreshed about every 15 minutes.
 - [Liquidity](https://www.alphaboard.xyz/liquidity): Polymarket LP opportunities, reward farms, spread and depth, and a maker reward simulator.
+- [How Polymarket liquidity rewards work](https://www.alphaboard.xyz/how-polymarket-liquidity-rewards-work): plain-English explanation of eligibility, daily pools, max spread and min size, the order scoring formula, the two-sided rule and payout timing, based on Polymarket's documentation.
 - [How to earn yield as a liquidity provider on Polymarket](https://www.alphaboard.xyz/blog/polymarket-lp-guide): guide to spread, depth, APR estimates and LP risks.
 - [FAQ](https://www.alphaboard.xyz/faq): how the LP Score and APR estimates are calculated and what risks LPs carry.
 

@@ -10,6 +10,7 @@ const BREADCRUMB_MAP: Record<string, string> = {
   '/activity': 'Activity',
   '/liquidity': 'Liquidity',
   '/polymarket-lp-rewards': 'Polymarket LP Rewards',
+  '/how-polymarket-liquidity-rewards-work': 'How Liquidity Rewards Work',
   '/insights': 'Insights',
   '/faq': 'FAQ',
 

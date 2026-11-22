@@ -151,6 +151,7 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
           All market types are included, from season-long questions to single games that close within hours; check the Closes / starts column
           before quoting. Games that have started usually keep trading until they resolve. The daily reward is the whole pool for a market, shared by all qualifying makers; it is not what one provider earns.
           For estimated returns on your own capital, use the <Link href="/liquidity" className="underline hover:text-ink">Liquidity Hub</Link>.
+          For how rewards are scored and paid, read <Link href="/how-polymarket-liquidity-rewards-work" className="underline hover:text-ink">how Polymarket liquidity rewards work</Link>.
           Program rules are set by Polymarket; see the{' '}
           <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">official liquidity rewards documentation</a>.
         </p>

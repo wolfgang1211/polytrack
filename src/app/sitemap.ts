@@ -22,6 +22,7 @@ const EDITORIAL_META: Record<string, [Freq, number]> = {
   '/compare': ['monthly', 0.6],
   '/about': ['monthly', 0.5],
   '/faq': ['monthly', 0.5],
+  '/how-polymarket-liquidity-rewards-work': ['monthly', 0.8],
   '/blog': ['weekly', 0.5],
   '/api-docs': ['weekly', 0.4],
   '/privacy': ['yearly', 0.3],

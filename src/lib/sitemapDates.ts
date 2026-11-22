@@ -7,6 +7,7 @@ export const EDITORIAL_UPDATED: Record<string, string> = {
   '/compare': '2026-11-18',
   '/about': '2026-11-18',
   '/faq': '2026-11-18',
+  '/how-polymarket-liquidity-rewards-work': '2026-11-22',
   '/blog': '2026-11-18',
   '/api-docs': '2026-11-18',
   '/privacy': '2026-11-22',

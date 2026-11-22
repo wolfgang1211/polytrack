@@ -12,7 +12,7 @@ export function pageGroup(pathname: string): PageGroup | null {
   if (/^\/blog\/[a-z0-9-]+\/?$/.test(pathname)) return 'blog';
   const fixed: Record<string, PageGroup> = {
     '/leaderboard': 'leaderboard', '/markets': 'markets', '/liquidity': 'liquidity',
-    '/polymarket-lp-rewards': 'liquidity', '/compare': 'compare', '/activity': 'activity', '/insights': 'insights',
+    '/polymarket-lp-rewards': 'liquidity', '/how-polymarket-liquidity-rewards-work': 'liquidity', '/compare': 'compare', '/activity': 'activity', '/insights': 'insights',
     '/blog': 'blog', '/watchlist': 'watchlist', '/checker': 'checker',
     '/faq': 'info', '/privacy': 'info', '/terms': 'info', '/disclaimer': 'info', '/api-docs': 'info',
   };
