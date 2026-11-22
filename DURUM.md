@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-22T17:58+03:00
+- Güncelleme: 2026-11-22T20:00+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (Clarity proje ID'si; `cowork/kalshi` yayın onayı).
+- Çalışma sırası: **ONAY BEKLİYOR** (sıradaki: hydration incelemesi beklemede; GEO Öncelik 1 Yusuf'a haber verilmeden başlamaz).
 
 ## Şu anki aşama
-Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (kontrast düzeltmesiyle). Kod `cowork/kalshi` branch'inde; main ve production değişmedi.
+main `c4fa7f7` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, GEO Öncelik 0 (robots AI botları, sitemap tarihleri, llms.txt). Clarity ertelendi (kod pasif). Yerel klasör main'den temiz kopyaya geçirildi.
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -27,16 +27,22 @@ Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (
 - Preview: https://polytrack-git-cowork-analytics-wolfgang37s-projects.vercel.app — gerçek tarayıcıda Vercel Analytics script'i 200, `/view` beacon 200 (Web Analytics projede açık görünüyor). Clarity yüklenmedi: beklenen, çünkü ID henüz yok.
 - Yerel Windows kopyasına uygulanmadı (yerel main + Kalshi değişiklikleri ayrı; yeni paket yerelde kurulu değil).
 
-## Yayın (2026-11-22, Yusuf onayıyla)
-- Yusuf Vercel panelinde Web Analytics'i açtı ve "analytics dalını yayına al" dedi. `cowork/analytics` main'e fast-forward edildi (main `736eeb4` → `9f593f0`), production deploy `dpl_EvcAqr1iSXWGXJHacsFUAvupZjrc` READY.
-- Canlı doğrulama (www.alphaboard.xyz/markets, gerçek tarayıcı): Vercel Analytics script 200, `/view` 200. Clarity yüklü değil (ID yok, beklenen).
-- Konsolda React #418 hydration hatası var; önceki production (`736eeb4`) aynı sayfada da aynı hatayı veriyor, yani analytics kaynaklı değil, mevcut sorun. `cowork/kalshi` preview'unda bu hata görülmedi.
-- `cowork/kalshi` yayına dahil edilmedi.
+## Yayın 2 (2026-11-22, Yusuf onayıyla) ve GEO Öncelik 0
+- `cowork/kalshi` main'e merge edildi (`5a0bbc5`), ardından `994245f`: LP-ROADMAP.md'ye madde 10 "Yapay zekâ arama optimizasyonu (GEO)" eklendi; gizlilik metninde Clarity "etkinleştirilirse" diye düzeltildi (Clarity çalışmıyor). 551/551 test, tsc/lint/diff-check temiz. Production `dpl_4YxbRHbUJMDiM2wr6kA7Zke3FRcN` READY.
+- Canlı doğrulama: www.alphaboard.xyz/markets?platform=kalshi&view=discover açılıyor (12 event kartı), Polymarket varsayılanı korunuyor, Vercel Analytics script/view 200, Clarity yok.
+- React #418: konsol aracı aynı hatayı her sayfada tek kayıt olarak gösteriyor; /privacy'de sunucu HTML'i ile canlı DOM metni birebir aynı çıktı. Kayıt bayat olabilir; önceki production'da da vardı. Ayrı, kısa bir inceleme işi olarak açık.
+- GEO Öncelik 0 (`cowork/geo-p0`): robots'ta 8 AI tarayıcısına açık izin (/api/ ve /watchlist yine kapalı), sitemap'te canlı sayfalar "şimdi", editoryal sayfalar sabit gerçek tarih (git geçmişine karşı test), blog yazıları eklendi, `public/llms.txt`. Önce RED (5 fail), sonra 556/556; tsc/lint/diff-check temiz.
+- Yerel Windows kopyası: main artık Kalshi+analytics içeriyor; yerel çalışma kopyası eski main üzerinde, aynı Kalshi dosyaları commit'siz duruyor. Yerelde `git pull` öncesi bu değişikliklerin temizlenmesi gerekecek (dosya silme onayı gerektirir).
+
+## Yayın 3 ve yerel klasör (2026-11-22, Yusuf onayıyla)
+- GEO Öncelik 0 main'e fast-forward (`994245f` → `c4fa7f7`), production `dpl_6rg1957JR8xmNZERmS4PABSdKHVu` READY. Canlı kontrol: robots.txt 8 AI tarayıcısına izinli ve `/api/` iki grupta da kapalı; sitemap.xml 19 adres (4 blog); llms.txt 200.
+- Yerel klasör: silme yapılmadı. Eski `C:/Users/wolfgang/polytrack` → `C:/Users/wolfgang/polytrack-eski` olarak yeniden adlandırıldı (içerik, `.env.local`, `.hermes/`, `node_modules`, `.next` orada duruyor). Yeni `C:/Users/wolfgang/polytrack` GitHub main'den temiz kopya.
+- Yeni klasörde yerel çalıştırma için Yusuf'un yapacakları: eski klasörden `.env.local` dosyasını kopyalamak (gizli bilgi içerdiği için Claude dokunmadı) ve `npm install` çalıştırmak. Gerekirse `.hermes/` da eski klasörden alınabilir.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Clarity doğrulaması**: Yusuf ID'yi verince Vercel'de `NEXT_PUBLIC_CLARITY_ID` (Preview + Production) eklenip preview yeniden deploy edilecek ve Clarity script'i tarayıcıda doğrulanacak.
+1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **Yayın**: `cowork/kalshi` → main merge ve production, yalnız "yayına al" onayıyla (main artık analytics içeriyor; birleştirme gerekebilir).
+3. **GEO Öncelik 1** (cevap sayfası): yayın oturduktan sonra, önce Yusuf'a haber verilecek. Clarity ertelendi.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
