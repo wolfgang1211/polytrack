@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-23T03:00+03:00
+- Güncelleme: 2026-11-23T02:40+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (hydration düzeltmesi + anlatım sayfası `cowork/hydration-geo2` preview'da; Yusuf onaylamadan yayın yok).
+- Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
 
 ## Şu anki aşama
-main `0964751` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0, `/polymarket-lp-rewards` (tüm ödüllü piyasalar ilk 50 + "Longer-term markets" ilk 25).
+main `ae14861` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0, `/polymarket-lp-rewards` (ilk 50 + Longer-term ilk 25), `/how-polymarket-liquidity-rewards-work`, Markets hydration düzeltmesi.
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -71,12 +71,15 @@ main `0964751` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Micr
 ## Hydration (React 418) ve anlatım sayfası (2026-11-23, branch `cowork/hydration-geo2`, preview)
 - İnceleme: önceki "her sayfada #418" görüntüsü eski konsol kaydıydı; temiz sekmede 9 sayfa + iki tema ayarı + dakika sınırına zamanlanmış 2 yükleme ile canlıda yeniden üretilemedi. Kodda kaynak: `MarketsClient` "Xm left" etiketleri ve süresi geçmiş piyasa filtresi render sırasında `Date.now()` ile hesaplanıyordu (lint de uyarıyordu). Sunucu ve tarayıcı farklı anda okuyunca dakika sınırında metin değişip 418 verir; 1 saatten kısa kalan maçlar varken aralıklı olur.
 - `f942328`: sayfa render zamanını (`serverNow`) istemciye geçiriyor; `src/lib/useNow.ts` SSR ve hydration'da bu değeri, sonra dakikalık tarayıcı saatini kullanıyor. Test: istemci saati 2 ve 30 dk kaysa da aynı props aynı HTML'i veriyor (önce RED). Lint uyarısı 25 → 24. Canlıda tekrarlanamadığı için "düzeltildi" kanıtı test ve kod incelemesine dayanıyor; başka bir kaynak çıkarsa ayrıca bakılacak.
-- `71a005e`: `/how-polymarket-liquidity-rewards-work` sunucuda render; ilk paragraf doğrudan cevap; uygunluk, üç parametre, puan formülü S(v,s)=((v−s)/v)²×b, iki taraflı kural (c=3, 0,10–0,90), dakikalık örnekleme → günlük ödeme (1.440 örnek, UTC gece yarısı, 1$ alt sınır), pratik sonuçlar, riskler, 5 SSS. Örnek rakamlar `src/lib/lpRewardsMath.ts` ile hesaplanıyor (0,44 / 0,11 / 30 / 60 / 0 / 5$). Polymarket dokümanına 2 atıf; `/polymarket-lp-rewards` ile çift yönlü link. Article + FAQPage + BreadcrumbList; sitemap (2026-11-22), llms.txt, breadcrumb, sayfa grubu.
+- `71a005e`: `/how-polymarket-liquidity-rewards-work` sunucuda render; ilk paragraf doğrudan cevap; uygunluk, üç parametre, puan formülü S(v,s)=((v−s)/v)²×b, iki taraflı kural (c=3, 0,10–0,90), dakikalık örnekleme → günlük ödeme (1.440 örnek, UTC gece yarısı, 1$ alt sınır), pratik sonuçlar, riskler, 5 SSS. Örnek rakamlar `src/lib/lpRewardsMath.ts` ile hesaplanıyor (0,44 / 0,11 / 30 / 60 / 0 / 5$). Polymarket dokümanına 2 atıf; `/polymarket-lp-rewards` ile çift yönlü link. Article + FAQPage + BreadcrumbList; sitemap (2026-11-23), llms.txt, breadcrumb, sayfa grubu.
 - Doğrulama: 578/578 test, tsc exit 0, lint 0 hata/24 uyarı, diff-check temiz; preview'da iki sayfada konsol hatası yok, JSON-LD 3 tip, canonical doğru.
 - Preview: https://polytrack-git-cowork-hydration-geo2-wolfgang37s-projects.vercel.app/how-polymarket-liquidity-rewards-work
 
+## Yayın 7 (2026-11-23, Yusuf onayıyla)
+- `cowork/hydration-geo2` main'e (`ae14861`), production `dpl_ChjjcKR7jfcE1dTBFccx8ydkYf5t` READY. Canlı kontrol: anlatım sayfası açılıyor (Article + FAQPage + BreadcrumbList, tarih 2026-11-23), sitemap ve llms.txt'de, ödül tablosundan linkli; anlatım ve /markets sayfalarında konsol hatası yok.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Hydration düzeltmesi + anlatım sayfası yayını**: Yusuf onaylayınca `cowork/hydration-geo2` → main.
+1. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları (chatgpt.com, perplexity.ai, claude.ai).
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
 3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
