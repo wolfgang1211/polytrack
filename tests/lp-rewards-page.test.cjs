@@ -67,11 +67,15 @@ test('universe: retries a flaky page; a page that keeps failing marks the result
 
 test('meta: one Gamma request for the displayed ids; missing markets are just absent', async () => {
   const { fetchMarketMeta } = uni();
-  const f = fakeFetch(() => [{ conditionId: '0xAA', question: 'Q aa?', slug: 'q-aa', events: [{ slug: 'ev-aa' }], endDate: '2026-11-23T00:00:00Z', liquidityNum: 0 }]);
-  const m = await fetchMarketMeta(['0xaa', '0xbb'], f.fn);
+  const f = fakeFetch(() => [
+    { conditionId: '0xAA', question: 'Q aa?', slug: 'q-aa', events: [{ slug: 'ev-aa' }], endDate: '2026-11-23T00:00:00Z', liquidityNum: 0 },
+    { conditionId: '0xCC', question: 'Saints vs. Bears', slug: 'nfl', endDate: '2026-11-22T18:00:00Z', gameStartTime: '2026-11-22 18:00:00+00', liquidityNum: 452386 },
+  ]);
+  const m = await fetchMarketMeta(['0xaa', '0xbb', '0xcc'], f.fn);
   assert.equal(f.calls.length, 1);
   assert.match(f.calls[0], /condition_ids=0xaa&condition_ids=0xbb/);
-  assert.deepEqual(m.get('0xaa'), { question: 'Q aa?', slug: 'q-aa', eventSlug: 'ev-aa', endDate: '2026-11-23T00:00:00Z', liquidity: null });
+  assert.deepEqual(m.get('0xaa'), { question: 'Q aa?', slug: 'q-aa', eventSlug: 'ev-aa', endDate: '2026-11-23T00:00:00Z', gameStart: null, liquidity: null });
+  assert.equal(m.get('0xcc').gameStart, '2026-11-22T18:00:00.000Z', 'Gamma "YYYY-MM-DD HH:MM:SS+00" parsed to ISO');
   assert.equal(m.has('0xbb'), false);
 });
 
@@ -114,7 +118,10 @@ test('closes label is relative to the snapshot time and never invents a date', (
   assert.equal(closesLabel('2026-11-22T18:00:00Z', at), 'in <1h');
   assert.equal(closesLabel('2026-11-26T00:00:00Z', at), 'in 3d');
   assert.equal(closesLabel('2027-03-01T00:00:00Z', at), '2027-03-01');
-  assert.equal(closesLabel('2026-10-28T00:00:00Z', at), 'Past end date');
+  assert.equal(closesLabel('2026-10-28T00:00:00Z', at), 'Awaiting resolution');
+  // Sports: Polymarket's end date is the kick-off time, so use the game start instead.
+  assert.equal(closesLabel('2026-11-22T17:00:00Z', at, '2026-11-22T17:00:00.000Z'), 'Game started');
+  assert.equal(closesLabel('2026-11-22T20:00:00Z', at, '2026-11-22T20:00:00.000Z'), 'Starts in 2h');
   assert.equal(closesLabel(null, at), '—');
   assert.equal(closesLabel('garbage', at), '—');
 });
@@ -130,14 +137,15 @@ test('view: server HTML has h1, summary first, a table with a Closes column and 
   const { buildLpRewardsSnapshot } = lib();
   const html = view(buildLpRewardsSnapshot(
     universe([rm('b', 1200, { minSize: null }), rm('a', 50), rm('x', 40)]),
-    meta([['b', { endDate: '2026-11-22T21:00:00Z', liquidity: null }], ['a']]),
+    meta([['b', { endDate: '2026-11-22T21:00:00Z', liquidity: null }], ['a', { endDate: '2026-11-22T17:00:00Z', gameStart: '2026-11-22T17:00:00.000Z' }]]),
     AT,
   ));
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   const firstP = html.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)[1];
   assert.match(firstP, /As of 22 Nov 2026, 17:45 UTC/);
   assert.match(firstP, /\$1,200 per day/);
-  assert.match(html, /<th scope="col"[^>]*>Closes<\/th>/);
+  assert.match(html, /<th scope="col"[^>]*>Closes \/ starts<\/th>/);
+  assert.match(html, />Game started</);
   const rowB = html.match(/<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*SYNTHETIC market b\?[\s\S]*?<\/tr>/)[0];
   assert.match(rowB, />in 3h</);
   assert.match(rowB, />—</);

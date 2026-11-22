@@ -29,7 +29,16 @@ export interface MarketMeta {
   slug: string;
   eventSlug?: string;
   endDate: string | null;
+  /** Sports only: kick-off time. Polymarket's endDate for games is the kick-off, not the close. */
+  gameStart: string | null;
   liquidity: number | null;
+}
+
+/** Gamma sends "2026-11-22 18:00:00+00"; returns ISO or null. */
+function parseGameStart(v: unknown): string | null {
+  if (typeof v !== 'string' || !v.trim()) return null;
+  const t = new Date(v.trim().replace(' ', 'T').replace(/([+-]\d{2})$/, '$1:00')).getTime();
+  return Number.isFinite(t) ? new Date(t).toISOString() : null;
 }
 
 const num = (v: unknown): number | null => {
@@ -111,6 +120,7 @@ export async function fetchMarketMeta(conditionIds: string[], fetchFn: FetchLike
       slug: typeof m.slug === 'string' ? m.slug : '',
       eventSlug: typeof m.eventSlug === 'string' ? m.eventSlug : typeof events[0]?.slug === 'string' ? (events[0].slug as string) : undefined,
       endDate: typeof m.endDate === 'string' ? m.endDate : typeof m.endDateIso === 'string' ? m.endDateIso : null,
+      gameStart: parseGameStart(m.gameStartTime),
       liquidity: liq !== null && liq > 0 ? liq : null,
     });
   }

@@ -18,6 +18,7 @@ export interface LpRewardsRow {
   minSize: number | null;
   liquidity: number | null;
   endDate: string | null;
+  gameStart: string | null;
 }
 
 export type LpRewardsSnapshot =
@@ -50,17 +51,28 @@ export function formatUsd(n: number): string {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
-/** Market close relative to the snapshot time: "in 5h", "in 3d", a date beyond 30 days, "Past end date" if it already passed. */
-export function closesLabel(endIso: string | null, snapshotIso: string): string {
+const relative = (h: number) => (h < 1 ? '<1h' : h < 48 ? `${Math.floor(h)}h` : `${Math.floor(h / 24)}d`);
+
+/**
+ * Timing relative to the snapshot. Games: "Starts in 2h" / "Game started" (Polymarket's end date for a game is its kick-off).
+ * Other markets: "in 5h", "in 3d", a date beyond 30 days, or "Awaiting resolution" once the end date has passed.
+ */
+export function closesLabel(endIso: string | null, snapshotIso: string, gameStartIso: string | null = null): string {
+  const now = new Date(snapshotIso).getTime();
+  if (!Number.isFinite(now)) return '\u2014';
+  if (gameStartIso) {
+    const start = new Date(gameStartIso).getTime();
+    if (Number.isFinite(start)) {
+      const h = (start - now) / 3_600_000;
+      return h <= 0 ? 'Game started' : `Starts in ${relative(h)}`;
+    }
+  }
   if (!endIso) return '\u2014';
   const end = new Date(endIso).getTime();
-  const now = new Date(snapshotIso).getTime();
-  if (!Number.isFinite(end) || !Number.isFinite(now)) return '\u2014';
+  if (!Number.isFinite(end)) return '\u2014';
   const h = (end - now) / 3_600_000;
-  if (h < 0) return 'Past end date';
-  if (h < 1) return 'in <1h';
-  if (h < 48) return `in ${Math.floor(h)}h`;
-  if (h < 24 * 30) return `in ${Math.floor(h / 24)}d`;
+  if (h < 0) return 'Awaiting resolution';
+  if (h < 24 * 30) return `in ${relative(h)}`;
   return new Date(end).toISOString().slice(0, 10);
 }
 
@@ -88,6 +100,7 @@ export function buildLpRewardsSnapshot(
       minSize: m.minSize,
       liquidity: info?.liquidity ?? null,
       endDate: info?.endDate ?? null,
+      gameStart: info?.gameStart ?? null,
     };
   });
   const totalDaily = sorted.reduce((s, m) => s + m.dailyRate, 0);

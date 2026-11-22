@@ -78,7 +78,7 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
                   <th scope="col" className="px-3 py-2 text-right font-medium">Max spread</th>
                   <th scope="col" className="px-3 py-2 text-right font-medium">Min size</th>
                   <th scope="col" className="px-3 py-2 text-right font-medium">Liquidity</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Closes</th>
+                  <th scope="col" className="px-3 py-2 text-right font-medium">Closes / starts</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,14 +97,14 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.maxSpread, v => `${v}¢`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.minSize, v => `${v.toLocaleString('en-US')} shares`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.liquidity, formatUsd)}</td>
-                    <td className="whitespace-nowrap px-3 py-2 text-right text-ink/80">{closesLabel(r.endDate, ok.generatedAt)}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-right text-ink/80">{closesLabel(r.endDate, ok.generatedAt, r.gameStart)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <p className="mt-2 text-xs text-ink/55">
-            Showing the {ok.rows.length} largest of {ok.marketCount.toLocaleString('en-US')} pools. &ldquo;Closes&rdquo; is the market end time relative to this snapshot;
+            Showing the {ok.rows.length} largest of {ok.marketCount.toLocaleString('en-US')} pools. &ldquo;Closes / starts&rdquo; is relative to this snapshot (for games, the kick-off time);
             &ldquo;—&rdquo; means Polymarket did not publish the value. Market links open Polymarket. External link · Referral may apply.
           </p>
         </section>
@@ -119,8 +119,8 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
           come from Polymarket&apos;s market data for the markets shown.
         </p>
         <p>
-          All market types are included, from season-long questions to single games that close within hours; check the Closes column
-          before quoting. The daily reward is the whole pool for a market, shared by all qualifying makers; it is not what one provider earns.
+          All market types are included, from season-long questions to single games that close within hours; check the Closes / starts column
+          before quoting. Games that have started usually keep trading until they resolve. The daily reward is the whole pool for a market, shared by all qualifying makers; it is not what one provider earns.
           For estimated returns on your own capital, use the <Link href="/liquidity" className="underline hover:text-ink">Liquidity Hub</Link>.
           Program rules are set by Polymarket; see the{' '}
           <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">official liquidity rewards documentation</a>.
