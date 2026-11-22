@@ -52,8 +52,12 @@ test('blog post list used by the sitemap matches the posts the blog route actual
   assert.deepEqual(createLoader()('src/lib/blogPosts.ts').BLOG_POSTS, rendered);
 });
 
-test('sitemap editorial dates are not older than the last git change of the page (skipped without git history)', t => {
+test('sitemap editorial dates are not older than the last git change of the page (skipped without full git history)', t => {
   const { EDITORIAL_UPDATED } = createLoader()('src/lib/sitemapDates.ts');
+  let shallow = 'true';
+  try { shallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: root, encoding: 'utf8' }).trim(); } catch { /* no git */ }
+  // A shallow clone reports its boundary commit as the last change of every file, which is not a real date.
+  if (shallow !== 'false') { t.skip('no full git history available'); return; }
   let checked = 0;
   for (const [route, date] of Object.entries(EDITORIAL_UPDATED)) {
     const file = `src/app${route}/page.tsx`;
