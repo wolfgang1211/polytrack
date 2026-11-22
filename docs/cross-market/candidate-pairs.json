@@ -1,0 +1,172 @@
+{
+  "schema": "research-candidate-inventory/0",
+  "research_only": true,
+  "production_manifest": false,
+  "human_approval": false,
+  "note": "K0 research inventory only. No pair is qualified. Matching requires USER/HUMAN approval, not agent approval. No net/advantage calculations; unknown fees are not zero.",
+  "checkpoint_date": "2026-11-18",
+  "evidence_dir": "hermes_reports/alphaboard-cross-market-k0-20261118",
+  "k0_acceptance_met": false,
+  "counts": { "total": 5, "pending": 4, "qualified": 0, "related": 0, "rejected": 1 },
+  "shared_rule_differences": {
+    "R1_measure": "Poly: change in upper bound vs level prior to meeting; Kalshi: FOMC action on target range. May diverge on asymmetric range moves (hypothesis).",
+    "R2_rounding": "Poly rounds non-25 moves up to nearest 25; Kalshi 'at most one can resolve to Yes' - 12.5bp handling unstated (hypothesis: all Kalshi No).",
+    "R3_fallback": "Kalshi: meeting canceled and not on scheduled date -> maintains Yes; Poly: no statement by end of next scheduled meeting -> No change. Postponement may diverge.",
+    "R4_raw_text_ambiguity": "rules_secondary example literal 'Hike   25 bps' (missing comparator) in all four Kalshi rows; preserved raw, not normalized.",
+    "R5_timing": "Kalshi close_time 18:59Z vs contract Last Trading Time 1:55 PM ET (mismatch flagged); expected_expiration 19:05Z; Poly endDate differs. Trading close is not the observation target.",
+    "R6_resolution_authority": "Kalshi may initiate Market Outcome Review; post-expiration revisions ignored. Poly mechanism not in evidence.",
+    "R7_denomination": "Kalshi $1.00 USD settlement; Poly pUSD (USDC-backed). Not treated as identical; no peg assumed.",
+    "R8_ticks": "Kalshi linear_cent 0.01, can_close_early true; Poly tick_size 0.001, min_order_size 5, neg_risk true."
+  },
+  "fee_readiness": {
+    "ready": false,
+    "polymarket": "Formula fee = C*feeRate*p*(1-p); category coefficient changes 2026-11-20T23:59Z; market category and V2 per-market fd {r,e,to} not observed. Legacy /fee-rate base_fee=1000 is NOT the V2 rate.",
+    "kalshi": "fee_type quadratic_with_maker_fees, fee_multiplier 1; formula/rounding unavailable (fee schedule PDF HTTP 429, not retried)."
+  },
+  "freshness_readiness": {
+    "ready": false,
+    "polymarket": "Book has 'timestamp' (13-digit string; unit/UTC conversion pending Hermes).",
+    "kalshi": "Orderbook has no source timestamp; received_at/HTTP Date is not sourceAsOf. Metadata (19:42Z) and books (19:46Z) are not a simultaneous snapshot."
+  },
+  "candidates": [
+    {
+      "id": "C1",
+      "status": "pending",
+      "review_readiness": "ready_for_human_review",
+      "blockers": ["human_approval", "fee_unknown", "freshness_not_simultaneous"],
+      "polymarket": {
+        "event_id": "770450",
+        "market_id": "3215007",
+        "conditionId": "0x723822eb2b143cee54c0bd7c1efba322b21f0051984c266df8879c394f1011c0",
+        "outcomes_raw": "[\"Yes\", \"No\"]",
+        "clobTokenIds_raw": "[\"42865728742506860386768556888821101266630139112044622335353850919229585308601\", \"8077351031134730167836761678618167504307708651130165095377248922919635337796\"]",
+        "bound_outcome": "Yes",
+        "bound_token_id": "42865728742506860386768556888821101266630139112044622335353850919229585308601",
+        "binding_note": "Bind by parsing outcomes/clobTokenIds by value; book market==conditionId and asset_id==token observed. asset_id alone does not prove Yes.",
+        "endDate": "2026-12-09T23:59:00Z"
+      },
+      "kalshi": {
+        "ticker": "KXFEDDECISION-26DEC-H0",
+        "event_ticker": "KXFEDDECISION-26DEC",
+        "custom_strike": { "Hike": "0" },
+        "yes_sub_title": "Fed maintains rate",
+        "bound_side": "yes",
+        "close_time": "2026-12-09T18:59:00Z",
+        "expected_expiration_time": "2026-12-09T19:05:00Z",
+        "rules_primary_raw": "If the Federal Reserve does a Hike of 0bps on December 09, 2026, then the market resolves to Yes."
+      },
+      "outcome_mapping": "same",
+      "rule_differences": ["R1", "R3", "R5", "R6", "R7", "R8", "yes_sub_title and no_sub_title both 'Fed maintains rate'"],
+      "price_availability": { "polymarket_book": "fetched_two_sided", "kalshi_book": "fetched; yes_dollars 2 levels, no_dollars 78 levels" },
+      "evidence": [
+        "candidate-inventory.json:634-647",
+        "kalshi-selected-markets.json:53-103",
+        "kalshi-book-KXFEDDECISION-26DEC-H0.json",
+        "poly-book-3215007-yes.json",
+        "kalshi-feddecision-contract-extracted.md:5-20"
+      ]
+    },
+    {
+      "id": "C2",
+      "status": "pending",
+      "review_readiness": "blocked",
+      "blockers": ["R2_12.5bp_handling", "human_approval", "fee_unknown", "freshness_not_simultaneous"],
+      "polymarket": {
+        "event_id": "770450",
+        "market_id": "3215006",
+        "conditionId": "0xf17ad24eb4ad57926495b114149c765b9b95bc286eadc91cbbfa901ceb10d0b8",
+        "outcomes_raw": "[\"Yes\", \"No\"]",
+        "clobTokenIds_raw": "[\"77367448845023382525249480243608609306658725883285195065573683809293972009019\", \"23677896678650147625251750117853328843601853501710889530409633595389256242910\"]",
+        "bound_outcome": "Yes",
+        "bound_token_id": "77367448845023382525249480243608609306658725883285195065573683809293972009019",
+        "endDate": "2026-12-09T23:59:00Z"
+      },
+      "kalshi": {
+        "ticker": "KXFEDDECISION-26DEC-C25",
+        "event_ticker": "KXFEDDECISION-26DEC",
+        "custom_strike": { "Cut": "25" },
+        "yes_sub_title": "Cut 25bps",
+        "bound_side": "yes",
+        "close_time": "2026-12-09T18:59:00Z",
+        "rules_primary_raw": "If the Federal Reserve does a Cut of 25bps on December 09, 2026, then the market resolves to Yes."
+      },
+      "outcome_mapping": "same",
+      "rule_differences": ["R1", "R2", "R3", "R5", "R6", "R7", "R8"],
+      "price_availability": {
+        "polymarket_book": "fetched_two_sided",
+        "kalshi_book": "fetched; yes_dollars empty (no YES bids; not zero; does not imply no YES ask), no_dollars 29 levels"
+      },
+      "evidence": ["candidate-inventory.json:618-631", "kalshi-selected-markets.json:155-205", "kalshi-book-KXFEDDECISION-26DEC-C25.json", "poly-book-3215006-yes.json"]
+    },
+    {
+      "id": "C3",
+      "status": "pending",
+      "review_readiness": "blocked",
+      "blockers": ["R4_rules_primary_missing_comparator", "R2_bucket_boundary", "polymarket_book_not_fetched", "human_approval", "fee_unknown"],
+      "polymarket": {
+        "event_id": "770450",
+        "market_id": "3215005",
+        "conditionId": "0xb9aee520bf51ac5f00b5c43e54ef9245bc9fcdef866ce8a33025f9a441cc651d",
+        "outcomes_raw": "[\"Yes\", \"No\"]",
+        "clobTokenIds_raw": "[\"17640596861394454242836532536014033416733783473450136742726948856144855149507\", \"104236736263775307891497202874191911203963566711959725788584750440530976742193\"]",
+        "bound_outcome": "Yes",
+        "bound_token_id": "17640596861394454242836532536014033416733783473450136742726948856144855149507",
+        "endDate": "2026-12-09T23:59:00Z"
+      },
+      "kalshi": {
+        "ticker": "KXFEDDECISION-26DEC-C26",
+        "event_ticker": "KXFEDDECISION-26DEC",
+        "custom_strike": { "Cut": ">25" },
+        "yes_sub_title": "Cut >25bps",
+        "bound_side": "yes",
+        "close_time": "2026-12-09T18:59:00Z",
+        "rules_primary_raw": "If the Federal Reserve does a Cut of   25bps on December 09, 2026, then the market resolves to Yes.",
+        "rules_ambiguity": "Raw rules_primary lacks comparator and reads like C25; title/custom_strike say >25. Not repaired."
+      },
+      "outcome_mapping": "same_if_rules_clarified",
+      "rule_differences": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"],
+      "price_availability": { "polymarket_book": "not_fetched", "kalshi_book": "fetched; yes_dollars 0 levels, no_dollars 32 levels" },
+      "evidence": ["candidate-inventory.json:602-615", "kalshi-selected-markets.json:104-154", "kalshi-book-KXFEDDECISION-26DEC-C26.json"]
+    },
+    {
+      "id": "C4",
+      "status": "pending",
+      "review_readiness": "blocked",
+      "blockers": ["polymarket_book_not_fetched", "human_approval", "fee_unknown"],
+      "polymarket": {
+        "event_id": "770451",
+        "market_id": "3215012",
+        "conditionId": "0xf6e7c89ec4b5d3c887ed9b70dfbcac9392e287367783ce475d32e8c16ed9f61c",
+        "outcomes_raw": "[\"Yes\", \"No\"]",
+        "clobTokenIds_raw": "[\"63563009510989471204377539732457086916124654411092982704760023438039220215330\", \"36342864926284644003283595741257595655709757799681943153551982143131732331338\"]",
+        "bound_outcome": "Yes",
+        "bound_token_id": "63563009510989471204377539732457086916124654411092982704760023438039220215330",
+        "endDate": "2027-01-28T04:59:00Z"
+      },
+      "kalshi": {
+        "ticker": "KXFEDDECISION-27JAN-H0",
+        "event_ticker": "KXFEDDECISION-27JAN",
+        "custom_strike": { "Hike": "0" },
+        "yes_sub_title": "Fed maintains rate",
+        "bound_side": "yes",
+        "close_time": "2027-01-27T18:59:00Z",
+        "expected_expiration_time": "2027-01-27T19:05:00Z",
+        "rules_primary_raw": "If the Federal Reserve does a Hike of 0bps on January 27, 2027, then the market resolves to Yes."
+      },
+      "outcome_mapping": "same",
+      "rule_differences": ["R1", "R3", "R5", "R6", "R7", "R8"],
+      "price_availability": { "polymarket_book": "not_fetched", "kalshi_book": "fetched; yes_dollars 31 levels, no_dollars 34 levels" },
+      "evidence": ["candidate-inventory.json:687,722-728", "kalshi-selected-markets.json:1-52", "kalshi-book-KXFEDDECISION-27JAN-H0.json"]
+    },
+    {
+      "id": "C5",
+      "status": "rejected",
+      "review_readiness": "not_applicable",
+      "reason": "Level-family idea: KXFED measures rate level, Poly Dec brackets measure change; KXFED open list partial (100 rows, nonempty cursor). May only ever be shown as related with explicit differences; cannot be promoted to equivalent.",
+      "polymarket": { "event_id": "770450", "market_id": null, "market_id_reason": "family-level idea, no individual mapping" },
+      "kalshi": { "series_ticker": "KXFED", "ticker": null, "ticker_reason": "no individual mapping made; list partial; not fabricated" },
+      "price_availability": null,
+      "evidence": ["source-manifest-2.json:29-41"]
+    }
+  ]
+}

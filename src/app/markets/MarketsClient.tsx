@@ -6,6 +6,7 @@ import { formatCurrency, resolveCategory } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import TopMarkets from '@/components/TopMarkets';
 import PolymarketTradeLink from '@/components/PolymarketTradeLink';
+import { ExplorerCard, ExplorerDetails, ExplorerHeader, ExplorerToolbar } from './MarketExplorerUI';
 
 /* ── helpers ───────────────────────────────────────────── */
 
@@ -54,17 +55,6 @@ function categoryText(m: Pick<TopMarket, 'category' | 'question' | 'slug' | 'eve
   return resolveCategory(m.category, m.question ?? '', `${m.slug ?? ''} ${m.eventSlug ?? ''}`);
 }
 
-function SectionHeader({ index, label }: { index: string; label: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
-      <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
-    </div>
-  );
-}
-
 /* ── card ──────────────────────────────────────────────── */
 
 function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
@@ -77,9 +67,7 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
   const close     = closesIn(market.endDate);
 
   return (
-    <article
-      className="group glass glass-hover gradient-border rounded-2xl p-5 flex flex-col gap-4 animate-fade-in-up"
-    >
+    <ExplorerCard className="group glass-hover gradient-border h-full p-5 gap-4 animate-fade-in-up">
       <div className="flex items-start gap-3">
         {market.image ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -98,12 +86,12 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
 
       {/* Tags */}
       <div className="flex items-center gap-2 -mt-1">
-        <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+        <span className="rounded-full px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
           style={{ background: `${CAT_COLOR[cat] ?? '#94a3b8'}1a`, color: CAT_COLOR[cat] ?? '#94a3b8', border: `1px solid ${CAT_COLOR[cat] ?? '#94a3b8'}33` }}>
           {cat}
         </span>
         {close && (
-          <span className="flex items-center gap-1 text-[10px] font-semibold text-ink/35">
+          <span className="flex items-center gap-1 text-xs font-semibold text-ink/55">
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -119,11 +107,11 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
             const p = parseFloat(prices[i] ?? '0');
             const isYes = /yes/i.test(o) || i === 0;
             return (
-              <div key={o + i} className="flex-1 rounded-xl px-3 py-2 text-center"
+              <div key={o + i} className="min-w-0 flex-1 rounded-xl px-3 py-2 text-center"
                 style={isYes
                   ? { background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }
                   : { background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
-                <p className="text-[11px] font-semibold text-ink/40 truncate">{o}</p>
+                <p className="text-xs font-semibold text-ink/55 truncate">{o}</p>
                 <p className={`text-base font-black ${isYes ? 'text-grad-profit' : 'text-grad-loss'}`}>
                   {isNaN(p) ? '—' : `${(p * 100).toFixed(0)}¢`}
                 </p>
@@ -137,18 +125,18 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
       <div className="flex items-center justify-between pt-1 mt-auto"
         style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.05)' }}>
         <div>
-          <p className="text-[10px] text-ink/25 uppercase tracking-wider">24h Vol</p>
+          <p className="text-xs text-ink/55 uppercase tracking-wider">24h Vol</p>
           <p className="text-sm font-bold text-ink/70">{formatCurrency(volume, true)}</p>
         </div>
         {liquidity > 0 && (
           <div className="text-right">
-            <p className="text-[10px] text-ink/25 uppercase tracking-wider">Liquidity</p>
+            <p className="text-xs text-ink/55 uppercase tracking-wider">Liquidity</p>
             <p className="text-sm font-bold text-ink/70">{formatCurrency(liquidity, true)}</p>
           </div>
         )}
       </div>
       <PolymarketTradeLink href={href} />
-    </article>
+    </ExplorerCard>
   );
 }
 
@@ -231,31 +219,22 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
   return (
     <div className="flex flex-col gap-6">
 
-      {/* ── [01] Header ── */}
-      <div className="animate-fade-in-up">
-        <SectionHeader index="[01]" label="Markets Explorer" />
-        <h1 className="text-3xl font-black leading-none tracking-tight sm:text-4xl mb-3">
-          <span className="text-ink">Markets</span>{' '}
-          <span className="text-grad">Explorer</span>
-        </h1>
-        <p className="text-sm text-ink/40 max-w-lg">
-          Browse {pool.length || 'all'} active prediction markets. Search, filter by category, and sort by volume, liquidity or closing time.
-        </p>
-      </div>
+      <ExplorerHeader
+        provider="Polymarket"
+        title={<><span className="text-ink">Markets</span>{' '}<span className="text-grad">Explorer</span></>}
+        description={`Browse ${pool.length || 'all'} active prediction markets. Search, filter by category, and sort by volume, liquidity or closing time.`}
+      />
 
-      {/* ── [02] Featured ── */}
-      <div>
-        <SectionHeader index="[02]" label="Featured" />
-        <TopMarkets campaignContext="markets_featured" />
-      </div>
+      {/* Featured stays one tap away but no longer pushes search and results below the fold. */}
+      <ExplorerDetails summary="Featured markets" className="glass rounded-2xl px-4">
+        <div className="pb-4">
+          <TopMarkets campaignContext="markets_featured" />
+        </div>
+      </ExplorerDetails>
 
-      {/* ── [03] All Markets ── */}
-      <SectionHeader index="[03]" label="All Markets" />
-
-      {/* Toolbar */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between animate-fade-in-up" style={{ animationDelay: '60ms' }}>
+      <ExplorerToolbar label="Search and sort markets" className="lg:items-center">
         {/* Search */}
-        <div className="relative flex items-center rounded-xl glass max-w-md flex-1">
+        <div className="relative flex min-w-0 items-center rounded-xl glass max-w-md flex-1">
           <svg className="absolute left-3 h-4 w-4 text-ink/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -263,19 +242,21 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
             value={q}
             onChange={e => setQ(e.target.value)}
             placeholder="Search markets…"
-            className="w-full bg-transparent py-2.5 pl-9 pr-3 text-sm text-ink/80 placeholder-ink/25 outline-none"
+            aria-label="Search markets"
+            className="min-h-[44px] w-full bg-transparent py-2.5 pl-9 pr-3 text-sm text-ink/80 placeholder-ink/25 outline-none"
           />
         </div>
 
-        {/* Sort */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-[10px] uppercase tracking-widest text-ink/30 hidden sm:inline">Sort</span>
-          <div className="flex gap-1 rounded-xl glass p-1">
+        {/* Sort: wraps on narrow screens instead of overflowing. */}
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="text-xs uppercase tracking-widest text-ink/55 hidden sm:inline">Sort</span>
+          <div className="flex min-w-0 flex-wrap gap-1 rounded-xl glass p-1">
             {SORTS.map(s => (
               <button
                 key={s.key}
+                type="button"
                 onClick={() => setSort(s.key)}
-                className={`rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition-all ${sort === s.key ? 'text-ink' : 'text-ink/40 hover:text-ink/70'}`}
+                className={`min-h-[44px] rounded-lg px-2.5 text-xs font-semibold transition-all ${sort === s.key ? 'text-ink' : 'text-ink/55 hover:text-ink/80'}`}
                 style={sort === s.key ? { background: 'var(--accent-fill)', border: '1px solid var(--accent-border-md)' } : { border: '1px solid transparent' }}
               >
                 {s.label}
@@ -283,15 +264,16 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
             ))}
           </div>
         </div>
-      </div>
+      </ExplorerToolbar>
 
       {/* Category chips + count */}
       <div className="flex flex-wrap items-center gap-2 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
         {CATS.map(c => (
           <button
             key={c}
+            type="button"
             onClick={() => setCat(c)}
-            className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${cat === c ? 'text-ink' : 'text-ink/45 hover:text-ink/75'}`}
+            className={`min-h-[44px] rounded-full px-3 text-xs font-semibold transition-all ${cat === c ? 'text-ink' : 'text-ink/55 hover:text-ink/80'}`}
             style={cat === c
               ? { background: 'var(--accent-fill)', border: '1px solid var(--accent-border-lg)' }
               : { background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}
@@ -299,7 +281,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
             {c}
           </button>
         ))}
-        <span className="ml-auto text-[11px] text-ink/30">
+        <span className="ml-auto text-xs text-ink/55">
           {filtered.length} markets · {formatCurrency(totalVol, true)} 24h vol
         </span>
       </div>
@@ -314,12 +296,12 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
       ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl py-24 text-center">
           <p className="text-3xl mb-3">🔍</p>
-          <p className="text-sm text-ink/25">No markets match your filters</p>
+          <p className="text-sm text-ink/55">No markets match your filters</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((m, i) => (
-            <div key={m.id ?? i} style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}>
+            <div key={m.id ?? i} className="min-w-0" style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}>
               <MarketCard market={m} />
             </div>
           ))}
