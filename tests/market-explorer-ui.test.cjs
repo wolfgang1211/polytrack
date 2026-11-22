@@ -212,6 +212,16 @@ test('Polymarket: one h1 in shared header, search in shared toolbar, cards are E
   noNestedAnchors(html);
 });
 
+test('Polymarket: a missing or non-numeric outcome price renders as unknown (—), never as 0¢; a real 0 stays 0¢', () => {
+  const priceTexts = card => [...card.html.matchAll(/<p class="text-base font-black[^"]*">([^<]*)<\/p>/g)].map(m => m[1]);
+  const render = prices => byAttr(ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [polyMarket('p1', { outcomePrices: prices })] }), 'data-explorer-card')[0];
+  assert.deepEqual(priceTexts(render('["0.62"]')), ['62¢', '—'], 'second price missing from the feed');
+  assert.deepEqual(priceTexts(render('["0.62", null]')), ['62¢', '—'], 'null price');
+  assert.deepEqual(priceTexts(render('["0.62", ""]')), ['62¢', '—'], 'blank price');
+  assert.deepEqual(priceTexts(render('["0.62", "abc"]')), ['62¢', '—'], 'non-numeric price');
+  assert.deepEqual(priceTexts(render('["1", "0"]')), ['100¢', '0¢'], 'genuine 0 is kept');
+});
+
 test('Polymarket: Featured TopMarkets (campaign unchanged) sits in a CLOSED disclosure; filters/sort/search stay outside', () => {
   const html = ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [polyMarket('p1')] });
   const featured = details(html).filter(d => d.html.includes('data-stub="top-markets"'));
