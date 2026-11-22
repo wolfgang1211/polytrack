@@ -78,7 +78,7 @@ const relative = (h: number) => (h < 1 ? '<1h' : h < 48 ? `${Math.floor(h)}h` : 
 
 /**
  * Timing relative to the snapshot. Games: "Starts in 2h" / "Game started" (Polymarket's end date for a game is its kick-off).
- * Other markets: "in 5h", "in 3d", a date beyond 30 days, or "Awaiting resolution" once the end date has passed.
+ * Other markets: "in 5h", "in 3d", a date beyond 7 days, or "Awaiting resolution" once the end date has passed.
  */
 export function closesLabel(endIso: string | null, snapshotIso: string, gameStartIso: string | null = null): string {
   const now = new Date(snapshotIso).getTime();
@@ -95,7 +95,7 @@ export function closesLabel(endIso: string | null, snapshotIso: string, gameStar
   if (!Number.isFinite(end)) return '\u2014';
   const h = (end - now) / 3_600_000;
   if (h < 0) return 'Awaiting resolution';
-  if (h < 24 * 30) return `in ${relative(h)}`;
+  if (h <= 24 * LP_REWARDS_LONG_TERM_DAYS) return `in ${relative(h)}`;
   return new Date(end).toISOString().slice(0, 10);
 }
 

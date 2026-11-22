@@ -184,6 +184,8 @@ test('closes label is relative to the snapshot time and never invents a date', (
   assert.equal(closesLabel('2026-11-22T18:00:00Z', at), 'in <1h');
   assert.equal(closesLabel('2026-11-26T00:00:00Z', at), 'in 3d');
   assert.equal(closesLabel('2027-03-01T00:00:00Z', at), '2027-03-01');
+  assert.equal(closesLabel('2026-11-30T03:00:00Z', at), '2026-11-30', 'beyond 7 days a date, so "longer than 7 days" never reads "in 7d"');
+  assert.equal(closesLabel('2026-11-29T12:00:00Z', at), 'in 6d');
   assert.equal(closesLabel('2026-10-28T00:00:00Z', at), 'Awaiting resolution');
   // Sports: Polymarket's end date is the kick-off time, so use the game start instead.
   assert.equal(closesLabel('2026-11-22T17:00:00Z', at, '2026-11-22T17:00:00.000Z'), 'Game started');
