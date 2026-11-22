@@ -62,7 +62,7 @@ test('page cites the official documentation and links to the live rewards table'
   assert.ok((html.match(new RegExp(`href="${DOCS.replace(/[.]/g, '\\.')}"`, 'g')) || []).length >= 2, 'docs cited at least twice');
   assert.match(html, /href="\/polymarket-lp-rewards"/);
   assert.match(html, /Not affiliated with Polymarket/);
-  assert.match(html, /<time dateTime="2026-11-22">/);
+  assert.match(html, /<time dateTime="2026-11-23">/);
 });
 
 test('Article, FAQPage and BreadcrumbList JSON-LD; metadata and canonical', () => {
@@ -70,7 +70,7 @@ test('Article, FAQPage and BreadcrumbList JSON-LD; metadata and canonical', () =
   const blocks = jsonLd(html);
   const article = blocks.find(b => b['@type'] === 'Article');
   assert.equal(article.headline, 'How Polymarket Liquidity Rewards Work');
-  assert.equal(article.dateModified, '2026-11-22');
+  assert.equal(article.dateModified, '2026-11-23');
   assert.equal(article.mainEntityOfPage, 'https://www.alphaboard.xyz/how-polymarket-liquidity-rewards-work');
   assert.ok(article.citation.includes(DOCS));
   const faq = blocks.find(b => b['@type'] === 'FAQPage');
@@ -86,7 +86,7 @@ test('wired into sitemap, llms.txt, breadcrumbs, analytics page group, and linke
   const urls = createLoader()('src/app/sitemap.ts').default();
   const e = urls.find(u => u.url === 'https://www.alphaboard.xyz/how-polymarket-liquidity-rewards-work');
   assert.ok(e);
-  assert.equal(e.lastModified, '2026-11-22');
+  assert.equal(e.lastModified, '2026-11-23');
   assert.match(read('public/llms.txt'), /\]\(https:\/\/www\.alphaboard\.xyz\/how-polymarket-liquidity-rewards-work\)/);
   assert.match(read('src/components/Breadcrumb.tsx'), /'\/how-polymarket-liquidity-rewards-work': 'How Liquidity Rewards Work'/);
   assert.equal(createLoader()('src/lib/funnelSchema.ts').pageGroup('/how-polymarket-liquidity-rewards-work'), 'liquidity');

@@ -6,7 +6,7 @@ const SLUG = '/how-polymarket-liquidity-rewards-work';
 const PAGE_URL = `https://www.alphaboard.xyz${SLUG}`;
 const DOCS_URL = 'https://docs.polymarket.com/market-makers/liquidity-rewards';
 const TITLE = 'How Polymarket Liquidity Rewards Work';
-const UPDATED = '2026-11-22'; // date the content was last checked against Polymarket's documentation
+const UPDATED = '2026-11-23'; // date the content was last checked against Polymarket's documentation
 const DESCRIPTION = 'How Polymarket pays liquidity rewards: eligibility, daily pools, max spread and min size, the order scoring formula, the two-sided rule and when rewards are paid.';
 
 export const metadata: Metadata = {
@@ -96,7 +96,7 @@ export default function HowLiquidityRewardsWorkPage() {
           at midnight UTC; amounts under $1 are not paid.
         </p>
         <p className="mt-3 text-xs text-ink/55">
-          Last checked against <Docs>Polymarket&apos;s liquidity rewards documentation</Docs>: <time dateTime={UPDATED}>22 Nov 2026</time>.
+          Last checked against <Docs>Polymarket&apos;s liquidity rewards documentation</Docs>: <time dateTime={UPDATED}>23 Nov 2026</time>.
           {' '}See which markets pay the most right now on the <Link href="/polymarket-lp-rewards" className="underline hover:text-ink">Polymarket liquidity rewards table</Link>.
         </p>
       </header>
