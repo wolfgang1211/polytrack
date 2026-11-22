@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-22T20:00+03:00
+- Güncelleme: 2026-11-22T20:50+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (sıradaki: hydration incelemesi beklemede; GEO Öncelik 1 Yusuf'a haber verilmeden başlamaz).
 
 ## Şu anki aşama
-main `c4fa7f7` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, GEO Öncelik 0 (robots AI botları, sitemap tarihleri, llms.txt). Clarity ertelendi (kod pasif). Yerel klasör main'den temiz kopyaya geçirildi.
+main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 (robots AI botları, sitemap tarihleri, llms.txt). Yerel klasör main'den temiz kopya.
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -38,6 +38,12 @@ main `c4fa7f7` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, GEO 
 - GEO Öncelik 0 main'e fast-forward (`994245f` → `c4fa7f7`), production `dpl_6rg1957JR8xmNZERmS4PABSdKHVu` READY. Canlı kontrol: robots.txt 8 AI tarayıcısına izinli ve `/api/` iki grupta da kapalı; sitemap.xml 19 adres (4 blog); llms.txt 200.
 - Yerel klasör: silme yapılmadı. Eski `C:/Users/wolfgang/polytrack` → `C:/Users/wolfgang/polytrack-eski` olarak yeniden adlandırıldı (içerik, `.env.local`, `.hermes/`, `node_modules`, `.next` orada duruyor). Yeni `C:/Users/wolfgang/polytrack` GitHub main'den temiz kopya.
 - Yeni klasörde yerel çalıştırma için Yusuf'un yapacakları: eski klasörden `.env.local` dosyasını kopyalamak (gizli bilgi içerdiği için Claude dokunmadı) ve `npm install` çalıştırmak. Gerekirse `.hermes/` da eski klasörden alınabilir.
+
+## Clarity açıldı (2026-11-22, Yusuf onayıyla)
+- Yusuf Vercel'e `NEXT_PUBLIC_CLARITY_ID` (Production + Preview) ekledi; Claude'un Vercel bağlantısının env ekleme/okuma yetkisi yok (403).
+- Preview (`cowork/clarity-check`, boş commit `7333cea`) ve production yeniden derlemesi (`0b7940f`, `dpl_DbocfVBLsnVU5FRTmanNK5hXK6pW`) sonrası canlı kontrol: www.alphaboard.xyz/markets'te Clarity tag'i (`zhqjwr7lqg`) yüklü, çalışma zamanı aktif, `data-clarity-unmask` yok; Vercel Analytics `/view` devam ediyor.
+- Gizlilik sayfası Clarity'yi kullanılan araç olarak anlatacak şekilde güncellendi (maskeleme ve DNT/GPC notu korunuyor).
+- Clarity panelinde Masking "Balanced/Strict" kalmalı (Yusuf). AB ziyaretçileri için çerez onayı banner'ı yok; gerekirse ayrı iş.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
