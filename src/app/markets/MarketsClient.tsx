@@ -5,6 +5,7 @@ import type { TopMarket } from '@/types';
 import { formatCurrency, resolveCategory } from '@/lib/utils';
 import { marketUrl } from '@/lib/builder';
 import TopMarkets from '@/components/TopMarkets';
+import { useNow } from '@/lib/useNow';
 import PolymarketTradeLink from '@/components/PolymarketTradeLink';
 import { ExplorerCard, ExplorerDetails, ExplorerHeader, ExplorerToolbar } from './MarketExplorerUI';
 
@@ -21,11 +22,12 @@ function vol24h(m: TopMarket): number {
   return isNaN(v) ? 0 : v;
 }
 
-function closesIn(endDate?: string): string | null {
+/** `now` comes from useNow(): the server timestamp during SSR + hydration, then the browser clock. */
+function closesIn(endDate: string | undefined, now: number): string | null {
   if (!endDate) return null;
   const end = new Date(endDate).getTime();
   if (isNaN(end)) return null;
-  const ms = end - Date.now();
+  const ms = end - now;
   if (ms <= 0) return 'Closed';
   const days = Math.floor(ms / 86_400_000);
   if (days >= 1) return `${days}d`;
@@ -57,14 +59,14 @@ function categoryText(m: Pick<TopMarket, 'category' | 'question' | 'slug' | 'eve
 
 /* ── card ──────────────────────────────────────────────── */
 
-function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
+function MarketCard({ market, now }: { market: TopMarket & { category?: string }; now: number }) {
   const volume    = vol24h(market);
   const liquidity = market.liquidityNum ?? 0;
   const href      = marketUrl(market.eventSlug, market.slug, 'markets_explorer');
   const outcomes  = parseJson(market.outcomes);
   const prices    = parseJson(market.outcomePrices);
   const cat       = categoryText(market);
-  const close     = closesIn(market.endDate);
+  const close     = closesIn(market.endDate, now);
 
   return (
     <ExplorerCard className="group glass-hover gradient-border h-full p-5 gap-4 animate-fade-in-up">
@@ -144,7 +146,9 @@ function MarketCard({ market }: { market: TopMarket & { category?: string } }) {
 
 /* ── client view ───────────────────────────────────────── */
 
-export default function MarketsClient({ initialMarkets }: { initialMarkets: TopMarket[] }) {
+export default function MarketsClient({ initialMarkets, serverNow }: { initialMarkets: TopMarket[]; serverNow: number }) {
+  // Same clock on server and during hydration (no React error 418 text mismatch on "Xm left" labels or the expired-market filter).
+  const now = useNow(serverNow);
   const [markets, setMarkets] = useState<TopMarket[]>(initialMarkets);
   const [loading, setLoading] = useState(initialMarkets.length === 0);
   const [sort, setSort] = useState<SortKey>('vol24h');
@@ -187,7 +191,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
-    const nowMs = Date.now();
+    const nowMs = now;
     const result = pool.filter(m => {
       if (m.endDate) {
         const end = new Date(m.endDate).getTime();
@@ -214,7 +218,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
       result.sort(cmp[sort]);
     }
     return result;
-  }, [pool, cat, q, sort, extra]);
+  }, [pool, cat, q, sort, extra, now]);
 
   const totalVol = useMemo(() => filtered.reduce((s, m) => s + vol24h(m), 0), [filtered]);
 
@@ -304,7 +308,7 @@ export default function MarketsClient({ initialMarkets }: { initialMarkets: TopM
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((m, i) => (
             <div key={m.id ?? i} className="min-w-0" style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}>
-              <MarketCard market={m} />
+              <MarketCard market={m} now={now} />
             </div>
           ))}
         </div>

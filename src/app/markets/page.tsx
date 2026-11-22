@@ -25,6 +25,9 @@ export const revalidate = 120;
 /* Provider + view navigation share one wrapping row; the client stays a sibling at the same level. */
 const NavRow = ({ children }: { children: ReactNode }) => <div className="flex flex-wrap items-center gap-x-4 gap-y-2">{children}</div>;
 
+/** Timestamp shared with the client so relative "time left" labels hydrate identically. */
+const renderedAt = () => Date.now();
+
 export default async function MarketsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
   const platform = resolvePlatform(sp.platform);
@@ -114,7 +117,7 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
   return (
     <div className="flex flex-col gap-6">
       <NavRow><MarketPlatformSelect active="polymarket" /></NavRow>
-      <MarketsClient key="polymarket" initialMarkets={initialMarkets} />
+      <MarketsClient key="polymarket" initialMarkets={initialMarkets} serverNow={renderedAt()} />
     </div>
   );
 }

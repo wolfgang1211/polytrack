@@ -212,6 +212,22 @@ test('Polymarket: one h1 in shared header, search in shared toolbar, cards are E
   noNestedAnchors(html);
 });
 
+test('Polymarket: "time left" is rendered from the server timestamp, so hydration text matches even if the clock moved', () => {
+  const serverNow = Date.parse('2026-11-22T18:00:00Z');
+  const ending = polyMarket('p1', { endDate: new Date(serverNow + 59.5 * 60_000).toISOString() });
+  const realNow = Date.now;
+  try {
+    Date.now = () => serverNow + 2 * 60_000; // client hydrates 2 minutes later
+    const html = ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [ending], serverNow });
+    assert.match(html, />59m left</, 'label comes from serverNow, not from the moving clock');
+    Date.now = () => serverNow + 30 * 60_000;
+    assert.equal(ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [ending], serverNow }), html, 'same props, same markup at any wall-clock time');
+  } finally {
+    Date.now = realNow;
+  }
+  assert.match(src('src/app/markets/page.tsx'), /<MarketsClient\b[^>]*serverNow=/, 'page passes its render timestamp');
+});
+
 test('Polymarket: a missing or non-numeric outcome price renders as unknown (—), never as 0¢; a real 0 stays 0¢', () => {
   const priceTexts = card => [...card.html.matchAll(/<p class="text-base font-black[^"]*">([^<]*)<\/p>/g)].map(m => m[1]);
   const render = prices => byAttr(ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [polyMarket('p1', { outcomePrices: prices })] }), 'data-explorer-card')[0];
