@@ -5,7 +5,7 @@ export interface OutboundEvent {
 }
 const PLACEMENTS = new Set([
   'activity_feed', 'home_hot_bets', 'home_live_ticker', 'home_recent_trades', 'home_top_markets',
-  'liquidity_backtester', 'liquidity_farm_changes', 'liquidity_opportunities', 'liquidity_reward_farms',
+  'liquidity_backtester', 'liquidity_farm_changes', 'liquidity_opportunities', 'liquidity_reward_farms', 'lp_rewards_page',
   'markets_explorer', 'markets_featured', 'wallet_latest_moves', 'wallet_positions',
   'world_cup_board', 'world_cup_hub', 'unattributed',
 ]);

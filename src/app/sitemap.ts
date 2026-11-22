@@ -13,6 +13,7 @@ const LIVE_PAGES: Array<[path: string, changeFrequency: Freq, priority: number]>
   ['/markets', 'always', 0.9],
   ['/activity', 'always', 0.8],
   ['/liquidity', 'hourly', 0.8],
+  ['/polymarket-lp-rewards', 'hourly', 0.9],
   ['/insights', 'daily', 0.7],
 ];
 

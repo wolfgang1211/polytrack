@@ -10,7 +10,7 @@ const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const BASE = 'https://www.alphaboard.xyz';
 const AI_AGENTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User'];
-const LIVE = ['', '/leaderboard', '/markets', '/activity', '/liquidity', '/insights'];
+const LIVE = ['', '/leaderboard', '/markets', '/activity', '/liquidity', '/polymarket-lp-rewards', '/insights'];
 
 test('robots: every AI crawler gets an explicit allow group that still keeps /api/ and /watchlist closed', () => {
   const robots = createLoader()('src/app/robots.ts').default();

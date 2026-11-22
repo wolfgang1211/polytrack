@@ -15,6 +15,7 @@ export type MarketCampaignContext =
   | 'liquidity_farm_changes'
   | 'liquidity_opportunities'
   | 'liquidity_reward_farms'
+  | 'lp_rewards_page'
   | 'markets_explorer'
   | 'markets_featured'
   | 'wallet_latest_moves'
