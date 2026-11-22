@@ -1,9 +1,9 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-21T17:00+03:00
+- Güncelleme: 2026-11-22T17:58+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (Clarity proje ID'si ve yayın onayı bekleniyor).
+- Çalışma sırası: **ONAY BEKLİYOR** (Clarity proje ID'si; `cowork/kalshi` yayın onayı).
 
 ## Şu anki aşama
 Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (kontrast düzeltmesiyle). Kod `cowork/kalshi` branch'inde; main ve production değişmedi.
@@ -27,10 +27,16 @@ Kalshi/Polymarket ortak market arayüzü gerçek tarayıcı kabulünden geçti (
 - Preview: https://polytrack-git-cowork-analytics-wolfgang37s-projects.vercel.app — gerçek tarayıcıda Vercel Analytics script'i 200, `/view` beacon 200 (Web Analytics projede açık görünüyor). Clarity yüklenmedi: beklenen, çünkü ID henüz yok.
 - Yerel Windows kopyasına uygulanmadı (yerel main + Kalshi değişiklikleri ayrı; yeni paket yerelde kurulu değil).
 
+## Yayın (2026-11-22, Yusuf onayıyla)
+- Yusuf Vercel panelinde Web Analytics'i açtı ve "analytics dalını yayına al" dedi. `cowork/analytics` main'e fast-forward edildi (main `736eeb4` → `9f593f0`), production deploy `dpl_EvcAqr1iSXWGXJHacsFUAvupZjrc` READY.
+- Canlı doğrulama (www.alphaboard.xyz/markets, gerçek tarayıcı): Vercel Analytics script 200, `/view` 200. Clarity yüklü değil (ID yok, beklenen).
+- Konsolda React #418 hydration hatası var; önceki production (`736eeb4`) aynı sayfada da aynı hatayı veriyor, yani analytics kaynaklı değil, mevcut sorun. `cowork/kalshi` preview'unda bu hata görülmedi.
+- `cowork/kalshi` yayına dahil edilmedi.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Clarity doğrulaması**: Yusuf ID'yi verince Vercel'de `NEXT_PUBLIC_CLARITY_ID` (Preview + Production) eklenip preview yeniden deploy edilecek ve Clarity script'i tarayıcıda doğrulanacak.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **Yayın**: `cowork/kalshi` ve `cowork/analytics` → main merge ve production, yalnız "yayına al" onayıyla.
+3. **Yayın**: `cowork/kalshi` → main merge ve production, yalnız "yayına al" onayıyla (main artık analytics içeriyor; birleştirme gerekebilir).
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
