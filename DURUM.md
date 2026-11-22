@@ -48,7 +48,7 @@ main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clar
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **GEO Öncelik 1** (cevap sayfası): yayın oturduktan sonra, önce Yusuf'a haber verilecek. Clarity ertelendi.
+3. **GEO Öncelik 1** (cevap sayfası): yayın oturduktan sonra, önce Yusuf'a haber verilecek.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
