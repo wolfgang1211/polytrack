@@ -4,6 +4,8 @@ import type { RewardFarm } from '@/lib/rewards';
 export const LP_REWARDS_TOP_N = 20;
 /** Shown to visitors when the rendered snapshot is older than this. */
 export const LP_REWARDS_STALE_MINUTES = 60;
+/** Polymarket does not pay out daily amounts below $1, so smaller pools are not real opportunities. */
+export const LP_REWARDS_MIN_DAILY = 1;
 
 export interface LpRewardsRow {
   rank: number;
@@ -40,10 +42,18 @@ export function formatUtc(iso: string): string {
   return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}, ${p(d.getUTCHours())}:${p(d.getUTCMinutes())} UTC`;
 }
 
-/** "$1,250" for >= $100, "$12.50" below. */
+/** "$1,250" for >= $100 or whole amounts, "$12.50" otherwise. */
 export function formatUsd(n: number): string {
-  const digits = Math.abs(n) >= 100 ? 0 : 2;
+  const digits = Math.abs(n) >= 100 || Number.isInteger(n) ? 0 : 2;
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+}
+
+/** Polymarket marks open-ended reward pools with a far-future end date (e.g. 2500-12-31). */
+export function rewardEndLabel(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (!Number.isFinite(d.getTime())) return '—';
+  return d.getUTCFullYear() >= 2100 ? 'No end date' : d.toISOString().slice(0, 10);
 }
 
 const finiteOrNull = (n: unknown): number | null => (typeof n === 'number' && Number.isFinite(n) ? n : null);
@@ -55,7 +65,7 @@ export function buildLpRewardsSnapshot(
   const at = generatedAt.toISOString();
   // A failed upstream fetch yields zero scanned markets: that is "no data", never "no rewards".
   if (!input || input.scanned <= 0) return { status: 'unavailable', generatedAt: at };
-  const paying = input.farms.filter(f => Number.isFinite(f.dailyRate) && f.dailyRate > 0);
+  const paying = input.farms.filter(f => Number.isFinite(f.dailyRate) && f.dailyRate >= LP_REWARDS_MIN_DAILY);
   if (!paying.length) return { status: 'empty', generatedAt: at, scanned: input.scanned };
 
   const sorted = [...paying].sort((a, b) => b.dailyRate - a.dailyRate);

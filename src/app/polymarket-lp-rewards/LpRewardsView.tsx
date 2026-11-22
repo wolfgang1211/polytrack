@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { marketUrl } from '@/lib/builder';
-import { formatUsd, formatUtc, LP_REWARDS_FAQ, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
+import { formatUsd, formatUtc, LP_REWARDS_FAQ, rewardEndLabel, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
 import SnapshotAge from '@/app/polymarket-lp-rewards/SnapshotAge';
 
 const PAGE_URL = 'https://www.alphaboard.xyz/polymarket-lp-rewards';
@@ -8,11 +8,6 @@ const DOCS_URL = 'https://docs.polymarket.com/market-makers/liquidity-rewards';
 
 const dash = '—';
 const num = (n: number | null, fmt: (v: number) => string) => (n === null ? dash : fmt(n));
-const shortDate = (iso: string | null) => {
-  if (!iso) return dash;
-  const d = new Date(iso);
-  return Number.isFinite(d.getTime()) ? d.toISOString().slice(0, 10) : dash;
-};
 
 function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }} />;
@@ -93,7 +88,7 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.maxSpread, v => `${v}¢`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.minSize, v => `${v.toLocaleString('en-US')} shares`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.liquidity, formatUsd)}</td>
-                    <td className="px-3 py-2 text-right text-ink/80">{shortDate(r.rewardEnd)}</td>
+                    <td className="px-3 py-2 text-right text-ink/80">{rewardEndLabel(r.rewardEnd)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -108,7 +103,8 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
         <p>
           AlphaBoard reads the reward fields Polymarket publishes on each market in its public market data: the daily reward pool,
           the maximum qualifying spread and the minimum qualifying order size. It scans the 200 most liquid and the 200 highest-volume
-          active markets{ok ? ` (${ok.scanned} unique markets in this snapshot)` : ''} and ranks markets with an active pool by daily reward.
+          active markets{ok ? ` (${ok.scanned} unique markets in this snapshot)` : ''} and ranks markets with an active pool of at least $1 per day
+          by daily reward (Polymarket does not pay out amounts under $1).
         </p>
         <p>
           Single-game and match markets and markets resolving within three days are left out, because they move too fast to hold as

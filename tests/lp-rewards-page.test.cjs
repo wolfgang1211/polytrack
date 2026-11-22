@@ -40,6 +40,11 @@ test('snapshot: failed upstream (0 scanned) is "unavailable", never a page of ze
   assert.equal(buildLpRewardsSnapshot({ farms: [], scanned: 0 }, AT).status, 'unavailable');
   assert.equal(buildLpRewardsSnapshot(null, AT).status, 'unavailable');
   assert.equal(buildLpRewardsSnapshot({ farms: [farm('z', 0)], scanned: 200 }, AT).status, 'empty');
+  // Pools under Polymarket's $1 minimum payout cannot pay anyone: not listed, not counted.
+  const dust = buildLpRewardsSnapshot({ farms: [farm('d', 0.004), farm('r', 6)], scanned: 200 }, AT);
+  assert.deepEqual(dust.rows.map(r => r.question), ['SYNTHETIC market r?']);
+  assert.equal(dust.totalDaily, 6);
+  assert.equal(buildLpRewardsSnapshot({ farms: [farm('d', 0.5)], scanned: 200 }, AT).status, 'empty');
   const many = Array.from({ length: 40 }, (_, i) => farm(`m${i}`, i + 1));
   const s = buildLpRewardsSnapshot({ farms: many, scanned: 400 }, AT);
   assert.equal(s.rows.length, LP_REWARDS_TOP_N);
@@ -70,6 +75,17 @@ test('view: server HTML carries h1, the summary as the first paragraph, a real t
   assert.doesNotMatch(rowB, />0</);
   assert.match(html, /Not affiliated with Polymarket/);
   assert.match(html, /href="https:\/\/docs\.polymarket\.com\/market-makers\/liquidity-rewards"/);
+});
+
+test('format: whole dollars without cents, open-ended pool dates shown as "No end date"', () => {
+  const { formatUsd, buildLpRewardsSnapshot } = lib();
+  assert.equal(formatUsd(50), '$50');
+  assert.equal(formatUsd(12.5), '$12.50');
+  assert.equal(formatUsd(1250.4), '$1,250');
+  const html = view(buildLpRewardsSnapshot({ farms: [farm('a', 50, { rewardEnd: '2500-12-31T00:00:00Z' }), farm('b', 40)], scanned: 10 }, AT));
+  assert.match(html, />No end date</);
+  assert.match(html, />2026-12-31</);
+  assert.doesNotMatch(html, /2500-12-31/);
 });
 
 test('view: FAQPage, Dataset and BreadcrumbList JSON-LD match the visible content', () => {
