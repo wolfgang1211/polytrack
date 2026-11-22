@@ -1,0 +1,28 @@
+# AlphaBoard
+
+> AlphaBoard (alphaboard.xyz) is an independent, read-only analytics site for prediction markets. It focuses on Polymarket liquidity: liquidity-provider (LP) opportunities, maker reward farms, order-book spread and depth, plus trader leaderboards and wallet analytics. It also shows a read-only sample of Kalshi markets. Not affiliated with Polymarket or Kalshi. Not financial advice.
+
+Data is fetched from public Polymarket and Kalshi APIs. Pages show when their data was retrieved; figures change continuously and reward programs are set by the platforms, not by AlphaBoard.
+
+## Liquidity and LP rewards
+
+- [Liquidity](https://www.alphaboard.xyz/liquidity): Polymarket LP opportunities, reward farms, spread and depth, and a maker reward simulator.
+- [How to earn yield as a liquidity provider on Polymarket](https://www.alphaboard.xyz/blog/polymarket-lp-guide): guide to spread, depth, APR estimates and LP risks.
+- [FAQ](https://www.alphaboard.xyz/faq): how the LP Score and APR estimates are calculated and what risks LPs carry.
+
+## Markets
+
+- [Markets explorer](https://www.alphaboard.xyz/markets): active Polymarket markets by volume, liquidity and closing time; a Kalshi view groups recently traded Kalshi markets by event with spread and displayed size.
+
+## Traders and wallets
+
+- [Leaderboard](https://www.alphaboard.xyz/leaderboard): top Polymarket traders by profit and volume.
+- [Wallet checker](https://www.alphaboard.xyz/checker): P&L, win rate and trade history for a Polymarket wallet address.
+- [Activity](https://www.alphaboard.xyz/activity): live Polymarket trade feed.
+- [Insights](https://www.alphaboard.xyz/insights): market-wide trends.
+
+## About
+
+- [About](https://www.alphaboard.xyz/about)
+- [API docs](https://www.alphaboard.xyz/api-docs)
+- [Disclaimer](https://www.alphaboard.xyz/disclaimer)

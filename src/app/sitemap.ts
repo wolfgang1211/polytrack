@@ -1,101 +1,41 @@
 import type { MetadataRoute } from 'next';
+import { BLOG_POSTS } from '@/lib/blogPosts';
+import { EDITORIAL_UPDATED } from '@/lib/sitemapDates';
+
+const BASE_URL = 'https://www.alphaboard.xyz';
+
+type Freq = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>;
+
+/** Pages whose content is live market data: "now" is their honest last-modified time. */
+const LIVE_PAGES: Array<[path: string, changeFrequency: Freq, priority: number]> = [
+  ['', 'always', 1],
+  ['/leaderboard', 'hourly', 0.9],
+  ['/markets', 'always', 0.9],
+  ['/activity', 'always', 0.8],
+  ['/liquidity', 'hourly', 0.8],
+  ['/insights', 'daily', 0.7],
+];
+
+const EDITORIAL_META: Record<string, [Freq, number]> = {
+  '/checker': ['monthly', 0.6],
+  '/compare': ['monthly', 0.6],
+  '/about': ['monthly', 0.5],
+  '/faq': ['monthly', 0.5],
+  '/blog': ['weekly', 0.5],
+  '/api-docs': ['weekly', 0.4],
+  '/privacy': ['yearly', 0.3],
+  '/terms': ['yearly', 0.3],
+  '/disclaimer': ['yearly', 0.3],
+};
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://www.alphaboard.xyz';
-
-  const staticPages = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'always' as const,
-      priority: 1,
-    },
-
-    {
-      url: `${baseUrl}/leaderboard`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/markets`,
-      lastModified: new Date(),
-      changeFrequency: 'always' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/activity`,
-      lastModified: new Date(),
-      changeFrequency: 'always' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/liquidity`,
-      lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/insights`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/checker`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/compare`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/privacy`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/disclaimer`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/faq`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/api-docs`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.4,
-    },
+  const now = new Date();
+  return [
+    ...LIVE_PAGES.map(([path, changeFrequency, priority]) => ({ url: `${BASE_URL}${path}`, lastModified: now, changeFrequency, priority })),
+    ...Object.entries(EDITORIAL_UPDATED).map(([path, lastModified]) => {
+      const [changeFrequency, priority] = EDITORIAL_META[path];
+      return { url: `${BASE_URL}${path}`, lastModified, changeFrequency, priority };
+    }),
+    ...BLOG_POSTS.map(post => ({ url: `${BASE_URL}/blog/${post.slug}`, lastModified: post.date, changeFrequency: 'yearly' as const, priority: 0.5 })),
   ];
-
-  return staticPages;
 }
