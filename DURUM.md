@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-22T22:30+03:00
+- Güncelleme: 2026-11-23T01:40+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (ödül sayfası tam kapsam `cowork/lp-rewards-all` preview'da; Yusuf onaylamadan yayın yok. Hydration incelemesi beklemede).
+- Çalışma sırası: **ONAY BEKLİYOR** ("Longer-term markets" tablosu `cowork/lp-rewards-longterm` preview'da; Yusuf onaylamadan yayın yok. Hydration incelemesi beklemede).
 
 ## Şu anki aşama
-main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 ve Öncelik 1 (`/polymarket-lp-rewards`, eski 400 piyasalık tarama). Tam kapsamlı sürüm preview'da.
+main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 ve tam kapsamlı `/polymarket-lp-rewards` (tüm ödüllü piyasalar, ilk 50). İkinci tablo preview'da.
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -59,10 +59,16 @@ main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clar
 - Test: 567/567, tsc exit 0, lint 0 hata/25 uyarı, diff-check temiz.
 - Preview: https://polytrack-git-cowork-lp-rewards-all-wolfgang37s-projects.vercel.app/polymarket-lp-rewards
 
+## Yayın 5 ve "Longer-term markets" (2026-11-22/23)
+- Yusuf onayıyla tam kapsamlı ödül sayfası main'e (`e32ca66`), production `dpl_6cc1BVMvbJDT7aQLQAdH51mhb9eB` READY; canlıda 6.625 piyasa, 50 satır, "Closes / starts" sütunu.
+- `cowork/lp-rewards-longterm` (`d9934a4`, `73a8d51`), preview: ana tablo aynen duruyor; altına "Longer-term markets" (kapanışı snapshot'tan 7 günden fazla sonra, maçlar ve tarihi bilinmeyenler hariç, günlük ödüle göre ilk 25). Meta, sıralamada aşağı doğru 50'lik gruplarla 25 uygun bulunana kadar çekiliyor (ana tablodan sonra en fazla 1.000 piyasa); not satırı kaç havuzun kontrol edildiğini yazıyor, sınıra takılırsa belirtiyor. 7 günden uzak kapanışlar artık iki tabloda da tarih olarak görünüyor ("in 7d" çelişkisi giderildi).
+- Preview doğrulaması: 2 tablo (50 + 25), ikinci tabloda tüm kapanışlar 7 günden uzak tarih, ilk 100 havuz kontrolünde 25 bulundu; konsol hatası yok. 571/571 test, tsc exit 0, lint 0 hata/25 uyarı.
+- Preview: https://polytrack-git-cowork-lp-rewards-longterm-wolfgang37s-projects.vercel.app/polymarket-lp-rewards
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **Ödül sayfası tam kapsam yayını**: Yusuf onaylayınca `cowork/lp-rewards-all` → main.
+3. **Longer-term tablosu yayını**: Yusuf onaylayınca `cowork/lp-rewards-longterm` → main.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
