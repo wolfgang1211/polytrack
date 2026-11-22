@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-22T21:45+03:00
+- Güncelleme: 2026-11-22T22:30+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (GEO Öncelik 1 `cowork/geo-p1` preview'da; Yusuf onaylamadan yayın yok. Hydration incelemesi beklemede).
+- Çalışma sırası: **ONAY BEKLİYOR** (ödül sayfası tam kapsam `cowork/lp-rewards-all` preview'da; Yusuf onaylamadan yayın yok. Hydration incelemesi beklemede).
 
 ## Şu anki aşama
-main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 (robots AI botları, sitemap tarihleri, llms.txt). Yerel klasör main'den temiz kopya.
+main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 ve Öncelik 1 (`/polymarket-lp-rewards`, eski 400 piyasalık tarama). Tam kapsamlı sürüm preview'da.
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -52,10 +52,17 @@ main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clar
 - Doğrulama: 564/564 test, tsc exit 0, lint 0 hata/25 uyarı, diff-check temiz, Vercel preview READY. Preview'da JS'siz HTML'de özet + 11 satırlık tablo + 6 SSS + 3 JSON-LD; konsol hatası yok; 375px'te taşma yok, kontrast eşiği altında metin yok.
 - Preview: https://polytrack-git-cowork-geo-p1-wolfgang37s-projects.vercel.app/polymarket-lp-rewards
 
+## Yayın 4 ve ödül sayfası tam kapsam (2026-11-22)
+- Yusuf onayıyla `cowork/geo-p1` main'e (`5943cbb`), production `dpl_4RyPniYvD3QefW8k2sYRfNB3XgdT` READY; canlıda sayfa açılıyor, sitemap'te.
+- `cowork/lp-rewards-all` (`8390566`, `db6196c`), preview: kaynak artık Polymarket CLOB `rewards/markets/current` (tüm ödüllü piyasalar, 500/sayfa, sayfa başına 3 deneme + 10 sn zaman aşımı; eksik sayfa = "Partial data", ilk sayfa yok = "temporarily unavailable"). Maç/kısa vade filtresi bu sayfada yok. İlk 50 satır için Gamma meta tek istekte. "Closes / starts" sütunu: maçlarda başlama saati ("Starts in 2h" / "Game started"; Polymarket'in maç endDate'i başlama saati), diğerlerinde "in 5h / in 3d / tarih / Awaiting resolution". Günlük ödül sponsorlu ödülleri içerir; <1$/gün havuzlar hariç.
+- Ölçüm (preview, 22 Kasım ~19:20 UTC): 7.778 ödüllü piyasa, 6.609'u ≥1$/gün, toplam ≈189.800$/gün; en büyük havuz 15.771$/gün (NFL maçları). Sunucuda tam tarama 16 sayfa / 659 ms (build log, iad1); İstanbul'dan tarayıcıyla ~11 sn. Ziyaretçi: TTFB 43 ms, DOMContentLoaded 0,8 sn, load 1,1 sn, HTML 18 KB sıkıştırılmış (164 KB açık); önbellekten tekrar istek 63–115 ms. Konsol hatası yok.
+- Test: 567/567, tsc exit 0, lint 0 hata/25 uyarı, diff-check temiz.
+- Preview: https://polytrack-git-cowork-lp-rewards-all-wolfgang37s-projects.vercel.app/polymarket-lp-rewards
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **GEO Öncelik 1 yayını**: Yusuf preview'u onaylayınca `cowork/geo-p1` → main.
+3. **Ödül sayfası tam kapsam yayını**: Yusuf onaylayınca `cowork/lp-rewards-all` → main.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
