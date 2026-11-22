@@ -1,4 +1,4 @@
-/* GEO priority 1: /polymarket-lp-rewards answer page. */
+/* GEO priority 1: /polymarket-lp-rewards answer page, covering every Polymarket market with an active reward pool. */
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -10,87 +10,151 @@ const { createLoader } = require('./helpers/load-ts.cjs');
 const root = path.resolve(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 const lib = () => createLoader()('src/lib/lpRewardsPage.ts');
+const uni = () => createLoader()('src/lib/rewardsUniverse.ts');
 const AT = new Date('2026-11-22T17:45:30Z');
 
-const farm = (id, dailyRate, o = {}) => ({
-  conditionId: id, question: `SYNTHETIC market ${id}?`, slug: `syn-${id}`, eventSlug: `syn-ev-${id}`,
-  volume24h: 1000, liquidity: 5000, spread: 0.02, dailyRate, minSize: 100, maxSpread: 3.5,
-  estDailyReward: 1, estApr: 10, daysToResolve: 30, competition: 'Low', rewardStart: null,
-  rewardEnd: '2026-12-31T00:00:00Z', isNew: false, endsSoon: false, priceVol: 1, stability: 'A', riskAdjApr: 10, ...o,
+const rm = (id, dailyRate, o = {}) => ({ conditionId: `0x${id}`, dailyRate, maxSpread: 3.5, minSize: 100, ...o });
+const meta = (entries) => new Map(entries.map(([id, o = {}]) => [`0x${id}`, {
+  question: `SYNTHETIC market ${id}?`, slug: `syn-${id}`, eventSlug: `syn-ev-${id}`, endDate: '2026-12-31T00:00:00Z', liquidity: 5000, ...o,
+}]));
+const universe = (markets, o = {}) => ({ markets, pages: 1, complete: true, ...o });
+
+/* ---------- CLOB paging ---------- */
+const page = (rows, next) => ({ data: rows, next_cursor: next, limit: 500, count: rows.length });
+const clobRow = (id, rate, o = {}) => ({ condition_id: `0x${id.toUpperCase()}`, rewards_max_spread: 2.5, rewards_min_size: 50, native_daily_rate: rate, total_daily_rate: rate, ...o });
+function fakeFetch(script) {
+  const calls = [];
+  const fn = async url => {
+    calls.push(url);
+    const step = script(url, calls.length);
+    if (step instanceof Error) throw step;
+    if (typeof step === 'number') return { ok: false, status: step, json: async () => ({}) };
+    return { ok: true, status: 200, json: async () => step };
+  };
+  return { fn, calls };
+}
+
+test('universe: follows next_cursor to the end marker, dedupes, lower-cases ids, prefers total (incl. sponsored) rate', async () => {
+  const { fetchRewardUniverse } = uni();
+  const f = fakeFetch(url => {
+    if (!url.includes('next_cursor')) return page([clobRow('aa', 5), clobRow('bb', 1, { total_daily_rate: 3 })], 'NTAw');
+    if (url.includes('NTAw')) return page([clobRow('aa', 5), clobRow('cc', 0.2, { rewards_max_spread: 0, rewards_min_size: null })], 'LTE=');
+    throw new Error('unexpected');
+  });
+  const u = await fetchRewardUniverse(f.fn);
+  assert.equal(u.pages, 2);
+  assert.equal(u.complete, true);
+  assert.deepEqual(u.markets.map(m => [m.conditionId, m.dailyRate]), [['0xaa', 5], ['0xbb', 3], ['0xcc', 0.2]]);
+  assert.equal(u.markets[2].maxSpread, null, 'zero spread is "not published", not 0');
+  assert.equal(u.markets[2].minSize, null);
 });
 
-test('snapshot: ranks by real daily reward, writes a numbered UTC-dated summary, keeps unknowns unknown', () => {
+test('universe: retries a flaky page; a page that keeps failing marks the result incomplete; first page down = null', async () => {
+  const { fetchRewardUniverse } = uni();
+  let n = 0;
+  const flaky = fakeFetch(url => (!url.includes('next_cursor') ? (++n < 3 ? 503 : page([clobRow('aa', 5)], 'LTE=')) : null));
+  const ok = await fetchRewardUniverse(flaky.fn);
+  assert.equal(ok.complete, true);
+  assert.equal(flaky.calls.length, 3);
+
+  const broken = fakeFetch(url => (!url.includes('next_cursor') ? page([clobRow('aa', 5)], 'NTAw') : new Error('reset')));
+  const part = await fetchRewardUniverse(broken.fn);
+  assert.equal(part.complete, false);
+  assert.equal(part.markets.length, 1);
+
+  assert.equal(await fetchRewardUniverse(fakeFetch(() => 500).fn), null);
+});
+
+test('meta: one Gamma request for the displayed ids; missing markets are just absent', async () => {
+  const { fetchMarketMeta } = uni();
+  const f = fakeFetch(() => [{ conditionId: '0xAA', question: 'Q aa?', slug: 'q-aa', events: [{ slug: 'ev-aa' }], endDate: '2026-11-23T00:00:00Z', liquidityNum: 0 }]);
+  const m = await fetchMarketMeta(['0xaa', '0xbb'], f.fn);
+  assert.equal(f.calls.length, 1);
+  assert.match(f.calls[0], /condition_ids=0xaa&condition_ids=0xbb/);
+  assert.deepEqual(m.get('0xaa'), { question: 'Q aa?', slug: 'q-aa', eventSlug: 'ev-aa', endDate: '2026-11-23T00:00:00Z', liquidity: null });
+  assert.equal(m.has('0xbb'), false);
+});
+
+/* ---------- snapshot ---------- */
+test('snapshot: every rewarded market counts (no match/short-term filter), ranked by daily pool, sub-$1 pools excluded', () => {
   const { buildLpRewardsSnapshot } = lib();
-  const farms = [farm('a', 50), farm('b', 1200, { minSize: null, maxSpread: null, liquidity: 0, rewardEnd: null }), farm('c', 300)];
-  const s = buildLpRewardsSnapshot({ farms, scanned: 380 }, AT);
+  const s = buildLpRewardsSnapshot(
+    universe([rm('a', 50), rm('nfl', 15771.43), rm('c', 300), rm('dust', 0.4)]),
+    meta([['a'], ['nfl', { question: 'Saints vs. Bears', endDate: '2026-11-22T21:00:00Z' }], ['c']]),
+    AT,
+  );
   assert.equal(s.status, 'ok');
-  assert.deepEqual(s.rows.map(r => r.question), ['SYNTHETIC market b?', 'SYNTHETIC market c?', 'SYNTHETIC market a?']);
-  assert.deepEqual(s.rows.map(r => r.rank), [1, 2, 3]);
-  assert.equal(s.totalDaily, 1550);
-  assert.equal(s.rows[0].minSize, null);
-  assert.equal(s.rows[0].maxSpread, null);
-  assert.equal(s.rows[0].liquidity, null, 'zero liquidity from the feed is shown as unknown');
+  assert.equal(s.universe, 4);
+  assert.equal(s.marketCount, 3);
+  assert.deepEqual(s.rows.map(r => r.question), ['Saints vs. Bears', 'SYNTHETIC market c?', 'SYNTHETIC market a?']);
   assert.equal(s.summary,
-    'As of 22 Nov 2026, 17:45 UTC, the highest daily liquidity reward among the 3 Polymarket reward markets AlphaBoard tracks is $1,200 per day on "SYNTHETIC market b?". '
-    + 'The top 3 markets offer $1,550 per day combined, and all 3 tracked markets offer $1,550 per day.');
+    'As of 22 Nov 2026, 17:45 UTC, Polymarket offers liquidity rewards of $1 per day or more on 3 markets, worth $16,121 per day in total. '
+    + 'The largest pool is $15,771 per day on "Saints vs. Bears"; the top 3 pools total $16,121 per day.');
 });
 
-test('snapshot: failed upstream (0 scanned) is "unavailable", never a page of zeros; top list is capped', () => {
+test('snapshot: incomplete paging is disclosed as a lower bound; failure is "unavailable"; table capped at 50', () => {
   const { buildLpRewardsSnapshot, LP_REWARDS_TOP_N } = lib();
-  assert.equal(buildLpRewardsSnapshot({ farms: [], scanned: 0 }, AT).status, 'unavailable');
-  assert.equal(buildLpRewardsSnapshot(null, AT).status, 'unavailable');
-  assert.equal(buildLpRewardsSnapshot({ farms: [farm('z', 0)], scanned: 200 }, AT).status, 'empty');
-  // Pools under Polymarket's $1 minimum payout cannot pay anyone: not listed, not counted.
-  const dust = buildLpRewardsSnapshot({ farms: [farm('d', 0.004), farm('r', 6)], scanned: 200 }, AT);
-  assert.deepEqual(dust.rows.map(r => r.question), ['SYNTHETIC market r?']);
-  assert.equal(dust.totalDaily, 6);
-  assert.equal(buildLpRewardsSnapshot({ farms: [farm('d', 0.5)], scanned: 200 }, AT).status, 'empty');
-  const many = Array.from({ length: 40 }, (_, i) => farm(`m${i}`, i + 1));
-  const s = buildLpRewardsSnapshot({ farms: many, scanned: 400 }, AT);
-  assert.equal(s.rows.length, LP_REWARDS_TOP_N);
-  assert.equal(s.marketCount, 40);
+  const part = buildLpRewardsSnapshot(universe([rm('a', 10)], { complete: false }), meta([['a']]), AT);
+  assert.match(part.summary, /^Partial data: /);
+  assert.match(part.summary, /on at least 1 market, worth at least \$10 per day/);
+  assert.equal(buildLpRewardsSnapshot(null, new Map(), AT).status, 'unavailable');
+  assert.equal(buildLpRewardsSnapshot(universe([rm('d', 0.5)]), new Map(), AT).status, 'empty');
+  const many = Array.from({ length: 80 }, (_, i) => rm(`m${i}`, i + 1));
+  const s = buildLpRewardsSnapshot(universe(many), new Map(), AT);
+  assert.equal(LP_REWARDS_TOP_N, 50);
+  assert.equal(s.rows.length, 50);
+  assert.equal(s.marketCount, 80);
+  assert.equal(s.rows[0].question, null, 'no metadata stays unknown');
 });
 
+test('closes label is relative to the snapshot time and never invents a date', () => {
+  const { closesLabel } = lib();
+  const at = AT.toISOString();
+  assert.equal(closesLabel('2026-11-22T21:00:00Z', at), 'in 3h');
+  assert.equal(closesLabel('2026-11-22T18:00:00Z', at), 'in <1h');
+  assert.equal(closesLabel('2026-11-26T00:00:00Z', at), 'in 3d');
+  assert.equal(closesLabel('2027-03-01T00:00:00Z', at), '2027-03-01');
+  assert.equal(closesLabel('2026-10-28T00:00:00Z', at), 'Past end date');
+  assert.equal(closesLabel(null, at), '—');
+  assert.equal(closesLabel('garbage', at), '—');
+});
+
+/* ---------- view ---------- */
 const view = snapshot => {
   const View = createLoader()('src/app/polymarket-lp-rewards/LpRewardsView.tsx').default;
   return renderToStaticMarkup(React.createElement(View, { snapshot }));
 };
 const jsonLd = html => [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1]));
 
-test('view: server HTML carries h1, the summary as the first paragraph, a real table and an outbound referral link', () => {
+test('view: server HTML has h1, summary first, a table with a Closes column and referral links; unknowns are dashes', () => {
   const { buildLpRewardsSnapshot } = lib();
-  const html = view(buildLpRewardsSnapshot({ farms: [farm('b', 1200, { minSize: null }), farm('a', 50)], scanned: 380 }, AT));
+  const html = view(buildLpRewardsSnapshot(
+    universe([rm('b', 1200, { minSize: null }), rm('a', 50), rm('x', 40)]),
+    meta([['b', { endDate: '2026-11-22T21:00:00Z', liquidity: null }], ['a']]),
+    AT,
+  ));
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   const firstP = html.match(/<p\b[^>]*>([\s\S]*?)<\/p>/)[1];
   assert.match(firstP, /As of 22 Nov 2026, 17:45 UTC/);
   assert.match(firstP, /\$1,200 per day/);
-  assert.match(html, /<table\b/);
-  assert.equal((html.match(/<tbody>[\s\S]*?<\/tbody>/)[0].match(/<tr\b/g) || []).length, 2);
-  assert.match(html, /<time dateTime="2026-11-22T17:45:30.000Z">/);
+  assert.match(html, /<th scope="col"[^>]*>Closes<\/th>/);
+  const rowB = html.match(/<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*SYNTHETIC market b\?[\s\S]*?<\/tr>/)[0];
+  assert.match(rowB, />in 3h</);
+  assert.match(rowB, />—</);
+  assert.doesNotMatch(rowB, />\$?0</);
   const link = html.match(/<a\b[^>]*href="https:\/\/polymarket\.com\/event\/syn-ev-b[^"]*"[^>]*>/)[0];
   assert.match(link, /utm_content=lp_rewards_page/);
   assert.match(link, /rel="noopener noreferrer sponsored"/);
-  const rowB = html.match(/<tr\b[^>]*>(?:(?!<\/tr>)[\s\S])*SYNTHETIC market b\?[\s\S]*?<\/tr>/)[0];
-  assert.match(rowB, />—</, 'unknown min size shows a dash');
-  assert.doesNotMatch(rowB, />0</);
+  assert.match(html, /Market details unavailable/, 'row without metadata says so instead of inventing a name');
+  assert.match(html, /<time dateTime="2026-11-22T17:45:30.000Z">/);
   assert.match(html, /Not affiliated with Polymarket/);
   assert.match(html, /href="https:\/\/docs\.polymarket\.com\/market-makers\/liquidity-rewards"/);
-});
-
-test('format: whole dollars without cents, open-ended pool dates shown as "No end date"', () => {
-  const { formatUsd, buildLpRewardsSnapshot } = lib();
-  assert.equal(formatUsd(50), '$50');
-  assert.equal(formatUsd(12.5), '$12.50');
-  assert.equal(formatUsd(1250.4), '$1,250');
-  const html = view(buildLpRewardsSnapshot({ farms: [farm('a', 50, { rewardEnd: '2500-12-31T00:00:00Z' }), farm('b', 40)], scanned: 10 }, AT));
-  assert.match(html, />No end date</);
-  assert.match(html, />2026-12-31</);
-  assert.doesNotMatch(html, /2500-12-31/);
+  assert.doesNotMatch(html, /Single-game and match markets/, 'old filter text is gone');
 });
 
 test('view: FAQPage, Dataset and BreadcrumbList JSON-LD match the visible content', () => {
   const { buildLpRewardsSnapshot, LP_REWARDS_FAQ } = lib();
-  const html = view(buildLpRewardsSnapshot({ farms: [farm('a', 50)], scanned: 10 }, AT));
+  const html = view(buildLpRewardsSnapshot(universe([rm('a', 50)]), meta([['a']]), AT));
   const blocks = jsonLd(html);
   const faq = blocks.find(b => b['@type'] === 'FAQPage');
   assert.deepEqual(faq.mainEntity.map(e => e.name), LP_REWARDS_FAQ.map(f => f.q));
@@ -102,25 +166,27 @@ test('view: FAQPage, Dataset and BreadcrumbList JSON-LD match the visible conten
   assert.deepEqual(bc.itemListElement.map(i => i.name), ['Home', 'Polymarket LP Rewards']);
 });
 
-test('view: unavailable data says so plainly and shows no figures', () => {
+test('view: unavailable data says so plainly and shows no figures; partial data is flagged', () => {
   const { buildLpRewardsSnapshot } = lib();
-  const html = view(buildLpRewardsSnapshot({ farms: [], scanned: 0 }, AT));
+  const html = view(buildLpRewardsSnapshot(null, new Map(), AT));
   assert.match(html, /temporarily unavailable/i);
   assert.doesNotMatch(html, /<table\b/);
-  const header = html.match(/<header\b[\s\S]*?<\/header>/)[0];
-  assert.doesNotMatch(header, /\$\d/, 'no reward figures outside the static FAQ');
-  assert.equal(jsonLd(html).some(b => b['@type'] === 'Dataset'), false, 'no Dataset claim without data');
+  assert.doesNotMatch(html.match(/<header\b[\s\S]*?<\/header>/)[0], /\$\d/);
+  assert.equal(jsonLd(html).some(b => b['@type'] === 'Dataset'), false);
+  const part = view(buildLpRewardsSnapshot(universe([rm('a', 10)], { complete: false }), meta([['a']]), AT));
+  assert.match(part, /Partial data/);
 });
 
-test('page is server-rendered with ISR and wired into sitemap, llms.txt, analytics and breadcrumbs', () => {
+test('page is server-rendered with ISR, scans the full reward list and is wired into sitemap, llms.txt, analytics and breadcrumbs', () => {
   const page = read('src/app/polymarket-lp-rewards/page.tsx');
   assert.doesNotMatch(page, /'use client'/);
   assert.match(page, /export const revalidate = 900/);
-  assert.match(page, /scanRewardFarms\(\)/);
+  assert.match(page, /fetchRewardUniverse\(\)/);
+  assert.doesNotMatch(page, /scanRewardFarms/);
   assert.match(page, /canonical: '\/polymarket-lp-rewards'/);
   const urls = createLoader()('src/app/sitemap.ts').default().map(e => e.url);
   assert.ok(urls.includes('https://www.alphaboard.xyz/polymarket-lp-rewards'));
-  assert.match(read('public/llms.txt'), /\]\(https:\/\/www\.alphaboard\.xyz\/polymarket-lp-rewards\)/);
+  assert.match(read('public/llms.txt'), /\]\(https:\/\/www\.alphaboard\.xyz\/polymarket-lp-rewards\): [^\n]*every Polymarket market with an active liquidity-reward pool/);
   assert.equal(createLoader()('src/lib/funnelSchema.ts').pageGroup('/polymarket-lp-rewards'), 'liquidity');
   const { outboundEvent } = createLoader()('src/lib/outboundAnalytics.ts');
   const { marketUrl } = createLoader()('src/lib/builder.ts');

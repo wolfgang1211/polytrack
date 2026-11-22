@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { marketUrl } from '@/lib/builder';
-import { formatUsd, formatUtc, LP_REWARDS_FAQ, rewardEndLabel, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
+import { closesLabel, formatUsd, formatUtc, LP_REWARDS_FAQ, type LpRewardsSnapshot } from '@/lib/lpRewardsPage';
 import SnapshotAge from '@/app/polymarket-lp-rewards/SnapshotAge';
 
 const PAGE_URL = 'https://www.alphaboard.xyz/polymarket-lp-rewards';
@@ -46,7 +46,7 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
           <p className="mt-4 text-base leading-relaxed text-ink/80">{ok.summary}</p>
         ) : snapshot.status === 'empty' ? (
           <p className="mt-4 text-base leading-relaxed text-ink/80">
-            As of {formatUtc(snapshot.generatedAt)}, AlphaBoard found no active liquidity-reward pools among the {snapshot.scanned} Polymarket markets it scanned.
+            As of {formatUtc(snapshot.generatedAt)}, none of the {snapshot.universe} Polymarket markets with a reward pool offer $1 per day or more.
           </p>
         ) : (
           <p className="mt-4 text-base leading-relaxed text-ink/80">
@@ -56,6 +56,11 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
         <p className="mt-3 text-xs text-ink/55">
           Last updated: <time dateTime={snapshot.generatedAt}>{formatUtc(snapshot.generatedAt)}</time> · Refreshed about every 15 minutes
         </p>
+        {ok && !ok.complete && (
+          <p role="status" className="mt-3 rounded-lg px-3 py-2 text-xs text-amber-400" style={{ border: '1px solid rgba(251,191,36,0.3)', background: 'rgba(251,191,36,0.06)' }}>
+            Partial data: part of Polymarket&apos;s reward list could not be loaded in this refresh, so totals are a lower bound.
+          </p>
+        )}
         <SnapshotAge generatedAt={snapshot.generatedAt} />
       </header>
 
@@ -73,42 +78,49 @@ export default function LpRewardsView({ snapshot }: { snapshot: LpRewardsSnapsho
                   <th scope="col" className="px-3 py-2 text-right font-medium">Max spread</th>
                   <th scope="col" className="px-3 py-2 text-right font-medium">Min size</th>
                   <th scope="col" className="px-3 py-2 text-right font-medium">Liquidity</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Reward ends</th>
+                  <th scope="col" className="px-3 py-2 text-right font-medium">Closes</th>
                 </tr>
               </thead>
               <tbody>
                 {ok.rows.map(r => (
-                  <tr key={r.slug + r.rank} style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.06)' }}>
+                  <tr key={r.conditionId} style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.06)' }}>
                     <td className="px-3 py-2 text-ink/55">{r.rank}</td>
                     <td className="px-3 py-2">
-                      <a href={marketUrl(r.eventSlug, r.slug, 'lp_rewards_page')} target="_blank" rel="noopener noreferrer sponsored"
-                        className="font-medium text-ink/90 hover:text-ink hover:underline">{r.question}</a>
+                      {r.question && (r.eventSlug || r.slug) ? (
+                        <a href={marketUrl(r.eventSlug, r.slug, 'lp_rewards_page')} target="_blank" rel="noopener noreferrer sponsored"
+                          className="font-medium text-ink/90 hover:text-ink hover:underline">{r.question}</a>
+                      ) : (
+                        <span className="text-ink/70">{r.question ?? 'Market details unavailable'} <span className="font-mono text-xs text-ink/55">{r.conditionId.slice(0, 10)}…</span></span>
+                      )}
                     </td>
                     <td className="px-3 py-2 text-right font-semibold text-ink">{formatUsd(r.dailyRate)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.maxSpread, v => `${v}¢`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.minSize, v => `${v.toLocaleString('en-US')} shares`)}</td>
                     <td className="px-3 py-2 text-right text-ink/80">{num(r.liquidity, formatUsd)}</td>
-                    <td className="px-3 py-2 text-right text-ink/80">{rewardEndLabel(r.rewardEnd)}</td>
+                    <td className="whitespace-nowrap px-3 py-2 text-right text-ink/80">{closesLabel(r.endDate, ok.generatedAt)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-ink/55">Market links open Polymarket. External link · Referral may apply. &ldquo;—&rdquo; means Polymarket did not publish the value.</p>
+          <p className="mt-2 text-xs text-ink/55">
+            Showing the {ok.rows.length} largest of {ok.marketCount.toLocaleString('en-US')} pools. &ldquo;Closes&rdquo; is the market end time relative to this snapshot;
+            &ldquo;—&rdquo; means Polymarket did not publish the value. Market links open Polymarket. External link · Referral may apply.
+          </p>
         </section>
       )}
 
       <section aria-labelledby="method-heading" className="mb-10 space-y-3 text-sm leading-relaxed text-ink/80">
         <h2 id="method-heading" className="text-xl font-semibold text-ink">How this list is built</h2>
         <p>
-          AlphaBoard reads the reward fields Polymarket publishes on each market in its public market data: the daily reward pool,
-          the maximum qualifying spread and the minimum qualifying order size. It scans the 200 most liquid and the 200 highest-volume
-          active markets{ok ? ` (${ok.scanned} unique markets in this snapshot)` : ''} and ranks markets with an active pool of at least $1 per day
-          by daily reward (Polymarket does not pay out amounts under $1).
+          AlphaBoard reads Polymarket&apos;s public list of every market with an active liquidity-reward pool (the CLOB rewards API)
+          {ok ? ` (${ok.universe.toLocaleString('en-US')} markets in this snapshot)` : ''} and ranks them by daily reward, including sponsored rewards.
+          Pools under $1 per day are left out because Polymarket does not pay out amounts under $1. Names, close times and liquidity
+          come from Polymarket&apos;s market data for the markets shown.
         </p>
         <p>
-          Single-game and match markets and markets resolving within three days are left out, because they move too fast to hold as
-          liquidity. The daily reward is the whole pool for a market, shared by all qualifying makers; it is not what one provider earns.
+          All market types are included, from season-long questions to single games that close within hours; check the Closes column
+          before quoting. The daily reward is the whole pool for a market, shared by all qualifying makers; it is not what one provider earns.
           For estimated returns on your own capital, use the <Link href="/liquidity" className="underline hover:text-ink">Liquidity Hub</Link>.
           Program rules are set by Polymarket; see the{' '}
           <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-ink">official liquidity rewards documentation</a>.

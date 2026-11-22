@@ -1,7 +1,7 @@
 /* Data shaping for the /polymarket-lp-rewards answer page. Pure: no fetching, fully testable. */
-import type { RewardFarm } from '@/lib/rewards';
+import type { MarketMeta, RewardUniverse } from '@/lib/rewardsUniverse';
 
-export const LP_REWARDS_TOP_N = 20;
+export const LP_REWARDS_TOP_N = 50;
 /** Shown to visitors when the rendered snapshot is older than this. */
 export const LP_REWARDS_STALE_MINUTES = 60;
 /** Polymarket does not pay out daily amounts below $1, so smaller pools are not real opportunities. */
@@ -9,24 +9,26 @@ export const LP_REWARDS_MIN_DAILY = 1;
 
 export interface LpRewardsRow {
   rank: number;
-  question: string;
+  conditionId: string;
+  question: string | null;    // null when Polymarket metadata could not be loaded
   slug: string;
   eventSlug?: string;
   dailyRate: number;
   maxSpread: number | null;
   minSize: number | null;
   liquidity: number | null;
-  rewardEnd: string | null;
+  endDate: string | null;
 }
 
 export type LpRewardsSnapshot =
   | { status: 'unavailable'; generatedAt: string }
-  | { status: 'empty'; generatedAt: string; scanned: number }
+  | { status: 'empty'; generatedAt: string; universe: number }
   | {
       status: 'ok';
       generatedAt: string;
-      scanned: number;
-      marketCount: number;
+      complete: boolean;
+      universe: number;       // markets with any active pool
+      marketCount: number;    // markets with a pool of at least $1/day
       totalDaily: number;
       top10Daily: number;
       rows: LpRewardsRow[];
@@ -48,49 +50,59 @@ export function formatUsd(n: number): string {
   return `$${n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
 }
 
-/** Polymarket marks open-ended reward pools with a far-future end date (e.g. 2500-12-31). */
-export function rewardEndLabel(iso: string | null): string {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (!Number.isFinite(d.getTime())) return '—';
-  return d.getUTCFullYear() >= 2100 ? 'No end date' : d.toISOString().slice(0, 10);
+/** Market close relative to the snapshot time: "in 5h", "in 3d", a date beyond 30 days, "Past end date" if it already passed. */
+export function closesLabel(endIso: string | null, snapshotIso: string): string {
+  if (!endIso) return '\u2014';
+  const end = new Date(endIso).getTime();
+  const now = new Date(snapshotIso).getTime();
+  if (!Number.isFinite(end) || !Number.isFinite(now)) return '\u2014';
+  const h = (end - now) / 3_600_000;
+  if (h < 0) return 'Past end date';
+  if (h < 1) return 'in <1h';
+  if (h < 48) return `in ${Math.floor(h)}h`;
+  if (h < 24 * 30) return `in ${Math.floor(h / 24)}d`;
+  return new Date(end).toISOString().slice(0, 10);
 }
 
-const finiteOrNull = (n: unknown): number | null => (typeof n === 'number' && Number.isFinite(n) ? n : null);
-
 export function buildLpRewardsSnapshot(
-  input: { farms: RewardFarm[]; scanned: number } | null,
+  universe: RewardUniverse | null,
+  meta: Map<string, MarketMeta>,
   generatedAt: Date,
 ): LpRewardsSnapshot {
   const at = generatedAt.toISOString();
-  // A failed upstream fetch yields zero scanned markets: that is "no data", never "no rewards".
-  if (!input || input.scanned <= 0) return { status: 'unavailable', generatedAt: at };
-  const paying = input.farms.filter(f => Number.isFinite(f.dailyRate) && f.dailyRate >= LP_REWARDS_MIN_DAILY);
-  if (!paying.length) return { status: 'empty', generatedAt: at, scanned: input.scanned };
+  if (!universe || universe.pages === 0) return { status: 'unavailable', generatedAt: at };
+  const paying = universe.markets.filter(m => Number.isFinite(m.dailyRate) && m.dailyRate >= LP_REWARDS_MIN_DAILY);
+  if (!paying.length) return { status: 'empty', generatedAt: at, universe: universe.markets.length };
 
-  const sorted = [...paying].sort((a, b) => b.dailyRate - a.dailyRate);
-  const rows: LpRewardsRow[] = sorted.slice(0, LP_REWARDS_TOP_N).map((f, i) => ({
-    rank: i + 1,
-    question: f.question,
-    slug: f.slug,
-    eventSlug: f.eventSlug,
-    dailyRate: f.dailyRate,
-    maxSpread: finiteOrNull(f.maxSpread),
-    minSize: finiteOrNull(f.minSize),
-    liquidity: finiteOrNull(f.liquidity) !== null && f.liquidity > 0 ? f.liquidity : null,
-    rewardEnd: f.rewardEnd ?? null,
-  }));
-  const totalDaily = sorted.reduce((s, f) => s + f.dailyRate, 0);
-  const top10Daily = sorted.slice(0, 10).reduce((s, f) => s + f.dailyRate, 0);
-  const first = rows[0];
+  const sorted = [...paying].sort((a, b) => b.dailyRate - a.dailyRate || a.conditionId.localeCompare(b.conditionId));
+  const rows: LpRewardsRow[] = sorted.slice(0, LP_REWARDS_TOP_N).map((m, i) => {
+    const info = meta.get(m.conditionId);
+    return {
+      rank: i + 1,
+      conditionId: m.conditionId,
+      question: info?.question ?? null,
+      slug: info?.slug ?? '',
+      eventSlug: info?.eventSlug,
+      dailyRate: m.dailyRate,
+      maxSpread: m.maxSpread,
+      minSize: m.minSize,
+      liquidity: info?.liquidity ?? null,
+      endDate: info?.endDate ?? null,
+    };
+  });
+  const totalDaily = sorted.reduce((s, m) => s + m.dailyRate, 0);
+  const top10Daily = sorted.slice(0, 10).reduce((s, m) => s + m.dailyRate, 0);
   const n = sorted.length;
+  const first = rows[0];
+  const lead = universe.complete ? '' : 'Partial data: ';
+  const atLeast = universe.complete ? '' : 'at least ';
+  const firstName = first.question ? ` on "${first.question}"` : '';
   const summary =
-    `As of ${formatUtc(at)}, the highest daily liquidity reward among the ${n} Polymarket reward market${n === 1 ? '' : 's'} AlphaBoard tracks is `
-    + `${formatUsd(first.dailyRate)} per day on "${first.question}". `
-    + (n > 1
-      ? `The top ${Math.min(10, n)} markets offer ${formatUsd(top10Daily)} per day combined, and all ${n} tracked markets offer ${formatUsd(totalDaily)} per day.`
-      : '');
-  return { status: 'ok', generatedAt: at, scanned: input.scanned, marketCount: n, totalDaily, top10Daily, rows, summary: summary.trim() };
+    `${lead}As of ${formatUtc(at)}, Polymarket offers liquidity rewards of $1 per day or more on ${atLeast}${n.toLocaleString('en-US')} market${n === 1 ? '' : 's'}, `
+    + `worth ${atLeast}${formatUsd(totalDaily)} per day in total. `
+    + `The largest pool is ${formatUsd(first.dailyRate)} per day${firstName}`
+    + (n > 1 ? `; the top ${Math.min(10, n)} pools total ${formatUsd(top10Daily)} per day.` : '.');
+  return { status: 'ok', generatedAt: at, complete: universe.complete, universe: universe.markets.length, marketCount: n, totalDaily, top10Daily, rows, summary };
 }
 
 export interface FaqItem { q: string; a: string }
