@@ -47,9 +47,9 @@ export default function PrivacyPage() {
             <li><strong>Cookies:</strong> We use essential cookies for authentication and session management.</li>
             <li>
               <strong>Visitor analytics:</strong> We use Vercel Web Analytics (cookieless, aggregated page views and
-              referrers) and Microsoft Clarity (heatmaps and session replays of clicks, scrolling and page
-              navigation). Clarity may set its own cookies. Text you type into form fields is masked and never
-              recorded. Clarity does not load if your browser sends Do Not Track or Global Privacy Control.
+              referrers). We may also enable Microsoft Clarity (heatmaps and session replays of clicks, scrolling and
+              page navigation); when enabled, Clarity may set its own cookies, text you type into form fields is masked
+              and never recorded, and Clarity does not load if your browser sends Do Not Track or Global Privacy Control.
             </li>
           </ul>
         </section>
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <h2>4. Data Sharing</h2>
           <p>We do <strong>not</strong> sell your personal information. We may share data with:</p>
           <ul>
-            <li><strong>Service Providers:</strong> Hosting and web analytics (Vercel), session analytics (Microsoft Clarity), and email services that help us operate.</li>
+            <li><strong>Service Providers:</strong> Hosting and web analytics (Vercel), session analytics (Microsoft Clarity, if enabled), and email services that help us operate.</li>
             <li><strong>Legal Requirements:</strong> If required by law, subpoena, or government request.</li>
             <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets.</li>
           </ul>
