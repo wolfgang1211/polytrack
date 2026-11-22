@@ -1,15 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 import { LP_REWARDS_STALE_MINUTES } from '@/lib/lpRewardsPage';
+
+const noopSubscribe = () => () => {};
 
 /** Client-only notice when the cached page is older than expected. Renders nothing on the server, so it cannot cause a hydration mismatch. */
 export default function SnapshotAge({ generatedAt }: { generatedAt: string }) {
-  const [minutes, setMinutes] = useState<number | null>(null);
-  useEffect(() => {
-    const t = new Date(generatedAt).getTime();
-    if (Number.isFinite(t)) setMinutes(Math.floor((Date.now() - t) / 60_000));
-  }, [generatedAt]);
+  const t = new Date(generatedAt).getTime();
+  // Server snapshot is null (nothing rendered), so hydration always matches; the browser then reads its own clock.
+  const minutes = useSyncExternalStore(
+    noopSubscribe,
+    () => (Number.isFinite(t) ? Math.floor((Date.now() - t) / 60_000) : null),
+    () => null,
+  );
   if (minutes === null || minutes < LP_REWARDS_STALE_MINUTES) return null;
   const age = minutes < 120 ? `${minutes} minutes` : `${Math.floor(minutes / 60)} hours`;
   return (
