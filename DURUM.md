@@ -1,9 +1,9 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-22T20:50+03:00
+- Güncelleme: 2026-11-22T21:45+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
-- Çalışma sırası: **ONAY BEKLİYOR** (sıradaki: hydration incelemesi beklemede; GEO Öncelik 1 Yusuf'a haber verilmeden başlamaz).
+- Çalışma sırası: **ONAY BEKLİYOR** (GEO Öncelik 1 `cowork/geo-p1` preview'da; Yusuf onaylamadan yayın yok. Hydration incelemesi beklemede).
 
 ## Şu anki aşama
 main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0 (robots AI botları, sitemap tarihleri, llms.txt). Yerel klasör main'den temiz kopya.
@@ -45,10 +45,17 @@ main canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clar
 - Gizlilik sayfası Clarity'yi kullanılan araç olarak anlatacak şekilde güncellendi (maskeleme ve DNT/GPC notu korunuyor).
 - Clarity panelinde Masking "Balanced/Strict" kalmalı (Yusuf). AB ziyaretçileri için çerez onayı banner'ı yok; gerekirse ayrı iş.
 
+## GEO Öncelik 1 — cevap sayfası (2026-11-22, branch `cowork/geo-p1`, preview)
+- `b82979f`: Polymarket kartlarında eksik/boş/sayısal olmayan outcome fiyatı artık "—"; gerçek 0 hâlâ 0¢ (`parseFloat(prices[i] ?? '0')` hatası). Önce RED test.
+- `7cbe39f` + `7da7e6d` + `ed6832e`: `/polymarket-lp-rewards` sunucuda render (ISR 15 dk). Polymarket'in yayımladığı günlük ödül havuzu, max spread, min size; ilk paragrafta rakamlı ve UTC tarihli özet; görünür "Last updated"; yöntem (tarama kapsamı, maç/3 gün filtresi, <1$/gün havuzlar hariç) açık; 6 soruluk SSS (Polymarket dokümanıyla kontrol); FAQPage + Dataset + BreadcrumbList JSON-LD; veri gelmezse "temporarily unavailable", asla sıfır; 60 dk'dan eski önbellekte istemci uyarısı. Sitemap, llms.txt, breadcrumb, sayfa grubu ve `lp_rewards_page` outbound yerleşimi bağlandı.
+- Gerçek preview verisinde bulunan iki sorun düzeltildi: 1$ altı "dust" havuzlar "$0.00" görünüyordu (artık listelenmiyor), Polymarket'in süresiz havuz tarihi 2500-12-31 artık "No end date".
+- Doğrulama: 564/564 test, tsc exit 0, lint 0 hata/25 uyarı, diff-check temiz, Vercel preview READY. Preview'da JS'siz HTML'de özet + 11 satırlık tablo + 6 SSS + 3 JSON-LD; konsol hatası yok; 375px'te taşma yok, kontrast eşiği altında metin yok.
+- Preview: https://polytrack-git-cowork-geo-p1-wolfgang37s-projects.vercel.app/polymarket-lp-rewards
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Hydration incelemesi** (React #418, beklemede): Yusuf başlat diyene kadar sırada.
 2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
-3. **GEO Öncelik 1** (cevap sayfası): yayın oturduktan sonra, önce Yusuf'a haber verilecek.
+3. **GEO Öncelik 1 yayını**: Yusuf preview'u onaylayınca `cowork/geo-p1` → main.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
