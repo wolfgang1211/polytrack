@@ -173,9 +173,9 @@ test('provider select: Kalshi -> DISCOVER_HREF, Polymarket unchanged, raw Market
   assert.equal(sel.DISCOVER_HREF, '/markets?platform=kalshi&view=discover');
   const prov = renderToStaticMarkup(React.createElement(sel.default, { active: 'polymarket' }));
   assert.match(prov, /href="\/markets\?platform=polymarket"[^>]*>Polymarket</);
-  assert.match(prov, /href="\/markets\?platform=kalshi&amp;view=discover"[^>]*>Kalshi</);
+  assert.match(prov, /href="\/markets\?platform=kalshi&amp;view=top"[^>]*>Kalshi</);
   const views = renderToStaticMarkup(React.createElement(sel.KalshiViewSelect, { active: 'markets' }));
-  assert.match(views, /href="\/markets\?platform=kalshi"[^>]*>Markets</);
+  assert.match(views, /href="\/markets\?platform=kalshi"[^>]*>Newest</);
   assert.deepEqual(['kalshi', ['kalshi'], 'x', undefined].map(sel.resolvePlatform), ['kalshi', 'polymarket', 'polymarket', 'polymarket']);
   assert.deepEqual(['discover', 'events', 'markets', ['events'], undefined].map(sel.resolveKalshiView), ['discover', 'events', 'markets', 'markets', 'markets']);
 });

@@ -518,8 +518,8 @@ test('/markets?platform=kalshi&view=events server-renders loaded events with vie
   assert.doesNotMatch(html, /polymarket-client/);
   assert.equal(anchor(html, 'Events').href, '/markets?platform=kalshi&view=events');
   assert.equal(anchor(html, 'Events')['aria-current'], 'page');
-  assert.equal(anchor(html, 'Markets').href, '/markets?platform=kalshi');
-  assert.equal(anchor(html, 'Markets')['aria-current'], undefined);
+  assert.equal(anchor(html, 'Newest').href, '/markets?platform=kalshi');
+  assert.equal(anchor(html, 'Newest')['aria-current'], undefined);
   assert.match(html, /href="\/markets\/kalshi\/events\/KXSYN-26DEC"/);
   assert.match(html, /href="\/markets\/kalshi\/events\/KXSYN2-1"/);
   assert.match(html, /Search loaded events/);
@@ -546,7 +546,7 @@ test('/markets?platform=kalshi keeps the markets list; repeated or unknown view 
     const html = await renderMarkets(sp);
     assert.deepEqual(calls.map(c => c.url.pathname), ['/trade-api/v2/markets'], JSON.stringify(sp));
     assert.match(html, /Search loaded markets/);
-    assert.equal(anchor(html, 'Markets')['aria-current'], 'page');
+    assert.equal(anchor(html, 'Newest')['aria-current'], 'page');
     assert.equal(anchor(html, 'Events')['aria-current'], undefined);
   }
   mock.restoreAll();

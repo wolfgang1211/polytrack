@@ -2,10 +2,11 @@ import Link from 'next/link';
 
 export type MarketPlatform = 'polymarket' | 'kalshi';
 
-// Kalshi lands on Discover (seeded recent activity); the raw markets list stays one click away at /markets?platform=kalshi.
+// Kalshi lands on Top (every open market ranked by 24h volume, like the Polymarket explorer); Discover, the raw newest
+// list (/markets?platform=kalshi) and Events stay one click away.
 const PLATFORMS: { key: MarketPlatform; label: string; href: string }[] = [
   { key: 'polymarket', label: 'Polymarket', href: '/markets?platform=polymarket' },
-  { key: 'kalshi', label: 'Kalshi', href: '/markets?platform=kalshi&view=discover' },
+  { key: 'kalshi', label: 'Kalshi', href: '/markets?platform=kalshi&view=top' },
 ];
 
 /** Exact scalar match only; repeated, unknown or missing values fall back to the Polymarket default. */
@@ -13,18 +14,21 @@ export function resolvePlatform(value: string | string[] | undefined): MarketPla
   return value === 'kalshi' ? 'kalshi' : 'polymarket';
 }
 
-export type KalshiView = 'discover' | 'markets' | 'events';
+export type KalshiView = 'top' | 'discover' | 'markets' | 'events';
 
-/** Exact scalar "discover" or "events" only; repeated, unknown or missing values fall back to the raw markets list. */
+/** Exact scalar "top", "discover" or "events" only; repeated, unknown or missing values fall back to the raw markets list. */
 export function resolveKalshiView(value: string | string[] | undefined): KalshiView {
-  return value === 'events' || value === 'discover' ? value : 'markets';
+  return value === 'events' || value === 'discover' || value === 'top' ? value : 'markets';
 }
+
+export const TOP_HREF = '/markets?platform=kalshi&view=top';
 
 export const DISCOVER_HREF = '/markets?platform=kalshi&view=discover';
 
 const VIEWS: { key: KalshiView; label: string; href: string }[] = [
+  { key: 'top', label: 'Top', href: TOP_HREF },
   { key: 'discover', label: 'Discover', href: DISCOVER_HREF },
-  { key: 'markets', label: 'Markets', href: '/markets?platform=kalshi' },
+  { key: 'markets', label: 'Newest', href: '/markets?platform=kalshi' },
   { key: 'events', label: 'Events', href: '/markets?platform=kalshi&view=events' },
 ];
 

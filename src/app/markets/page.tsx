@@ -11,6 +11,9 @@ import MarketsClient from './MarketsClient';
 import KalshiMarketsClient from './KalshiMarketsClient';
 import KalshiEventsClient from './KalshiEventsClient';
 import KalshiDiscoveryClient from './KalshiDiscoveryClient';
+import KalshiTopClient from './KalshiTopClient';
+import { getCachedKalshiTop } from '@/lib/kalshiTopCache';
+import type { KalshiTopScan } from '@/lib/kalshiTop';
 import MarketPlatformSelect, { DISCOVER_HREF, KalshiViewSelect, resolveKalshiView, resolvePlatform } from './MarketPlatformSelect';
 
 /* Server component: fetches the default market list so crawlers and the
@@ -18,9 +21,12 @@ import MarketPlatformSelect, { DISCOVER_HREF, KalshiViewSelect, resolveKalshiVie
    takes over for sorting/filtering/refreshing. Revalidates every 2 minutes.
    ?platform=kalshi switches to the read-only Kalshi provider; Polymarket stays the default.
    ?platform=kalshi&view=events lists open Kalshi events; ?series=<TICKER> filters them (exact scalar only).
+   ?platform=kalshi&view=top ranks every open Kalshi market by 24h volume (full scan, cached 15 min) — the Kalshi default.
    ?platform=kalshi&view=discover shows a bounded recent-trade SAMPLE grouped by event (not a global ranking). */
 
 export const revalidate = 120;
+// The Kalshi Top view may run the (cached, 15 min) full open-market scan when its cache entry is refreshed.
+export const maxDuration = 60;
 
 /* Provider + view navigation share one wrapping row; the client stays a sibling at the same level. */
 const NavRow = ({ children }: { children: ReactNode }) => <div className="flex flex-wrap items-center gap-x-4 gap-y-2">{children}</div>;
@@ -32,6 +38,22 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const platform = resolvePlatform(sp.platform);
   const view = resolveKalshiView(sp.view);
+
+  if (platform === 'kalshi' && view === 'top') {
+    let scan: KalshiTopScan | null = null;
+    let error: string | null = null;
+    try {
+      scan = await getCachedKalshiTop();
+    } catch {
+      error = 'Kalshi markets could not be loaded right now.';
+    }
+    return (
+      <div className="flex flex-col gap-6">
+        <NavRow><MarketPlatformSelect active="kalshi" /><KalshiViewSelect active="top" /></NavRow>
+        <KalshiTopClient scan={scan} error={error} serverNow={renderedAt()} />
+      </div>
+    );
+  }
 
   if (platform === 'kalshi' && view === 'discover') {
     // Every entry (incl. repeated values) is kept so the strict parser can reject duplicates; filters never go upstream.

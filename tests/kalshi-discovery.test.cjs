@@ -569,7 +569,8 @@ test('resolveKalshiView accepts exact scalar "discover" and "events"; everything
   const { resolveKalshiView } = makeLoader(nextMocks())('src/app/markets/MarketPlatformSelect.tsx');
   assert.equal(resolveKalshiView('discover'), 'discover');
   assert.equal(resolveKalshiView('events'), 'events');
-  for (const v of [undefined, 'DISCOVER', ' discover', ['discover'], ['discover', 'discover'], '', 'top']) {
+  assert.equal(resolveKalshiView('top'), 'top');
+  for (const v of [undefined, 'DISCOVER', ' discover', ['discover'], ['discover', 'discover'], '', 'TOP', ['top']]) {
     assert.equal(resolveKalshiView(v), 'markets', JSON.stringify(v));
   }
 });
@@ -586,11 +587,11 @@ test('/markets?platform=kalshi&view=discover renders sample-scoped groups, categ
   assert.equal(calls[0].url.pathname, P.trades);
   assert.equal(calls.some(c => c.url.pathname === '/trade-api/v2/events'), false, 'no events list request');
   assert.doesNotMatch(html, /polymarket-client/);
-  const tabs = anchors(html).filter(a => ['Discover', 'Markets', 'Events'].includes(a.text)).slice(0, 3);
-  assert.deepEqual(tabs.map(a => a.text), ['Discover', 'Markets', 'Events']);
+  const tabs = anchors(html).filter(a => ['Top', 'Discover', 'Newest', 'Events'].includes(a.text)).slice(0, 4);
+  assert.deepEqual(tabs.map(a => a.text), ['Top', 'Discover', 'Newest', 'Events']);
   assert.equal(anchor(html, 'Discover').href, DISCOVER_HREF);
   assert.equal(anchor(html, 'Discover')['aria-current'], 'page');
-  assert.equal(anchor(html, 'Markets')['aria-current'], undefined);
+  assert.equal(anchor(html, 'Newest')['aria-current'], undefined);
   assert.match(html, /sample of recent (Kalshi )?trades/i);
   assert.match(html, /not (a|the) full/i);
   assert.match(html, labeled('Trades scanned', '4'));
@@ -628,7 +629,7 @@ test('raw /markets?platform=kalshi is unchanged but explains newest listings and
   assert.deepEqual(calls.map(c => c.url.pathname), [P.markets]);
   assert.equal(calls[0].url.searchParams.has('tickers'), false);
   assert.match(html, /Search loaded markets/);
-  assert.equal(anchor(html, 'Markets')['aria-current'], 'page');
+  assert.equal(anchor(html, 'Newest')['aria-current'], 'page');
   assert.match(html, /newest listings/i);
   assert.ok(anchors(html).filter(a => a.href === DISCOVER_HREF).length >= 2, 'tab plus an explanatory Discover link');
   mock.restoreAll();

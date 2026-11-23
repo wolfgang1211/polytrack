@@ -98,7 +98,7 @@ test('selector is plain links with aria-current on the active provider only (no 
   const html = renderToStaticMarkup(React.createElement(Select, { active: 'kalshi' }));
   assert.match(html, /<a href="\/markets\?platform=polymarket"(?![^>]*aria-current)[^>]*>Polymarket<\/a>/);
   // Kalshi lands on Discover; SSR escapes the query separator as &amp;.
-  assert.match(html, /<a href="\/markets\?platform=kalshi&amp;view=discover" aria-current="page"[^>]*>Kalshi<\/a>/);
+  assert.match(html, /<a href="\/markets\?platform=kalshi&amp;view=top" aria-current="page"[^>]*>Kalshi<\/a>/);
   assert.equal((html.match(/aria-current/g) || []).length, 1);
   assert.doesNotMatch(html, /role="tab/);
 });
