@@ -919,7 +919,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                   style={{
                     background: on ? 'rgba(var(--ink-rgb),0.10)' : 'rgba(var(--ink-rgb),0.04)',
                     border: `1px solid ${on ? 'rgba(var(--ink-rgb),0.45)' : 'rgba(var(--ink-rgb),0.07)'}`,
-                    color: on ? 'var(--text-primary)' : 'var(--text-muted)',
+                    color: on ? 'var(--text-primary)' : 'var(--text-tertiary)',
                   }}>
                   {on ? '✓ ' : ''}{o.question.slice(0, 38)}
                 </button>
