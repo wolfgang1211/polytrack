@@ -1,12 +1,12 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-23T02:40+03:00
+- Güncelleme: 2026-11-23T11:50+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
 
 ## Şu anki aşama
-main `ae14861` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Microsoft Clarity, GEO Öncelik 0, `/polymarket-lp-rewards` (ilk 50 + Longer-term ilk 25), `/how-polymarket-liquidity-rewards-work`, Markets hydration düzeltmesi.
+main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri (iki temada da Markets sayfasında WCAG AA altı metin yok).
 
 ## Son yapılan iş ve kanıt (2026-11-21)
 - Yerel 3016 kapalıydı, bu oturumdan Windows'ta süreç başlatılamadı. Yerel 45 dosya birebir (SHA1 eşleşmesi) `cowork/kalshi` → commit `b2aabee`, Vercel preview READY.
@@ -78,9 +78,14 @@ main `ae14861` canlıda: Kalshi + ortak market arayüzü, Vercel Analytics, Micr
 ## Yayın 7 (2026-11-23, Yusuf onayıyla)
 - `cowork/hydration-geo2` main'e (`ae14861`), production `dpl_ChjjcKR7jfcE1dTBFccx8ydkYf5t` READY. Canlı kontrol: anlatım sayfası açılıyor (Article + FAQPage + BreadcrumbList, tarih 2026-11-23), sitemap ve llms.txt'de, ödül tablosundan linkli; anlatım ve /markets sayfalarında konsol hatası yok.
 
+## Site geneli kontrast (2026-11-23, Yusuf "testler geçerse doğrudan yayına al" dedi)
+- `7bb8972`: Breadcrumb (ink/30 11px → ink/55 text-xs, son öğe ink/80, 24px dokunma alanı, ayraç dekoratif), TopMarkets "YES / 24h Vol / 24h Volume" (ink/25 10px → ink/55 text-xs), "Trade on Polymarket" 32/40px → 44px ve "External link · Referral may apply" (ink/35 9–10px → ink/55 text-xs).
+- Canlı ölçümde açık temada ink/55'in açık zeminde ~4,0:1 kaldığı görüldü (68 farklı metin). `79c475e`: açık temada ink/50-55-60 → %64 (~5:1); koyu tema aynı. `d5d7892` + `c9f99ce`: kategori etiketleri sabit pastel hex yerine `--cat-*` tema değişkenleri; açık temada koyu tonlar (Crypto 4,31 → 6,07).
+- Son canlı ölçüm (www.alphaboard.xyz/markets, 375px, Featured açık, her tema sıfırdan yüklenerek): koyu 1.288 metin / 0 eşik altı; açık 1.288 / 0. CTA'lar 44px, yatay taşma yok. 583/583 test, tsc exit 0, lint 0 hata/24 uyarı. Yeni test: `tests/global-contrast.test.cjs`.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları (chatgpt.com, perplexity.ai, claude.ai).
-2. **Dilim dışı erişilebilirlik**: global Breadcrumb, TopMarkets etiketleri, PolymarketTradeLink notu kontrastı; Polymarket CTA 44px; açık tema ölçümü.
+2. **Erişilebilirlik takibi**: diğer sayfalarda (leaderboard, wallet, liquidity) iki temada ölçüm yapılmadı.
 3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
 ## Bloklayan şeyler
