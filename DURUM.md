@@ -91,10 +91,21 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Testler 591/591, tsc exit 0, lint 0 hata/24 uyarı, git diff --check temiz. Yeni testler `tests/global-contrast.test.cjs` içinde.
 - Not: açık tema renk eşlemesi `globals.css` içinde inline stil seçicileriyle (`[style*="color:#34d399"]`) yapılıyor; yeni bileşenlerde sabit hex yerine `var(--success)` vb. kullanmak daha sağlam.
 
+## Kalshi tam liste + Polymarket görünümü (2026-11-24 gece, branch `cowork/kalshi-unify`, YALNIZ PREVIEW)
+- Yusuf "Kalshi'yi de tamamen listeleyebiliyoruz, başla" dedi. Yayına alınmadı; onay bekliyor.
+- Veri: Kalshi GET /markets hacme göre sıralamıyor. Yeni `src/lib/kalshiTop.ts` tüm açık piyasaları tarar (status=open, mve_filter=exclude, limit=1000). Etkinlikleri 24s kontrat hacmine (tüm işlem gören piyasaların toplamı) göre sıralar, ilk 60 etkinliği ve her birinin en çok işlem gören 4 sonucunu tutar. `unstable_cache` ile 15 dk önbellek (`kalshiTopCache.ts`, anahtar v3), maxDuration 120 s, tarama bütçesi 100 s; erken durursa sayfa "Partial scan" ve nedenini yazar.
+- Ölçüm (preview, 2026-11-23 21:49 UTC): 176.996 açık piyasa, 177 sayfa, tam tarama ~44 s; son 24 saatte 22.403 piyasa / 5.591 etkinlik işlem görmüş; 60 kartın hepsinde kategori dolu.
+- Görünüm: `/markets?platform=kalshi&view=top` (Kalshi'nin yeni varsayılanı) Polymarket ile aynı çerçeve: başlık, arama, sıralama (24h Volume / Open Interest / Closing Soon), kategori çipleri, 3 sütun kart, Yes/No fiyat kutuları (ask; ask yoksa "bid" etiketiyle bid), "contracts" birimi, kapanan etkinlik gizlenir. Kart düğmesi AlphaBoard içindeki etkinlik/piyasa sayfasına gider (kontrol: 3/3 HTTP 200). Discover, Newest (eski "Markets") ve Events sekmeleri duruyor.
+- Ek: açık temada yeşil/kırmızı fiyat yazıları koyulaştırıldı (Polymarket kartları da düzelir).
+- Commit'ler: 6daf45b, da0d60f, 3d2e005, ea032dc, 84fb0fa, 845e153 (yeniden build: geçici Google Fonts hatası), 446204c. Testler 607/607, tsc 0, lint 0 hata/24 uyarı, diff-check temiz. Yeni testler: `tests/kalshi-top.test.cjs`, `tests/kalshi-top-ui.test.cjs`; test yükleyicisi artık göreli TS importlarını çözüyor.
+- Tarayıcı kontrolü (Chrome, masaüstü genişliği): koyu ve açık temada kart/metin kontrastı uygun, taşma yok. **375 px mobil görsel kontrol yapılamadı**: Chrome penceresi daraltılamadı, yerleşik tarayıcı preview alan adı için onay istiyor. Kısmi.
+- Bilinen risk: önbellek dolarken ilk ziyaretçi ~45 s bekleyebilir (her 15 dakikada bir, arka planda yenilenir).
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları (chatgpt.com, perplexity.ai, claude.ai).
-2. **Erişilebilirlik takibi (küçük)**: ana sayfa, /activity, /insights, blog sayfaları iki temada ölçülmedi; sabit hex renkleri tema değişkenlerine taşımak.
-3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
+1. **Kalshi preview onayı**: Yusuf preview'a bakar (telefonda da); mobil kontrolü yaparım; onay gelirse main'e alırım.
+2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
+3. **Erişilebilirlik takibi (küçük)**: ana sayfa, /activity, /insights, blog iki temada ölçülmedi.
+4. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
