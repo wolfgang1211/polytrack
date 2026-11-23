@@ -63,9 +63,9 @@ function changeText(c: FarmChange): string {
 
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
+    <div className="flex items-center gap-2 mb-5 sm:gap-3">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
+      <div className="hidden h-px w-12 sm:block" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="ml-2 min-w-0 flex-shrink">{controls}</div>}

@@ -143,6 +143,8 @@
 :root[data-theme="light"] .text-orange-400 { color: #9a3412; }
 :root[data-theme="light"] .text-yellow-400 { color: #854d0e; }
 :root[data-theme="light"] .text-sky-300 { color: #0369a1; }
+:root[data-theme="light"] .text-cyan-300 { color: #0e7490; }
+:root[data-theme="light"] .text-cyan-400 { color: #0e7490; }
 :root[data-theme="light"] .text-sky-400 { color: #0369a1; }
 :root[data-theme="light"] .text-blue-400 { color: #1d4ed8; }
 

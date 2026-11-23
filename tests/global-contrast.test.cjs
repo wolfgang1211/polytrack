@@ -117,3 +117,11 @@ test('liquidity light theme: tooltips use the theme surface, header fits 375px, 
   assert.match(p, /accent="var\(--warning\)"/);
   assert.match(read('src/app/globals.css'), /color:#fb923c" i\][^\n]*\{ color: #9a3412 !important; \}/);
 });
+
+test('every liquidity section header drops the decorative rule on mobile; cyan readable on light', () => {
+  for (const f of ['src/app/liquidity/page.tsx', 'src/app/liquidity/Backtester.tsx', 'src/app/liquidity/FarmChanges.tsx', 'src/app/liquidity/RecorderHealth.tsx', 'src/app/liquidity/ModelValidation.tsx']) {
+    const s = read(f);
+    if (s.includes('function SectionHeader')) assert.match(s, /hidden h-px w-12 sm:block/, f);
+  }
+  assert.match(read('src/app/globals.css'), /:root\[data-theme="light"\] \.text-cyan-300 \{ color: #0e7490; \}/);
+});
