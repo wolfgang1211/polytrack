@@ -60,7 +60,7 @@ function Panel({ accent, title, sub, children }: {
 }
 
 const tooltipStyle = {
-  background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)',
+  background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.1)',
   borderRadius: 12, fontSize: 12,
 };
 

@@ -74,7 +74,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">Bid Depth</p>
           {opp.depthKnown && opp.bidDepth != null ? (
             <>
-              <p className="text-sm font-black text-emerald-300/90">{formatCurrency(opp.bidDepth, true)}</p>
+              <p className="text-sm font-black text-emerald-300">{formatCurrency(opp.bidDepth, true)}</p>
               <p className="text-[10px] text-ink/55">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
             </>
           ) : (
@@ -88,7 +88,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
           <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">Ask Depth</p>
           {opp.depthKnown && opp.askDepth != null ? (
             <>
-              <p className="text-sm font-black text-rose-300/90">{formatCurrency(opp.askDepth, true)}</p>
+              <p className="text-sm font-black text-rose-300">{formatCurrency(opp.askDepth, true)}</p>
               <p className="text-[10px] text-ink/55">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
             </>
           ) : (
@@ -153,7 +153,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
             {/* Score breakdown tooltip */}
             <span
               className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded-xl p-3 text-left opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100"
-              style={{ background: 'rgba(25,25,25,0.97)', border: '1px solid rgba(var(--ink-rgb),0.12)' }}
+              style={{ background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.12)' }}
             >
               <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-ink/55">
                 Score Breakdown
@@ -490,7 +490,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
                       tickFormatter={(v) => formatCurrency(v as number, true)}
                     />
                     <Tooltip
-                      contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
                       labelStyle={{ color: 'rgba(var(--ink-rgb),0.6)' }}
                       labelFormatter={(v) => `${v}¢`}
                       formatter={(v, n) => [formatCurrency(Number(v), true), n === 'bid' ? 'Bid depth' : 'Ask depth'] as [string, string]}
@@ -825,7 +825,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
                   axisLine={false} tickLine={false} width={42}
                 />
                 <Tooltip
-                  contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
+                  contentStyle={{ background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
                   labelStyle={{ color: 'var(--text-muted)' }}
                   labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   formatter={(v) => [`${v}¢`, 'Price'] as [string, string]}
@@ -949,7 +949,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                   <span className="text-right text-xs font-bold text-ink/55 tabular-nums">{pct(yourShare, 2)}</span>
                   <span className="text-right text-xs font-black tabular-nums" style={{ color: isBest ? '#34d399' : 'rgba(var(--ink-rgb),0.8)' }}>{formatCurrency(dailyReward)}</span>
                   <span className="text-right text-xs font-bold text-ink/60 tabular-nums">{formatCurrency(monthly)}</span>
-                  <span className="text-right text-xs font-bold text-amber-300/80 tabular-nums">{apr.toFixed(1)}%</span>
+                  <span className="text-right text-xs font-bold text-amber-300 tabular-nums">{apr.toFixed(1)}%</span>
                 </div>
               );
             })}
@@ -979,9 +979,9 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
 
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-3 mb-5">
+    <div className="flex items-center gap-2 mb-5 sm:gap-3">
       <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
-      <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
+      <div className="hidden h-px w-12 sm:block" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="ml-2 min-w-0 flex-shrink">{controls}</div>}
@@ -1078,7 +1078,7 @@ export default function LiquidityPage() {
           <DataCell
             label="Avg Spread"
             value={oppsLoading || !opps.length ? '—' : `${(opps.reduce((s, o) => s + o.spread, 0) / opps.length * 100).toFixed(1)}¢`}
-            accent="rgba(251,191,36,0.95)"
+            accent="var(--warning)"
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell

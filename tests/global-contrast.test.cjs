@@ -101,3 +101,19 @@ test('leaderboard stat accents use theme-aware status tokens', () => {
   assert.doesNotMatch(s, /accent=\{?[^}\n]*rgba\((?!var)/);
   assert.match(s, /accent="var\(--info\)"/);
 });
+
+test('wallet watchlist button idle text uses secondary ink', () => {
+  assert.match(read('src/app/wallet/[address]/page.tsx'), /border:'1px solid rgba\(var\(--ink-rgb\),0\.1\)', color:'var\(--text-secondary\)'/);
+});
+
+test('liquidity light theme: tooltips use the theme surface, header fits 375px, no dimmed accent text', () => {
+  for (const f of ['src/app/liquidity/page.tsx', 'src/app/liquidity/Backtester.tsx', 'src/app/liquidity/RecorderHealth.tsx', 'src/components/WalletActivity.tsx']) {
+    const s = read(f);
+    assert.doesNotMatch(s, /rgba\(25,25,25/, `${f}: hard-coded dark tooltip`);
+    assert.doesNotMatch(s, /(?<![:\w-])text-(?:rose|emerald|amber|sky)-\d00\/\d\d\b/, `${f}: dimmed accent text`);
+  }
+  const p = read('src/app/liquidity/page.tsx');
+  assert.match(p, /hidden h-px w-12 sm:block/);
+  assert.match(p, /accent="var\(--warning\)"/);
+  assert.match(read('src/app/globals.css'), /color:#fb923c" i\][^\n]*\{ color: #9a3412 !important; \}/);
+});

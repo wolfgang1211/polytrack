@@ -36,7 +36,7 @@ function AprCell({ apr, coveragePct }: { apr: number; coveragePct: number }) {
       </span>
     );
   }
-  return <span className="text-right text-xs font-bold tabular-nums text-amber-300/80">{apr.toFixed(1)}%</span>;
+  return <span className="text-right text-xs font-bold tabular-nums text-amber-300">{apr.toFixed(1)}%</span>;
 }
 
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
@@ -170,7 +170,7 @@ export default function Backtester() {
               <div>
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">
-                    Cumulative earnings — <span className="text-amber-300/80">{sel.question ?? sel.conditionId.slice(0, 10) + '…'}</span>
+                    Cumulative earnings — <span className="text-amber-300">{sel.question ?? sel.conditionId.slice(0, 10) + '…'}</span>
                   </p>
                   <span className="text-xs font-black text-amber-300">
                     {formatCurrency(sel.earned)}
@@ -194,7 +194,7 @@ export default function Backtester() {
                       tick={{ fill: 'rgba(var(--ink-rgb),0.3)', fontSize: 10 }}
                       axisLine={false} tickLine={false} width={46} />
                     <Tooltip
-                      contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
                       labelStyle={{ color: 'var(--text-muted)' }}
                       labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       formatter={(v) => [formatCurrency(Number(v)), 'Earned'] as [string, string]} />

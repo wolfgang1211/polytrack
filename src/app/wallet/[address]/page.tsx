@@ -265,7 +265,7 @@ export default function WalletPage({ params }: { params: Promise<{ address: stri
                   className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition-all hover:scale-[1.02]"
                   style={isWatched(address)
                     ? { background:'rgba(251,191,36,0.15)', border:'1px solid rgba(251,191,36,0.35)', color:'#fbbf24' }
-                    : { background:'rgba(var(--ink-rgb),0.06)', border:'1px solid rgba(var(--ink-rgb),0.1)', color:'rgba(var(--ink-rgb),0.55)' }}
+                    : { background:'rgba(var(--ink-rgb),0.06)', border:'1px solid rgba(var(--ink-rgb),0.1)', color:'var(--text-secondary)' }}
                 >
                   <span className="text-sm leading-none">{isWatched(address) ? '⭐' : '☆'}</span>
                   {isWatched(address) ? 'Watching' : 'Add to Watchlist'}

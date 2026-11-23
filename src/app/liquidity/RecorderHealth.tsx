@@ -172,7 +172,7 @@ export default function RecorderHealth() {
                       axisLine={false} tickLine={false} minTickGap={48} interval="preserveStartEnd" />
                     <Tooltip
                       cursor={{ fill: 'rgba(var(--ink-rgb),0.04)' }}
-                      contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
+                      contentStyle={{ background: 'var(--surface-1)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
                       labelStyle={{ color: 'var(--text-muted)' }}
                       labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit' })}
                       formatter={(v) => [`${v} snapshot${Number(v) === 1 ? '' : 's'}`, 'Recorded'] as [string, string]} />
