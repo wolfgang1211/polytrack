@@ -4,28 +4,46 @@
    Units stay honest: Kalshi volume and open interest are CONTRACT COUNTS, never dollars.
    If the time budget or the source's rate limit stops the scan early, the result says so (complete=false) and
    the page must show that it is a partial scan; it is never presented as a full ranking. */
-import { KalshiError, getKalshiJson, isOpenListable, normalizeMarket, parseNextCursor, type KalshiMarket } from './kalshi';
-import { fetchKalshiEvent } from './kalshiEvents';
+import { KalshiError, getKalshiJson, isOpenListable, normalizeMarket, parseNextCursor, type KalshiMarket } from '@/lib/kalshi';
+import { fetchKalshiEvent } from '@/lib/kalshiEvents';
 
 export const SCAN_PAGE_LIMIT = 1000;      // Kalshi's documented max page size for GET /markets
-export const MAX_SCAN_PAGES = 200;        // hard stop (200k markets) so a looping cursor can never run forever
+export const MAX_SCAN_PAGES = 300;        // hard stop (300k markets) so a looping cursor can never run forever
 export const SCAN_BUDGET_MS = 45_000;     // stays inside the function limit; a partial scan is labelled as partial
-export const PAGE_GAP_MS = 120;           // polite spacing between pages (well under the public read rate limit)
+export const PAGE_GAP_MS = 0;             // sequential pages are already well under the public read limit; 429s back off
 export const RATE_LIMIT_RETRIES = 3;      // per page, on Kalshi 429 (mapped to KalshiError 503)
-export const TOP_N = 120;
-export const MAX_EVENT_LOOKUPS = 80;
+export const TOP_EVENTS = 60;
+export const OUTCOMES_PER_EVENT = 4;
 export const EVENT_CONCURRENCY = 4;
 
-export interface KalshiTopMarket extends KalshiMarket {
-  category: string | null;   // as published by Kalshi on the event; null when the lookup failed
-  eventTitle: string | null;
+/** One outcome (= one binary Kalshi market) inside an event card. Prices are Kalshi quotes in USD per contract. */
+export interface KalshiTopOutcome {
+  ticker: string;
+  label: string;               // yes_sub_title, else the market title
+  yesBid: number | null;
+  yesAsk: number | null;
+  volume24hContracts: number;
+}
+
+/** Explorer card: a Kalshi event with its most-traded outcomes. Volumes are CONTRACT COUNTS summed over ALL its
+    traded open markets seen in the scan (not only the outcomes shown). */
+export interface KalshiTopEvent {
+  eventTicker: string;
+  title: string;               // event title as published, else the top market's title
+  category: string | null;     // as published by Kalshi on the event; null when the lookup failed
+  volume24hContracts: number;
+  openInterestContracts: number;
+  tradedMarkets: number;
+  closeTime: string | null;    // earliest close among the outcomes shown
+  outcomes: KalshiTopOutcome[];
 }
 
 export interface KalshiTopScan {
-  markets: KalshiTopMarket[];
+  events: KalshiTopEvent[];
   scannedMarkets: number;     // rows returned by the source across all pages
   listableMarkets: number;    // open binary $1 markets with a future close
   tradedMarkets: number;      // listable markets with 24h volume > 0
+  tradedEvents: number;
   pages: number;
   complete: boolean;          // true only when the source cursor was exhausted
   stopReason: 'done' | 'budget' | 'rate_limited' | 'page_cap';
@@ -48,10 +66,7 @@ export function compareByVolume(a: KalshiMarket, b: KalshiMarket): number {
   return a.ticker < b.ticker ? -1 : a.ticker > b.ticker ? 1 : 0;
 }
 
-/** Keeps only the best `n` (bounded memory while scanning tens of thousands of rows). */
-function keepTop(list: KalshiMarket[], n: number): KalshiMarket[] {
-  return list.sort(compareByVolume).slice(0, n);
-}
+interface Bucket { vol: number; oi: number; count: number; top: KalshiMarket[] }
 
 export async function scanKalshiTopMarkets(opts: {
   getJson?: JsonGetter;
@@ -59,20 +74,20 @@ export async function scanKalshiTopMarkets(opts: {
   now?: () => number;
   wait?: (ms: number) => Promise<void>;
   budgetMs?: number;
-  topN?: number;
+  topEvents?: number;
 } = {}): Promise<KalshiTopScan> {
   const getJson = opts.getJson ?? getKalshiJson;
   const getEvent = opts.getEvent ?? defaultGetEvent;
   const now = opts.now ?? (() => Date.now());
   const wait = opts.wait ?? sleep;
   const budget = opts.budgetMs ?? SCAN_BUDGET_MS;
-  const topN = opts.topN ?? TOP_N;
+  const topEvents = opts.topEvents ?? TOP_EVENTS;
 
   const t0 = now();
   const clock = new Date(t0);
   let cursor: string | undefined;
   let pages = 0, scanned = 0, listable = 0, traded = 0;
-  let top: KalshiMarket[] = [];
+  const buckets = new Map<string, Bucket>();
   const seen = new Set<string>();
   let stopReason: KalshiTopScan['stopReason'] = 'done';
 
@@ -101,29 +116,58 @@ export async function scanKalshiTopMarkets(opts: {
     if (!isObj(body) || !Array.isArray(body.markets)) throw new KalshiError(502, 'malformed markets envelope');
     if (body.markets.length > SCAN_PAGE_LIMIT) throw new KalshiError(502, 'oversized markets page');
     pages++;
-    const batch: KalshiMarket[] = [];
     for (const row of body.markets) {
       scanned++;
       const m = normalizeMarket(row);
       if (!m || !isOpenListable(m, clock) || seen.has(m.ticker)) continue;
       seen.add(m.ticker);
       listable++;
-      if ((m.volume24hContracts ?? 0) > 0) { traded++; batch.push(m); }
+      const v = m.volume24hContracts ?? 0;
+      if (v <= 0) continue;
+      traded++;
+      let b = buckets.get(m.eventTicker);
+      if (!b) buckets.set(m.eventTicker, (b = { vol: 0, oi: 0, count: 0, top: [] }));
+      b.vol += v;
+      b.oi += m.openInterestContracts ?? 0;
+      b.count++;
+      b.top.push(m);
+      if (b.top.length > OUTCOMES_PER_EVENT) b.top = b.top.sort(compareByVolume).slice(0, OUTCOMES_PER_EVENT);
     }
-    if (batch.length) top = keepTop(top.concat(batch), topN);
     const next = parseNextCursor(body.cursor);
     if (next === null) { stopReason = 'done'; break; }
     if (next === cursor) throw new KalshiError(502, 'cursor did not advance');
     cursor = next;
-    await wait(PAGE_GAP_MS);
+    if (PAGE_GAP_MS > 0) await wait(PAGE_GAP_MS);
   }
 
-  const markets = await attachEvents(top, getEvent);
+  const ranked = [...buckets.entries()]
+    .sort(([ta, a], [tb, b]) => (b.vol - a.vol) || (b.oi - a.oi) || (ta < tb ? -1 : ta > tb ? 1 : 0))
+    .slice(0, topEvents);
+  const meta = await lookupEvents(ranked.map(([t]) => t), getEvent);
+  const events: KalshiTopEvent[] = ranked.map(([eventTicker, b]) => {
+    const top = b.top.sort(compareByVolume);
+    const e = meta.get(eventTicker) ?? null;
+    const closes = top.map(m => m.closeTime).filter((c): c is string => c !== null).sort();
+    return {
+      eventTicker,
+      title: e?.title ?? top[0].title ?? eventTicker,
+      category: e?.category ?? null,
+      volume24hContracts: b.vol,
+      openInterestContracts: b.oi,
+      tradedMarkets: b.count,
+      closeTime: closes[0] ?? null,
+      outcomes: top.map(m => ({
+        ticker: m.ticker, label: m.yesLabel ?? m.title ?? m.ticker,
+        yesBid: m.yesBid, yesAsk: m.yesAsk, volume24hContracts: m.volume24hContracts ?? 0,
+      })),
+    };
+  });
   return {
-    markets,
+    events,
     scannedMarkets: scanned,
     listableMarkets: listable,
     tradedMarkets: traded,
+    tradedEvents: buckets.size,
     pages,
     complete: stopReason === 'done',
     stopReason,
@@ -137,22 +181,22 @@ async function defaultGetEvent(eventTicker: string) {
   return { category: event.category, title: event.title };
 }
 
-/** Category and event title for the top markets' events (bounded, 4 in flight, failures stay per event). */
-async function attachEvents(top: KalshiMarket[], getEvent: EventGetter): Promise<KalshiTopMarket[]> {
-  const tickers = [...new Set(top.map(m => m.eventTicker))].slice(0, MAX_EVENT_LOOKUPS);
+/** Event title and category for the ranked events (4 in flight; a failed lookup stays per event). */
+async function lookupEvents(tickers: string[], getEvent: EventGetter) {
   const meta = new Map<string, { category: string | null; title: string } | null>();
   let i = 0;
   const worker = async () => {
     while (i < tickers.length) {
       const t = tickers[i++];
-      try { meta.set(t, await getEvent(t)); } catch { meta.set(t, null); }
+      let got: { category: string | null; title: string } | null = null;
+      for (let attempt = 0; attempt < 2 && got === null; attempt++) {
+        try { got = await getEvent(t); } catch { if (attempt === 0) await sleep(300); }
+      }
+      meta.set(t, got);
     }
   };
   await Promise.all(Array.from({ length: Math.min(EVENT_CONCURRENCY, tickers.length) }, worker));
-  return top.map(m => {
-    const e = meta.get(m.eventTicker) ?? null;
-    return { ...m, category: e?.category ?? null, eventTitle: e?.title ?? null };
-  });
+  return meta;
 }
 
 /* ── display grouping: Kalshi's published categories folded into the explorer's chips ── */

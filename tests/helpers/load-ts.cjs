@@ -17,7 +17,8 @@ exports.createLoader = function createLoader() {
     cache.set(filename, loaded);
     const requireNative = createRequire(filename);
     const localRequire = name => name.startsWith('@/')
-      ? load(`src/${name.slice(2)}`) : requireNative(name);
+      ? load(`src/${name.slice(2)}`)
+      : name.startsWith('./') || name.startsWith('../') ? load(path.resolve(path.dirname(filename), name)) : requireNative(name);
     const compiled = ts.transpileModule(fs.readFileSync(filename, 'utf8'), {
       fileName: filename,
       compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX },
