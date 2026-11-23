@@ -313,7 +313,7 @@ function LPLeaderboardSection() {
 
       <div className="glass rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
         {/* Table header */}
-        <div className="grid grid-cols-[40px_1fr_140px_140px] px-4 py-3 glass-strong"
+        <div className="grid grid-cols-[32px_1fr_84px_84px] sm:grid-cols-[40px_1fr_140px_140px] px-4 py-3 glass-strong"
           style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">#</span>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">Trader</span>
@@ -322,7 +322,7 @@ function LPLeaderboardSection() {
         </div>
         <div>
           {loading ? Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="grid grid-cols-[40px_1fr_140px_140px] gap-2 px-4 py-3.5"
+            <div key={i} className="grid grid-cols-[32px_1fr_84px_84px] sm:grid-cols-[40px_1fr_140px_140px] gap-2 px-4 py-3.5"
               style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
               <div className="h-4 rounded animate-shimmer" />
               <div className="h-4 rounded animate-shimmer" />
@@ -331,7 +331,7 @@ function LPLeaderboardSection() {
             </div>
           )) : traders.map((t, i) => (
             <Link key={t.proxyWallet} href={`/wallet/${t.proxyWallet}`}
-              className="grid grid-cols-[40px_1fr_140px_140px] px-4 py-3.5 transition-colors hover:bg-ink/[0.03] cursor-pointer"
+              className="grid grid-cols-[32px_1fr_84px_84px] sm:grid-cols-[40px_1fr_140px_140px] px-4 py-3.5 transition-colors hover:bg-ink/[0.03] cursor-pointer"
               style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
               <span className="font-mono text-xs text-ink/55">#{i + 1}</span>
               <div className="flex items-center gap-2 min-w-0">
@@ -438,7 +438,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
           <select
             value={selected?.conditionId ?? ''}
             onChange={e => setChoice(opps.find(o => o.conditionId === e.target.value) ?? null)}
-            className="rounded-xl glass px-3 py-1.5 text-xs text-ink/70 outline-none max-w-xs truncate"
+            className="rounded-xl glass px-3 py-1.5 text-xs text-ink/70 outline-none max-w-[44vw] truncate sm:max-w-xs"
             style={{ border: '1px solid rgba(var(--ink-rgb),0.1)' }}
           >
             {opps.map(o => (
@@ -917,9 +917,9 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                 <button key={o.conditionId} onClick={() => toggle(o.conditionId)}
                   className="rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all max-w-[220px] truncate text-left"
                   style={{
-                    background: on ? 'rgba(var(--ink-rgb),0.18)' : 'rgba(var(--ink-rgb),0.04)',
+                    background: on ? 'rgba(var(--ink-rgb),0.10)' : 'rgba(var(--ink-rgb),0.04)',
                     border: `1px solid ${on ? 'rgba(var(--ink-rgb),0.45)' : 'rgba(var(--ink-rgb),0.07)'}`,
-                    color: on ? 'var(--text-secondary)' : 'rgba(var(--ink-rgb),0.4)',
+                    color: on ? 'var(--text-primary)' : 'var(--text-muted)',
                   }}>
                   {on ? '✓ ' : ''}{o.question.slice(0, 38)}
                 </button>
@@ -984,7 +984,7 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
-      {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
+      {controls && <div className="ml-2 min-w-0 flex-shrink">{controls}</div>}
     </div>
   );
 }

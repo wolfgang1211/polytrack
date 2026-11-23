@@ -23,7 +23,7 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
       <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
-      {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
+      {controls && <div className="ml-2 min-w-0 flex-shrink">{controls}</div>}
     </div>
   );
 }

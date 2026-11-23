@@ -76,3 +76,11 @@ test('wallet/liquidity tap targets and mobile overflow (2026-11-23 audit)', () =
   assert.match(fc, /hidden w-16 flex-shrink-0[^"]*sm:inline/);
   assert.match(fc, /gap-2 px-3 py-2\.5 sm:gap-3 sm:px-4/);
 });
+
+test('liquidity mobile: picker chips readable, trader grid and selects fit 375px (2026-11-23 live re-measure)', () => {
+  const s = read('src/app/liquidity/page.tsx');
+  assert.match(s, /color: on \? 'var\(--text-primary\)' : 'var\(--text-muted\)'/);
+  assert.doesNotMatch(s, /(?<!sm:)grid-cols-\[40px_1fr_140px_140px\]/);
+  assert.match(s, /max-w-\[44vw\] truncate sm:max-w-xs/);
+  assert.doesNotMatch(s, /'rgba\(var\(--ink-rgb\),0\.[1-4]\d?\)',\s*\n\s*\}\}/);
+});
