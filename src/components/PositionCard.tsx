@@ -51,7 +51,7 @@ export default function PositionCard({ position, delay = 0 }: Props) {
               {position.outcome}
             </span>
             {isClosed && (
-              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-ink/35"
+              <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold text-ink/55"
                 style={{ background: 'rgba(var(--ink-rgb),0.06)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
                 Closed
               </span>
@@ -62,16 +62,16 @@ export default function PositionCard({ position, delay = 0 }: Props) {
                 Redeemable ✓
               </span>
             )}
-            {endDate && <span className="text-[10px] text-ink/25">{endDate}</span>}
+            {endDate && <span className="text-[10px] text-ink/55">{endDate}</span>}
           </div>
         </div>
 
         {/* PnL */}
         <div className="flex-shrink-0 text-right">
-          <p className={`text-base font-black leading-none ${isProfit ? 'text-grad-profit' : isLoss ? 'text-grad-loss' : 'text-ink/40'}`}>
+          <p className={`text-base font-black leading-none ${isProfit ? 'text-grad-profit' : isLoss ? 'text-grad-loss' : 'text-ink/55'}`}>
             {pnl >= 0 ? '+' : ''}{formatCurrency(pnl)}
           </p>
-          <p className={`mt-0.5 text-[11px] font-semibold ${isProfit ? 'text-emerald-500/70' : isLoss ? 'text-rose-500/70' : 'text-ink/25'}`}>
+          <p className={`mt-0.5 text-[11px] font-semibold ${isProfit ? 'text-emerald-500' : isLoss ? 'text-rose-500' : 'text-ink/55'}`}>
             {pctPnl >= 0 ? '+' : ''}{pctPnl.toFixed(1)}%
           </p>
         </div>
@@ -81,17 +81,17 @@ export default function PositionCard({ position, delay = 0 }: Props) {
       <div className="mt-3 grid grid-cols-3 gap-2 rounded-xl px-3 py-2.5"
         style={{ background: 'rgba(0,0,0,0.25)', border: '1px solid rgba(var(--ink-rgb),0.04)' }}>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Size</p>
+          <p className="text-[10px] uppercase tracking-wider text-ink/55 mb-0.5">Size</p>
           <p className="text-xs font-bold text-ink/70">
             {position.size.toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Avg Price</p>
+          <p className="text-[10px] uppercase tracking-wider text-ink/55 mb-0.5">Avg Price</p>
           <p className="text-xs font-bold text-ink/70">${position.avgPrice.toFixed(3)}</p>
         </div>
         <div>
-          <p className="text-[9px] uppercase tracking-wider text-ink/25 mb-0.5">Current</p>
+          <p className="text-[10px] uppercase tracking-wider text-ink/55 mb-0.5">Current</p>
           <p className="text-xs font-bold text-ink/70">
             {position.curPrice > 0 ? `$${position.curPrice.toFixed(3)}` : '—'}
           </p>

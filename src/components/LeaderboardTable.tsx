@@ -39,7 +39,7 @@ const GRID = 'grid-cols-[40px_1fr_96px_104px_92px_84px_56px]';
 
 function SortArrow({ active, order }: { active: boolean; order: SortOrder }) {
   return (
-    <span className={`ml-1 text-[10px] transition-colors ${active ? 'text-[var(--text-secondary)]' : 'text-ink/15'}`}>
+    <span className={`ml-1 text-[10px] transition-colors ${active ? 'text-[var(--text-secondary)]' : 'text-ink/55'}`}>
       {active && order === 'asc' ? '↑' : '↓'}
     </span>
   );
@@ -96,7 +96,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
               key={tw.value}
               onClick={() => onWindowChange(tw.value)}
               className={`relative shrink-0 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 sm:px-4
-                ${window === tw.value ? 'text-ink' : 'text-ink/35 hover:text-ink/60'}`}
+                ${window === tw.value ? 'text-ink' : 'text-ink/55 hover:text-ink/60'}`}
             >
               {window === tw.value && (
                 <span className="absolute inset-0 rounded-xl"
@@ -111,7 +111,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           {/* Filter chips */}
           <button
             onClick={() => setProfitableOnly(v => !v)}
-            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${profitableOnly ? 'text-emerald-300' : 'text-ink/35 hover:text-ink/60'}`}
+            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${profitableOnly ? 'text-emerald-300' : 'text-ink/55 hover:text-ink/60'}`}
             style={profitableOnly
               ? { background: 'rgba(16,185,129,0.12)', border: '1px solid rgba(16,185,129,0.35)' }
               : { background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}
@@ -120,7 +120,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
           </button>
           <button
             onClick={() => setVerifiedOnly(v => !v)}
-            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-[var(--text-secondary)]' : 'text-ink/35 hover:text-ink/60'}`}
+            className={`rounded-xl px-3 py-2 text-xs font-semibold transition-all ${verifiedOnly ? 'text-[var(--text-secondary)]' : 'text-ink/55 hover:text-ink/60'}`}
             style={verifiedOnly
               ? { background: 'var(--accent-bg)', border: '1px solid var(--accent-border-lg)' }
               : { background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}
@@ -130,7 +130,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
           {/* Search */}
           <div className="relative w-full sm:w-auto">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink/55" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -153,13 +153,13 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
         {error && (
           <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-sm text-ink/40">{error}</p>
+            <p className="text-sm text-ink/55">{error}</p>
           </div>
         )}
 
         {!loading && !error && sorted.length === 0 && (
           <div className="glass rounded-2xl p-8 text-center">
-            <p className="text-sm text-ink/40">No results found</p>
+            <p className="text-sm text-ink/55">No results found</p>
           </div>
         )}
 
@@ -200,7 +200,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   <div className="min-w-0">
                     <p className={`truncate text-sm font-bold ${isTop3 ? rs.text : 'text-ink/85'}`}>{displayName}</p>
                     <div className="mt-0.5 flex items-center gap-1">
-                      <p className="truncate font-mono text-[10px] text-ink/30">{formatAddress(entry.proxyWallet)}</p>
+                      <p className="truncate font-mono text-[10px] text-ink/55">{formatAddress(entry.proxyWallet)}</p>
                       <CopyAddress address={entry.proxyWallet} />
                     </div>
                   </div>
@@ -212,7 +212,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                   className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-sm transition-all active:scale-95"
                   style={isWatched(entry.proxyWallet)
                     ? { background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.35)' }
-                    : { background: 'rgba(var(--ink-rgb),0.045)', border: '1px solid rgba(var(--ink-rgb),0.09)', color: 'rgba(var(--ink-rgb),0.45)' }}
+                    : { background: 'rgba(var(--ink-rgb),0.045)', border: '1px solid rgba(var(--ink-rgb),0.09)', color: 'var(--text-muted)' }}
                 >
                   {isWatched(entry.proxyWallet) ? '★' : '☆'}
                 </button>
@@ -220,15 +220,15 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <div className="rounded-xl p-2" style={{ background: 'rgba(var(--ink-rgb),0.035)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-ink/30">P&L</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/55">P&L</p>
                   <p className={`mt-1 truncate text-xs font-black tabular-nums ${entry.pnl >= 0 ? 'text-emerald-300' : 'text-rose-300'}`}>{entry.pnl >= 0 ? '+' : ''}{formatCurrency(entry.pnl, true)}</p>
                 </div>
                 <div className="rounded-xl p-2" style={{ background: 'rgba(var(--ink-rgb),0.035)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-ink/30">Volume</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/55">Volume</p>
                   <p className="mt-1 truncate text-xs font-bold tabular-nums text-ink/60">{formatShares(entry.vol)}</p>
                 </div>
                 <div className="rounded-xl p-2" style={{ background: 'rgba(var(--ink-rgb),0.035)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                  <p className="text-[9px] font-bold uppercase tracking-widest text-ink/30">Smart</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-ink/55">Smart</p>
                   <p className="mt-1 flex items-center gap-1 text-xs font-black tabular-nums" style={{ color: tier.color }}><span>{score}</span><span>{tier.badge}</span></p>
                 </div>
               </div>
@@ -262,24 +262,24 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         {/* Header */}
         <div className={`grid ${GRID} glass-strong px-4 py-2.5`}
           style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-ink/30 hover:text-ink/60 transition-colors">
+          <button onClick={() => handleSort('rank')} className="text-left text-[10px] font-semibold uppercase tracking-widest text-ink/55 hover:text-ink/60 transition-colors">
             #<SortArrow active={sortField==='rank'} order={sortOrder} />
           </button>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/30">Trader</span>
-          <span className="text-center text-[10px] font-semibold uppercase tracking-widest text-ink/30">7d</span>
-          <button onClick={() => handleSort('pnl')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/30 hover:text-ink/60 transition-colors">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">Trader</span>
+          <span className="text-center text-[10px] font-semibold uppercase tracking-widest text-ink/55">7d</span>
+          <button onClick={() => handleSort('pnl')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/55 hover:text-ink/60 transition-colors">
             P&amp;L<SortArrow active={sortField==='pnl'} order={sortOrder} />
           </button>
-          <button onClick={() => handleSort('vol')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/30 hover:text-ink/60 transition-colors">
+          <button onClick={() => handleSort('vol')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/55 hover:text-ink/60 transition-colors">
             Volume<SortArrow active={sortField==='vol'} order={sortOrder} />
           </button>
           <div className="relative flex items-center justify-end gap-1">
-            <button onClick={() => handleSort('score')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/30 hover:text-ink/60 transition-colors">
+            <button onClick={() => handleSort('score')} className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/55 hover:text-ink/60 transition-colors">
               Smart<SortArrow active={sortField==='score'} order={sortOrder} />
             </button>
             <button
               onClick={() => setShowScoreInfo(v => !v)}
-              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[9px] font-bold text-ink/30 hover:text-[var(--text-secondary)] transition-colors"
+              className="flex h-3.5 w-3.5 items-center justify-center rounded-full text-[10px] font-bold text-ink/55 hover:text-[var(--text-secondary)] transition-colors"
               style={{ border: '1px solid rgba(var(--ink-rgb),0.15)' }}
               aria-label="What is Smart Score?"
             >
@@ -291,7 +291,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                 <div className="absolute right-0 top-6 z-50 w-64 rounded-xl glass-strong p-3.5 text-left animate-scale-in"
                   style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.5)' }}>
                   <p className="mb-1.5 text-xs font-bold text-ink/80">Smart Score (0–100)</p>
-                  <p className="text-[11px] leading-relaxed text-ink/45 normal-case tracking-normal font-normal">
+                  <p className="text-[11px] leading-relaxed text-ink/55 normal-case tracking-normal font-normal">
                     Relative sample ranking. Blends <span className="text-emerald-300">P&amp;L per traded share</span> (
                     60%) with <span className="text-[var(--text-secondary)]">absolute P&amp;L</span> (40%), scored by percentile across the list.
                     Not capital ROI, risk adjustment, consistency or a forecast of returns.
@@ -320,13 +320,13 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
           {error && (
             <div className="py-20 text-center">
-              <p className="text-sm text-ink/30">{error}</p>
+              <p className="text-sm text-ink/55">{error}</p>
             </div>
           )}
 
           {!loading && !error && sorted.length === 0 && (
             <div className="py-20 text-center">
-              <p className="text-sm text-ink/30">No results found</p>
+              <p className="text-sm text-ink/55">No results found</p>
             </div>
           )}
 
@@ -369,7 +369,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                     {isTop3 ? (
                       <span className="text-lg leading-none select-none">{rs.badge}</span>
                     ) : (
-                      <span className="font-mono text-xs font-semibold text-ink/25">#{rank}</span>
+                      <span className="font-mono text-xs font-semibold text-ink/55">#{rank}</span>
                     )}
                   </div>
 
@@ -398,7 +398,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
                         {displayName}
                       </p>
                       <div className="flex items-center gap-1">
-                        <p className="font-mono text-[10px] text-ink/20 truncate">{formatAddress(entry.proxyWallet)}</p>
+                        <p className="font-mono text-[10px] text-ink/55 truncate">{formatAddress(entry.proxyWallet)}</p>
                         <CopyAddress address={entry.proxyWallet} />
                       </div>
                     </div>
@@ -419,7 +419,7 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
 
                   {/* Volume */}
                   <div className="flex items-center justify-end">
-                    <span className="text-xs font-semibold text-ink/40 tabular-nums">
+                    <span className="text-xs font-semibold text-ink/55 tabular-nums">
                       {formatShares(entry.vol)}
                     </span>
                   </div>
@@ -475,8 +475,8 @@ export default function LeaderboardTable({ data, loading, error, window, onWindo
         {!loading && sorted.length > 0 && (
           <div className="px-4 py-3 flex items-center justify-between glass-strong"
             style={{ borderTop: '1px solid rgba(var(--ink-rgb),0.05)' }}>
-            <span className="text-[10px] text-ink/20">{sorted.length} traders</span>
-            <span className="text-[10px] text-ink/15">data-api.polymarket.com</span>
+            <span className="text-[10px] text-ink/55">{sorted.length} traders</span>
+            <span className="text-[10px] text-ink/55">data-api.polymarket.com</span>
           </div>
         )}
         </div>

@@ -43,7 +43,7 @@ function timeAgo(ts: number): string {
 }
 
 function pnlClass(v: number): string {
-  return v > 0 ? 'text-grad-profit' : v < 0 ? 'text-grad-loss' : 'text-ink/40';
+  return v > 0 ? 'text-grad-profit' : v < 0 ? 'text-grad-loss' : 'text-ink/55';
 }
 
 export default function LpEarnings({ address }: { address: string }) {
@@ -88,8 +88,8 @@ export default function LpEarnings({ address }: { address: string }) {
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/35">LP Earnings</p>
-          <p className="mt-0.5 text-[10px] text-ink/25">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">LP Earnings</p>
+          <p className="mt-0.5 text-[10px] text-ink/55">
             Maker-fill spread P&amp;L · v2 roles inferred · excludes reward payouts
           </p>
         </div>
@@ -109,7 +109,7 @@ export default function LpEarnings({ address }: { address: string }) {
             </span>
           )}
           {data?.lastTs != null && (
-            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-ink/45"
+            <span className="rounded-full px-2.5 py-1 text-[10px] font-semibold text-ink/55"
               style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
               last fill {timeAgo(data.lastTs)} ago
             </span>
@@ -130,37 +130,37 @@ export default function LpEarnings({ address }: { address: string }) {
           {/* Summary stats */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-ink/30">Spread P&L</p>
+              <p className="text-[10px] uppercase tracking-wider text-ink/55">Spread P&L</p>
               <p className={`mt-1 text-lg font-black tabular-nums ${pnlClass(data.realized)}`}>
                 {data.realized >= 0 ? '+' : ''}{formatCurrency(data.realized, true)}
               </p>
               {bps != null && (
-                <p className="text-[10px] text-ink/25">{bps >= 0 ? '+' : ''}{bps.toFixed(1)} bps of volume</p>
+                <p className="text-[10px] text-ink/55">{bps >= 0 ? '+' : ''}{bps.toFixed(1)} bps of volume</p>
               )}
             </div>
             <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-ink/30">Maker Volume</p>
+              <p className="text-[10px] uppercase tracking-wider text-ink/55">Maker Volume</p>
               <p className="mt-1 text-lg font-black tabular-nums text-ink">{formatCurrency(data.makerVolume, true)}</p>
-              <p className="text-[10px] text-ink/25">
+              <p className="text-[10px] text-ink/55">
                 {formatCurrency(data.buyVolume, true)} buy · {formatCurrency(data.sellVolume, true)} sell
               </p>
             </div>
             <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-ink/30">Maker Fills</p>
+              <p className="text-[10px] uppercase tracking-wider text-ink/55">Maker Fills</p>
               <p className="mt-1 text-lg font-black tabular-nums text-ink">{data.fills.toLocaleString()}</p>
-              <p className="text-[10px] text-ink/25">orders filled as maker</p>
+              <p className="text-[10px] text-ink/55">orders filled as maker</p>
             </div>
             <div className="rounded-xl p-3" style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-              <p className="text-[10px] uppercase tracking-wider text-ink/30">Markets</p>
+              <p className="text-[10px] uppercase tracking-wider text-ink/55">Markets</p>
               <p className="mt-1 text-lg font-black tabular-nums text-ink">{data.marketCount.toLocaleString()}</p>
-              <p className="text-[10px] text-ink/25">quoted with resting orders</p>
+              <p className="text-[10px] text-ink/55">quoted with resting orders</p>
             </div>
           </div>
 
           {/* Per-market breakdown */}
           {data.markets.length > 0 && (
             <div className="mt-4">
-              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/25">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/55">
                 Top markets by maker volume
               </p>
               <div className="flex flex-col gap-1">
@@ -179,7 +179,7 @@ export default function LpEarnings({ address }: { address: string }) {
                               </span>
                             )}
                           </p>
-                          <div className="mt-1 flex items-center gap-2 text-[10px] text-ink/30">
+                          <div className="mt-1 flex items-center gap-2 text-[10px] text-ink/55">
                             <span>{m.fills.toLocaleString()} fills</span>
                             <span>·</span>
                             <span>{formatCurrency(m.volume, true)} vol</span>
@@ -197,7 +197,7 @@ export default function LpEarnings({ address }: { address: string }) {
                           <p className={`text-sm font-black tabular-nums ${pnlClass(m.realized)}`}>
                             {m.realized >= 0 ? '+' : ''}{formatCurrency(m.realized, true)}
                           </p>
-                          <p className="mt-0.5 text-[10px] text-ink/25">{share.toFixed(0)}% of vol</p>
+                          <p className="mt-0.5 text-[10px] text-ink/55">{share.toFixed(0)}% of vol</p>
                         </div>
                       </div>
                       {/* volume share bar */}

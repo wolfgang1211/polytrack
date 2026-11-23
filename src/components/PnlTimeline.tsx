@@ -27,7 +27,7 @@ function TimelineTooltip({ active, payload }: TipProps) {
   const date = pt ? new Date(pt.t * 1000).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
   return (
     <div className="glass-strong rounded-lg px-3 py-2 text-xs">
-      <p className="text-ink/45">{date}</p>
+      <p className="text-ink/55">{date}</p>
       <p className={`font-bold ${v >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
         {v >= 0 ? '+' : ''}{formatCurrency(v, true)}
       </p>
@@ -90,8 +90,8 @@ export default function PnlTimeline({
     <div className="glass rounded-2xl p-4">
       <div className="mb-3 flex items-end justify-between">
         <div>
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/35">Trade P&amp;L Timeline</p>
-          <p className="text-[10px] text-ink/25 mt-0.5">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">Trade P&amp;L Timeline</p>
+          <p className="text-[10px] text-ink/55 mt-0.5">
             {isFlat
               ? 'No Trade P&L change in the period covered by the available series'
               : data?.metric === 'trade_pnl'
@@ -100,7 +100,7 @@ export default function PnlTimeline({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[9px] uppercase tracking-wider text-ink/25">Current</p>
+          <p className="text-[10px] uppercase tracking-wider text-ink/55">Current</p>
           <p className={`text-lg font-black leading-none ${positive ? 'text-grad-profit' : 'text-grad-loss'}`}>
             {current == null ? 'Unavailable' : `${positive ? '+' : ''}${formatCurrency(current, true)}`}
           </p>
@@ -111,12 +111,12 @@ export default function PnlTimeline({
         <div className="flex h-56 flex-col items-center justify-center gap-3 rounded-xl animate-shimmer text-center">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-400/30 border-t-emerald-400" />
           <div>
-            <p className="text-xs font-semibold text-ink/45">Building full-history PnL chart…</p>
-            <p className="mt-1 text-[10px] text-ink/25">Large wallets can take a few seconds</p>
+            <p className="text-xs font-semibold text-ink/55">Building full-history PnL chart…</p>
+            <p className="mt-1 text-[10px] text-ink/55">Large wallets can take a few seconds</p>
           </div>
         </div>
       ) : points.length < 2 ? (
-        <div className="flex h-56 items-center justify-center text-xs text-ink/25">
+        <div className="flex h-56 items-center justify-center text-xs text-ink/55">
           {data == null ? 'Trade P&L data is unavailable' : 'Not enough trade history to chart'}
         </div>
       ) : (

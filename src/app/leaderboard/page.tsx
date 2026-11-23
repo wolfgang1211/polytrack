@@ -8,9 +8,9 @@ import { formatCurrency, formatShares } from '@/lib/utils';
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -19,7 +19,7 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function DataCell({ label, value, accent, loading }: { label: string; value: string; accent?: string; loading?: boolean }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[130px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
       {loading ? (
         <div className="h-6 w-20 rounded animate-shimmer" />
       ) : (
@@ -68,7 +68,7 @@ export default function LeaderboardPage() {
           <span className="text-ink">Trader</span>{' '}
           <span className="text-grad">Leaderboard</span>
         </h1>
-        <p className="text-sm text-ink/40 max-w-lg">
+        <p className="text-sm text-ink/55 max-w-lg">
           Top prediction market traders ranked by P&amp;L, volume and Smart Score.
         </p>
       </div>

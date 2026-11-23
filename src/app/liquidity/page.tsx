@@ -47,7 +47,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
     <div className="glass glass-hover gradient-border rounded-2xl p-5 flex flex-col gap-4 animate-fade-in-up">
       {/* Header */}
       <div className="flex items-start gap-3">
-        <span className="flex-shrink-0 text-[10px] font-black text-ink/20 w-5 mt-0.5">#{rank}</span>
+        <span className="flex-shrink-0 text-[10px] font-black text-ink/55 w-5 mt-0.5">#{rank}</span>
         {opp.image && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={opp.image} alt="" className="h-8 w-8 rounded-lg object-cover flex-shrink-0"
@@ -61,40 +61,40 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       {/* Metrics grid */}
       <div className="grid grid-cols-2 gap-2.5">
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-0.5">Spread</p>
+          <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">Spread</p>
           <p className="text-sm font-black text-ink">{(opp.spread * 100).toFixed(1)}¢</p>
-          <p className="text-[10px] text-ink/25">{pct(opp.spreadPct, 1)} of mid</p>
+          <p className="text-[10px] text-ink/55">{pct(opp.spreadPct, 1)} of mid</p>
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-0.5">24h Vol</p>
+          <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">24h Vol</p>
           <p className="text-sm font-black text-ink">{formatCurrency(opp.volume24h, true)}</p>
-          <p className="text-[10px] text-ink/25">Liquidity {formatCurrency(opp.liquidity, true)}</p>
+          <p className="text-[10px] text-ink/55">Liquidity {formatCurrency(opp.liquidity, true)}</p>
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-0.5">Bid Depth</p>
+          <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">Bid Depth</p>
           {opp.depthKnown && opp.bidDepth != null ? (
             <>
               <p className="text-sm font-black text-emerald-300/90">{formatCurrency(opp.bidDepth, true)}</p>
-              <p className="text-[10px] text-ink/25">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
+              <p className="text-[10px] text-ink/55">Best {(opp.bestBid * 100).toFixed(1)}¢</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-black text-ink/30">—</p>
-              <p className="text-[10px] text-ink/20">orderbook n/a</p>
+              <p className="text-sm font-black text-ink/55">—</p>
+              <p className="text-[10px] text-ink/55">orderbook n/a</p>
             </>
           )}
         </div>
         <div className="rounded-xl px-3 py-2" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-0.5">Ask Depth</p>
+          <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">Ask Depth</p>
           {opp.depthKnown && opp.askDepth != null ? (
             <>
               <p className="text-sm font-black text-rose-300/90">{formatCurrency(opp.askDepth, true)}</p>
-              <p className="text-[10px] text-ink/25">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
+              <p className="text-[10px] text-ink/55">Best {(opp.bestAsk * 100).toFixed(1)}¢</p>
             </>
           ) : (
             <>
-              <p className="text-sm font-black text-ink/30">—</p>
-              <p className="text-[10px] text-ink/20">orderbook n/a</p>
+              <p className="text-sm font-black text-ink/55">—</p>
+              <p className="text-[10px] text-ink/55">orderbook n/a</p>
             </>
           )}
         </div>
@@ -103,7 +103,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       {/* Fee potential */}
       <div className="flex items-center justify-between rounded-xl px-3 py-2"
         style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)' }}>
-        <span className="text-[10px] uppercase tracking-wider text-amber-300/70">Est. spread capture / day ($1K LP)</span>
+        <span className="text-[10px] uppercase tracking-wider text-amber-300">Est. spread capture / day ($1K LP)</span>
         <span className="text-sm font-black text-amber-300">{formatCurrency(opp.estDailyFee, true)}</span>
       </div>
 
@@ -112,19 +112,19 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
         <div className="flex items-center gap-3">
           {/* Days to resolve */}
           <div>
-            <p className="text-[9px] uppercase tracking-wider text-ink/30 mb-0.5">Resolves in</p>
+            <p className="text-[10px] uppercase tracking-wider text-ink/55 mb-0.5">Resolves in</p>
             {opp.daysToResolve != null ? (
               <p className={`text-xs font-bold ${opp.daysToResolve < 5 ? 'text-rose-400' : 'text-ink/70'}`}>
                 {opp.daysToResolve === 0 ? '<1d' : `${opp.daysToResolve}d`}
                 {opp.daysToResolve < 5 && <span className="ml-1 text-[10px]">⚠</span>}
               </p>
             ) : (
-              <p className="text-xs font-bold text-ink/30">—</p>
+              <p className="text-xs font-bold text-ink/55">—</p>
             )}
           </div>
           {/* Spread volatility */}
           <div>
-            <p className="text-[9px] uppercase tracking-wider text-ink/30 mb-0.5">Price move 24h</p>
+            <p className="text-[10px] uppercase tracking-wider text-ink/55 mb-0.5">Price move 24h</p>
             <p className={`text-xs font-bold ${opp.spreadVol > 30 ? 'text-rose-400' : opp.spreadVol > 10 ? 'text-amber-300' : 'text-ink/70'}`}>
               {opp.spreadVol.toFixed(1)}%
             </p>
@@ -146,7 +146,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
       {/* Score + CTA */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-ink/30 uppercase tracking-wider">LP Score</span>
+          <span className="text-[10px] text-ink/55 uppercase tracking-wider">LP Score</span>
           <span className="group relative cursor-help rounded-full px-2.5 py-0.5 text-[11px] font-black"
             style={{ background: `${scoreColor(sc)}20`, color: scoreColor(sc), border: `1px solid ${scoreColor(sc)}40` }}>
             {sc} · {scoreLabel(sc)}
@@ -155,31 +155,31 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
               className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded-xl p-3 text-left opacity-0 shadow-xl transition-opacity duration-150 group-hover:opacity-100"
               style={{ background: 'rgba(25,25,25,0.97)', border: '1px solid rgba(var(--ink-rgb),0.12)' }}
             >
-              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-ink/40">
+              <span className="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-ink/55">
                 Score Breakdown
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Reward Pool</span>
+                <span className="text-ink/55">Reward Pool</span>
                 <span className="font-bold text-emerald-300">{opp.scoreBreakdown.rewards}/25</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Volume</span>
+                <span className="text-ink/55">Volume</span>
                 <span className="font-bold text-sky-300">{opp.scoreBreakdown.volume}/20</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Spread</span>
+                <span className="text-ink/55">Spread</span>
                 <span className="font-bold text-amber-300">{opp.scoreBreakdown.spread}/15</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Stability</span>
+                <span className="text-ink/55">Stability</span>
                 <span className="font-bold text-ink/70">{opp.scoreBreakdown.stability}/15</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Horizon</span>
+                <span className="text-ink/55">Horizon</span>
                 <span className="font-bold text-cyan-300">{opp.scoreBreakdown.horizon}/15</span>
               </span>
               <span className="flex items-center justify-between py-0.5 text-[11px]">
-                <span className="text-ink/50">Balance</span>
+                <span className="text-ink/55">Balance</span>
                 <span className="font-bold text-rose-300">{opp.scoreBreakdown.balance}/10</span>
               </span>
               <span className="mt-1.5 flex items-center justify-between border-t border-ink/10 pt-1.5 text-[11px]">
@@ -300,7 +300,7 @@ function LPLeaderboardSection() {
           {LP_PERIODS.map(p => (
             <button key={p} onClick={() => setPeriod(p)}
               className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                ${period === p ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}>
+                ${period === p ? 'text-ink' : 'text-ink/55 hover:text-ink/60'}`}>
               {period === p && (
                 <span className="absolute inset-0 rounded-lg"
                   style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.4),rgba(16,185,129,0.4))', border: '1px solid rgba(52,211,153,0.3)' }} />
@@ -315,10 +315,10 @@ function LPLeaderboardSection() {
         {/* Table header */}
         <div className="grid grid-cols-[40px_1fr_140px_140px] px-4 py-3 glass-strong"
           style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/30">#</span>
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/30">Trader</span>
-          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/30">Volume (shares)</span>
-          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/30">P&amp;L</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">#</span>
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">Trader</span>
+          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/55">Volume (shares)</span>
+          <span className="text-right text-[10px] font-semibold uppercase tracking-widest text-ink/55">P&amp;L</span>
         </div>
         <div>
           {loading ? Array.from({ length: 8 }).map((_, i) => (
@@ -333,7 +333,7 @@ function LPLeaderboardSection() {
             <Link key={t.proxyWallet} href={`/wallet/${t.proxyWallet}`}
               className="grid grid-cols-[40px_1fr_140px_140px] px-4 py-3.5 transition-colors hover:bg-ink/[0.03] cursor-pointer"
               style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)' }}>
-              <span className="font-mono text-xs text-ink/25">#{i + 1}</span>
+              <span className="font-mono text-xs text-ink/55">#{i + 1}</span>
               <div className="flex items-center gap-2 min-w-0">
                 <div className="h-7 w-7 rounded-full flex items-center justify-center text-[10px] font-black text-ink flex-shrink-0"
                   style={{ background: 'var(--accent-grad)' }}>
@@ -341,11 +341,11 @@ function LPLeaderboardSection() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-ink/75 truncate">{t.userName || formatAddress(t.proxyWallet)}</p>
-                  <p className="font-mono text-[10px] text-ink/20 truncate">{formatAddress(t.proxyWallet)}</p>
+                  <p className="font-mono text-[10px] text-ink/55 truncate">{formatAddress(t.proxyWallet)}</p>
                 </div>
               </div>
               <div className="flex items-center justify-end">
-                <span className="text-xs font-bold text-ink/50">{formatShares(t.vol ?? 0)}</span>
+                <span className="text-xs font-bold text-ink/55">{formatShares(t.vol ?? 0)}</span>
               </div>
               <div className="flex items-center justify-end">
                 <span className={`text-xs font-black ${(t.pnl ?? 0) >= 0 ? 'text-grad-profit' : 'text-grad-loss'}`}>
@@ -378,16 +378,16 @@ function DepthBar({ levels, best, side, maxTotal }: {
         const dist = Math.abs(l.price - best) * 100;
         return (
           <div key={i} className="flex items-center gap-2 text-[10px]">
-            <span className="w-10 text-right tabular-nums text-ink/35">{(l.price * 100).toFixed(1)}¢</span>
+            <span className="w-10 text-right tabular-nums text-ink/55">{(l.price * 100).toFixed(1)}¢</span>
             <div className="flex-1 relative h-5 rounded-sm overflow-hidden" style={{ background: 'rgba(var(--ink-rgb),0.03)' }}>
               <div className="absolute inset-y-0 h-full rounded-sm transition-all duration-500"
                 style={{ width: `${barW}%`, background: bg, borderRight: `2px solid ${color}40`,
                   [side === 'bid' ? 'right' : 'left']: 0 }} />
-              <span className="absolute inset-0 flex items-center px-2 text-ink/40 tabular-nums" style={{ fontSize: 9 }}>
+              <span className="absolute inset-0 flex items-center px-2 text-ink/55 tabular-nums" style={{ fontSize: 9 }}>
                 {l.size.toFixed(0)} ({dist.toFixed(1)}¢ away)
               </span>
             </div>
-            <span className="w-14 tabular-nums text-ink/25">${l.total.toFixed(0)}</span>
+            <span className="w-14 tabular-nums text-ink/55">${l.total.toFixed(0)}</span>
           </div>
         );
       })}
@@ -462,7 +462,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             {/* Cumulative depth curve */}
             {depthCurve.length > 1 && (
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/35 mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/55 mb-2">
                   Cumulative Depth Curve
                 </p>
                 <ResponsiveContainer width="100%" height={250}>
@@ -516,7 +516,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
               ].map(m => (
                 <div key={m.label} className="rounded-xl px-4 py-3"
                   style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                  <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-1">{m.label}</p>
+                  <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-1">{m.label}</p>
                   <p className="text-sm font-black" style={{ color: m.color }}>{m.value}</p>
                 </div>
               ))}
@@ -525,15 +525,15 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             {/* Liquidity score + imbalance */}
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-ink/40">Liquidity Quality</span>
+                <span className="text-xs text-ink/55">Liquidity Quality</span>
                 <span className="rounded-full px-3 py-0.5 text-sm font-black"
                   style={{ background: `${scoreColor(depth.qualityScore)}20`, color: scoreColor(depth.qualityScore), border: `1px solid ${scoreColor(depth.qualityScore)}40` }}>
                   {depth.qualityScore}/100, {scoreLabel(depth.qualityScore)}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-ink/40">Order Imbalance</span>
-                <span className={`text-xs font-bold ${depth.imbalance > 0.1 ? 'text-emerald-400' : depth.imbalance < -0.1 ? 'text-rose-400' : 'text-ink/50'}`}>
+                <span className="text-xs text-ink/55">Order Imbalance</span>
+                <span className={`text-xs font-bold ${depth.imbalance > 0.1 ? 'text-emerald-400' : depth.imbalance < -0.1 ? 'text-rose-400' : 'text-ink/55'}`}>
                   {depth.imbalance > 0 ? 'Bid Heavy' : depth.imbalance < 0 ? 'Ask Heavy' : 'Balanced'} ({pct(Math.abs(depth.imbalance))})
                 </span>
               </div>
@@ -542,13 +542,13 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
             {/* Depth visualization */}
             <div className="grid gap-4 lg:grid-cols-2">
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400/70 mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-emerald-400 mb-2">
                   Bids · Total {formatCurrency(depth.bidDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.bids} best={depth.bestBid} side="bid" maxTotal={maxTotal} />
               </div>
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-rose-400/70 mb-2">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-rose-400 mb-2">
                   Asks · Total {formatCurrency(depth.askDepthTotal, true)}
                 </p>
                 <DepthBar levels={depth.asks} best={depth.bestAsk} side="ask" maxTotal={maxTotal} />
@@ -558,7 +558,7 @@ function MarketDepthSection({ opps }: { opps: LPOpportunity[] }) {
         )}
 
         {!loading && !depth && (
-          <p className="text-center text-sm text-ink/25 py-8">Select a market to view orderbook</p>
+          <p className="text-center text-sm text-ink/55 py-8">Select a market to view orderbook</p>
         )}
       </div>
     </section>
@@ -601,7 +601,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
         {/* Inputs */}
         <div className="glass rounded-2xl p-6 flex flex-col gap-5" style={{ border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
           <div>
-            <label className="block text-xs font-semibold text-ink/50 mb-2">Select Market</label>
+            <label className="block text-xs font-semibold text-ink/55 mb-2">Select Market</label>
             <select
               value={selected?.conditionId ?? ''}
               onChange={e => setChoice(opps.find(o => o.conditionId === e.target.value) ?? null)}
@@ -615,7 +615,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
               ))}
             </select>
             {selected && (
-              <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-ink/30">
+              <div className="mt-2 flex flex-wrap gap-3 text-[10px] text-ink/55">
                 <span>Spread: <span className="text-ink/60">{(selected.spread * 100).toFixed(1)}¢</span></span>
                 <span>24h Vol: <span className="text-ink/60">{formatCurrency(selected.volume24h, true)}</span></span>
                 <span>Total Liquidity: <span className="text-ink/60">{formatCurrency(selected.liquidity, true)}</span></span>
@@ -624,10 +624,10 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-ink/50 mb-2">Your Liquidity Amount (USDC)</label>
+            <label className="block text-xs font-semibold text-ink/55 mb-2">Your Liquidity Amount (USDC)</label>
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/30 font-bold">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/55 font-bold">$</span>
                 <input
                   type="number"
                   value={amount}
@@ -641,7 +641,7 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
             <div className="flex gap-2 mt-2">
               {[500, 1000, 5000, 10000].map(v => (
                 <button key={v} onClick={() => setAmount(String(v))}
-                  className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-ink/40 transition-all hover:text-ink/70"
+                  className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-ink/55 transition-all hover:text-ink/70"
                   style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
                   ${v >= 1000 ? `${v / 1000}K` : v}
                 </button>
@@ -649,18 +649,18 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
             </div>
           </div>
 
-          <div className="rounded-xl px-4 py-3 text-[10px] text-ink/25 leading-relaxed"
+          <div className="rounded-xl px-4 py-3 text-[10px] text-ink/55 leading-relaxed"
             style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
             {hasRealPool ? (
               <>
-                <strong className="text-emerald-400/70">Real reward pool:</strong> this market pays{' '}
-                <strong className="text-ink/50">{formatCurrency(selected?.rewardsDailyRate ?? 0, true)}/day</strong> to makers
+                <strong className="text-emerald-400">Real reward pool:</strong> this market pays{' '}
+                <strong className="text-ink/55">{formatCurrency(selected?.rewardsDailyRate ?? 0, true)}/day</strong> to makers
                 (Polymarket liquidity rewards program). Estimate = your_share × daily pool.
                 Actual payouts depend on spread tightness, uptime and two-sidedness.
               </>
             ) : (
               <>
-                <strong className="text-ink/40">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
+                <strong className="text-ink/55">Formula:</strong> your_share × daily_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate rate.
                 Estimates only; actual rewards depend on spread, fill rate, and Polymarket&apos;s reward program.
               </>
             )}
@@ -678,16 +678,16 @@ function RewardSimulator({ opps }: { opps: LPOpportunity[] }) {
             <div key={r.label} className="flex items-center gap-4 rounded-2xl px-5 py-4"
               style={{ background: r.gradient, border: `1px solid ${r.color}33` }}>
               <div className="flex-1">
-                <p className="text-[10px] uppercase tracking-widest text-ink/35">{r.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-ink/55">{r.label}</p>
                 <p className="text-2xl font-black mt-0.5" style={{ color: r.color }}>{r.value}</p>
-                <p className="text-[10px] text-ink/25 mt-0.5">{r.sub}</p>
+                <p className="text-[10px] text-ink/55 mt-0.5">{r.sub}</p>
               </div>
             </div>
           ))}
 
           {/* Your share */}
           <div className="rounded-2xl px-5 py-3 glass flex items-center justify-between">
-            <span className="text-xs text-ink/40">Your pool share</span>
+            <span className="text-xs text-ink/55">Your pool share</span>
             <span className="text-sm font-black text-ink">{selected ? pct(yourShare, 3) : '—'}</span>
           </div>
         </div>
@@ -745,7 +745,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
           {PH_WINDOWS.map(w => (
             <button key={w.key} onClick={() => setWin(w.key)}
               className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                ${win === w.key ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}>
+                ${win === w.key ? 'text-ink' : 'text-ink/55 hover:text-ink/60'}`}>
               {win === w.key && (
                 <span className="absolute inset-0 rounded-lg"
                   style={{ background: 'linear-gradient(135deg,rgba(96,165,250,0.4),rgba(var(--ink-rgb),0.4))', border: '1px solid rgba(96,165,250,0.3)' }} />
@@ -784,7 +784,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
             ].map(s => (
               <div key={s.label} className="rounded-lg px-2.5 py-1.5"
                 style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-                <p className="text-[9px] text-ink/30 uppercase tracking-wider mb-0.5">{s.label}</p>
+                <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-0.5">{s.label}</p>
                 <p className="text-xs font-black" style={{ color: s.color }}>{s.value}</p>
               </div>
             ))}
@@ -796,7 +796,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
           {loading ? (
             <div className="h-full w-full rounded-xl animate-shimmer" />
           ) : err || data.length === 0 ? (
-            <div className="flex h-full items-center justify-center text-sm text-ink/25">
+            <div className="flex h-full items-center justify-center text-sm text-ink/55">
               No price history available for this market
             </div>
           ) : (
@@ -826,7 +826,7 @@ function PriceHistorySection({ opps }: { opps: LPOpportunity[] }) {
                 />
                 <Tooltip
                   contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
-                  labelStyle={{ color: 'rgba(var(--ink-rgb),0.5)' }}
+                  labelStyle={{ color: 'var(--text-muted)' }}
                   labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   formatter={(v) => [`${v}¢`, 'Price'] as [string, string]}
                 />
@@ -888,9 +888,9 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
         {/* Capital input */}
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-xs font-semibold text-ink/50 mb-2">Capital to deploy (USDC)</label>
+            <label className="block text-xs font-semibold text-ink/55 mb-2">Capital to deploy (USDC)</label>
             <div className="relative w-44">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/30 font-bold">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/55 font-bold">$</span>
               <input type="number" min="0" value={amount} onChange={e => setAmount(e.target.value)}
                 className="w-full rounded-xl glass pl-7 pr-4 py-2.5 text-sm font-bold text-ink outline-none"
                 style={{ border: '1px solid rgba(var(--ink-rgb),0.3)' }} />
@@ -899,7 +899,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
           <div className="flex gap-2">
             {[500, 1000, 5000, 10000].map(v => (
               <button key={v} onClick={() => setAmount(String(v))}
-                className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-ink/40 transition-all hover:text-ink/70"
+                className="rounded-lg px-2.5 py-1 text-[10px] font-semibold text-ink/55 transition-all hover:text-ink/70"
                 style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
                 ${v >= 1000 ? `${v / 1000}K` : v}
               </button>
@@ -909,7 +909,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
 
         {/* Market multi-select chips */}
         <div>
-          <p className="text-xs font-semibold text-ink/50 mb-2">Markets to compare ({picked.length} selected)</p>
+          <p className="text-xs font-semibold text-ink/55 mb-2">Markets to compare ({picked.length} selected)</p>
           <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
             {opps.map(o => {
               const on = picked.includes(o.conditionId);
@@ -934,7 +934,7 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
             <div className="grid grid-cols-[1fr_90px_90px_100px_80px] px-4 py-2.5 glass-strong"
               style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
               {['Market', 'Pool Share', 'Daily', 'Monthly', 'APR'].map((h, i) => (
-                <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-ink/30 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
+                <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-ink/55 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
               ))}
             </div>
             {rows.map(({ o, yourShare, dailyReward, monthly, apr }) => {
@@ -943,10 +943,10 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
                 <div key={o.conditionId} className="grid grid-cols-[1fr_90px_90px_100px_80px] px-4 py-3 items-center"
                   style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.04)', background: isBest ? 'rgba(52,211,153,0.05)' : 'transparent' }}>
                   <div className="flex items-center gap-2 min-w-0">
-                    {isBest && <span className="text-[9px] font-black px-1.5 py-0.5 rounded" style={{ background: 'rgba(52,211,153,0.2)', color: '#34d399' }}>BEST</span>}
+                    {isBest && <span className="text-[10px] font-black px-1.5 py-0.5 rounded" style={{ background: 'rgba(52,211,153,0.2)', color: '#34d399' }}>BEST</span>}
                     <span className="text-xs font-semibold text-ink/70 truncate">{o.question.slice(0, 48)}</span>
                   </div>
-                  <span className="text-right text-xs font-bold text-ink/50 tabular-nums">{pct(yourShare, 2)}</span>
+                  <span className="text-right text-xs font-bold text-ink/55 tabular-nums">{pct(yourShare, 2)}</span>
                   <span className="text-right text-xs font-black tabular-nums" style={{ color: isBest ? '#34d399' : 'rgba(var(--ink-rgb),0.8)' }}>{formatCurrency(dailyReward)}</span>
                   <span className="text-right text-xs font-bold text-ink/60 tabular-nums">{formatCurrency(monthly)}</span>
                   <span className="text-right text-xs font-bold text-amber-300/80 tabular-nums">{apr.toFixed(1)}%</span>
@@ -955,20 +955,20 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
             })}
           </div>
         ) : (
-          <p className="text-center text-sm text-ink/25 py-6">Select markets above to compare</p>
+          <p className="text-center text-sm text-ink/55 py-6">Select markets above to compare</p>
         )}
 
         {best && (
           <div className="rounded-xl px-4 py-3 flex items-center gap-2"
             style={{ background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.2)' }}>
-            <span className="text-xs text-ink/50">Best for ${amt.toLocaleString()}:</span>
+            <span className="text-xs text-ink/55">Best for ${amt.toLocaleString()}:</span>
             <span className="text-xs font-black text-emerald-300 truncate">{best.o.question.slice(0, 50)}</span>
-            <span className="text-xs text-ink/40 ml-auto flex-shrink-0">≈ {formatCurrency(best.dailyReward)}/day</span>
+            <span className="text-xs text-ink/55 ml-auto flex-shrink-0">≈ {formatCurrency(best.dailyReward)}/day</span>
           </div>
         )}
 
-        <p className="text-[10px] text-ink/25 leading-relaxed">
-          Markets with an active Polymarket reward program use their <span className="text-emerald-400/70 font-semibold">real daily pool</span> (your_share × daily pool); others fall back to your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s scoring.
+        <p className="text-[10px] text-ink/55 leading-relaxed">
+          Markets with an active Polymarket reward program use their <span className="text-emerald-400 font-semibold">real daily pool</span> (your_share × daily pool); others fall back to your_share × 24h_volume × {(MAKER_REBATE_RATE * 100).toFixed(1)}% maker rebate. Actual rewards depend on spread, fill rate and Polymarket&apos;s scoring.
         </p>
       </div>
     </section>
@@ -980,9 +980,9 @@ function LPCalculator({ opps }: { opps: LPOpportunity[] }) {
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
@@ -992,7 +992,7 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
 function DataCell({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[140px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
       <p className="font-mono text-xl font-black tabular-nums leading-none" style={{ color: accent ?? 'rgba(var(--ink-rgb),0.88)' }}>{value}</p>
     </div>
   );
@@ -1045,7 +1045,7 @@ export default function LiquidityPage() {
           <span className="text-ink">Liquidity</span>{' '}
           <span className="text-grad">Hub</span>
         </h1>
-        <p className="text-sm text-ink/40 max-w-xl">
+        <p className="text-sm text-ink/55 max-w-xl">
           Discover LP opportunities, analyze market depth, and simulate maker rewards on Polymarket.
         </p>
         <div className="mt-4 flex items-center gap-3">
@@ -1054,11 +1054,11 @@ export default function LiquidityPage() {
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
             Live
           </span>
-          <span className="text-[11px] text-ink/30">
+          <span className="text-[11px] text-ink/55">
             {agoSec == null ? 'Loading…' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
           </span>
           <button onClick={() => { setOppsLoading(true); loadOpps(); }}
-            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-ink/50 transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-ink/55 transition-colors hover:text-ink"
             style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
             <svg className={`h-3 w-3 ${oppsLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />

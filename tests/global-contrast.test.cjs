@@ -47,3 +47,32 @@ test('market category badges use theme variables with darker light-theme tones (
     assert.match(light.slice(0, light.indexOf('}')), new RegExp(`--cat-${c}:\\s*#[0-9a-f]{6}`), `light --cat-${c}`);
   }
 });
+
+const PAGE_FILES = [
+  'src/app/leaderboard/page.tsx', 'src/app/wallet/[address]/page.tsx',
+  'src/app/liquidity/page.tsx', 'src/app/liquidity/Backtester.tsx', 'src/app/liquidity/RewardFarms.tsx',
+  'src/app/liquidity/FarmChanges.tsx', 'src/app/liquidity/RecorderHealth.tsx', 'src/app/liquidity/ModelValidation.tsx',
+  'src/components/CopyAddress.tsx', 'src/components/LatestMoves.tsx', 'src/components/LeaderboardTable.tsx',
+  'src/components/LpEarnings.tsx', 'src/components/PnlTimeline.tsx', 'src/components/PositionCard.tsx',
+  'src/components/StatsCard.tsx', 'src/components/WalletActivity.tsx', 'src/components/WalletCharts.tsx',
+  'src/components/WalletSidebar.tsx',
+];
+
+test('leaderboard, wallet and liquidity: no sub-ink/55 text, no 8-9px text, no faint inline ink colour (2026-11-23 audit)', () => {
+  for (const f of PAGE_FILES) {
+    const s = read(f);
+    assert.deepEqual([...s.matchAll(/(?<![:\w-])text-ink\/([1-4]\d|50)\b/g)].map(m => m[0]), [], `${f}: low-contrast ink text class`);
+    assert.doesNotMatch(s, /text-\[(?:8|9)px\]/, `${f}: 8-9px text`);
+    const faint = [...s.matchAll(/color:\s*'rgba\(var\(--ink-rgb\),\s*0?\.(\d+)\)'/g)].filter(m => Number(`0.${m[1]}`) < 0.55);
+    assert.deepEqual(faint.map(m => m[0]), [], `${f}: faint inline ink colour`);
+    assert.doesNotMatch(s, /(?<![:\w-])text-(?:rose|emerald|amber|red|green|sky)-\d00\/[1-7]\d\b/, `${f}: dimmed coloured text`);
+  }
+});
+
+test('wallet/liquidity tap targets and mobile overflow (2026-11-23 audit)', () => {
+  assert.match(read('src/components/CopyAddress.tsx'), /width: 24, height: 24/);
+  assert.match(read('src/app/wallet/[address]/page.tsx'), /href="\/leaderboard" className="inline-flex min-h-6/);
+  const fc = read('src/app/liquidity/FarmChanges.tsx');
+  assert.match(fc, /hidden w-16 flex-shrink-0[^"]*sm:inline/);
+  assert.match(fc, /gap-2 px-3 py-2\.5 sm:gap-3 sm:px-4/);
+});

@@ -17,7 +17,7 @@ export default function StatsCard({ label, value, sub, valueClass, gradient, ico
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between mb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/35">{label}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-ink/55">{label}</p>
         {icon && (
           <div className="flex h-7 w-7 items-center justify-center rounded-lg"
             style={{ background: gradient ?? 'var(--accent-tint)', border: '1px solid var(--accent-border-xs)' }}>
@@ -26,7 +26,7 @@ export default function StatsCard({ label, value, sub, valueClass, gradient, ico
         )}
       </div>
       <p className={`text-2xl font-black tracking-tight ${valueClass ?? 'text-ink'}`}>{value}</p>
-      {sub && <p className="mt-1 text-[11px] text-ink/30">{sub}</p>}
+      {sub && <p className="mt-1 text-[11px] text-ink/55">{sub}</p>}
     </div>
   );
 }

@@ -20,9 +20,9 @@ const STATUS_META: Record<RecorderStatus, { label: string; color: string; dot: b
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
@@ -47,9 +47,9 @@ function span(hours: number): string {
 function Stat({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
     <div className="rounded-xl px-3.5 py-2.5" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-      <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-1">{label}</p>
       <p className="text-sm font-black tabular-nums" style={{ color: color ?? 'rgba(var(--ink-rgb),0.88)' }}>{value}</p>
-      {sub && <p className="text-[10px] text-ink/25 mt-0.5">{sub}</p>}
+      {sub && <p className="text-[10px] text-ink/55 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -107,13 +107,13 @@ export default function RecorderHealth() {
         )}
 
         {!loading && data?.enabled === false && (
-          <p className="text-center text-sm text-ink/25 py-6">
+          <p className="text-center text-sm text-ink/55 py-6">
             Snapshot storage isn&apos;t configured — the recorder needs the KV history store (UPSTASH_REDIS_REST_URL / _TOKEN).
           </p>
         )}
 
         {!loading && data?.enabled && data.snapshots === 0 && (
-          <p className="text-center text-sm text-ink/25 py-6">
+          <p className="text-center text-sm text-ink/55 py-6">
             No snapshots recorded yet. Once the 10-minute recorder runs, coverage and cadence stats appear here.
           </p>
         )}
@@ -135,7 +135,7 @@ export default function RecorderHealth() {
             {/* 7-day coverage progress */}
             <div>
               <div className="mb-1.5 flex items-center justify-between text-[11px]">
-                <span className="font-semibold uppercase tracking-widest text-ink/35">Replayable coverage → 7-day window</span>
+                <span className="font-semibold uppercase tracking-widest text-ink/55">Replayable coverage → 7-day window</span>
                 <span className="font-black tabular-nums" style={{ color: data.coveragePct >= 100 ? '#34d399' : '#fbbf24' }}>
                   {data.coveragePct.toFixed(0)}%
                 </span>
@@ -149,7 +149,7 @@ export default function RecorderHealth() {
                       : 'linear-gradient(90deg,#fbbf24,#f97316)',
                   }} />
               </div>
-              <p className="mt-1.5 text-[10px] text-ink/30">
+              <p className="mt-1.5 text-[10px] text-ink/55">
                 {(data.coveredHours / 24).toFixed(1)}d of {(data.targetHours / 24).toFixed(1)}d recorded
                 {remainingDays > 0
                   ? ` · ~${remainingDays} more day${remainingDays > 1 ? 's' : ''} of recording for a full 7-day backtest`
@@ -161,8 +161,8 @@ export default function RecorderHealth() {
             {/* Hourly density — empty bars are hours with no snapshot (gaps) */}
             {chartData.length > 1 && (
               <div>
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/35">
-                  Snapshots per hour <span className="text-ink/20 normal-case tracking-normal">· empty columns = gaps</span>
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-ink/55">
+                  Snapshots per hour <span className="text-ink/55 normal-case tracking-normal">· empty columns = gaps</span>
                 </p>
                 <ResponsiveContainer width="100%" height={90}>
                   <BarChart data={chartData} margin={{ top: 2, right: 4, left: 4, bottom: 0 }} barCategoryGap={1}>
@@ -173,7 +173,7 @@ export default function RecorderHealth() {
                     <Tooltip
                       cursor={{ fill: 'rgba(var(--ink-rgb),0.04)' }}
                       contentStyle={{ background: 'rgba(25,25,25,0.95)', border: '1px solid rgba(var(--ink-rgb),0.1)', borderRadius: 12, fontSize: 12 }}
-                      labelStyle={{ color: 'rgba(var(--ink-rgb),0.5)' }}
+                      labelStyle={{ color: 'var(--text-muted)' }}
                       labelFormatter={t => new Date(t as number).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit' })}
                       formatter={(v) => [`${v} snapshot${Number(v) === 1 ? '' : 's'}`, 'Recorded'] as [string, string]} />
                     <Bar dataKey="count" radius={[2, 2, 0, 0]} isAnimationActive={false}>
@@ -186,7 +186,7 @@ export default function RecorderHealth() {
               </div>
             )}
 
-            <p className="text-[10px] text-ink/25 leading-relaxed">
+            <p className="text-[10px] text-ink/55 leading-relaxed">
               {`The recorder snapshots reward-farm liquidity, spread and daily pool every ${data.cadenceMin} minutes into KV. `}
               {`"Replayable" coverage counts only observed time — gaps beyond 3h aren't credited, matching the Backtester. `}
               {`If cadence drifts far above ${data.cadenceMin}m or status shows Stalled, the cron pinger likely needs attention.`}

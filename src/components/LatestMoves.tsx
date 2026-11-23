@@ -51,7 +51,7 @@ function MoveRow({ trade }: { trade: RecentTrade }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={trade.icon} alt="" className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-[10px] text-ink/30">◧</div>
+          <div className="flex h-full w-full items-center justify-center text-[10px] text-ink/55">◧</div>
         )}
       </div>
 
@@ -67,14 +67,14 @@ function MoveRow({ trade }: { trade: RecentTrade }) {
           {trade.outcome && (
             <span className="font-semibold" style={{ color: outcomeColor }}>{trade.outcome}</span>
           )}
-          {priceC != null && <span className="text-ink/30">@ {priceC}¢</span>}
+          {priceC != null && <span className="text-ink/55">@ {priceC}¢</span>}
         </div>
       </div>
 
       {/* amount + time */}
       <div className="flex-shrink-0 text-right">
         <p className="text-sm font-black tabular-nums text-ink">{formatCurrency(amount, true)}</p>
-        <p className="mt-0.5 text-[10px] text-ink/25">{timeAgo(ts)} ago</p>
+        <p className="mt-0.5 text-[10px] text-ink/55">{timeAgo(ts)} ago</p>
       </div>
     </a>
   );
@@ -106,12 +106,12 @@ export default function LatestMoves({ address }: { address: string }) {
         <div className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'var(--text-primary)' }} />
           <h2 className="text-sm font-bold uppercase tracking-wider text-ink/70">Latest Moves</h2>
-          <span className="rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider"
+          <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
             style={{ background: 'var(--accent-bg)', color: 'var(--text-secondary)', border: '1px solid var(--accent-border-xs)' }}>
             Copy-trade signal
           </span>
         </div>
-        <span className="text-[10px] text-ink/25">{stale ? 'Most recent activity' : 'Last 30 days'}</span>
+        <span className="text-[10px] text-ink/55">{stale ? 'Most recent activity' : 'Last 30 days'}</span>
       </div>
 
       <div className="glass rounded-2xl p-2">

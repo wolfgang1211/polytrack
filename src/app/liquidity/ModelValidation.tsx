@@ -19,9 +19,9 @@ const WINDOWS = [
 function SectionHeader({ index, label, controls }: { index: string; label: string; controls?: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
       {controls && <div className="flex-shrink-0 ml-2">{controls}</div>}
     </div>
@@ -31,9 +31,9 @@ function SectionHeader({ index, label, controls }: { index: string; label: strin
 function Stat({ label, value, sub, color }: { label: string; value: string; sub?: string; color?: string }) {
   return (
     <div className="rounded-xl px-3.5 py-2.5" style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
-      <p className="text-[10px] text-ink/30 uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-[10px] text-ink/55 uppercase tracking-wider mb-1">{label}</p>
       <p className="text-sm font-black tabular-nums" style={{ color: color ?? 'rgba(var(--ink-rgb),0.88)' }}>{value}</p>
-      {sub && <p className="text-[10px] text-ink/25 mt-0.5">{sub}</p>}
+      {sub && <p className="text-[10px] text-ink/55 mt-0.5">{sub}</p>}
     </div>
   );
 }
@@ -73,7 +73,7 @@ export default function ModelValidation() {
           {WINDOWS.map(w => (
             <button key={w.key} onClick={() => setHours(w.key)}
               className={`relative rounded-lg px-3 py-1 text-[11px] font-bold transition-all
-                ${hours === w.key ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}>
+                ${hours === w.key ? 'text-ink' : 'text-ink/55 hover:text-ink/60'}`}>
               {hours === w.key && (
                 <span className="absolute inset-0 rounded-lg"
                   style={{ background: 'linear-gradient(135deg,rgba(52,211,153,0.4),rgba(16,185,129,0.4))', border: '1px solid rgba(52,211,153,0.3)' }} />
@@ -88,7 +88,7 @@ export default function ModelValidation() {
         {/* Inputs */}
         <div className="flex flex-wrap items-end gap-4">
           <div className="flex-1 min-w-[260px]">
-            <label className="block text-xs font-semibold text-ink/50 mb-2">LP wallet address</label>
+            <label className="block text-xs font-semibold text-ink/55 mb-2">LP wallet address</label>
             <input type="text" value={address} spellCheck={false}
               onChange={e => setAddress(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') run(); }}
@@ -97,9 +97,9 @@ export default function ModelValidation() {
               style={{ border: `1px solid ${address && !addrOk ? 'rgba(251,113,133,0.4)' : 'rgba(52,211,153,0.3)'}` }} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-ink/50 mb-2">Sim capital</label>
+            <label className="block text-xs font-semibold text-ink/55 mb-2">Sim capital</label>
             <div className="relative w-32">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/30 font-bold">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-ink/55 font-bold">$</span>
               <input type="number" min="1" value={amount} onChange={e => setAmount(e.target.value)}
                 className="w-full rounded-xl glass pl-7 pr-3 py-2.5 text-sm font-bold text-ink outline-none"
                 style={{ border: '1px solid rgba(var(--ink-rgb),0.1)' }} />
@@ -113,14 +113,14 @@ export default function ModelValidation() {
         </div>
 
         {!data && !loading && !failed && (
-          <p className="text-center text-sm text-ink/25 py-6">
+          <p className="text-center text-sm text-ink/55 py-6">
             Paste a wallet that actually provided liquidity to see its real maker-fill spread earnings
             next to what the backtest model predicts for the same markets and window.
           </p>
         )}
 
         {failed && (
-          <p className="text-center text-sm text-rose-300/60 py-6">
+          <p className="text-center text-sm text-rose-300 py-6">
             Comparison failed — the fill fetch or snapshot read errored. Try again in a moment.
           </p>
         )}
@@ -132,13 +132,13 @@ export default function ModelValidation() {
         )}
 
         {!loading && data?.enabled === false && (
-          <p className="text-center text-sm text-ink/25 py-6">
+          <p className="text-center text-sm text-ink/55 py-6">
             Validation needs the KV snapshot store configured.
           </p>
         )}
 
         {!loading && data?.error && data.enabled && (
-          <p className="text-center text-sm text-ink/25 py-6">{data.error}.</p>
+          <p className="text-center text-sm text-ink/55 py-6">{data.error}.</p>
         )}
 
         {!loading && hasResult && data && (
@@ -162,7 +162,7 @@ export default function ModelValidation() {
               <div className="grid grid-cols-[1fr_100px_90px_100px_80px] px-4 py-2.5 glass-strong"
                 style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
                 {['Market', 'Real P&L', 'Maker Vol', 'Sim Rewards', 'Coverage'].map((h, i) => (
-                  <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-ink/30 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
+                  <span key={h} className={`text-[10px] font-semibold uppercase tracking-widest text-ink/55 ${i === 0 ? '' : 'text-right'}`}>{h}</span>
                 ))}
               </div>
               {rows.map(r => (
@@ -172,30 +172,30 @@ export default function ModelValidation() {
                   <div className="min-w-0 pr-2">
                     <p className="truncate text-xs font-semibold text-ink/70">
                       {r.question ?? `${r.tokenIds[0].slice(0, 14)}…`}
-                      {r.outcome && <span className="text-ink/30"> · {r.outcome}</span>}
+                      {r.outcome && <span className="text-ink/55"> · {r.outcome}</span>}
                     </p>
                     {r.simEarned == null && (
-                      <p className="text-[9px] text-ink/25">not in snapshot history — no sim possible</p>
+                      <p className="text-[10px] text-ink/55">not in snapshot history — no sim possible</p>
                     )}
                   </div>
                   <span className="text-right text-xs font-black tabular-nums" style={{ color: pnlColor(r.realRealized) }}>
                     {formatCurrency(r.realRealized)}
                   </span>
-                  <span className="text-right text-xs font-bold tabular-nums text-ink/50">
+                  <span className="text-right text-xs font-bold tabular-nums text-ink/55">
                     {formatCurrency(r.realVolume, true)}
                   </span>
                   <span className="text-right text-xs font-black tabular-nums"
                     style={{ color: r.simEarned == null ? 'rgba(var(--ink-rgb),0.2)' : '#fbbf24' }}>
                     {r.simEarned == null ? '—' : formatCurrency(r.simEarned)}
                   </span>
-                  <span className={`text-right text-xs font-bold tabular-nums ${r.simCoveragePct < 50 ? 'text-rose-400/70' : 'text-ink/40'}`}>
+                  <span className={`text-right text-xs font-bold tabular-nums ${r.simCoveragePct < 50 ? 'text-rose-400' : 'text-ink/55'}`}>
                     {r.simEarned == null ? '—' : `${r.simCoveragePct.toFixed(0)}%`}
                   </span>
                 </div>
               ))}
             </div>
 
-            <p className="text-[10px] text-ink/25 leading-relaxed">
+            <p className="text-[10px] text-ink/55 leading-relaxed">
               {`Real = the wallet's realized maker-fill spread capture (cost-basis replay, reward payouts NOT included). `}
               {`Sim = the Backtester's reward-pool model (share × daily_pool × Δt) run over the same window for the same markets — spread and inventory risk NOT included. `}
               {`They measure different income streams, so don't expect equality: the bridge checks whether the model favors the markets where real LPs actually earned, and whether magnitudes are plausible. `}

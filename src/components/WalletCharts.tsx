@@ -21,7 +21,7 @@ const CAT_COLORS: Record<string, string> = {
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass rounded-2xl p-3.5">
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/35">{title}</p>
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/55">{title}</p>
       {children}
     </div>
   );
@@ -78,7 +78,7 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
 
   return (
     <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/25">Performance Breakdown</p>
+      <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-ink/55">Performance Breakdown</p>
       <div className="grid gap-3 lg:grid-cols-[1fr_320px]">
 
         {/* P&L by category */}
@@ -118,13 +118,13 @@ export default function WalletCharts({ positions }: { positions: Position[] }) {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-[168px] items-center justify-center text-xs text-ink/25">No data</div>
+            <div className="flex h-[168px] items-center justify-center text-xs text-ink/55">No data</div>
           )}
           <div className="mt-2 flex justify-center gap-4">
             {splitData.map(d => (
               <div key={d.name} className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full" style={{ background: d.fill }} />
-                <span className="text-[10px] text-ink/40">{d.name}</span>
+                <span className="text-[10px] text-ink/55">{d.name}</span>
               </div>
             ))}
           </div>

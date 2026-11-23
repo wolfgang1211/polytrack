@@ -51,7 +51,7 @@ function Panel({ accent, title, sub, children }: {
         <span className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full" style={{ background: accent }} />
         <div>
           <h3 className="text-xs font-black text-ink">{title}</h3>
-          <p className="text-[10px] text-ink/35 mt-0.5 leading-snug">{sub}</p>
+          <p className="text-[10px] text-ink/55 mt-0.5 leading-snug">{sub}</p>
         </div>
       </div>
       {children}
@@ -175,7 +175,7 @@ export default function WalletActivity({ address, positions }: { address: string
       <div className="flex items-center gap-2">
         <span className="inline-block h-1 w-6 rounded-full" style={{ background: 'var(--text-primary)' }} />
         <h2 className="text-sm font-bold uppercase tracking-wider text-ink/70">Behaviour &amp; Activity</h2>
-        <span className="text-[10px] text-ink/25">{trades.length} trades analyzed</span>
+        <span className="text-[10px] text-ink/55">{trades.length} trades analyzed</span>
       </div>
 
       <div className="grid gap-2.5 lg:grid-cols-2">
@@ -206,7 +206,7 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#34d399" title="Win Rate by Category"
           sub="Profitable position share per market category (min 3 positions)">
           {byCategory.length === 0 ? (
-            <p className="flex h-36 items-center justify-center text-sm text-ink/25">Not enough data per category</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/55">Not enough data per category</p>
           ) : (
             <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
@@ -231,12 +231,12 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="var(--text-secondary)" title="Avg Hold Time"
           sub="How long positions are held from first buy to last sell (closed round-trips)">
           {!holdStats ? (
-            <p className="flex h-36 items-center justify-center text-sm text-ink/25">No closed round-trips found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/55">No closed round-trips found</p>
           ) : (
             <div className="flex h-36 flex-col justify-center gap-3">
               <div className="text-center">
                 <p className="text-2xl font-black text-grad">{fmtDuration(holdStats.avg)}</p>
-                <p className="mt-0.5 text-[10px] text-ink/30 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
+                <p className="mt-0.5 text-[10px] text-ink/55 uppercase tracking-wider">average across {holdStats.n} round-trips</p>
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {[
@@ -247,7 +247,7 @@ export default function WalletActivity({ address, positions }: { address: string
                   <div key={s.label} className="rounded-lg px-2 py-1.5 text-center"
                     style={{ background: 'rgba(var(--ink-rgb),0.04)', border: '1px solid rgba(var(--ink-rgb),0.06)' }}>
                     <p className="text-xs font-black" style={{ color: s.color }}>{s.value}</p>
-                    <p className="text-[8px] text-ink/30 uppercase tracking-wider mt-0.5">{s.label}</p>
+                    <p className="text-[10px] text-ink/55 uppercase tracking-wider mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -259,7 +259,7 @@ export default function WalletActivity({ address, positions }: { address: string
         <Panel accent="#fbbf24" title="Outcome Bias"
           sub="Yes vs No share of buy orders: does this wallet lean optimistic or contrarian?">
           {bias.totalN === 0 ? (
-            <p className="flex h-36 items-center justify-center text-sm text-ink/25">No buy orders found</p>
+            <p className="flex h-36 items-center justify-center text-sm text-ink/55">No buy orders found</p>
           ) : (
             <div className="flex h-36 flex-col justify-center gap-3.5">
               {/* split bar */}
@@ -275,14 +275,14 @@ export default function WalletActivity({ address, positions }: { address: string
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }}>
-                  <p className="text-[9px] uppercase tracking-wider text-emerald-300/70">Yes buys</p>
+                  <p className="text-[10px] uppercase tracking-wider text-emerald-300">Yes buys</p>
                   <p className="text-base font-black text-emerald-300">{bias.yesN}</p>
-                  <p className="text-[9px] text-ink/30">{formatCurrency(bias.yesUsd, true)}</p>
+                  <p className="text-[10px] text-ink/55">{formatCurrency(bias.yesUsd, true)}</p>
                 </div>
                 <div className="rounded-lg px-3 py-2" style={{ background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
-                  <p className="text-[9px] uppercase tracking-wider text-rose-300/70">No buys</p>
+                  <p className="text-[10px] uppercase tracking-wider text-rose-300">No buys</p>
                   <p className="text-base font-black text-rose-300">{bias.noN}</p>
-                  <p className="text-[9px] text-ink/30">{formatCurrency(bias.noUsd, true)}</p>
+                  <p className="text-[10px] text-ink/55">{formatCurrency(bias.noUsd, true)}</p>
                 </div>
               </div>
             </div>
@@ -298,12 +298,12 @@ export default function WalletActivity({ address, positions }: { address: string
             {/* hour axis */}
             <div className="mb-1 flex pl-7">
               {HOURS.map(h => (
-                <div key={h} className="flex-1 text-center text-[8px] text-ink/25">{h % 3 === 0 ? h : ''}</div>
+                <div key={h} className="flex-1 text-center text-[10px] text-ink/55">{h % 3 === 0 ? h : ''}</div>
               ))}
             </div>
             {heat.grid.map((row, ri) => (
               <div key={ri} className="mb-0.5 flex items-center">
-                <span className="w-7 text-[8px] font-semibold uppercase text-ink/35">{DAY_LABELS[ri]}</span>
+                <span className="w-7 text-[10px] font-semibold uppercase text-ink/55">{DAY_LABELS[ri]}</span>
                 <div className="flex flex-1 gap-px">
                   {row.map((c, ci) => {
                     const intensity = heat.max > 0 ? c / heat.max : 0;
@@ -321,12 +321,12 @@ export default function WalletActivity({ address, positions }: { address: string
             ))}
             {/* legend */}
             <div className="mt-2 flex items-center justify-end gap-1.5 pr-1">
-              <span className="text-[9px] text-ink/25">Less</span>
+              <span className="text-[10px] text-ink/55">Less</span>
               {[0.03, 0.25, 0.5, 0.75, 1].map((v, i) => (
                 <span key={i} className="h-2.5 w-2.5 rounded-sm"
                   style={{ background: v <= 0.03 ? 'rgba(var(--ink-rgb),0.03)' : `rgba(244,114,182,${0.18 + v * 0.8})` }} />
               ))}
-              <span className="text-[9px] text-ink/25">More</span>
+              <span className="text-[10px] text-ink/55">More</span>
             </div>
           </div>
         </div>
