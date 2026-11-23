@@ -125,3 +125,9 @@ test('every liquidity section header drops the decorative rule on mobile; cyan r
   }
   assert.match(read('src/app/globals.css'), /:root\[data-theme="light"\] \.text-cyan-300 \{ color: #0e7490; \}/);
 });
+
+test('light theme: profit/loss gradient text uses dark shades (Polymarket and Kalshi price tiles)', () => {
+  const css = read('src/app/globals.css');
+  assert.match(css, /:root\[data-theme="light"\] \.text-grad-profit \{ background:linear-gradient\(135deg,#047857,#065f46\)/);
+  assert.match(css, /:root\[data-theme="light"\] \.text-grad-loss   \{ background:linear-gradient\(135deg,#be123c,#9f1239\)/);
+});
