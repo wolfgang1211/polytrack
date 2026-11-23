@@ -2,7 +2,7 @@ import { KalshiError, kalshiErrorResponse } from '@/lib/kalshi';
 import { getCachedKalshiTop } from '@/lib/kalshiTopCache';
 
 // Full open-market scan ranked by 24h contract volume (cached 15 min). Takes no input.
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export async function GET(req: Request) {
   try {

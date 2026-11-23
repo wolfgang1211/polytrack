@@ -9,12 +9,12 @@ import { fetchKalshiEvent } from '@/lib/kalshiEvents';
 
 export const SCAN_PAGE_LIMIT = 1000;      // Kalshi's documented max page size for GET /markets
 export const MAX_SCAN_PAGES = 300;        // hard stop (300k markets) so a looping cursor can never run forever
-export const SCAN_BUDGET_MS = 45_000;     // stays inside the function limit; a partial scan is labelled as partial
+export const SCAN_BUDGET_MS = 100_000;    // a full scan takes ~45 s (≈178 pages); maxDuration is 120 s. Partial scans are labelled
 export const PAGE_GAP_MS = 0;             // sequential pages are already well under the public read limit; 429s back off
 export const RATE_LIMIT_RETRIES = 3;      // per page, on Kalshi 429 (mapped to KalshiError 503)
 export const TOP_EVENTS = 60;
 export const OUTCOMES_PER_EVENT = 4;
-export const EVENT_CONCURRENCY = 4;
+export const EVENT_CONCURRENCY = 2;
 
 /** One outcome (= one binary Kalshi market) inside an event card. Prices are Kalshi quotes in USD per contract. */
 export interface KalshiTopOutcome {
@@ -181,7 +181,7 @@ async function defaultGetEvent(eventTicker: string) {
   return { category: event.category, title: event.title };
 }
 
-/** Event title and category for the ranked events (4 in flight; a failed lookup stays per event). */
+/** Event title and category for the ranked events (2 in flight, one retry; a failed lookup stays per event). */
 async function lookupEvents(tickers: string[], getEvent: EventGetter) {
   const meta = new Map<string, { category: string | null; title: string } | null>();
   let i = 0;
@@ -190,7 +190,7 @@ async function lookupEvents(tickers: string[], getEvent: EventGetter) {
       const t = tickers[i++];
       let got: { category: string | null; title: string } | null = null;
       for (let attempt = 0; attempt < 2 && got === null; attempt++) {
-        try { got = await getEvent(t); } catch { if (attempt === 0) await sleep(300); }
+        try { got = await getEvent(t); } catch { if (attempt === 0) await sleep(1000); }
       }
       meta.set(t, got);
     }

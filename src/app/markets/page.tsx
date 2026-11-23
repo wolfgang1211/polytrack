@@ -26,7 +26,7 @@ import MarketPlatformSelect, { DISCOVER_HREF, KalshiViewSelect, resolveKalshiVie
 
 export const revalidate = 120;
 // The Kalshi Top view may run the (cached, 15 min) full open-market scan when its cache entry is refreshed.
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 /* Provider + view navigation share one wrapping row; the client stays a sibling at the same level. */
 const NavRow = ({ children }: { children: ReactNode }) => <div className="flex flex-wrap items-center gap-x-4 gap-y-2">{children}</div>;

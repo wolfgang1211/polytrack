@@ -105,8 +105,17 @@ test('wiring: Kalshi provider link and Top tab go to view=top; the page renders 
   assert.match(views, /href="\/markets\?platform=kalshi&amp;view=top" aria-current="page"[^>]*>Top</);
   const page = fs.readFileSync(path.join(root, 'src/app/markets/page.tsx'), 'utf8');
   assert.match(page, /view === 'top'[\s\S]*getCachedKalshiTop\(\)[\s\S]*<KalshiTopClient/);
-  assert.match(page, /export const maxDuration = 60;/);
+  assert.match(page, /export const maxDuration = 120;/);
   const cache = fs.readFileSync(path.join(root, 'src/lib/kalshiTopCache.ts'), 'utf8');
   assert.match(cache, /unstable_cache\(/);
   assert.match(cache, /KALSHI_TOP_REVALIDATE_S = 900/);
+});
+
+test('no ask: the best bid is shown and labelled as a bid; closed events are hidden', () => {
+  const s = scan();
+  s.events[0].outcomes[0] = { ...s.events[0].outcomes[0], yesAsk: null, yesBid: 0.99 };
+  s.events.push(ev('KXOLD-1', { title: 'Already closed', closeTime: '2026-11-23T20:00:00Z' }));
+  const h = html({ scan: s });
+  assert.match(h, />Cincinnati<\/p><p[^>]*>99¢<span[^>]*>bid<\/span>/);
+  assert.doesNotMatch(h, /Already closed/);
 });

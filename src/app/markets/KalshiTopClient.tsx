@@ -52,14 +52,20 @@ const SORTS = [
 ] as const;
 type SortKey = typeof SORTS[number]['key'];
 
-function Tile({ label, price, yes }: { label: string; price: number | null; yes: boolean }) {
+/** Shows the ask (price to buy); when no one is selling, the best bid is shown and labelled as a bid instead. */
+function Tile({ label, ask, bid, yes }: { label: string; ask: number | null; bid: number | null; yes: boolean }) {
+  const useBid = ask === null && bid !== null;
+  const price = useBid ? bid : ask;
   return (
-    <div className="min-w-0 flex-1 rounded-xl px-3 py-2 text-center" title="Current ask: the price to buy one contract"
+    <div className="min-w-0 flex-1 rounded-xl px-3 py-2 text-center"
+      title={useBid ? 'No ask right now: showing the best bid' : 'Current ask: the price to buy one contract'}
       style={yes
         ? { background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)' }
         : { background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
       <p className="truncate text-xs font-semibold text-ink/55">{label}</p>
-      <p className={`text-base font-black ${yes ? 'text-grad-profit' : 'text-grad-loss'}`}>{cents(price)}</p>
+      <p className={`text-base font-black ${yes ? 'text-grad-profit' : 'text-grad-loss'}`}>
+        {cents(price)}{useBid && <span className="ml-1 text-xs font-semibold text-ink/55">bid</span>}
+      </p>
     </div>
   );
 }
@@ -97,11 +103,11 @@ function EventCard({ event, now }: { event: KalshiTopEvent; now: number }) {
       <div className="flex gap-2">
         {single ? (
           <>
-            <Tile label="Yes" price={event.outcomes[0].yesAsk} yes />
-            <Tile label="No" price={noAsk(event.outcomes[0].yesBid)} yes={false} />
+            <Tile label="Yes" ask={event.outcomes[0].yesAsk} bid={event.outcomes[0].yesBid} yes />
+            <Tile label="No" ask={noAsk(event.outcomes[0].yesBid)} bid={noAsk(event.outcomes[0].yesAsk)} yes={false} />
           </>
         ) : (
-          shown.map((o, i) => <Tile key={o.ticker} label={o.label} price={o.yesAsk} yes={i === 0} />)
+          shown.map((o, i) => <Tile key={o.ticker} label={o.label} ask={o.yesAsk} bid={o.yesBid} yes={i === 0} />)
         )}
       </div>
       {!single && more > 0 && <p className="-mt-2 text-xs text-ink/55">+{more} more outcome{more === 1 ? '' : 's'} · prices are Yes asks</p>}
@@ -145,6 +151,8 @@ export default function KalshiTopClient({ scan, error, serverNow }: { scan: Kals
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
     const list = events.filter(e => {
+      // The list is cached for up to 15 minutes: events that have closed since are hidden, as on the Polymarket view.
+      if (e.closeTime && Date.parse(e.closeTime) <= now) return false;
       if (chip !== 'All' && chipFor(e.category) !== chip) return false;
       if (!query) return true;
       return `${e.title} ${e.category ?? ''} ${e.outcomes.map(o => o.label).join(' ')}`.toLowerCase().includes(query);
@@ -152,7 +160,7 @@ export default function KalshiTopClient({ scan, error, serverNow }: { scan: Kals
     if (sort === 'oi') list.sort((a, b) => b.openInterestContracts - a.openInterestContracts);
     if (sort === 'ending') list.sort((a, b) => Date.parse(a.closeTime ?? '9999-12-31') - Date.parse(b.closeTime ?? '9999-12-31'));
     return list;
-  }, [events, chip, q, sort]);
+  }, [events, chip, q, sort, now]);
 
   const totalVol = useMemo(() => filtered.reduce((s, e) => s + e.volume24hContracts, 0), [filtered]);
 
