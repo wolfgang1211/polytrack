@@ -16,7 +16,7 @@ export default function PolymarketTradeLink({ href, compact = false }: Polymarke
         aria-label="Trade on Polymarket (opens external site)"
         data-polymarket-trade-link
         className={`inline-flex w-full items-center justify-center gap-1.5 rounded-lg font-bold text-[var(--text-primary)] transition-all hover:-translate-y-0.5 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-secondary)]/70 ${
-          compact ? 'min-h-8 px-2 text-[10px]' : 'min-h-10 px-3 text-xs'
+          compact ? 'min-h-11 px-2 text-xs' : 'min-h-11 px-3 text-xs'
         }`}
         style={{ background: 'var(--accent-tint)', border: '1px solid var(--accent-border-md)' }}
       >
@@ -25,7 +25,7 @@ export default function PolymarketTradeLink({ href, compact = false }: Polymarke
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5h5v5m0-5L10 14M19 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" />
         </svg>
       </a>
-      <p className={`mt-1 text-center text-ink/35 ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+      <p className="mt-1 text-center text-xs text-ink/55">
         External link · Referral may apply
       </p>
     </div>

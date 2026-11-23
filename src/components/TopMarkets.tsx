@@ -45,7 +45,7 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
   const href = marketUrl(market.eventSlug, market.slug, campaignContext);
 
   const priceColor =
-    price == null ? 'text-ink/40'
+    price == null ? 'text-ink/55'
     : price >= 0.7  ? 'text-grad-profit'
     : price <= 0.3  ? 'text-grad-loss'
     : 'text-ink';
@@ -76,13 +76,13 @@ function MarketCard({ market, index, campaignContext }: { market: TopMarket; ind
 
       <div className="flex items-end justify-between mt-auto">
         <div>
-          <p className="text-[10px] uppercase tracking-widest text-ink/25">YES</p>
+          <p className="text-xs uppercase tracking-widest text-ink/55">YES</p>
           <p className={`text-xl font-black ${priceColor}`}>
             {price != null ? `${(price * 100).toFixed(0)}¢` : '—'}
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest text-ink/25">24h Vol</p>
+          <p className="text-xs uppercase tracking-widest text-ink/55">24h Vol</p>
           <p className="text-sm font-bold text-ink/60">{formatCurrency(volume, true)}</p>
         </div>
       </div>
@@ -127,7 +127,7 @@ export default function TopMarkets({ limit = 5, showViewAll = false, campaignCon
             style={{ background: 'var(--text-primary)' }} />
           <h2 className="text-sm font-bold text-ink/70 uppercase tracking-wider">Top Markets</h2>
         </div>
-        <span className="text-[10px] text-ink/25 uppercase tracking-widest">24h Volume</span>
+        <span className="text-xs text-ink/55 uppercase tracking-widest">24h Volume</span>
       </div>
 
       {loading ? (
