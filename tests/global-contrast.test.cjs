@@ -35,3 +35,15 @@ test('light theme lifts the readable ink tones (50/55/60) to >= 62% so they pass
     assert.ok(Number(m[1]) >= 62, `ink/${a} -> ${m[1]}%`);
   }
 });
+
+test('market category badges use theme variables with darker light-theme tones (no hard-coded pastel text on light)', () => {
+  const src = read('src/app/markets/MarketsClient.tsx');
+  assert.doesNotMatch(src, /Politics: '#|Crypto: '#|Sports: '#/);
+  assert.match(src, /var\(--cat-politics\)/);
+  const css = read('src/app/globals.css');
+  const light = css.slice(css.indexOf(':root[data-theme="light"] {'));
+  for (const c of ['politics', 'crypto', 'sports', 'tech', 'entertainment', 'other']) {
+    assert.match(css, new RegExp(`--cat-${c}:\\s*#[0-9a-f]{6}`), `dark --cat-${c}`);
+    assert.match(light.slice(0, light.indexOf('}')), new RegExp(`--cat-${c}:\\s*#[0-9a-f]{6}`), `light --cat-${c}`);
+  }
+});

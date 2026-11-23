@@ -48,9 +48,10 @@ const SORTS = [
 ] as const;
 type SortKey = typeof SORTS[number]['key'];
 
+/* Theme variables (globals.css): pastel on dark, darker tones on the light canvas so badge text stays >= 4.5:1. */
 const CAT_COLOR: Record<string, string> = {
-  Politics: '#fb7185', Crypto: '#fbbf24', Sports: '#34d399',
-  Tech: '#38bdf8', World: 'var(--text-secondary)', Entertainment: '#f472b6', Other: '#94a3b8',
+  Politics: 'var(--cat-politics)', Crypto: 'var(--cat-crypto)', Sports: 'var(--cat-sports)',
+  Tech: 'var(--cat-tech)', World: 'var(--text-secondary)', Entertainment: 'var(--cat-entertainment)', Other: 'var(--cat-other)',
 };
 
 function categoryText(m: Pick<TopMarket, 'category' | 'question' | 'slug' | 'eventSlug'>): string {
@@ -89,7 +90,7 @@ function MarketCard({ market, now }: { market: TopMarket & { category?: string }
       {/* Tags */}
       <div className="flex items-center gap-2 -mt-1">
         <span className="rounded-full px-2 py-0.5 text-xs font-bold uppercase tracking-wider"
-          style={{ background: `${CAT_COLOR[cat] ?? '#94a3b8'}1a`, color: CAT_COLOR[cat] ?? '#94a3b8', border: `1px solid ${CAT_COLOR[cat] ?? '#94a3b8'}33` }}>
+          style={{ background: `color-mix(in srgb, ${CAT_COLOR[cat] ?? 'var(--cat-other)'} 10%, transparent)`, color: CAT_COLOR[cat] ?? 'var(--cat-other)', border: `1px solid color-mix(in srgb, ${CAT_COLOR[cat] ?? 'var(--cat-other)'} 20%, transparent)` }}>
           {cat}
         </span>
         {close && (

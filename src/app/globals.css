@@ -56,6 +56,14 @@
 
   /* Ink = neutral foreground for legacy white/alpha utilities: rgba(var(--ink-rgb),a) */
   --ink-rgb: 242,240,233;
+
+  /* Market category badge colours (dark canvas) */
+  --cat-politics: #fb7185;
+  --cat-crypto: #fbbf24;
+  --cat-sports: #34d399;
+  --cat-tech: #38bdf8;
+  --cat-entertainment: #f472b6;
+  --cat-other: #94a3b8;
 }
 
 /* Light theme: neutral monochrome tokens. Semantic --success/--danger/--warning/--info
@@ -68,6 +76,14 @@
   --color-ink: #161614;
   --color-on-primary: #f7f6f2;
   --ink-rgb: 22,22,20;
+
+  /* Market category badge colours: darker tones for >= 4.5:1 on the light canvas */
+  --cat-politics: #be123c;
+  --cat-crypto: #a16207;
+  --cat-sports: #047857;
+  --cat-tech: #0369a1;
+  --cat-entertainment: #be185d;
+  --cat-other: #475569;
 
   --accent-bg: rgba(22,22,20,0.04);
   --accent-tint: rgba(22,22,20,0.06);
