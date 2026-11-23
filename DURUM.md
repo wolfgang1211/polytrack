@@ -83,9 +83,17 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Canlı ölçümde açık temada ink/55'in açık zeminde ~4,0:1 kaldığı görüldü (68 farklı metin). `79c475e`: açık temada ink/50-55-60 → %64 (~5:1); koyu tema aynı. `d5d7892` + `c9f99ce`: kategori etiketleri sabit pastel hex yerine `--cat-*` tema değişkenleri; açık temada koyu tonlar (Crypto 4,31 → 6,07).
 - Son canlı ölçüm (www.alphaboard.xyz/markets, 375px, Featured açık, her tema sıfırdan yüklenerek): koyu 1.288 metin / 0 eşik altı; açık 1.288 / 0. CTA'lar 44px, yatay taşma yok. 583/583 test, tsc exit 0, lint 0 hata/24 uyarı. Yeni test: `tests/global-contrast.test.cjs`.
 
+## Leaderboard, wallet, liquidity kontrastı (2026-11-23, Yusuf "testler geçerse yayına al" dedi)
+- İlk ölçüm (375px): koyu temada leaderboard 2,0–3,5:1 (ink/25–40, 8–10px), wallet 18 grup 2,1–3,9:1, liquidity 26 grup + 90px yatay taşma; açık temada parlak yeşil/kırmızı/sarı/mavi vurgular 1,2–2,9:1, liquidity puan ipucu açık temada koyu zeminde okunmuyordu.
+- Wallet 503: 0x5668…5839 tekrar denendi, 3/3 HTTP 200; geçici upstream hatasıydı, kod hatası bulunmadı.
+- Commit'ler (hepsi main, production READY): `8ca5d70` (18 dosyada ink/≥55, en az 10px, soluk inline renkler, kopyala 24px, Back to Leaderboard 24px ve /leaderboard'a gider, FarmChanges mobil), `2d5d12b` (liquidity seçici çipler, trader tablosu ve select 375px'e sığar), `2bd21e9` + `de266e9` (açık temada vurgu renkleri 700–800 tonlarına, `--success/--danger/--warning/--info` açık değerleri, leaderboard istatistik renkleri tema değişkeni), `f10de89` (açık tema ipucu/grafik tooltip zemini `--surface-1`, liquidity başlığı mobil, izleme butonu), `fa54f66` (tüm liquidity bölüm başlıkları mobilde sığar, cyan açık tema). Son production: `dpl_Hd1s5j38kjVharGgggjQb7BiUQNw`.
+- Son canlı ölçüm (www.alphaboard.xyz, 375px, her tema sıfırdan): leaderboard koyu 530/0, açık 530/0; wallet koyu 254/0, açık 254/0; liquidity koyu 783/0, açık 783/0 eşik altı metin; yatay taşma 0, 24px altı dokunma alanı 0.
+- Testler 591/591, tsc exit 0, lint 0 hata/24 uyarı, git diff --check temiz. Yeni testler `tests/global-contrast.test.cjs` içinde.
+- Not: açık tema renk eşlemesi `globals.css` içinde inline stil seçicileriyle (`[style*="color:#34d399"]`) yapılıyor; yeni bileşenlerde sabit hex yerine `var(--success)` vb. kullanmak daha sağlam.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları (chatgpt.com, perplexity.ai, claude.ai).
-2. **Erişilebilirlik takibi**: diğer sayfalarda (leaderboard, wallet, liquidity) iki temada ölçüm yapılmadı.
+2. **Erişilebilirlik takibi (küçük)**: ana sayfa, /activity, /insights, blog sayfaları iki temada ölçülmedi; sabit hex renkleri tema değişkenlerine taşımak.
 3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
 ## Bloklayan şeyler
