@@ -80,19 +80,19 @@ export default function LeaderboardPage() {
           style={{ background: 'rgba(var(--ink-rgb),0.02)', borderTop: '1px solid rgba(var(--ink-rgb),0.07)', borderBottom: '1px solid rgba(var(--ink-rgb),0.07)' }}>
           <DataCell label="Traders" value={loading || error ? '—' : String(data.length)} accent="rgba(var(--ink-rgb),0.95)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
-          <DataCell label="Sample Volume" value={loading || error ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <DataCell label="Sample Volume" value={loading || error ? '—' : formatShares(totalVol)} accent="var(--info)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Sample P&L"
             value={loading || error ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-            accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
+            accent={totalPnl >= 0 ? 'var(--success)' : 'var(--danger)'}
             loading={loading}
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Top Earner"
             value={loading || !topTrader ? '—' : '+' + formatCurrency(topTrader.pnl, true)}
-            accent="rgba(251,191,36,0.95)"
+            accent="var(--warning)"
             loading={loading}
           />
         </div>

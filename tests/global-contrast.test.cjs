@@ -87,11 +87,17 @@ test('liquidity mobile: picker chips readable, trader grid and selects fit 375px
 
 test('light theme maps bright accent colours to readable shades (2026-11-23 live re-measure)', () => {
   const css = read('src/app/globals.css');
-  for (const [from, to] of [['#34d399', '#047857'], ['#fb7185', '#be123c'], ['#fbbf24', '#92400e'], ['#60a5fa', '#1d4ed8']]) {
+  for (const [from, to] of [['#34d399', '#065f46'], ['#fb7185', '#9f1239'], ['#fbbf24', '#92400e'], ['#60a5fa', '#1d4ed8']]) {
     assert.ok(css.includes(`[style*="color:${from}" i]`) && css.includes(`{ color: ${to} !important; }`), `${from} light mapping`);
   }
-  assert.match(css, /:root\[data-theme="light"\] \{ --success: #047857; --danger: #be123c; --warning: #92400e; --info: #1d4ed8; \}/);
+  assert.match(css, /:root\[data-theme="light"\] \{ --success: #065f46; --danger: #9f1239; --warning: #92400e; --info: #1d4ed8; \}/);
   for (const c of ['emerald-300', 'emerald-400', 'rose-300', 'rose-400', 'amber-300', 'amber-400']) {
     assert.match(css, new RegExp(`:root\\[data-theme="light"\\] \\.text-${c} \\{ color: #`));
   }
+});
+
+test('leaderboard stat accents use theme-aware status tokens', () => {
+  const s = read('src/app/leaderboard/page.tsx');
+  assert.doesNotMatch(s, /accent=\{?[^}\n]*rgba\((?!var)/);
+  assert.match(s, /accent="var\(--info\)"/);
 });
