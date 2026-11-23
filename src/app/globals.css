@@ -95,6 +95,10 @@
 
 /* Zero P&L keeps the shared formatter class and readable neutral ink on light. */
 :root[data-theme="light"] .text-zinc-400 { color:var(--text-muted); }
+/* Readable ink tones: on the light canvas 55% ink measures ~4.0:1, so lift 50/55/60 to 64% (~5:1). Dark theme unchanged. */
+:root[data-theme="light"] .text-ink\/50 { color: color-mix(in oklab, var(--color-ink) 64%, transparent); }
+:root[data-theme="light"] .text-ink\/55 { color: color-mix(in oklab, var(--color-ink) 64%, transparent); }
+:root[data-theme="light"] .text-ink\/60 { color: color-mix(in oklab, var(--color-ink) 64%, transparent); }
 
 html {
   scroll-behavior: smooth;

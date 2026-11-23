@@ -26,3 +26,12 @@ test('"Trade on Polymarket" CTA is at least 44px tall in both sizes', () => {
 test('breadcrumb links get a >= 24px tap target', () => {
   assert.match(read('src/components/Breadcrumb.tsx'), /min-h-6/);
 });
+
+test('light theme lifts the readable ink tones (50/55/60) to >= 62% so they pass 4.5:1 on the light canvas', () => {
+  const css = read('src/app/globals.css');
+  for (const a of ['50', '55', '60']) {
+    const m = css.match(new RegExp(`:root\\[data-theme="light"\\] \\.text-ink\\\\/${a}\\s*\\{\\s*color:\\s*color-mix\\(in oklab, var\\(--color-ink\\) (\\d+)%, transparent\\);?\\s*\\}`));
+    assert.ok(m, `override for ink/${a}`);
+    assert.ok(Number(m[1]) >= 62, `ink/${a} -> ${m[1]}%`);
+  }
+});
