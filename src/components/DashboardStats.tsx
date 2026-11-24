@@ -5,13 +5,13 @@ import { formatCurrency } from '@/lib/utils';
 import type { OverviewStats } from '@/app/api/stats/overview/route';
 
 const CAT_COLOR: Record<string, string> = {
-  Crypto:        '#fbbf24',
-  Politics:      '#fb7185',
-  Sports:        '#34d399',
-  Entertainment: '#f472b6',
-  Tech:          '#38bdf8',
+  Crypto:        'var(--cat-crypto)',
+  Politics:      'var(--cat-politics)',
+  Sports:        'var(--cat-sports)',
+  Entertainment: 'var(--cat-entertainment)',
+  Tech:          'var(--cat-tech)',
   World:         'var(--text-secondary)',
-  Other:         '#94a3b8',
+  Other:         'var(--cat-other)',
 };
 
 function DataCell({ label, value, sub, accent, loading }: {
@@ -49,7 +49,7 @@ export default function DashboardStats() {
       .finally(() => setLoading(false));
   }, []);
 
-  const catColor = stats ? (CAT_COLOR[stats.topCategory] ?? '#94a3b8') : '#94a3b8';
+  const catColor = stats ? (CAT_COLOR[stats.topCategory] ?? 'var(--cat-other)') : 'var(--cat-other)';
 
   return (
     <div data-testid="dashboard-stats" className="grid min-w-0 grid-cols-2 overflow-hidden animate-fade-in-up sm:grid-cols-4"
@@ -63,10 +63,10 @@ export default function DashboardStats() {
         <DataCell label="Tracked Markets" value={stats ? String(stats.activeMarkets) : '—'} sub="Up to 200 active markets" loading={loading} />
       </div>
       <div className="min-w-0 border-b sm:border-b-0 sm:border-r" style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
-        <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="rgba(242,240,233,0.95)" loading={loading} />
+        <DataCell label="Tracked 24h Volume" value={stats ? formatCurrency(stats.volume24h, true) : '—'} sub="Tracked market sample only" accent="var(--text-primary)" loading={loading} />
       </div>
       <div className="min-w-0 border-r" style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
-        <DataCell label="Trades (1h sample)" value={stats ? String(stats.trades1h) : '—'} sub="From latest 500 trades" accent="rgba(251,191,36,0.88)" loading={loading} />
+        <DataCell label="Trades (1h sample)" value={stats ? String(stats.trades1h) : '—'} sub="From latest 500 trades" accent="var(--warning)" loading={loading} />
       </div>
       <div className="min-w-0">
         <DataCell label="Top Category" value={stats?.topCategory ?? '—'} sub={stats ? `${stats.topCategoryCount} trades` : undefined} accent={catColor} loading={loading} />

@@ -26,7 +26,7 @@ export default function SmartMoneyCard() {
         style={{ borderBottom: '1px solid var(--accent-border-xs)', background: 'rgba(var(--ink-rgb),0.06)' }}>
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(var(--ink-rgb),0.55)' }}>
+          <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'var(--text-secondary)' }}>
             Smart Money
           </span>
         </div>

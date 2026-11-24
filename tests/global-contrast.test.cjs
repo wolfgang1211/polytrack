@@ -175,3 +175,13 @@ test('activity SELL badge: lighter rose on dark, mapped to a dark rose on light'
   assert.match(read('src/app/activity/page.tsx'), /background: 'rgba\(244,63,94,0\.10\)', color: '#fda4af'/);
   assert.match(read('src/app/globals.css'), /color:#fda4af" i\][^\n]*\{ color: #9f1239 !important; \}/);
 });
+
+test('home and insights stat accents use theme tokens, never fixed dark-theme colours (2026-11-24 light re-measure)', () => {
+  const ds = read('src/components/DashboardStats.tsx');
+  assert.doesNotMatch(ds, /accent="rgba\(/);
+  assert.doesNotMatch(ds, /'#(fbbf24|fb7185|34d399|f472b6|38bdf8|94a3b8)'/);
+  const ins = read('src/app/insights/page.tsx');
+  assert.doesNotMatch(ins, /accent=\{?[^}\n]*'rgba\((?!var)/);
+  assert.doesNotMatch(ins, /accent="rgba\(/);
+  assert.match(ins, /style=\{\{ color: 'var\(--success\)' \}\}>\+\{formatCurrency/);
+});

@@ -98,26 +98,26 @@ export default function InsightsPage() {
         <SectionHeader index="[02]" label="Top-50 Sample Overview" />
         <div className="flex overflow-x-auto animate-fade-in-up"
           style={{ background: 'rgba(var(--ink-rgb),0.02)', borderTop: '1px solid rgba(var(--ink-rgb),0.07)', borderBottom: '1px solid rgba(var(--ink-rgb),0.07)' }}>
-          <DataCell label="Sample Volume" value={loading ? '—' : formatShares(totalVol)} accent="rgba(96,165,250,0.95)" loading={loading} />
+          <DataCell label="Sample Volume" value={loading ? '—' : formatShares(totalVol)} accent="var(--info)" loading={loading} />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Total P&L"
             value={loading ? '—' : (totalPnl >= 0 ? '+' : '') + formatCurrency(totalPnl, true)}
-            accent={totalPnl >= 0 ? 'rgba(52,211,153,0.95)' : 'rgba(251,113,133,0.95)'}
+            accent={totalPnl >= 0 ? 'var(--success)' : 'var(--danger)'}
             loading={loading}
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Avg P&L / Trader"
             value={loading ? '—' : (avgPnl >= 0 ? '+' : '') + formatCurrency(avgPnl, true)}
-            accent="rgba(var(--ink-rgb),0.95)"
+            accent="var(--text-primary)"
             loading={loading}
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
             label="Median P&L / Trader"
             value={loading ? '—' : (median >= 0 ? '+' : '') + formatCurrency(median, true)}
-            accent="rgba(251,191,36,0.95)"
+            accent="var(--warning)"
             loading={loading}
           />
         </div>
@@ -146,7 +146,7 @@ export default function InsightsPage() {
                       <p className="text-[10px] font-mono text-ink/55">{formatAddress(e.proxyWallet)}</p>
                     </div>
                     <span className="font-mono text-[10px] uppercase tracking-wider rounded-full px-2 py-0.5"
-                      style={{ background: 'rgba(52,211,153,0.08)', color: 'rgba(52,211,153,0.8)', border: '1px solid rgba(52,211,153,0.2)' }}>
+                      style={{ background: 'rgba(52,211,153,0.08)', color: 'var(--success)', border: '1px solid rgba(52,211,153,0.2)' }}>
                       #{i + 1} P&amp;L/share
                     </span>
                   </div>
@@ -154,7 +154,7 @@ export default function InsightsPage() {
                   <div className="flex justify-between">
                     <div>
                       <p className="text-[10px] text-ink/55 uppercase tracking-wider">P&L</p>
-                      <p className="text-sm font-bold" style={{ color: 'rgba(52,211,153,0.9)' }}>+{formatCurrency(e.pnl, true)}</p>
+                      <p className="text-sm font-bold" style={{ color: 'var(--success)' }}>+{formatCurrency(e.pnl, true)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] text-ink/55 uppercase tracking-wider">Volume</p>
