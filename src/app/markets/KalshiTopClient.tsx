@@ -16,7 +16,9 @@ const contracts = (n: number) => `${compact.format(n)}`;
 export function cents(p: number | null): string {
   if (p === null || !Number.isFinite(p)) return '—';
   const c = p * 100;
-  return c > 0 && c < 1 ? `${c.toFixed(1)}¢` : `${Math.round(c)}¢`;
+  // Never round a live quote up to 100¢ or down to 0¢: keep one decimal at the extremes.
+  return c > 0 && c < 1 ? `${Math.max(0.1, Math.round(c * 10) / 10).toFixed(1)}¢`
+    : c > 99 && c < 100 ? `${(Math.floor(c * 10) / 10).toFixed(1)}¢` : `${Math.round(c)}¢`;
 }
 
 /** No ask derived from the Yes bid (buying No at 1 − p takes the other side of a Yes bid at p). */
@@ -99,7 +101,14 @@ function EventCard({ event, now }: { event: KalshiTopEvent; now: number }) {
 
   return (
     <ExplorerCard className="group glass-hover gradient-border h-full gap-4 p-5 animate-fade-in-up">
-      <p className="line-clamp-2 text-sm font-semibold leading-snug text-ink/85 transition-colors group-hover:text-ink">{event.title}</p>
+      <div className="flex items-start gap-3">
+        {event.image && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={event.image} alt="" className="h-10 w-10 flex-shrink-0 rounded-xl object-cover"
+            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        )}
+        <p className="line-clamp-2 min-w-0 text-sm font-semibold leading-snug text-ink/85 transition-colors group-hover:text-ink">{event.title}</p>
+      </div>
 
       <div className="-mt-1 flex items-center gap-2">
         <span className="rounded-full px-2 py-0.5 text-xs font-bold uppercase tracking-wider"

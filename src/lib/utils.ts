@@ -70,7 +70,7 @@ export function rankBadge(rank: number): string {
 export const CATEGORY_PATTERNS: [string, RegExp][] = [
   ['Crypto',        /bitcoin|btc|eth(?:ereum)?|crypto|solana|sol\b|doge|token|defi|nft|web3|blockchain|binance|xrp|avax|chainlink|usdc|stablecoin/i],
   ['Politics',      /trump|biden|harris|election|president|congress|senate|democrat|republican|ballot|vote|poll|minister|prime\s+minister|parliament|white\s+house|nato|geopolit|campaign/i],
-  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|fifa|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics|spurs|thunder|lakers|celtics|warriors|heat|bulls|knicks|nuggets|mavericks|bucks|sixers|hawks|rockets|vs\.|win\s+the\s+game/i],
+  ['Sports',        /nfl|nba|nhl|mlb|soccer|football|basketball|baseball|tennis|golf|champion(?:ship)?|super\s+bowl|world\s+cup|fifa|league|playoff|ufc|mma|boxing|formula\s*1|f1\b|olympics|spurs|thunder|lakers|celtics|warriors|heat|bulls|knicks|nuggets|mavericks|bucks|sixers|hawks|rockets|vs\.|\bvs\b|win\s+the\s+game|\batp\b|\bwta\b|\bitf\b|counter-strike|\bcs2\b|dota|valorant|league\s+of\s+legends|esports|\bbo[135]\b|cricket|rugby|premier\s+league|la\s+liga|serie\s+a|bundesliga|ligue\s+1|ncaa|nascar|\bfc\b|\bwin\s+on\s+\d{4}-\d{2}-\d{2}/i],
   ['Entertainment', /oscar|grammy|emmy|movie|film|show|tv\b|music|celebrity|award|actor|actress|box\s+office|netflix|album|billboard|spotify/i],
   ['Tech',          /\bai\b|gpt|openai|spacex|nasa|rocket|apple|google|microsoft|meta\b|amazon|tesla|nvidia|startup|ipo|antitrust/i],
   ['World',         /war|conflict|ceasefire|sanction|nato|invasion|russia|ukraine|israel|china|taiwan|climate|hurricane|earthquake/i],

@@ -125,3 +125,17 @@ test('total volume sums every listable market of the event (traded or not); open
   assert.equal(s.events[0].openedAt, '2026-11-01T00:00:00Z');
   assert.equal(s.events[0].volume24hContracts, 6);
 });
+
+test('event image comes from Kalshi event metadata and only an absolute https URL is kept', async () => {
+  assert.equal(top.safeImageUrl('https://kalshi-public-docs.s3.amazonaws.com/x.png'), 'https://kalshi-public-docs.s3.amazonaws.com/x.png');
+  for (const bad of ['http://x.test/a.png', '/images/a.png', 'javascript:alert(1)', '', null, 7, 'https://' + 'a'.repeat(600)]) {
+    assert.equal(top.safeImageUrl(bad), null, String(bad).slice(0, 30));
+  }
+  const s = await top.scanKalshiTopMarkets({
+    getJson: pagesOf([row('A-1', 5), row('B-1', 3)]).getJson, getEvent, wait: noWait,
+    getImage: async t => (t === 'EV-A' ? 'https://img.test/a.png' : (() => { throw new Error('down'); })()),
+  });
+  assert.equal(s.events[0].image, 'https://img.test/a.png');
+  assert.equal(s.events[1].image, null, 'a failed image lookup leaves the event without an image');
+  assert.equal(s.events[1].category, 'Sports');
+});

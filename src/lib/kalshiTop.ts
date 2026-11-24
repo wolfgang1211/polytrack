@@ -31,6 +31,7 @@ export interface KalshiTopEvent {
   eventTicker: string;
   title: string;               // event title as published, else the top market's title
   category: string | null;     // as published by Kalshi on the event; null when the lookup failed
+  image: string | null;        // event image_url from Kalshi event metadata (https only); null when absent
   volume24hContracts: number;
   totalVolumeContracts: number;  // lifetime volume summed over ALL listable open markets of the event (contracts)
   openInterestContracts: number;
@@ -55,6 +56,7 @@ export interface KalshiTopScan {
 
 type JsonGetter = (path: string, query?: Record<string, string>) => Promise<unknown>;
 type EventGetter = (eventTicker: string) => Promise<{ category: string | null; title: string } | null>;
+type ImageGetter = (eventTicker: string) => Promise<string | null>;
 
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -73,6 +75,7 @@ interface Bucket { vol: number; oi: number; count: number; top: KalshiMarket[] }
 export async function scanKalshiTopMarkets(opts: {
   getJson?: JsonGetter;
   getEvent?: EventGetter;
+  getImage?: ImageGetter;
   now?: () => number;
   wait?: (ms: number) => Promise<void>;
   budgetMs?: number;
@@ -80,6 +83,7 @@ export async function scanKalshiTopMarkets(opts: {
 } = {}): Promise<KalshiTopScan> {
   const getJson = opts.getJson ?? getKalshiJson;
   const getEvent = opts.getEvent ?? defaultGetEvent;
+  const getImage = opts.getImage ?? (opts.getJson ? async () => null : defaultGetImage(getJson));
   const now = opts.now ?? (() => Date.now());
   const wait = opts.wait ?? sleep;
   const budget = opts.budgetMs ?? SCAN_BUDGET_MS;
@@ -151,15 +155,16 @@ export async function scanKalshiTopMarkets(opts: {
   const ranked = [...buckets.entries()]
     .sort(([ta, a], [tb, b]) => (b.vol - a.vol) || (b.oi - a.oi) || (ta < tb ? -1 : ta > tb ? 1 : 0))
     .slice(0, topEvents);
-  const meta = await lookupEvents(ranked.map(([t]) => t), getEvent);
+  const meta = await lookupEvents(ranked.map(([t]) => t), getEvent, getImage);
   const events: KalshiTopEvent[] = ranked.map(([eventTicker, b]) => {
     const top = b.top.sort(compareByVolume);
     const e = meta.get(eventTicker) ?? null;
     const closes = top.map(m => m.closeTime).filter((c): c is string => c !== null).sort();
     return {
       eventTicker,
-      title: e?.title ?? top[0].title ?? eventTicker,
+      title: (e?.title || null) ?? top[0].title ?? eventTicker,
       category: e?.category ?? null,
+      image: e?.image ?? null,
       volume24hContracts: b.vol,
       totalVolumeContracts: totals.get(eventTicker)?.total ?? 0,
       openInterestContracts: b.oi,
@@ -191,9 +196,20 @@ async function defaultGetEvent(eventTicker: string) {
   return { category: event.category, title: event.title };
 }
 
-/** Event title and category for the ranked events (2 in flight, one retry; a failed lookup stays per event). */
-async function lookupEvents(tickers: string[], getEvent: EventGetter) {
-  const meta = new Map<string, { category: string | null; title: string } | null>();
+/** Kalshi event metadata image (GET /events/{ticker}/metadata). Only an absolute https URL is kept. */
+export function safeImageUrl(v: unknown): string | null {
+  if (typeof v !== 'string' || v.length > 500) return null;
+  try { const u = new URL(v); return u.protocol === 'https:' ? u.toString() : null; } catch { return null; }
+}
+
+const defaultGetImage = (getJson: JsonGetter): ImageGetter => async (eventTicker: string) => {
+  const body = await getJson(`/events/${encodeURIComponent(eventTicker)}/metadata`);
+  return isObj(body) ? safeImageUrl(body.image_url) : null;
+};
+
+/** Event title, category and image for the ranked events (2 in flight, one retry; a failed lookup stays per event). */
+async function lookupEvents(tickers: string[], getEvent: EventGetter, getImage: ImageGetter) {
+  const meta = new Map<string, { category: string | null; title: string; image: string | null } | null>();
   let i = 0;
   const worker = async () => {
     while (i < tickers.length) {
@@ -202,7 +218,9 @@ async function lookupEvents(tickers: string[], getEvent: EventGetter) {
       for (let attempt = 0; attempt < 2 && got === null; attempt++) {
         try { got = await getEvent(t); } catch { if (attempt === 0) await sleep(1000); }
       }
-      meta.set(t, got);
+      let image: string | null = null;
+      try { image = await getImage(t); } catch { /* an image is optional */ }
+      meta.set(t, got ? { ...got, image } : image ? { category: null, title: '', image } : null);
     }
   };
   await Promise.all(Array.from({ length: Math.min(EVENT_CONCURRENCY, tickers.length) }, worker));

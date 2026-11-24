@@ -23,12 +23,21 @@ function vol24h(m: TopMarket): number {
 }
 
 /** `now` comes from useNow(): the server timestamp during SSR + hydration, then the browser clock. */
+/** Price in cents; never rounds a live price up to 100¢ or down to 0¢ (one decimal at the extremes). */
+export function cents(p: number): string {
+  const c = p * 100;
+  return c > 0 && c < 1 ? `${Math.max(0.1, Math.round(c * 10) / 10).toFixed(1)}¢`
+    : c > 99 && c < 100 ? `${(Math.floor(c * 10) / 10).toFixed(1)}¢` : `${Math.round(c)}¢`;
+}
+
 function closesIn(endDate: string | undefined, now: number): string | null {
   if (!endDate) return null;
   const end = new Date(endDate).getTime();
   if (isNaN(end)) return null;
   const ms = end - now;
-  if (ms <= 0) return 'Closed';
+  // The list holds only active, unclosed markets: a passed end date (e.g. a game's start time) means trading or
+  // resolution is still pending, not that the market is closed.
+  if (ms <= 0) return 'Awaiting result';
   const days = Math.floor(ms / 86_400_000);
   if (days >= 1) return `${days}d`;
   const hrs = Math.floor(ms / 3_600_000);
@@ -98,7 +107,7 @@ function MarketCard({ market, now }: { market: TopMarket & { category?: string }
             <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            {close === 'Closed' ? 'Closed' : `${close} left`}
+            {close === 'Awaiting result' ? close : `${close} left`}
           </span>
         )}
       </div>
@@ -118,7 +127,7 @@ function MarketCard({ market, now }: { market: TopMarket & { category?: string }
                   : { background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
                 <p className="text-xs font-semibold text-ink/55 truncate">{o}</p>
                 <p className={`text-base font-black ${isYes ? 'text-grad-profit' : 'text-grad-loss'}`}>
-                  {Number.isFinite(p) ? `${(p * 100).toFixed(0)}¢` : '—'}
+                  {Number.isFinite(p) ? cents(p) : '—'}
                 </p>
               </div>
             );

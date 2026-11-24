@@ -8,6 +8,6 @@ export const KALSHI_TOP_REVALIDATE_S = 900;
 
 export const getCachedKalshiTop: () => Promise<KalshiTopScan> = unstable_cache(
   () => scanKalshiTopMarkets(),
-  ['kalshi-top-events-v4'],
+  ['kalshi-top-events-v5'],
   { revalidate: KALSHI_TOP_REVALIDATE_S, tags: ['kalshi-top'] },
 );

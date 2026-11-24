@@ -150,3 +150,28 @@ test('one Kalshi view like Polymarket: no view tabs; legacy ?view= and ?series= 
   const poly = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
   assert.match(poly, /data-stub="poly"/);
 });
+
+test('Kalshi card shows the event image like Polymarket; cents never round a live quote to 100¢ or 0¢', () => {
+  const s = scan(); s.events[0].image = 'https://img.test/a.png';
+  const h = html({ scan: s });
+  assert.match(h, /<img src="https:\/\/img\.test\/a\.png" alt="" class="h-10 w-10 flex-shrink-0 rounded-xl object-cover"/);
+  assert.equal(Client.cents(0.9996), '99.9¢');
+  assert.equal(Client.cents(0.0004), '0.1¢');
+  assert.equal(Client.cents(0.999), '99.9¢');
+  assert.equal(Client.cents(0.004), '0.4¢');
+  assert.equal(Client.cents(0.5), '50¢');
+  assert.equal(Client.cents(1), '100¢');
+});
+
+test('Polymarket explorer: same cents rule; a passed end date on an active market reads "Awaiting result", never "Closed"', () => {
+  const src = fs.readFileSync(path.join(root, 'src/app/markets/MarketsClient.tsx'), 'utf8');
+  assert.match(src, /if \(ms <= 0\) return 'Awaiting result';/);
+  assert.doesNotMatch(src, /'Closed'/);
+  assert.match(src, /Number\.isFinite\(p\) \? cents\(p\) : '—'/);
+  const utils = load('src/lib/utils.ts');
+  for (const t of ['Yokohama: Ryo Ono vs Lennon Roark Jones', 'Counter-Strike: Eternal Fire vs DENDELE CS (BO1)', 'Will Everton FC win on 2026-11-23?', 'atp-ono-lennonr-2026-11-22']) {
+    assert.equal(utils.detectCategory(t), 'Sports', t);
+  }
+  assert.equal(utils.detectCategory('Trump vs Harris debate winner'), 'Politics');
+  assert.equal(utils.detectCategory('Bitcoin Up or Down - November 24'), 'Crypto');
+});
