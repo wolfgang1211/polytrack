@@ -135,3 +135,22 @@ test('light theme: profit/loss gradient text uses dark shades (Polymarket and Ka
 test('dark theme: loss gradient is light enough on red-tinted price tiles', () => {
   assert.match(read('src/app/globals.css'), /^\.text-grad-loss     \{ background:linear-gradient\(135deg,#fda4af,#fb7185\)/m);
 });
+
+const PAGE_FILES_2 = ['src/app/activity/page.tsx', 'src/app/blog/[slug]/page.tsx', 'src/app/blog/page.tsx', 'src/app/insights/page.tsx', 'src/components/DashboardStats.tsx', 'src/components/HotBets.tsx', 'src/components/LiveTicker.tsx', 'src/components/RecentBigTrades.tsx', 'src/components/RisingTraders.tsx', 'src/components/SmartMoneyCard.tsx'];
+
+test('home, activity, insights and blog: no sub-ink/55 text, no 8-9px text, no faint inline ink colour (2026-11-24 audit)', () => {
+  for (const f of PAGE_FILES_2) {
+    const s = read(f);
+    assert.deepEqual([...s.matchAll(/(?<![:\w-])text-ink\/([1-4]\d|50)\b/g)].map(m => m[0]), [], `${f}: low-contrast ink text class`);
+    assert.doesNotMatch(s, /text-\[(?:8|9)px\]/, `${f}: 8-9px text`);
+    const faint = [...s.matchAll(/color:\s*'rgba\(var\(--ink-rgb\),\s*0?\.(\d+)\)'/g)].filter(m => Number(`0.${m[1]}`) < 0.55);
+    assert.deepEqual(faint.map(m => m[0]), [], `${f}: faint inline ink colour`);
+  }
+});
+
+test('home/activity/blog tap targets are at least 24px tall (2026-11-24 audit)', () => {
+  assert.match(read('src/components/SmartMoneyCard.tsx'), /className="inline-flex min-h-6 items-center font-mono[^"]*">\s*View All →/);
+  assert.match(read('src/components/RecentBigTrades.tsx'), /text-\[11px\] leading-6 transition-colors truncate/);
+  assert.match(read('src/app/activity/page.tsx'), /truncate font-mono text-\[11px\] leading-6 text-ink\/55/);
+  assert.match(read('src/app/blog/[slug]/page.tsx'), /inline-flex min-h-6 items-center text-\[11px\] text-ink\/55 hover:text-ink\/80">← Back to Blog/);
+});

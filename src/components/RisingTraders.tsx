@@ -35,7 +35,7 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
             {name}
           </p>
           {(trader.userName || trader.xUsername) && (
-            <p className="font-mono text-[9px] truncate" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>
+            <p className="font-mono text-[10px] truncate" style={{ color: 'var(--text-muted)' }}>
               {formatAddress(trader.proxyWallet, 6)}
             </p>
           )}
@@ -44,7 +44,7 @@ function TraderRow({ trader, index, maxPnl }: { trader: RisingTrader; index: num
         {/* PnL */}
         <div className="flex-shrink-0 text-right">
           <p className={`text-xs font-black tabular-nums font-mono ${pnl > 0 ? 'text-grad-profit' : pnl < 0 ? 'text-grad-loss' : ''}`}
-            style={pnl === 0 ? { color: 'rgba(var(--ink-rgb),0.35)' } : undefined}>
+            style={pnl === 0 ? { color: 'var(--text-muted)' } : undefined}>
             {pnl >= 0 ? '+' : ''}{formatCurrency(pnl, true)}
           </p>
         </div>
@@ -90,11 +90,11 @@ export default function RisingTraders() {
         <div className="flex items-center gap-2.5">
           <span className="inline-block h-1 w-5 rounded-full"
             style={{ background: '#fbbf24' }} />
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(var(--ink-rgb),0.35)' }}>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>
             Rising Traders
           </span>
         </div>
-        <span className="font-mono text-[9px] uppercase tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.18)' }}>
+        <span className="font-mono text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
           This Week
         </span>
       </div>

@@ -50,7 +50,7 @@ function TickerItem({ trade }: { trade: RecentTrade }) {
       )}
       <span className="text-xs font-black tabular-nums text-ink">{formatCurrency(amount, true)}</span>
       {time && (
-        <span className="text-[10px] tabular-nums text-ink/25">{time}</span>
+        <span className="text-[10px] tabular-nums text-ink/55">{time}</span>
       )}
     </a>
   );

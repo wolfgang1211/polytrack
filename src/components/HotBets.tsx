@@ -27,7 +27,7 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
       style={{ borderColor: 'rgba(var(--ink-rgb),0.05)' }}
     >
       {/* Rank */}
-      <span className="flex-shrink-0 w-5 text-center text-[11px] font-black text-ink/20 tabular-nums">
+      <span className="flex-shrink-0 w-5 text-center text-[11px] font-black text-ink/55 tabular-nums">
         {rank}
       </span>
 
@@ -57,12 +57,12 @@ function HotMarketRow({ market, rank }: { market: HotMarket; rank: number }) {
       </span>
 
       {/* Volume */}
-      <span className="flex-shrink-0 text-xs font-bold text-ink/50 tabular-nums w-16 text-right">
+      <span className="flex-shrink-0 text-xs font-bold text-ink/55 tabular-nums w-16 text-right">
         {formatCurrency(market.volume, true)}
       </span>
 
       {/* Last trade */}
-      <span className="flex-shrink-0 text-[10px] text-ink/20 w-12 text-right hidden sm:block">
+      <span className="flex-shrink-0 text-[10px] text-ink/55 w-12 text-right hidden sm:block">
         {timeAgo(market.lastTrade)}
       </span>
     </a>
@@ -105,7 +105,7 @@ export default function HotBets() {
               key={p}
               onClick={() => setPeriod(p)}
               className={`relative rounded-lg px-2.5 py-1 text-[11px] font-bold transition-all duration-150
-                ${period === p ? 'text-ink' : 'text-ink/30 hover:text-ink/60'}`}
+                ${period === p ? 'text-ink' : 'text-ink/55 hover:text-ink/60'}`}
             >
               {period === p && (
                 <span className="absolute inset-0 rounded-lg"
@@ -123,10 +123,10 @@ export default function HotBets() {
           style={{ borderColor: 'rgba(var(--ink-rgb),0.06)' }}>
           <span className="w-5" />
           <span className="w-7" />
-          <span className="flex-1 text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Market</span>
-          <span className="text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Trades</span>
-          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-ink/20 font-semibold">Vol</span>
-          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-ink/20 font-semibold hidden sm:block">Last</span>
+          <span className="flex-1 text-[10px] uppercase tracking-widest text-ink/55 font-semibold">Market</span>
+          <span className="text-[10px] uppercase tracking-widest text-ink/55 font-semibold">Trades</span>
+          <span className="w-16 text-right text-[10px] uppercase tracking-widest text-ink/55 font-semibold">Vol</span>
+          <span className="w-12 text-right text-[10px] uppercase tracking-widest text-ink/55 font-semibold hidden sm:block">Last</span>
         </div>
 
         {loading ? (

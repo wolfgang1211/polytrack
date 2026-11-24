@@ -19,7 +19,7 @@ function DataCell({ label, value, sub, accent, loading }: {
 }) {
   return (
     <div className="flex min-w-0 flex-col justify-center px-3 py-4 sm:px-5">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'var(--text-muted)' }}>
         {label}
       </p>
       {loading ? (
@@ -31,7 +31,7 @@ function DataCell({ label, value, sub, accent, loading }: {
         </p>
       )}
       {sub && !loading && (
-        <p className="font-mono text-[9px] mt-1 truncate" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{sub}</p>
+        <p className="font-mono text-[10px] mt-1 truncate" style={{ color: 'var(--text-muted)' }}>{sub}</p>
       )}
     </div>
   );

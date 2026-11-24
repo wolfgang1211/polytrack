@@ -11,9 +11,9 @@ import RisingTraders from '@/components/RisingTraders';
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -22,7 +22,7 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function DataCell({ label, value, accent, loading }: { label: string; value: string; accent?: string; loading?: boolean }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[140px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>{label}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
       {loading ? (
         <div className="h-6 w-20 rounded animate-shimmer" />
       ) : (
@@ -35,7 +35,7 @@ function DataCell({ label, value, accent, loading }: { label: string; value: str
 function HBar({ label, pct, detail, color }: { label: string; pct: number; detail: string; color: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="font-mono text-[10px] uppercase tracking-wider w-24 flex-shrink-0" style={{ color: 'rgba(var(--ink-rgb),0.35)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-wider w-24 flex-shrink-0" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="flex-1 h-5 rounded overflow-hidden" style={{ background: 'rgba(var(--ink-rgb),0.04)' }}>
         <div className="h-full rounded transition-all duration-700" style={{ width: `${Math.min(100, Math.max(0, pct))}%`, background: color }} />
       </div>
@@ -88,7 +88,7 @@ export default function InsightsPage() {
           <span className="text-ink">Market</span>{' '}
           <span className="text-grad">Insights</span>
         </h1>
-        <p className="text-sm text-ink/40 max-w-lg">
+        <p className="text-sm text-ink/55 max-w-lg">
           Derived analytics for top Polymarket traders — efficiency, distribution and concentration metrics you won&apos;t find on the leaderboard.
         </p>
       </div>
@@ -122,7 +122,7 @@ export default function InsightsPage() {
           />
         </div>
         {!loading && data.length > 0 && avgPnl > 0 && median > 0 && avgPnl / median > 1.5 && (
-          <p className="mt-2 font-mono text-[10px]" style={{ color: 'rgba(var(--ink-rgb),0.3)' }}>
+          <p className="mt-2 font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
             Average is {(avgPnl / median).toFixed(1)}× the median — profits are heavily concentrated at the top.
           </p>
         )}
@@ -143,9 +143,9 @@ export default function InsightsPage() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-bold text-ink">{name}</p>
-                      <p className="text-[10px] font-mono text-ink/25">{formatAddress(e.proxyWallet)}</p>
+                      <p className="text-[10px] font-mono text-ink/55">{formatAddress(e.proxyWallet)}</p>
                     </div>
-                    <span className="font-mono text-[9px] uppercase tracking-wider rounded-full px-2 py-0.5"
+                    <span className="font-mono text-[10px] uppercase tracking-wider rounded-full px-2 py-0.5"
                       style={{ background: 'rgba(52,211,153,0.08)', color: 'rgba(52,211,153,0.8)', border: '1px solid rgba(52,211,153,0.2)' }}>
                       #{i + 1} P&amp;L/share
                     </span>
@@ -153,17 +153,17 @@ export default function InsightsPage() {
                   <p className="text-3xl font-black text-grad-profit leading-none">${e.pnlPerShare.toFixed(4)}/share</p>
                   <div className="flex justify-between">
                     <div>
-                      <p className="text-[10px] text-ink/25 uppercase tracking-wider">P&L</p>
+                      <p className="text-[10px] text-ink/55 uppercase tracking-wider">P&L</p>
                       <p className="text-sm font-bold" style={{ color: 'rgba(52,211,153,0.9)' }}>+{formatCurrency(e.pnl, true)}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[10px] text-ink/25 uppercase tracking-wider">Volume</p>
+                      <p className="text-[10px] text-ink/55 uppercase tracking-wider">Volume</p>
                       <p className="text-sm font-bold text-ink/60">{formatShares(e.vol)}</p>
                     </div>
                   </div>
                   <a href={profileUrl(e.proxyWallet)} target="_blank" rel="noopener noreferrer"
                     onClick={ev => ev.stopPropagation()}
-                    className="text-[10px] text-ink/25 hover:text-ink/50 transition-colors">
+                    className="text-[10px] text-ink/55 hover:text-ink/50 transition-colors">
                     View on Polymarket →
                   </a>
                 </Link>
@@ -182,7 +182,7 @@ export default function InsightsPage() {
             {/* P&L distribution histogram */}
             <div className="glass rounded-2xl p-5 animate-fade-in-up">
               <p className="text-sm font-bold text-ink mb-1">P&L Distribution</p>
-              <p className="text-xs text-ink/35 mb-5">How profits are spread across the top {data.length} traders.</p>
+              <p className="text-xs text-ink/55 mb-5">How profits are spread across the top {data.length} traders.</p>
               <div className="flex flex-col gap-3">
                 {hist.map(b => (
                   <HBar
@@ -199,7 +199,7 @@ export default function InsightsPage() {
             {/* Concentration */}
             <div className="glass rounded-2xl p-5 animate-fade-in-up" style={{ animationDelay: '60ms' }}>
               <p className="text-sm font-bold text-ink mb-1">Whale Concentration</p>
-              <p className="text-xs text-ink/35 mb-5">Share of total volume and P&L held by the biggest traders.</p>
+              <p className="text-xs text-ink/55 mb-5">Share of total volume and P&L held by the biggest traders.</p>
               <div className="flex flex-col gap-3">
                 <HBar label="Top 3 · Vol"   pct={conc.top3VolPct}  detail={`${conc.top3VolPct.toFixed(1)}%`}  color="rgba(96,165,250,0.55)" />
                 <HBar label="Top 10 · Vol"  pct={conc.top10VolPct} detail={`${conc.top10VolPct.toFixed(1)}%`} color="rgba(96,165,250,0.35)" />
@@ -229,8 +229,8 @@ export default function InsightsPage() {
               style={{ opacity: 0.5 }}>
               <p className="text-2xl mb-3">{icon}</p>
               <p className="text-sm font-bold text-ink mb-1">{title}</p>
-              <p className="text-xs text-ink/35 leading-relaxed">{desc}</p>
-              <span className="mt-3 inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider"
+              <p className="text-xs text-ink/55 leading-relaxed">{desc}</p>
+              <span className="mt-3 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
                 style={{ background: 'var(--accent-tint)', color: 'rgba(var(--ink-rgb),0.7)', border: '1px solid var(--accent-border-xs)' }}>
                 Coming Soon
               </span>
@@ -240,7 +240,7 @@ export default function InsightsPage() {
       </section>
 
       {/* ── Methodology note ── */}
-      <p className="font-mono text-[10px] leading-relaxed max-w-2xl" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>
+      <p className="font-mono text-[10px] leading-relaxed max-w-2xl" style={{ color: 'var(--text-muted)' }}>
         Methodology: a top-50 all-time leaderboard sample, fetched on page load, with lifetime realized P&amp;L.
         Efficiency = USDC P&amp;L ÷ traded shares, not return on capital; wallets below {formatShares(ROI_MIN_VOLUME)} are excluded.
         Concentration percentages describe this sample only and rank each metric independently.

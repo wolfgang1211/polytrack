@@ -71,7 +71,7 @@ export default function BlogPage() {
     <div className="mx-auto max-w-4xl py-8">
       <div className="mb-10">
         <h1 className="text-3xl font-bold text-ink mb-2">Blog</h1>
-        <p className="text-xs text-ink/35">
+        <p className="text-xs text-ink/55">
           AlphaBoard research, guides, and market intelligence for Polymarket traders.
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function BlogPage() {
               {post.tags.map((tag) => (
                 <Tag key={tag} label={tag} />
               ))}
-              <span className="text-[10px] text-ink/25 ml-auto font-mono">
+              <span className="text-[10px] text-ink/55 ml-auto font-mono">
                 {post.readTime}
               </span>
             </div>
@@ -109,12 +109,12 @@ export default function BlogPage() {
             <h2 className="text-sm font-semibold text-ink/85 mb-1.5 leading-snug group-hover:text-ink/80 transition-colors">
               {post.title}
             </h2>
-            <p className="text-xs text-ink/35 leading-relaxed line-clamp-2">
+            <p className="text-xs text-ink/55 leading-relaxed line-clamp-2">
               {post.excerpt}
             </p>
 
             <div className="mt-4 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-ink/20">
+              <span className="text-[10px] font-mono text-ink/55">
                 {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               <span

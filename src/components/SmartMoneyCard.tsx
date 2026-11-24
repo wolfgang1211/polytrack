@@ -31,9 +31,9 @@ export default function SmartMoneyCard() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[9px] uppercase tracking-[0.12em]" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>All-Time</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>All-Time</span>
           <Link href="/leaderboard"
-            className="font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors">
+            className="inline-flex min-h-6 items-center font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
             View All →
           </Link>
         </div>
@@ -41,7 +41,7 @@ export default function SmartMoneyCard() {
 
       <div className="flex flex-col" data-testid={rows === null ? 'smart-money-loading' : undefined}>
         {rows?.length === 0 ? (
-          <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-ink/30">
+          <div className="flex h-44 items-center justify-center px-4 text-center font-mono text-[10px] uppercase tracking-wider text-ink/55">
             Live data is temporarily unavailable
           </div>
         ) : (rows ?? Array.from({ length: 4 })).map((e, i) => {

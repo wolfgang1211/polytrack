@@ -43,7 +43,7 @@ function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: bool
         style={{ width: `${barPct}%`, background: `${accent}09`, transition: 'width 0.6s ease' }} />
 
       {/* BUY / SELL badge */}
-      <span className="relative flex-shrink-0 font-mono text-[9px] font-black uppercase w-9 text-center rounded px-1 py-0.5"
+      <span className="relative flex-shrink-0 font-mono text-[10px] font-black uppercase w-9 text-center rounded px-1 py-0.5"
         style={{ background: `${accent}18`, color: accent, border: `1px solid ${accent}38` }}>
         {isBuy ? 'BUY' : 'SELL'}
       </span>
@@ -59,19 +59,19 @@ function TradeRow({ trade, fresh, maxAmount }: { trade: RecentTrade; fresh: bool
 
       {/* Market title */}
       <a href={href} target="_blank" rel="noopener noreferrer"
-        className="relative flex-1 min-w-0 text-[11px] transition-colors truncate hover:opacity-80"
-        style={{ color: 'rgba(var(--ink-rgb),0.48)' }}>
+        className="relative flex-1 min-w-0 text-[11px] leading-6 transition-colors truncate hover:opacity-80"
+        style={{ color: 'var(--text-secondary)' }}>
         {trade.title ?? trade.asset ?? '—'}
       </a>
 
       {/* Wallet + time */}
       <div className="relative flex-shrink-0 text-right hidden sm:block w-[52px]">
         <a href={trade.proxyWallet ? `/wallet/${trade.proxyWallet.toLowerCase()}` : undefined}
-          className="font-mono text-[9px] block truncate hover:opacity-80"
-          style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>
+          className="font-mono text-[10px] block truncate hover:opacity-80"
+          style={{ color: 'var(--text-muted)' }}>
           {wallet}
         </a>
-        <p className="font-mono text-[9px]" style={{ color: 'rgba(var(--ink-rgb),0.18)' }}>{timeAgo(ts)}</p>
+        <p className="font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>{timeAgo(ts)}</p>
       </div>
     </div>
   );
@@ -129,17 +129,17 @@ export default function RecentBigTrades() {
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <span className="flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-bold"
+          <span className="flex items-center gap-1 rounded px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] font-bold"
             style={{ background: 'rgba(52,211,153,0.10)', color: '#34d399', border: '1px solid rgba(52,211,153,0.20)' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
             Live
           </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'rgba(var(--ink-rgb),0.35)' }}>
-            Activity {belowThreshold ? '' : <span style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>$1K+</span>}
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>
+            Activity {belowThreshold ? '' : <span style={{ color: 'var(--text-muted)' }}>$1K+</span>}
           </span>
         </div>
         {lastUpdate && (
-          <span className="font-mono text-[9px]" style={{ color: 'rgba(var(--ink-rgb),0.18)' }}>
+          <span className="font-mono text-[10px]" style={{ color: 'var(--text-muted)' }}>
             {lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         )}
@@ -156,7 +156,7 @@ export default function RecentBigTrades() {
         ) : trades.length === 0 ? (
           <div className="py-10 text-center">
             <p className="text-2xl mb-2">📭</p>
-            <p className="font-mono text-[11px]" style={{ color: 'rgba(var(--ink-rgb),0.22)' }}>No recent trades</p>
+            <p className="font-mono text-[11px]" style={{ color: 'var(--text-muted)' }}>No recent trades</p>
           </div>
         ) : (
           <div className="max-h-[400px] overflow-y-auto p-1.5">

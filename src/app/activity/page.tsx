@@ -75,9 +75,9 @@ interface MarketAgg {
 function SectionHeader({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'rgba(var(--ink-rgb),0.20)' }}>{index}</span>
+      <span className="font-mono text-[10px] font-black tracking-widest" style={{ color: 'var(--text-muted)' }}>{index}</span>
       <div className="h-px w-12" style={{ background: 'var(--accent-border)' }} />
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'rgba(var(--ink-rgb),0.25)' }}>{label}</span>
+      <span className="font-mono text-[10px] uppercase tracking-[0.15em]" style={{ color: 'var(--text-muted)' }}>{label}</span>
       <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
     </div>
   );
@@ -87,7 +87,7 @@ function SectionHeader({ index, label }: { index: string; label: string }) {
 function DataCell({ label, value, accent, dot }: { label: string; value: string; accent?: string; dot?: boolean }) {
   return (
     <div className="flex-1 flex flex-col justify-center px-5 py-4 min-w-[110px]">
-      <p className="font-mono text-[9px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1.5" style={{ color: 'rgba(var(--ink-rgb),0.28)' }}>
+      <p className="font-mono text-[10px] uppercase tracking-[0.15em] mb-1.5 flex items-center gap-1.5" style={{ color: 'var(--text-muted)' }}>
         {dot && <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />}
         {label}
       </p>
@@ -243,7 +243,7 @@ export default function ActivityPage() {
         <h1 className="text-2xl font-black tracking-tight sm:text-3xl mb-2">
           <span className="text-ink">Live Trading </span><span className="text-grad">Activity</span>
         </h1>
-        <p className="text-sm text-ink/40">Observed Polymarket trade samples, not complete market-wide totals.</p>
+        <p className="text-sm text-ink/55">Observed Polymarket trade samples, not complete market-wide totals.</p>
         {feedError && <p role="alert" className="mt-3 text-sm text-amber-300">{feedError}</p>}
       </div>
 
@@ -278,7 +278,7 @@ export default function ActivityPage() {
               <option key={s.key} value={s.key} style={{ background: 'var(--surface-1)', color: 'var(--text-primary)' }}>{s.label}</option>
             ))}
           </select>
-          <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-ink/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-ink/55" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </div>
@@ -287,7 +287,7 @@ export default function ActivityPage() {
           style={{ border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
           {paused ? '▶ Resume' : '❚❚ Pause'}
         </button>
-        <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink/35">
+        <span className="ml-auto flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-ink/55">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           {lastUpdate ? `Updated ${lastUpdate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}` : `Updating every ${REFRESH_MS / 1000}s`}
         </span>
@@ -296,7 +296,7 @@ export default function ActivityPage() {
       {/* ── [03] Heatmap ── */}
       <section className="glass rounded-2xl p-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
         <SectionHeader index="[03]" label="Market Heatmap" />
-        <p className="mb-3 text-[11px] text-ink/35" style={{ marginTop: '-12px' }}>Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
+        <p className="mb-3 text-[11px] text-ink/55" style={{ marginTop: '-12px' }}>Cards scale by volume · colors show buy/sell pressure · labels show dominant outcome</p>
 
         {loading ? (
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
@@ -329,7 +329,7 @@ export default function ActivityPage() {
                   </div>
                   <div>
                     {m.outcome && (
-                      <p className="truncate text-[9px] font-bold uppercase tracking-wide text-ink/80">
+                      <p className="truncate text-[10px] font-bold uppercase tracking-wide text-ink/80">
                         {buyDom ? 'BUY' : 'SELL'} {m.outcome}
                       </p>
                     )}
@@ -347,10 +347,10 @@ export default function ActivityPage() {
         <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <SectionHeader index="[04]" label="Trade Feed" />
-            <p className="text-[11px] text-ink/30" style={{ marginTop: '-12px' }}>Last {filtered.length} trades</p>
+            <p className="text-[11px] text-ink/55" style={{ marginTop: '-12px' }}>Last {filtered.length} trades</p>
           </div>
           <div className="relative">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink/25" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-ink/55" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search trades…"
@@ -360,7 +360,7 @@ export default function ActivityPage() {
 
         <div className="overflow-x-auto">
           <div className="min-w-[680px]">
-            <div className="grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-ink/30"
+            <div className="grid grid-cols-[1fr_140px_120px_70px_80px_90px_64px] px-3 py-2 text-[10px] font-semibold uppercase tracking-widest text-ink/55"
               style={{ borderBottom: '1px solid rgba(var(--ink-rgb),0.06)' }}>
               <span>Market</span><span>Trader</span><span>Outcome</span><span className="text-center">Side</span>
               <span className="text-right">Price</span><span className="text-right">Size</span><span className="text-right">Time</span>
@@ -385,7 +385,7 @@ export default function ActivityPage() {
                   </a>
                   <div className="flex items-center gap-1 min-w-0">
                     <a href={t.proxyWallet ? `/wallet/${t.proxyWallet.toLowerCase()}` : undefined}
-                      className="truncate font-mono text-[11px] text-ink/45 hover:text-ink/70">{name}</a>
+                      className="truncate font-mono text-[11px] leading-6 text-ink/55 hover:text-ink/70">{name}</a>
                     {t.proxyWallet && <CopyAddress address={t.proxyWallet} />}
                   </div>
                   <span className="truncate text-ink/55">{t.outcome ?? '—'}</span>
@@ -397,7 +397,7 @@ export default function ActivityPage() {
                   </span>
                   <span className="text-right tabular-nums text-ink/55">{price}</span>
                   <span className="text-right font-bold tabular-nums text-ink/80">{formatCurrency(usd(t), true)}</span>
-                  <span className="text-right text-[10px] text-ink/30">{timeAgo(tsOf(t))}</span>
+                  <span className="text-right text-[10px] text-ink/55">{timeAgo(tsOf(t))}</span>
                 </div>
               );
             })}
