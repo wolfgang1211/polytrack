@@ -131,3 +131,7 @@ test('light theme: profit/loss gradient text uses dark shades (Polymarket and Ka
   assert.match(css, /:root\[data-theme="light"\] \.text-grad-profit \{ background:linear-gradient\(135deg,#047857,#065f46\)/);
   assert.match(css, /:root\[data-theme="light"\] \.text-grad-loss   \{ background:linear-gradient\(135deg,#be123c,#9f1239\)/);
 });
+
+test('dark theme: loss gradient is light enough on red-tinted price tiles', () => {
+  assert.match(read('src/app/globals.css'), /^\.text-grad-loss     \{ background:linear-gradient\(135deg,#fda4af,#fb7185\)/m);
+});

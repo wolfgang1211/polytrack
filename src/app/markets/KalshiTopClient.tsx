@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNow } from '@/lib/useNow';
 import { KALSHI_CHIPS, chipFor, type KalshiChip, type KalshiTopEvent, type KalshiTopScan } from '@/lib/kalshiTop';
 import { ExplorerCard, ExplorerDetails, ExplorerHeader, ExplorerToolbar } from './MarketExplorerUI';
@@ -40,6 +40,18 @@ function ago(iso: string, now: number): string {
   return min < 1 ? 'just now' : min < 60 ? `${min} min ago` : `${Math.round(min / 60)} h ago`;
 }
 
+/* The shared cache refreshes in the background on the first visit after it expires, so after a quiet period the
+   first visitor is served the previous scan. When the scan is older than this, the page says so, polls the API until
+   the background scan lands, and swaps it in. */
+export const STALE_AFTER_MS = 30 * 60_000;
+const POLL_EVERY_MS = 20_000;
+const POLL_FOR_MS = 4 * 60_000;
+
+export function isStale(receivedAt: string, now: number): boolean {
+  const t = Date.parse(receivedAt);
+  return Number.isFinite(t) && now - t > STALE_AFTER_MS;
+}
+
 const CHIP_COLOR: Record<Exclude<KalshiChip, 'All'>, string> = {
   Politics: 'var(--cat-politics)', Sports: 'var(--cat-sports)', Economy: 'var(--info)', Crypto: 'var(--cat-crypto)',
   Tech: 'var(--cat-tech)', Culture: 'var(--cat-entertainment)', World: 'var(--text-secondary)', Other: 'var(--cat-other)',
@@ -64,7 +76,7 @@ function Tile({ label, ask, bid, yes }: { label: string; ask: number | null; bid
         : { background: 'rgba(251,113,133,0.08)', border: '1px solid rgba(251,113,133,0.2)' }}>
       <p className="truncate text-xs font-semibold text-ink/55">{label}</p>
       <p className={`text-base font-black ${yes ? 'text-grad-profit' : 'text-grad-loss'}`}>
-        {cents(price)}{useBid && <span className="ml-1 text-xs font-semibold text-ink/55">bid</span>}
+        {cents(price)}{useBid && <span className="ml-1 text-xs font-semibold text-ink/70">bid</span>}
       </p>
     </div>
   );
@@ -135,8 +147,32 @@ function EventCard({ event, now }: { event: KalshiTopEvent; now: number }) {
   );
 }
 
-export default function KalshiTopClient({ scan, error, serverNow }: { scan: KalshiTopScan | null; error: string | null; serverNow: number }) {
+export default function KalshiTopClient({ scan: initialScan, error, serverNow }: { scan: KalshiTopScan | null; error: string | null; serverNow: number }) {
   const now = useNow(serverNow);
+  const [scan, setScan] = useState(initialScan);
+  const [refresh, setRefresh] = useState<'idle' | 'polling' | 'gave_up'>('idle');
+
+  useEffect(() => {
+    if (!initialScan || !isStale(initialScan.receivedAt, Date.now())) return;
+    const since = Date.parse(initialScan.receivedAt);
+    const started = Date.now();
+    let stopped = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const tick = async () => {
+      try {
+        const r = await fetch('/api/kalshi/top', { cache: 'no-store' });
+        if (r.ok) {
+          const next = (await r.json()) as KalshiTopScan;
+          if (!stopped && Array.isArray(next.events) && Date.parse(next.receivedAt) > since) { setScan(next); setRefresh('idle'); return; }
+        }
+      } catch { /* keep showing the previous scan */ }
+      if (stopped) return;
+      if (Date.now() - started > POLL_FOR_MS) { setRefresh('gave_up'); return; }
+      timer = setTimeout(tick, POLL_EVERY_MS);
+    };
+    timer = setTimeout(() => { if (!stopped) { setRefresh('polling'); void tick(); } }, 1_000);
+    return () => { stopped = true; if (timer) clearTimeout(timer); };
+  }, [initialScan]);
   const [sort, setSort] = useState<SortKey>('vol24h');
   const [chip, setChip] = useState<KalshiChip>('All');
   const [q, setQ] = useState('');
@@ -177,7 +213,7 @@ export default function KalshiTopClient({ scan, error, serverNow }: { scan: Kals
       {scan && (
         <ExplorerDetails
           className="glass rounded-2xl px-4"
-          summary={<span>{scan.complete ? 'Full scan' : 'Partial scan'} · updated {ago(scan.receivedAt, now)} · About this ranking</span>}>
+          summary={<span>{scan.complete ? 'Full scan' : 'Partial scan'} · updated {ago(scan.receivedAt, now)}{refresh === 'polling' ? ' · refreshing…' : refresh === 'gave_up' ? ' · refresh pending, reload later' : ''} · About this ranking</span>}>
           <div className="space-y-2 pb-4 text-xs text-ink/60">
             <p>
               Every open Kalshi market ({scan.scannedMarkets.toLocaleString('en-US')} rows, {scan.pages} pages) is read and ranked by 24h volume.

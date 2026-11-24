@@ -322,7 +322,7 @@ html {
 .text-grad-silver   { background:linear-gradient(135deg,#e2e8f0,#94a3b8,#64748b); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .text-grad-bronze   { background:linear-gradient(135deg,#fb923c,#ea580c,#c2410c); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .text-grad-profit   { background:linear-gradient(135deg,#34d399,#10b981); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.text-grad-loss     { background:linear-gradient(135deg,#fb7185,#f43f5e); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.text-grad-loss     { background:linear-gradient(135deg,#fda4af,#fb7185); -webkit-background-clip:text; background-clip:text; color:transparent; }
 /* Light canvas: the bright gradients measure ~2:1 on pale tiles; use the 700-800 shades (>= 4.5:1). */
 :root[data-theme="light"] .text-grad-profit { background:linear-gradient(135deg,#047857,#065f46); -webkit-background-clip:text; background-clip:text; }
 :root[data-theme="light"] .text-grad-loss   { background:linear-gradient(135deg,#be123c,#9f1239); -webkit-background-clip:text; background-clip:text; }

@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   try {
     if ([...new URL(req.url).searchParams.keys()].length > 0) throw new KalshiError(400, 'This endpoint does not accept query parameters.');
     const scan = await getCachedKalshiTop();
-    return Response.json(scan, { headers: { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600' } });
+    return Response.json(scan, { headers: { 'Cache-Control': 'public, s-maxage=30' } });
   } catch (e) {
     return kalshiErrorResponse(e);
   }

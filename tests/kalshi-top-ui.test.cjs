@@ -119,3 +119,14 @@ test('no ask: the best bid is shown and labelled as a bid; closed events are hid
   assert.match(h, />Cincinnati<\/p><p[^>]*>99¢<span[^>]*>bid<\/span>/);
   assert.doesNotMatch(h, /Already closed/);
 });
+
+test('stale cache: an old scan is flagged as refreshing and the client polls the API for the background result', () => {
+  assert.equal(Client.isStale('2026-11-23T20:55:00.000Z', NOW), false);
+  assert.equal(Client.isStale('2026-11-23T09:00:00.000Z', NOW), true);
+  const src = fs.readFileSync(path.join(root, 'src/app/markets/KalshiTopClient.tsx'), 'utf8');
+  assert.match(src, /fetch\('\/api\/kalshi\/top', \{ cache: 'no-store' \}\)/);
+  assert.match(src, /Date\.parse\(next\.receivedAt\) > since/);
+  assert.match(src, /refreshing…/);
+  const route = fs.readFileSync(path.join(root, 'src/app/api/kalshi/top/route.ts'), 'utf8');
+  assert.match(route, /s-maxage=30'/);
+});
