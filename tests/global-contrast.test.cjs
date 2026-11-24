@@ -154,3 +154,13 @@ test('home/activity/blog tap targets are at least 24px tall (2026-11-24 audit)',
   assert.match(read('src/app/activity/page.tsx'), /truncate font-mono text-\[11px\] leading-6 text-ink\/55/);
   assert.match(read('src/app/blog/[slug]/page.tsx'), /inline-flex min-h-6 items-center text-\[11px\] text-ink\/55 hover:text-ink\/80">← Back to Blog/);
 });
+
+test('activity heatmap tiles are opaque with white text; rank numbers use theme tokens (2026-11-24 re-measure)', () => {
+  const a = read('src/app/activity/page.tsx');
+  assert.match(a, /color-mix\(in srgb, \$\{buyDom \? '#047857' : '#be123c'\} \$\{pct\}%, #1f2937\)/);
+  assert.doesNotMatch(a, /rgba\(16,185,129,\$\{/);
+  assert.match(a, /leading-tight text-\[#fff\] line-clamp-2/);
+  for (const f of ['src/components/SmartMoneyCard.tsx', 'src/components/RisingTraders.tsx']) {
+    assert.doesNotMatch(read(f), /rgba\(242,240,233/, `${f}: hard-coded light text`);
+  }
+});

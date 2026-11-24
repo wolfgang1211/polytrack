@@ -307,10 +307,9 @@ export default function ActivityPage() {
             {treemap.map((m, i) => {
               const ratio = m.total > 0 ? m.buy / m.total : 0.5; // 1 = all buys
               const buyDom = ratio >= 0.5;
-              const intensity = 0.18 + Math.abs(ratio - 0.5) * 1.2; // 0.18..0.78
-              const bg = buyDom
-                ? `rgba(16,185,129,${Math.min(0.85, intensity)})`
-                : `rgba(244,63,94,${Math.min(0.85, intensity)})`;
+              // Opaque tiles from a dark slate to the 700 shade in BOTH themes, so their text is a fixed white (#fff, >= 4.5:1).
+              const pct = Math.round(35 + Math.min(1, Math.abs(ratio - 0.5) * 2) * 65); // 35..100
+              const bg = `color-mix(in srgb, ${buyDom ? '#047857' : '#be123c'} ${pct}%, #1f2937)`;
               // big tiles for the top few by volume
               const share = m.total / maxTotal;
               const span = i === 0 || share > 0.6 ? 'col-span-2 row-span-2'
@@ -325,15 +324,15 @@ export default function ActivityPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.icon} alt="" className="h-5 w-5 flex-shrink-0 rounded object-cover" />
                     )}
-                    <p className="text-[11px] font-semibold leading-tight text-ink line-clamp-2 drop-shadow">{m.title}</p>
+                    <p className="text-[11px] font-semibold leading-tight text-[#fff] line-clamp-2 drop-shadow">{m.title}</p>
                   </div>
                   <div>
                     {m.outcome && (
-                      <p className="truncate text-[10px] font-bold uppercase tracking-wide text-ink/80">
+                      <p className="truncate text-[10px] font-bold uppercase tracking-wide text-[#fff]/90">
                         {buyDom ? 'BUY' : 'SELL'} {m.outcome}
                       </p>
                     )}
-                    <p className="text-sm font-black tabular-nums text-ink drop-shadow">{formatCurrency(m.total, true)}</p>
+                    <p className="text-sm font-black tabular-nums text-[#fff] drop-shadow">{formatCurrency(m.total, true)}</p>
                   </div>
                 </a>
               );

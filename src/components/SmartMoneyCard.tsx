@@ -23,7 +23,7 @@ export default function SmartMoneyCard() {
 
       {/* Terminal header */}
       <div className="flex items-center justify-between px-4 py-2.5"
-        style={{ borderBottom: '1px solid var(--accent-border-xs)', background: 'rgba(242,240,233,0.06)' }}>
+        style={{ borderBottom: '1px solid var(--accent-border-xs)', background: 'rgba(var(--ink-rgb),0.06)' }}>
         <div className="flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
           <span className="font-mono text-[10px] uppercase tracking-[0.15em] font-bold" style={{ color: 'rgba(var(--ink-rgb),0.55)' }}>
@@ -31,7 +31,7 @@ export default function SmartMoneyCard() {
           </span>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'var(--text-muted)' }}>All-Time</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em]" style={{ color: 'var(--text-tertiary)' }}>All-Time</span>
           <Link href="/leaderboard"
             className="inline-flex min-h-6 items-center font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
             View All →
@@ -70,7 +70,7 @@ export default function SmartMoneyCard() {
                 style={{ background: strip, opacity: stripOp }} />
 
               <span className="w-5 flex-shrink-0 text-center font-mono text-[10px] font-black tabular-nums"
-                style={{ color: i < 3 ? 'rgba(242,240,233,0.80)' : 'rgba(var(--ink-rgb),0.22)' }}>
+                style={{ color: i < 3 ? 'var(--text-primary)' : 'var(--text-muted)' }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
 
