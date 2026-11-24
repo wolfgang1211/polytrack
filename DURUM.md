@@ -120,6 +120,19 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Korunanlar: etkinlik ve piyasa detay sayfaları, `/api/kalshi/events/[eventTicker]`, `/api/kalshi/markets`, etkinlik sayfasının kullandığı `KalshiMarketsClient`, fiyat özeti bileşenleri.
 - Doğrulama (preview dpl_2SKfVJbb9jgAiNk8EvKMQQEAepvH): `/markets?platform=kalshi&view=events` → yönlendirme → Kalshi listesi (58 kart, sekme yok); `/markets/kalshi/events/KXSB-27` HTTP 200, "Back to Kalshi markets"; `/api/kalshi/discovery` HTTP 404 (beklenen). Testler 490/490, tsc 0, lint 0 hata/24 uyarı.
 
+### Markets genel kontrol (2026-11-24 20:22–21:00, aynı dal, YALNIZ PREVIEW)
+- Yusuf: "markets bölümü için farklılık, eksik, hata var mı, varsa düzelt".
+- Bulunan ve düzeltilenler:
+  - **Polymarket "Closing Soon" boştu (0 piyasa).** Kaynak süresi geçmiş ama "aktif" piyasaları önce döndürüyordu, filtre hepsini atıyordu. Artık `end_date_min` = şimdi (5 dk'ya yuvarlanmış). Sonra 177 piyasa.
+  - **Polymarket piyasa sayısı sıralamaya göre zıplıyordu (96 → 77 → 172).** Derin havuz artık sunucuda yükleniyor; sıralama değişince liste küçülmüyor (aynı havuz + yüklenen liste).
+  - **Tenis/espor/futbol "Other" çıkıyordu** (ör. ATP maçı, Counter-Strike, "FC ... win on"). Kategori anahtar kelimeleri eklendi; Sports 0 → 65. "Trump vs Harris" Politics, "Bitcoin Up or Down" Crypto olarak kalıyor (test var).
+  - **"Closed" yanlış etiket:** liste sadece aktif piyasaları içeriyor; bitiş tarihi geçmiş (ör. maç başlamış) piyasa artık "Awaiting result".
+  - **100¢ / 0¢ yuvarlama:** canlı fiyat 99.9¢ / 0.1¢ gösteriliyor, iki sağlayıcıda aynı kural.
+  - **Kalshi kartlarında görsel yoktu:** Kalshi etkinlik metadata'sından (`/events/{ticker}/metadata`, yalnız https) görsel eklendi; 60 kartın 48'inde var, hepsi yükleniyor. Önbellek anahtarı v5; soğuk tarama ~60 sn.
+- Kontrol edilen ve sorunsuz: Kalshi arama/çip/sıralama, Polymarket arama/çip/sıralama, kart linkleri (Polymarket dış link + ref, Kalshi iç sayfa), konsol hatası yok, 375 px taşma 0.
+- Bilinen kalan fark (bilinçli): Polymarket kartında "Trade on Polymarket" dış link var; Kalshi kartı AlphaBoard içindeki detay sayfasına gidiyor (Kalshi web URL biçimi doğrulanmadı, referans programı Türkiye'den kullanılamıyor). Polymarket'te "Featured markets", Kalshi'de "About this ranking" açılır kutusu var. Polymarket sayısı farklı sıralamalar yüklendikçe artabiliyor (azalmıyor).
+- Commit'ler: e707614, 6729fe9, c0f804f. Testler 496/496, tsc 0, lint 0 hata/24 uyarı.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Kalshi + kontrast preview onayı**: mobil kontrol yapıldı (375 px, iki tema). Yusuf akşam bakıp onaylarsa main'e alınır.
 2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
