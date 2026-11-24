@@ -133,8 +133,16 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Bilinen kalan fark (bilinçli): Polymarket kartında "Trade on Polymarket" dış link var; Kalshi kartı AlphaBoard içindeki detay sayfasına gidiyor (Kalshi web URL biçimi doğrulanmadı, referans programı Türkiye'den kullanılamıyor). Polymarket'te "Featured markets", Kalshi'de "About this ranking" açılır kutusu var. Polymarket sayısı farklı sıralamalar yüklendikçe artabiliyor (azalmıyor).
 - Commit'ler: e707614, 6729fe9, c0f804f. Testler 496/496, tsc 0, lint 0 hata/24 uyarı.
 
+## YAYIN: Kalshi tam liste + Markets birleştirme + kontrast (2026-11-24 21:43–22:00, Yusuf "yayına geçebiliriz")
+- `cowork/kalshi-unify` dalı main'e fast-forward edildi (24 commit, son kod commit'i c0f804f, belge b37c8ef). Production: `dpl_5kRhh1i3pnRh5NgJsKSzWzNchLzf` READY. Birleşme öncesi: testler 496/496, tsc 0, lint 0 hata/24 uyarı, diff-check temiz.
+- Canlıya giden işler: Kalshi tam tarama + tek görünüm (Polymarket ile aynı başlık/arama/sıralama/çip/kart, görseller), eski Discover/Newest/Events silindi ve eski adresler yönlendiriliyor, Polymarket "Closing Soon" düzeltmesi, sayı kararlılığı, kategori ve fiyat yuvarlama düzeltmeleri, eski sayfa önbelleğinin sayfada yenilenmesi, ana sayfa/activity/insights/blog kontrast ve dokunma alanları.
+- Önbellek ısıtma: canlıda ilk Kalshi taraması yapıldı (sayfa ve `/api/kalshi/top` ayrı önbellek girdisi tutuyor; ikisi de ısıtıldı). `/api/kalshi/top`: tam tarama, 60 etkinlik, 57 görsel.
+- Canlı ölçüm (www.alphaboard.xyz, 375 px): `/markets?platform=kalshi`, `/markets`, `/`, `/activity` koyu temada; `/markets?platform=kalshi`, `/markets`, `/` açık temada: eşik altı metin 0, yatay taşma 0, 24 px altı dokunma alanı 0. Eski `?view=discover` → yönlendirme; `/markets/kalshi/events/KXSB-27` HTTP 200; `/api/kalshi/discovery` HTTP 404 (silindi, beklenen).
+- Not: Vercel build'leri ara ara geçici Google Fonts hatasıyla düşüyor; tekrar build yeterli.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Kalshi + kontrast preview onayı**: mobil kontrol yapıldı (375 px, iki tema). Yusuf akşam bakıp onaylarsa main'e alınır.
+1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.
+2. **Kalshi gelir seçenekleri (trafik oluşursa)**: affiliate ağları (ABD trafiği, CPA) ve Builder Codes/DFlow (işlem ekranı gerektirir, ayrı proje).
 2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
 3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
