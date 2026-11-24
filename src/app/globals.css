@@ -129,6 +129,7 @@
 :root[data-theme="light"] [style*="color:#60a5fa" i]:not([style*="-color:#60a5fa" i]), :root[data-theme="light"] [style*="; color: rgb(96, 165, 250)"], :root[data-theme="light"] [style^="color: rgb(96, 165, 250)"] { color: #1d4ed8 !important; }
 :root[data-theme="light"] [style*="color:#38bdf8" i]:not([style*="-color:#38bdf8" i]), :root[data-theme="light"] [style*="; color: rgb(56, 189, 248)"], :root[data-theme="light"] [style^="color: rgb(56, 189, 248)"] { color: #0369a1 !important; }
 :root[data-theme="light"] [style*="color:#fb923c" i]:not([style*="-color:#fb923c" i]), :root[data-theme="light"] [style*="; color: rgb(251, 146, 60)"], :root[data-theme="light"] [style^="color: rgb(251, 146, 60)"] { color: #9a3412 !important; }
+:root[data-theme="light"] [style*="color:#fda4af" i]:not([style*="-color:#fda4af" i]), :root[data-theme="light"] [style*="; color: rgb(253, 164, 175)"], :root[data-theme="light"] [style^="color: rgb(253, 164, 175)"] { color: #9f1239 !important; }
 :root[data-theme="light"] { --success: #065f46; --danger: #9f1239; --warning: #92400e; --info: #1d4ed8; }
 :root[data-theme="light"] .text-emerald-300 { color: #065f46; }
 :root[data-theme="light"] .text-emerald-400 { color: #065f46; }

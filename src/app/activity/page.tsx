@@ -390,7 +390,7 @@ export default function ActivityPage() {
                   <span className="truncate text-ink/55">{t.outcome ?? '—'}</span>
                   <span className="flex justify-center">
                     <span className="rounded px-1.5 py-0.5 text-[10px] font-black uppercase"
-                      style={buy ? { background: 'rgba(16,185,129,0.14)', color: '#34d399' } : { background: 'rgba(244,63,94,0.14)', color: '#fb7185' }}>
+                      style={buy ? { background: 'rgba(16,185,129,0.14)', color: '#34d399' } : { background: 'rgba(244,63,94,0.10)', color: '#fda4af' }}>
                       {buy ? 'BUY' : 'SELL'}
                     </span>
                   </span>

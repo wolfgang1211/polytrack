@@ -170,3 +170,8 @@ test('insights: coming-soon cards are not faded below contrast; profile links ar
   assert.doesNotMatch(s, /style=\{\{ opacity: 0\.5 \}\}/);
   assert.match(s, /inline-flex min-h-6 items-center text-\[10px\] text-ink\/55 hover:text-ink\/80 transition-colors">\s*View on Polymarket/);
 });
+
+test('activity SELL badge: lighter rose on dark, mapped to a dark rose on light', () => {
+  assert.match(read('src/app/activity/page.tsx'), /background: 'rgba\(244,63,94,0\.10\)', color: '#fda4af'/);
+  assert.match(read('src/app/globals.css'), /color:#fda4af" i\][^\n]*\{ color: #9f1239 !important; \}/);
+});
