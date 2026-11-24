@@ -156,7 +156,7 @@ function MarketCard({ market, now }: { market: TopMarket & { category?: string }
 
 /* ── client view ───────────────────────────────────────── */
 
-export default function MarketsClient({ initialMarkets, serverNow }: { initialMarkets: TopMarket[]; serverNow: number }) {
+export default function MarketsClient({ initialMarkets, initialExtra = [], serverNow }: { initialMarkets: TopMarket[]; initialExtra?: TopMarket[]; serverNow: number }) {
   // Same clock on server and during hydration (no React error 418 text mismatch on "Xm left" labels or the expired-market filter).
   const now = useNow(serverNow);
   const [markets, setMarkets] = useState<TopMarket[]>(initialMarkets);
@@ -166,7 +166,7 @@ export default function MarketsClient({ initialMarkets, serverNow }: { initialMa
   const [q, setQ] = useState('');
   // Deep pool fetched once (top by total volume) so category filters aren't
   // starved when one hot event dominates 24h volume.
-  const [extra, setExtra] = useState<TopMarket[] | null>(null);
+  const [extra, setExtra] = useState<TopMarket[] | null>(initialExtra.length > 0 ? initialExtra : null);
   const firstRun = useRef(true);
 
   useEffect(() => {

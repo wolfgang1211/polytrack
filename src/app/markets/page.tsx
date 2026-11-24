@@ -46,16 +46,16 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
     );
   }
 
-  let initialMarkets: TopMarket[];
-  try {
-    initialMarkets = await fetchMarketsList('vol24h', 200);
-  } catch {
-    initialMarkets = [];
-  }
+  // The 24h-volume list plus a deep pool (top by total volume), both server-side, so the market count and the
+  // category filters are the same from the first paint (no jump when the pool used to load on the first chip click).
+  const [initialMarkets, initialExtra] = await Promise.all([
+    fetchMarketsList('vol24h', 200).catch((): TopMarket[] => []),
+    fetchMarketsList('volume', 200).catch((): TopMarket[] => []),
+  ]);
   return (
     <div className="flex flex-col gap-6">
       <NavRow><MarketPlatformSelect active="polymarket" /></NavRow>
-      <MarketsClient key="polymarket" initialMarkets={initialMarkets} serverNow={renderedAt()} />
+      <MarketsClient key="polymarket" initialMarkets={initialMarkets} initialExtra={initialExtra} serverNow={renderedAt()} />
     </div>
   );
 }

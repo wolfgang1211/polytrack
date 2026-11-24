@@ -37,9 +37,13 @@ export async function fetchMarketsList(sortKey = 'vol24h', limit = 120): Promise
   // "ending" should be ascending (soonest first); everything else descending.
   const ascending = sortKey === 'ending';
 
+  // "Closing soon" must start from now: ordered by endDate alone, the source returns long-expired (still "active")
+  // markets first, which the filter below then removes, leaving an empty list. The bound is floored to 5 minutes so
+  // the fetch cache key stays stable.
+  const endMin = ascending ? `&end_date_min=${encodeURIComponent(new Date(Math.floor(Date.now() / 300_000) * 300_000).toISOString())}` : '';
   const url =
     `https://gamma-api.polymarket.com/markets?active=true&closed=false` +
-    `&order=${order}&ascending=${ascending}&limit=${cappedLimit}`;
+    `&order=${order}&ascending=${ascending}&limit=${cappedLimit}${endMin}`;
   const res = await fetch(url, { headers: HEADERS, next: { revalidate: 120 } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();

@@ -175,3 +175,25 @@ test('Polymarket explorer: same cents rule; a passed end date on an active marke
   assert.equal(utils.detectCategory('Trump vs Harris debate winner'), 'Politics');
   assert.equal(utils.detectCategory('Bitcoin Up or Down - November 24'), 'Crypto');
 });
+
+test('Polymarket "Closing Soon" asks the source for markets ending from now on (never an empty list of expired markets)', async () => {
+  const urls = [];
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async u => { urls.push(String(u)); return new Response(JSON.stringify([{ id: 1, question: 'Q?', active: true, closed: false, endDate: '2099-01-01T00:00:00Z' }]), { status: 200 }); };
+  try {
+    const { fetchMarketsList } = makeLoader()('src/lib/markets.ts');
+    const ending = await fetchMarketsList('ending', 120);
+    await fetchMarketsList('vol24h', 120);
+    assert.equal(ending.length, 1);
+    assert.match(urls[0], /order=endDate&ascending=true&limit=120&end_date_min=\d{4}-\d{2}-\d{2}T\d{2}%3A\d{2}%3A00\.000Z$/);
+    assert.doesNotMatch(urls[1], /end_date_min/);
+  } finally { globalThis.fetch = realFetch; }
+});
+
+test('Polymarket page renders the deep pool server-side so counts and category filters are stable from first paint', () => {
+  const page = fs.readFileSync(path.join(root, 'src/app/markets/page.tsx'), 'utf8');
+  assert.match(page, /fetchMarketsList\('volume', 200\)/);
+  assert.match(page, /initialExtra=\{initialExtra\}/);
+  const client = fs.readFileSync(path.join(root, 'src/app/markets/MarketsClient.tsx'), 'utf8');
+  assert.match(client, /useState<TopMarket\[\] \| null>\(initialExtra\.length > 0 \? initialExtra : null\)/);
+});
