@@ -164,3 +164,9 @@ test('activity heatmap tiles are opaque with white text; rank numbers use theme 
     assert.doesNotMatch(read(f), /rgba\(242,240,233/, `${f}: hard-coded light text`);
   }
 });
+
+test('insights: coming-soon cards are not faded below contrast; profile links are 24px tall', () => {
+  const s = read('src/app/insights/page.tsx');
+  assert.doesNotMatch(s, /style=\{\{ opacity: 0\.5 \}\}/);
+  assert.match(s, /inline-flex min-h-6 items-center text-\[10px\] text-ink\/55 hover:text-ink\/80 transition-colors">\s*View on Polymarket/);
+});

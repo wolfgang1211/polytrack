@@ -163,7 +163,7 @@ export default function InsightsPage() {
                   </div>
                   <a href={profileUrl(e.proxyWallet)} target="_blank" rel="noopener noreferrer"
                     onClick={ev => ev.stopPropagation()}
-                    className="text-[10px] text-ink/55 hover:text-ink/50 transition-colors">
+                    className="inline-flex min-h-6 items-center text-[10px] text-ink/55 hover:text-ink/80 transition-colors">
                     View on Polymarket →
                   </a>
                 </Link>
@@ -225,8 +225,7 @@ export default function InsightsPage() {
             { icon: '📈', title: 'Trend Timeline',        desc: 'Daily snapshots of volume, P&L and rank movement — who is climbing, who is fading.' },
             { icon: '🧠', title: 'Smart Money Consensus', desc: 'Markets where multiple top-50 traders hold the same position right now.' },
           ].map(({ icon, title, desc }) => (
-            <div key={title} className="glass rounded-2xl p-5"
-              style={{ opacity: 0.5 }}>
+            <div key={title} className="glass rounded-2xl border-dashed p-5" aria-label={`${title} (coming soon)`}>
               <p className="text-2xl mb-3">{icon}</p>
               <p className="text-sm font-bold text-ink mb-1">{title}</p>
               <p className="text-xs text-ink/55 leading-relaxed">{desc}</p>
