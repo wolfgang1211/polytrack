@@ -115,6 +115,11 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Sıralama Polymarket ile aynı sırada: 24h Volume, Total Volume, Open Interest, Closing Soon, Newest. Kalshi likidite yayınlamadığı için Liquidity yerine Open Interest var; About kısmında yazıyor. Total Volume = etkinliğin tüm açık piyasalarının toplam hacmi; Newest = etkinlikteki en erken open_time. Kategori çipleri Polymarket sırasında ("Culture" → "Entertainment", ayrıca Economy). Önbellek anahtarı v4.
 - Doğrulama (preview, 375 px, koyu tema): eski Discover adresi yönlendi; görünüm sekmesi yok; 60 kart; 5 sıralama düğmesinin hepsi listeyi değiştiriyor; yatay taşma 0. Testler 599/599 (kaldırılan görünümlerin sayfa testleri çıkarıldı, yönlendirme/sıralama testleri eklendi), tsc 0, lint 0 hata/24 uyarı. Commit 8619f5f.
 
+### Silme (2026-11-24 17:51, Yusuf onayı: "silebilirsin discover falan")
+- Silinenler (commit a4c62a7): `KalshiDiscoveryClient.tsx`, `KalshiEventsClient.tsx`, `src/lib/kalshiDiscovery.ts`, `kalshiDiscoveryCache.ts`, `kalshiDiscoveryFilters.ts`, `/api/kalshi/discovery`, `/api/kalshi/events` (liste uç noktası), `kalshiEvents.ts` içindeki kullanılmayan liste yardımcıları, görünüm seçici (`KalshiViewSelect`) ve bunların testleri (5 test dosyası + diğer dosyalardaki ilgili testler).
+- Korunanlar: etkinlik ve piyasa detay sayfaları, `/api/kalshi/events/[eventTicker]`, `/api/kalshi/markets`, etkinlik sayfasının kullandığı `KalshiMarketsClient`, fiyat özeti bileşenleri.
+- Doğrulama (preview dpl_2SKfVJbb9jgAiNk8EvKMQQEAepvH): `/markets?platform=kalshi&view=events` → yönlendirme → Kalshi listesi (58 kart, sekme yok); `/markets/kalshi/events/KXSB-27` HTTP 200, "Back to Kalshi markets"; `/api/kalshi/discovery` HTTP 404 (beklenen). Testler 490/490, tsc 0, lint 0 hata/24 uyarı.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Kalshi + kontrast preview onayı**: mobil kontrol yapıldı (375 px, iki tema). Yusuf akşam bakıp onaylarsa main'e alınır.
 2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
