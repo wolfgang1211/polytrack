@@ -65,31 +65,18 @@ const summaryText = d => (/<summary\b[^>]*>([\s\S]*?)<\/summary>/.exec(d.html)?.
 const byAttr = (html, attr) => nodes(html, new RegExp(`<[a-z]+\\b[^>]*\\s${attr}(=""|\\b)[^>]*>`, 'g'));
 const withoutRanges = (html, ranges) => ranges.reduceRight((s, r) => s.slice(0, r.start) + s.slice(r.end), html);
 const noNestedAnchors = html => assert.ok(!nodes(html, /<a\b[^>]*>/g).some(a => /<a\b/.test(a.html.slice(2))), 'nested <a>');
-// Market rows only: any <li> rendered inside KalshiQuoteSummary/policy markup is not a row.
-const rowLis = html => nodes(html, /<li\b[^>]*>/g).filter(l => /href="\/markets\/kalshi\/(?!events\/)/.test(l.html));
 const h1Count =html => (html.match(/<h1\b/g) ?? []).length;
 
 // ---------- SYNTHETIC fixtures ----------
 const T1 = '2026-11-19T10:05:00.000Z';
-const ev = (eventTicker, o = {}) => ({ eventTicker, seriesTicker: eventTicker.split('-')[0], title: `SYNTHETIC event ${eventTicker}`,
-  subTitle: null, category: 'Sports', mutuallyExclusive: true, updatedTime: null, strikeDate: null, ...o });
 const mk = (ticker, o = {}) => ({ ticker, eventTicker: ticker.replace(/-T\d+$/, ''), title: `SYNTHETIC market ${ticker}`,
   yesLabel: `Outcome ${ticker}`, noLabel: null, status: 'active', marketType: 'binary', closeTime: '2099-06-01T00:00:00Z',
   updatedTime: null, volume24hContracts: 5, totalVolumeContracts: 9, openInterestContracts: 3, yesBid: 0.41, yesAsk: 0.43,
   yesBidSize: 1, yesAskSize: 1, notionalDollars: 1, rulesPrimary: null, rulesSecondary: null, ...o });
-const group = (t, markets, o = {}) => ({ eventTicker: t, event: ev(t), metadataStatus: 'loaded', markets, ...o });
-const coverage = (o = {}) => ({ tradePages: 1, tradesScanned: 10, rejectedTrades: 0, uniqueTickers: 5, selectedTickers: 5,
-  moreTradesAvailable: false, oldestTradeAt: '2026-11-19T09:00:00.123456Z', newestTradeAt: '2026-11-19T09:59:00.123456Z',
-  marketPages: 1, rejectedMarkets: 0, eventMetadataRequested: 2, eventMetadataFailed: 0, truncated: false,
-  windowStart: '2026-11-18T10:00:00.000Z', windowEnd: '2026-11-19T10:00:00.000Z', ...o });
-const dpage = (groups, cov = {}) => ({ groups, receivedAt: T1, sourceAsOf: null, coverage: coverage(cov) });
-const twoGroups = () => dpage([group('KXA-E1', [mk('KXA-E1-T1')]), group('KXB-E1', [mk('KXB-E1-T1', { yesAsk: null })], { event: ev('KXB-E1', { category: 'Crypto' }) })]);
 const polyMarket = (id, o = {}) => ({ id, question: `SYNTHETIC question ${id}?`, slug: `syn-${id}`, eventSlug: `syn-ev-${id}`,
   outcomes: '["Yes","No"]', outcomePrices: '["0.62","0.38"]', volume24hr: 1234, volumeNum: 5000, liquidityNum: 800,
   endDate: '2099-01-01T00:00:00Z', image: '', category: 'Politics', ...o });
 
-const parse = qs => load('src/lib/kalshiDiscoveryFilters.ts').parseDiscoveryFilters(new URLSearchParams(qs));
-const discover = (initial, qs = '') => ssr('src/app/markets/KalshiDiscoveryClient.tsx', { initial, initialError: null, initialFilters: parse(qs) });
 const quoteHtml = m => ssr('src/app/markets/KalshiQuoteSummary.tsx', { yesBid: m.yesBid, yesAsk: m.yesAsk, yesBidSize: m.yesBidSize, yesAskSize: m.yesAskSize });
 const policyHtml = () => renderToStaticMarkup(React.createElement(load('src/app/markets/KalshiQuoteSummary.tsx').KalshiQuotePolicyNote));
 const K = () => load('src/lib/kalshi.ts');
@@ -158,11 +145,11 @@ test('source guard: stateless module, no hooks/deps, ink token, min-w-0, readabl
   assert.match(ui, /text-ink/);
   assert.match(ui, /min-w-0/);
   assert.doesNotMatch(ui, /text-\[(9|10|11)px\]/);
-  for (const f of ['MarketsClient', 'KalshiDiscoveryClient', 'KalshiMarketsClient', 'KalshiEventsClient']) {
+  for (const f of ['MarketsClient', 'KalshiTopClient', 'KalshiMarketsClient']) {
     assert.match(src(`src/app/markets/${f}.tsx`), /from '\.\/MarketExplorerUI'/, `${f} imports the shared module`);
   }
-  for (const f of [UI, 'src/app/markets/MarketsClient.tsx', 'src/app/markets/KalshiDiscoveryClient.tsx', 'src/app/markets/KalshiMarketsClient.tsx',
-    'src/app/markets/KalshiEventsClient.tsx', 'src/app/markets/MarketPlatformSelect.tsx', 'src/app/markets/page.tsx']) {
+  for (const f of [UI, 'src/app/markets/MarketsClient.tsx', 'src/app/markets/KalshiTopClient.tsx', 'src/app/markets/KalshiMarketsClient.tsx',
+    'src/app/markets/MarketPlatformSelect.tsx', 'src/app/markets/page.tsx']) {
     assert.doesNotMatch(src(f), /overflow-x-hidden/, f);
   }
 });
@@ -254,102 +241,10 @@ test('Raw Kalshi: shared header/toolbar; one article per market with exactly ONE
 
 // ======================= 2. Kalshi events =======================
 // ======================= 2 + 5. Kalshi Discover header, filters, about =======================
-test('Discover: shared header/toolbar; search, category (first select) and Refresh prominent; numeric filters in CLOSED "More filters"', () => {
-  const html = discover(twoGroups());
-  assert.equal(h1Count(html), 1);
-  assert.match(byAttr(html, 'data-explorer-header')[0].html, /<h1\b[^>]*id="kalshi-discover-heading"/);
-  const [bar] = byAttr(html, 'data-explorer-toolbar');
-  assert.ok(/<input\b/.test(bar.html) && />Refresh</.test(bar.html), 'search + Refresh in toolbar');
-  const ds = details(html);
-  const more = ds.filter(d => /more filters/i.test(summaryText(d)));
-  assert.equal(more.length, 1);
-  assert.equal(isOpen(more[0]), false);
-  for (const l of ['Max spread', 'Min displayed size', 'Closes within']) assert.ok(more[0].html.includes(l), l);
-  const firstSelect = at(html, '<select');
-  const catLabel = nodes(html, /<label\b[^>]*>/g).find(l => l.html.includes('Category'));
-  assert.ok(catLabel && within([catLabel], firstSelect), 'category is still the first select');
-  for (const needle of ['<input', 'Category', '>Refresh<']) assert.equal(within(ds, at(html, needle)), false, needle);
-});
-
-test('Discover: "More filters" opens automatically when ANY numeric filter is active from the URL; category/q alone keep it closed', () => {
-  const moreOpen = qs => isOpen(details(discover(twoGroups(), qs)).find(d => /more filters/i.test(summaryText(d))));
-  for (const qs of ['maxSpread=5', 'minSize=100', 'closing=24h', 'maxSpread=1&closing=7d']) assert.equal(moreOpen(qs), true, qs);
-  for (const qs of ['', 'category=Sports', 'q=fed']) assert.equal(moreOpen(qs), false, qs);
-});
-
-test('Discover: invalid-URL warning and Reset stay visible OUTSIDE every collapsed disclosure', () => {
-  const html = discover(twoGroups(), 'maxSpread=3');
-  const ds = details(html);
-  assert.equal(within(ds, at(html, 'role="status"')), false, 'warning outside details');
-  assert.match(html, /invalid filter values \(maxSpread\)/);
-  assert.equal(within(ds, at(html, '>Reset filters<')), false, 'Reset outside details');
-});
-
-test('Discover: concise visible scope (sample, not full catalog, contracts not dollars, retrieval, partial); long notes in CLOSED About', () => {
-  const html = discover(dpage(twoGroups().groups, { moreTradesAvailable: true }));
-  const ds = details(html);
-  const visible = withoutRanges(html, ds);
-  assert.match(visible, /not the full catalog/i);
-  assert.match(visible, /contract/i); assert.match(visible, /not dollars/i);
-  assert.match(visible, /Retrieved /);
-  assert.match(visible, /Partial sample/);
-  const about = ds.filter(d => /about/i.test(summaryText(d)));
-  assert.equal(about.length, 1);
-  assert.equal(isOpen(about[0]), false);
-  assert.ok(about[0].html.includes('20 seconds'), 'cache policy reachable in About');
-  assert.match(visible, /Sampled trades span/, 'actual sample time span stays visible, not hidden with technical explanations');
-  assert.ok(ds.some(d => d.html.includes('Trades scanned')), 'coverage table still reachable');
-});
-
 // ======================= 6. Discover rows and groups =======================
-test('Discover rows: compact minmax grid anchor with title, YES ask and 24h contracts; closed Quote details outside anchor with real summary', () => {
-  const page = twoGroups();
-  const html = discover(page);
-  const lis = rowLis(html);
-  const ms = page.groups.flatMap(g => g.markets);
-  assert.equal(lis.length, ms.length);
-  lis.forEach((li, i) => {
-    const m = ms[i];
-    const anchors = nodes(li.html, /<a\b[^>]*>/g);
-    assert.equal(anchors.length, 1);
-    const a = anchors[0];
-    assert.match(a.open, /href="\/markets\/kalshi\//);
-    assert.match(a.open, /minmax\(0,1fr\)/);
-    assert.doesNotMatch(a.open, /_auto_auto_auto/, 'old 4-column row replaced');
-    assert.ok(a.html.includes(m.yesLabel), 'title');
-    assert.match(a.html, /Yes ask/);
-    assert.ok(a.html.includes(K().formatCents(m.yesAsk)), 'published ask, unknown kept as-is');
-    assert.ok(a.html.includes(K().formatContracts(m.volume24hContracts)), '24h contracts');
-    assert.doesNotMatch(a.html, /%|No price|implied/i, 'ask not converted to probability');
-    const [q] = details(li.html);
-    assert.ok(q && !isOpen(q), 'closed Quote details');
-    assert.equal(within([a], q.start), false, 'details outside anchor');
-    assert.ok(q.html.includes(quoteHtml(m)), 'real KalshiQuoteSummary');
-  });
-  noNestedAnchors(html);
-});
-
-test('Discover groups: ExplorerCard articles, 12-group and 4-row caps with counts, honest unknown/not-loaded metadata', () => {
-  const gs = Array.from({ length: 13 }, (_, i) => group(`KXG${i}-E1`, Array.from({ length: 5 }, (_, j) => mk(`KXG${i}-E1-T${j + 1}`, { volume24hContracts: 100 - i }))));
-  gs[0] = { ...gs[0], event: null, metadataStatus: 'unavailable' };
-  gs[1] = { ...gs[1], event: null, metadataStatus: 'not_requested' };
-  const html = discover(dpage(gs));
-  const cards = byAttr(html, 'data-explorer-card');
-  assert.equal(cards.length, 12);
-  for (const c of cards) {
-    assert.match(c.open, /^<article\b/);
-    assert.equal(rowLis(c.html).length, 4);
-    assert.match(c.html, /Show 1 more sampled market/);
-  }
-  assert.match(html, /View all 13 event groups/);
-  assert.match(html, /Event details unavailable/);
-  assert.match(html, /Event details not loaded/);
-  noNestedAnchors(html);
-});
-
 // ======================= MU4: readability, long labels, More filters on back/forward =======================
 test('source guard: owned explorer views keep essential text at >= text-xs and >= text-ink/55', () => {
-  for (const f of ['MarketsClient', 'KalshiDiscoveryClient', 'KalshiMarketsClient', 'KalshiEventsClient',
+  for (const f of ['MarketsClient', 'KalshiTopClient', 'KalshiMarketsClient',
     // Browser acceptance 2026-11-21 measured 2.5-3.0:1 contrast on these Kalshi quote/detail texts at 375px; keep them guarded too.
     'KalshiQuoteSummary', 'KalshiHistoryClient', 'page', 'kalshi/[ticker]/page', 'kalshi/events/[eventTicker]/page']) {
     const s = src(`src/app/markets/${f}.tsx`);
@@ -372,78 +267,4 @@ test('Polymarket and raw Kalshi: outcome boxes and grid items carry min-w-0 so l
   assert.ok(html.includes('62¢') && html.includes('data-stub="trade-link"'), 'price and CTA unchanged');
   const raw = ssr('src/app/markets/KalshiMarketsClient.tsx', { initial: { markets: [mk('KXA-E1-T1')], nextCursor: null, rejectedCount: 0, receivedAt: T1 }, initialError: null });
   assert.match(raw, /<li class="min-w-0"><article\b[^>]*data-explorer-card/, 'raw Kalshi grid item');
-});
-
-/* Deterministic hook shim (same technique as tests/kalshi-discovery-filters.test.cjs): useState/useRef/useMemo/useEffect
-   replaced, effects run once on mount, popstate dispatched to the registered listener. It proves the component's STATE and the
-   `open`/`key` it hands to <details>. It does NOT run React DOM reconciliation in a browser, so the native "user closed the
-   panel, then back/forward" DOM behavior is inferred from React's key-remount semantics, not executed here. */
-function discoverHarness(search) {
-  const listeners = [];
-  const loc = { pathname: '/markets', search, hash: '' };
-  const nav = (_s, _t, url) => { const u = new URL(String(url), 'http://localhost'); Object.assign(loc, { pathname: u.pathname, search: u.search, hash: u.hash }); };
-  globalThis.window = { location: loc, history: { pushState: nav, replaceState: nav },
-    addEventListener: (t, fn) => { if (t === 'popstate') listeners.push(fn); }, removeEventListener: () => {} };
-  const slots = [], effects = [];
-  let i = 0;
-  const hooks = {
-    useState(init) {
-      const k = i++;
-      if (!(k in slots)) slots[k] = typeof init === 'function' ? init() : init;
-      return [slots[k], u => { slots[k] = typeof u === 'function' ? u(slots[k]) : u; }];
-    },
-    useRef(init) { const k = i++; if (!(k in slots)) slots[k] = { current: init }; return slots[k]; },
-    useMemo(fn) { i++; return fn(); },
-    useEffect(fn) { effects[i++] = fn; },
-  };
-  const Client = load('src/app/markets/KalshiDiscoveryClient.tsx', { react: { ...React, ...hooks } }).default;
-  const props = { initial: twoGroups(), initialError: null, initialFilters: parse(search) };
-  const render = () => { i = 0; return Client(props); };
-  const flat = n => (Array.isArray(n) ? n.flatMap(flat) : React.isValidElement(n) ? [n, ...flat(n.props.children)] : []);
-  const text = n => (typeof n === 'string' || typeof n === 'number' ? String(n) : Array.isArray(n) ? n.map(text).join('')
-    : React.isValidElement(n) ? text(n.props.children) : '');
-  const find = (pred, what) => { const el = flat(render()).find(pred); assert.ok(el, what); return el; };
-  render();
-  effects.forEach(fn => fn && fn()); // mount: registers the popstate listener
-  return {
-    more: () => find(n => n.props.summary === 'More filters', 'More filters'),
-    moreOpenInHtml: () => isOpen(details(renderToStaticMarkup(render())).find(d => /more filters/i.test(summaryText(d)))),
-    click: label => find(n => n.type === 'button' && text(n).trim() === label, label).props.onClick(),
-    setMaxSpread: v => flat(find(n => n.type === 'label' && text(n).includes('Max spread'), 'Max spread')).find(x => x.type === 'select').props.onChange({ target: { value: v } }),
-    pop: s => { loc.search = s; listeners.forEach(fn => fn({ type: 'popstate', state: null })); },
-  };
-}
-
-test('Discover: More filters re-syncs with the URL on back/forward (Reset -> back restores numeric filter -> panel opens); edits never collapse it', () => {
-  const base = '?platform=kalshi&view=discover';
-  try {
-    const h = discoverHarness(`${base}&maxSpread=5`);
-    let m = h.more();
-    const k0 = m.key;
-    assert.equal(m.props.open, true, 'opens on load with a numeric URL filter');
-    h.click('Reset filters');
-    m = h.more();
-    assert.deepEqual([m.props.open, m.key], [true, k0], 'Reset (outside the panel) neither collapses nor remounts it');
-    // (Native "user closes the panel" happens here in a browser; not executable in this shim.)
-    h.pop(`${base}&maxSpread=1`);
-    m = h.more();
-    assert.equal(m.props.open, true, 'back/forward restoring a numeric filter opens More filters');
-    assert.notEqual(m.key, k0, 'new key remounts <details>, so a user-closed panel is re-opened');
-    assert.equal(h.moreOpenInHtml(), true);
-    const k1 = m.key;
-    h.setMaxSpread('');
-    m = h.more();
-    assert.deepEqual([m.props.open, m.key], [true, k1], 'clearing a filter inside the panel never collapses it under the user');
-    h.pop(base);
-    m = h.more();
-    assert.equal(m.props.open, undefined, 'back/forward to a URL without numeric filters mirrors the closed default');
-    assert.notEqual(m.key, k1);
-    assert.equal(h.moreOpenInHtml(), false);
-    const k2 = m.key;
-    h.setMaxSpread('1');
-    m = h.more();
-    assert.deepEqual([m.props.open, m.key], [undefined, k2], 'user edits do not toggle the panel');
-  } finally {
-    delete globalThis.window;
-  }
 });

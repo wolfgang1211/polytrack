@@ -85,21 +85,6 @@ const rawEvent = (o = {}) => ({
   strike_date: '2099-12-31T19:00:00Z', ...o,
 });
 const rawBook = (yes, no) => ({ orderbook_fp: { yes_dollars: yes, no_dollars: no } });
-const mk = (ticker, o = {}) => ({
-  ticker, eventTicker: ticker.replace(/-T\d+$/, ''), title: `Market ${ticker}`, yesLabel: `Outcome ${ticker}`, noLabel: null,
-  status: 'active', marketType: 'binary', closeTime: '2099-06-01T00:00:00Z', updatedTime: null, volume24hContracts: 5,
-  totalVolumeContracts: 9, openInterestContracts: 3, yesBid: 0.41, yesAsk: 0.43, yesBidSize: 500, yesAskSize: 500,
-  notionalDollars: 1, rulesPrimary: null, rulesSecondary: null, ...o,
-});
-const discoveryPage = groups => ({
-  groups, receivedAt: '2026-11-19T10:00:00.000Z', sourceAsOf: null,
-  coverage: {
-    tradePages: 1, tradesScanned: 10, rejectedTrades: 0, uniqueTickers: 4, selectedTickers: 4, moreTradesAvailable: false,
-    oldestTradeAt: '2026-11-19T09:00:00Z', newestTradeAt: '2026-11-19T09:59:00Z', marketPages: 1, rejectedMarkets: 0,
-    eventMetadataRequested: 1, eventMetadataFailed: 0, truncated: false,
-    windowStart: '2026-11-18T10:00:00.000Z', windowEnd: '2026-11-19T10:00:00.000Z',
-  },
-});
 
 function upstream(fn) {
   const calls = [];
@@ -287,15 +272,6 @@ test('tiny positive displayed sizes never round to zero contracts', () => {
   assert.doesNotMatch(html, />0 contracts</);
 });
 
-/** Closed native "Quote details" disclosure body (no `open` attribute); null when absent or open.
-    The summary may hold only aria-hidden decorative SVG markup plus the exact visible text "Quote details". */
-const closedQuoteDetails = html => {
-  for (const m of html.matchAll(/<details\b(?![^>]*\bopen\b)[^>]*>\s*<summary\b[^>]*>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g)) {
-    const visible = m[1].replace(/<svg\b[^>]*\baria-hidden="true"[^>]*>[\s\S]*?<\/svg>/g, '');
-    if (!visible.includes('<') && visible.trim() === 'Quote details') return m[2];
-  }
-  return null;
-};
 
 test('event page list SSR: one-sided child quote is labeled, no book requests are added', async () => {
   const calls = upstream(url => (url.pathname.startsWith('/trade-api/v2/events/') ? { event: rawEvent() }
@@ -306,42 +282,6 @@ test('event page list SSR: one-sided child quote is labeled, no book requests ar
   assert.equal(summaries(html)[0]['data-quote-status'], 'bid_only');
   assert.match(html, />One-sided quote</);
   assert.match(html, labeled('Ask size', 'Unavailable'));
-});
-
-test('Discovery SSR: every row summary equals the helper, in its own closed Quote details outside the 2-column row link, zero fetches', () => {
-  const calls = upstream(() => { throw new Error('Discovery render must not fetch'); });
-  const markets = [
-    mk('KXA-E1-T1'),
-    mk('KXA-E1-T2', { yesBid: 0.3, yesAsk: 0.45, yesBidSize: 12.5, yesAskSize: 300 }),
-    mk('KXA-E1-T3', { yesAsk: null, yesAskSize: null }),
-    mk('KXA-E1-T4', { yesBid: null, yesAsk: null, yesBidSize: null, yesAskSize: null }),
-  ];
-  const ev = { eventTicker: 'KXA-E1', seriesTicker: 'KXA', title: 'Title KXA-E1', subTitle: null, category: 'Sports', mutuallyExclusive: true, updatedTime: null, strikeDate: null };
-  const Client = makeLoader(nextMocks())('src/app/markets/KalshiDiscoveryClient.tsx').default;
-  const html = renderToStaticMarkup(React.createElement(Client, {
-    initial: discoveryPage([{ eventTicker: 'KXA-E1', event: ev, metadataStatus: 'loaded', markets }]), initialError: null,
-  }));
-  assert.equal(calls.length, 0);
-  const { analyzeKalshiQuotes } = Q();
-  assert.deepEqual(summaries(html).map(s => [s['data-quote-status'], s['data-quote-warnings']]),
-    markets.map(m => { const r = analyzeKalshiQuotes(m); return [r.status, r.warnings.join(' ')]; }));
-  const rows = [...html.matchAll(/<li\b[^>]*>([\s\S]*?)<\/li>/g)].map(m => m[1]).filter(li => li.includes('href="/markets/kalshi/KXA-E1-T'));
-  assert.equal(rows.length, 4);
-  rows.forEach((li, i) => {
-    const m = markets[i];
-    const link = li.match(/<a href="\/markets\/kalshi\/(KXA-E1-T\d)"([^>]*)>([\s\S]*?)<\/a>/);
-    assert.ok(link, `row ${i}: link rendered`);
-    const [, ticker, rowAttrs, inner] = link;
-    assert.equal(ticker, m.ticker);
-    assert.match(rowAttrs, /grid-cols-\[minmax\(0,1fr\)_auto\](?!_)/, `${ticker}: 2-column row link`);
-    assert.doesNotMatch(inner, INTERACTIVE);
-    assert.doesNotMatch(inner, /data-quote-status=/, `${ticker}: quote summary outside the row link`);
-    const quote = closedQuoteDetails(li);
-    assert.ok(quote !== null, `${ticker}: closed Quote details in its own row`);
-    const r = analyzeKalshiQuotes(m);
-    assert.deepEqual(summaries(quote).map(s => [s['data-quote-status'], s['data-quote-warnings']]), [[r.status, r.warnings.join(' ')]], ticker);
-    assert.match(quote, new RegExp(`>${esc(ticker)}<`), `${ticker}: quote belongs to this row`);
-  });
 });
 
 // ================= market detail =================
@@ -417,17 +357,17 @@ test('existing parser output and API shape are unchanged (no quote-quality field
   assert.doesNotMatch(src('src/lib/kalshi.ts'), /kalshiQuoteQuality/);
 });
 
-test('source: helper is pure, summary is synchronous/non-interactive, and all four surfaces share it', () => {
+test('source: helper is pure, summary is synchronous/non-interactive, and the list and detail surfaces share it', () => {
   const helper = src('src/lib/kalshiQuoteQuality.ts');
   assert.doesNotMatch(helper, /fetch\(|process\.env|Date\.|Math\.random|localStorage|import\s/);
   const ui = src('src/app/markets/KalshiQuoteSummary.tsx');
   assert.doesNotMatch(ui, /use client|use(State|Effect|Ref|Memo|Callback|LayoutEffect)\b|window\.|document\.|fetch\(|onClick|<a\b|<button|<details/);
   assert.match(ui, /analyzeKalshiQuotes/);
   assert.match(ui, /formatSpreadCents/);
-  for (const f of ['src/app/markets/KalshiMarketsClient.tsx', 'src/app/markets/KalshiDiscoveryClient.tsx', DETAIL]) {
+  for (const f of ['src/app/markets/KalshiMarketsClient.tsx', DETAIL]) {
     assert.match(src(f), /import KalshiQuoteSummary(?:,\s*\{[^}]*\})? from ['"][^'"]*KalshiQuoteSummary['"]/, f);
   }
-  for (const f of ['src/app/markets/KalshiMarketsClient.tsx', 'src/app/markets/KalshiDiscoveryClient.tsx']) {
+  for (const f of ['src/app/markets/KalshiMarketsClient.tsx']) {
     assert.doesNotMatch(src(f), /orderbook|fetchVerifiedOrderbook/i, `${f}: no per-row book fetch`);
   }
 });

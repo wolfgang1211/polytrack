@@ -48,7 +48,6 @@ const K = () => load('src/lib/kalshi.ts');
 const E = () => load('src/lib/kalshiEvents.ts');
 const kerr = status => e => e instanceof K().KalshiError && e.status === status;
 const routes = {
-  events: 'src/app/api/kalshi/events/route.ts',
   event: 'src/app/api/kalshi/events/[eventTicker]/route.ts',
   markets: 'src/app/api/kalshi/markets/route.ts',
 };
@@ -106,10 +105,6 @@ const byPath = ({ event = () => ({ event: rawEvent() }), markets = () => ({ mark
   url.pathname.startsWith('/trade-api/v2/events/') ? event(url)
     : url.pathname === '/trade-api/v2/markets' ? markets(url) : new Response('unexpected path', { status: 500 });
 
-async function invokeEvents(search = '') {
-  const res = await load(routes.events).GET(new NextRequest(`http://localhost/api/kalshi/events${search}`));
-  return { res, body: await res.json() };
-}
 async function invokeEvent(eventTicker) {
   const req = new NextRequest(`http://localhost/api/kalshi/events/${encodeURIComponent(eventTicker)}`);
   const res = await load(routes.event).GET(req, { params: Promise.resolve({ eventTicker }) });
@@ -197,81 +192,6 @@ test('getKalshiJson is the exported fixed-host GET transport', async () => {
 });
 
 // ---------- fetchKalshiEvents ----------
-test('fetchKalshiEvents requests open events without nested markets and quarantines malformed rows', async () => {
-  const calls = upstream(() => ({
-    events: [rawEvent(), rawEvent({ event_ticker: 'kx-lower' }), rawEvent({ title: '' }), null], cursor: 'next-page', milestones: [],
-  }));
-  const before = Date.now();
-  const r = await E().fetchKalshiEvents({});
-  assertSafeCalls(calls);
-  assert.equal(calls.length, 1);
-  const sp = calls[0].url.searchParams;
-  assert.equal(calls[0].url.pathname, '/trade-api/v2/events');
-  assert.equal(sp.get('status'), 'open');
-  assert.equal(sp.get('with_nested_markets'), 'false');
-  assert.equal(sp.get('limit'), String(E().DEFAULT_EVENT_LIMIT));
-  assert.equal(E().DEFAULT_EVENT_LIMIT, 50);
-  assert.equal(sp.has('cursor'), false);
-  assert.equal(sp.has('series_ticker'), false);
-  assert.deepEqual(Object.keys(r).sort(), ['events', 'nextCursor', 'receivedAt', 'rejectedCount', 'sourceAsOf']);
-  assert.deepEqual(r.events.map(e => e.eventTicker), ['KXSYN-26DEC']);
-  assert.equal(r.rejectedCount, 3);
-  assert.equal(r.nextCursor, 'next-page');
-  assert.equal(r.sourceAsOf, null);
-  assert.ok(Date.parse(r.receivedAt) >= before - 1000 && /T.*Z$/.test(r.receivedAt));
-});
-
-test('fetchKalshiEvents passes the cursor literally, forwards series_ticker and quarantines foreign-series rows', async () => {
-  const cursor = 'a+b/c=d&e==';
-  const calls = upstream(() => ({ events: [rawEvent(), rawEvent({ event_ticker: 'KXOTHER-1', series_ticker: 'KXOTHER' })], cursor: '' }));
-  const r = await E().fetchKalshiEvents({ limit: 7, cursor, seriesTicker: 'KXSYN' });
-  const sp = calls[0].url.searchParams;
-  assert.equal(sp.get('cursor'), cursor);
-  assert.equal(sp.getAll('cursor').length, 1);
-  assert.equal(sp.has('e'), false);
-  assert.equal(sp.get('series_ticker'), 'KXSYN');
-  assert.equal(sp.get('limit'), '7');
-  assert.equal(sp.get('with_nested_markets'), 'false');
-  assert.deepEqual(r.events.map(e => e.eventTicker), ['KXSYN-26DEC']);
-  assert.equal(r.rejectedCount, 1);
-});
-
-test("an empty-string cursor means exhaustion; any valid opaque cursor is returned exactly", async () => {
-  upstream(() => ({ events: [], cursor: '' }));
-  const r = await E().fetchKalshiEvents({ limit: 10 });
-  assert.deepEqual([r.events, r.nextCursor, r.rejectedCount], [[], null, 0]);
-  mock.restoreAll();
-  upstream(() => ({ events: [], cursor: 'CgsI+/=%~_-.x' }));
-  assert.equal((await E().fetchKalshiEvents({ limit: 10 })).nextCursor, 'CgsI+/=%~_-.x');
-});
-
-test('an unusable upstream events cursor is a 502, never a silent end of results', async () => {
-  for (const [label, body] of [
-    ['missing', { events: [] }], ['null', { events: [], cursor: null }], ['numeric', { events: [], cursor: 123 }],
-    ['oversized', { events: [], cursor: 'x'.repeat(513) }], ['control char', { events: [], cursor: 'ab\u0001cd' }], ['newline', { events: [], cursor: 'ab\ncd' }],
-  ]) {
-    mock.restoreAll();
-    upstream(() => body);
-    await assert.rejects(E().fetchKalshiEvents({ limit: 10 }), kerr(502), label);
-  }
-});
-
-test('a malformed events envelope is a 502, not an empty list', async () => {
-  for (const body of [{ cursor: '' }, { events: null, cursor: '' }, { events: {}, cursor: '' }, ['not', 'an', 'object'], 'text']) {
-    mock.restoreAll();
-    upstream(() => Response.json(body));
-    await assert.rejects(E().fetchKalshiEvents({ limit: 10 }), kerr(502), JSON.stringify(body));
-  }
-});
-
-test('fetchKalshiEvents rejects invalid limit, cursor or series with 400 before any network', async () => {
-  const calls = upstream(() => ({ events: [], cursor: '' }));
-  for (const args of [{ limit: 0 }, { limit: 201 }, { limit: 1.5 }, { cursor: '' }, { cursor: 'a\u0001b' }, { seriesTicker: 'kxsyn' }, { seriesTicker: '../X' }]) {
-    await assert.rejects(E().fetchKalshiEvents(args), kerr(400), JSON.stringify(args));
-  }
-  assert.equal(calls.length, 0);
-});
-
 // ---------- fetchKalshiEvent ----------
 test('fetchKalshiEvent requests metadata with exclude_markets=true and never returns embedded markets', async () => {
   const calls = upstream(() => ({ event: { ...rawEvent(), markets: [rawMarket()] }, markets: [] }));
@@ -314,37 +234,7 @@ for (const [label, respond, status] of [
 }
 
 // ---------- client guard ----------
-test('isEventsPage accepts only a fully formed normalized page', () => {
-  const ev = E().normalizeEvent(rawEvent());
-  const good = { events: [ev], nextCursor: 'c1', receivedAt: '2026-11-19T10:00:00.000Z', sourceAsOf: null, rejectedCount: 0 };
-  assert.equal(E().isEventsPage(good), true);
-  assert.equal(E().isEventsPage({ ...good, nextCursor: null }), true);
-  for (const [label, v] of [
-    ['non-ISO receivedAt', { ...good, receivedAt: 'yesterday' }], ['sourceAsOf set', { ...good, sourceAsOf: good.receivedAt }],
-    ['empty-string cursor', { ...good, nextCursor: '' }], ['numeric cursor', { ...good, nextCursor: 5 }],
-    ['negative rejectedCount', { ...good, rejectedCount: -1 }], ['fractional rejectedCount', { ...good, rejectedCount: 1.5 }],
-    ['string rejectedCount', { ...good, rejectedCount: 'n' }], ['events not array', { ...good, events: {} }],
-    ['row with string bool', { ...good, events: [{ ...ev, mutuallyExclusive: 'false' }] }],
-    ['row with bad ticker', { ...good, events: [{ ...ev, eventTicker: 'kx' }] }],
-    ['row missing title', { ...good, events: [{ ...ev, title: undefined }] }], ['null', null],
-  ]) assert.equal(E().isEventsPage(v), false, label);
-});
-
 // ---------- query parsing ----------
-test('parseEventListQuery returns {limit, cursor?, seriesTicker?} with a default of 50', () => {
-  const p = sp => E().parseEventListQuery(new URLSearchParams(sp));
-  assert.deepEqual(p(''), { limit: 50 });
-  assert.deepEqual(p(`limit=200&cursor=${encodeURIComponent('a+b/c=')}&series_ticker=KXSYN`), { limit: 200, cursor: 'a+b/c=', seriesTicker: 'KXSYN' });
-  assert.deepEqual(p('limit=1'), { limit: 1 });
-});
-
-test('parseEventListQuery rejects repeated keys and invalid limit, cursor or series with 400', () => {
-  for (const q of [
-    'limit=0', 'limit=201', 'limit=1.5', 'limit=abc', 'limit=', 'limit=5&limit=6', 'cursor=a&cursor=b', `cursor=${'x'.repeat(513)}`,
-    'cursor=abc%01def', 'cursor=', 'series_ticker=kxsyn', 'series_ticker=', 'series_ticker=KX%2FSYN', 'series_ticker=KXSYN&series_ticker=KXSYN',
-  ]) assert.throws(() => E().parseEventListQuery(new URLSearchParams(q)), kerr(400), q);
-});
-
 test('parseListQuery accepts a strict, non-repeated event_ticker and keeps its default shape', () => {
   const p = sp => K().parseListQuery(new URLSearchParams(sp));
   assert.deepEqual(p(''), { limit: 100 });
@@ -378,63 +268,10 @@ test('fetchKalshiMarkets({eventTicker}) sends event_ticker and quarantines forei
 
 // ---------- routes ----------
 test('kalshi event routes are GET-only (no POST handler)', () => {
-  for (const file of [routes.events, routes.event]) {
+  for (const file of [routes.event]) {
     const mod = load(file);
     assert.equal(typeof mod.GET, 'function', file);
     assert.equal(mod.POST, undefined, file);
-  }
-});
-
-test('events route defaults to limit 50, open status and no nested markets', async () => {
-  const calls = upstream(() => ({ events: [rawEvent()], cursor: 'c2' }));
-  const { res, body } = await invokeEvents();
-  assert.equal(res.status, 200);
-  assertSafeCalls(calls);
-  const sp = calls[0].url.searchParams;
-  assert.equal(calls[0].url.pathname, '/trade-api/v2/events');
-  assert.deepEqual([sp.get('limit'), sp.get('status'), sp.get('with_nested_markets'), sp.has('cursor')], ['50', 'open', 'false', false]);
-  assert.deepEqual(body.events.map(e => e.eventTicker), ['KXSYN-26DEC']);
-  assert.equal(body.nextCursor, 'c2');
-  assert.equal(body.sourceAsOf, null);
-});
-
-test('events route forwards an opaque cursor unchanged and a valid series_ticker', async () => {
-  const cursor = 'a+b/c=d&e==';
-  const calls = upstream(() => ({ events: [], cursor: '' }));
-  const { res } = await invokeEvents(`?limit=200&cursor=${encodeURIComponent(cursor)}&series_ticker=KXSYN`);
-  assert.equal(res.status, 200);
-  const sp = calls[0].url.searchParams;
-  assert.equal(sp.get('cursor'), cursor);
-  assert.equal(sp.has('e'), false);
-  assert.equal(sp.get('series_ticker'), 'KXSYN');
-  assert.equal(sp.get('limit'), '200');
-});
-
-test('events route rejects invalid or repeated queries with a sanitized no-store 400 and zero network', async () => {
-  const calls = upstream(() => ({ events: [], cursor: '' }));
-  for (const q of ['?limit=0', '?limit=201', '?limit=abc', '?limit=5&limit=6', '?cursor=a&cursor=b', '?cursor=abc%01def',
-    `?cursor=${'x'.repeat(513)}`, '?series_ticker=kxsyn', '?series_ticker=', '?series_ticker=KX%2FSYN', '?series_ticker=KXSYN&series_ticker=KXSYN']) {
-    const { res, body } = await invokeEvents(q);
-    assert.equal(res.status, 400, q);
-    assert.equal(typeof body.error, 'string', q);
-    noStore(res);
-  }
-  assert.equal(calls.length, 0);
-});
-
-test('events route maps upstream failures and unusable cursors to sanitized no-store errors', async () => {
-  for (const [respond, status] of [
-    [() => new Response(SECRET, { status: 500 }), 502], [() => new Response(SECRET, { status: 429 }), 503],
-    [() => { throw new DOMException('timed out', 'TimeoutError'); }, 504], [() => ({ events: [rawEvent()], cursor: 42 }), 502],
-  ]) {
-    mock.restoreAll();
-    upstream(respond);
-    const { res, body } = await invokeEvents();
-    assert.equal(res.status, status);
-    assert.equal(typeof body.error, 'string');
-    assert.equal(body.events, undefined);
-    assert.doesNotMatch(JSON.stringify(body), /UPSTREAM-SECRET/);
-    noStore(res);
   }
 });
 
@@ -491,14 +328,6 @@ test('markets route forwards event_ticker, quarantines foreign children and reje
 });
 
 // ---------- /markets view selection ----------
-test('resolveKalshiView only accepts the exact scalar "events"', () => {
-  const { resolveKalshiView } = makeLoader(nextMocks())('src/app/markets/MarketPlatformSelect.tsx');
-  assert.equal(resolveKalshiView('events'), 'events');
-  for (const v of [undefined, 'markets', 'EVENTS', ' events', ['events'], ['events', 'events'], '', 'other']) {
-    assert.equal(resolveKalshiView(v), 'markets', JSON.stringify(v));
-  }
-});
-
 // ---------- event detail page ----------
 test('event page renders metadata and only its own open child markets from awaited params', async () => {
   const calls = upstream(byPath({ markets: () => ({ markets: [rawMarket(), foreignMarket()], cursor: '' }) }));
