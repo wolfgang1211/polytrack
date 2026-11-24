@@ -197,3 +197,9 @@ test('Polymarket page renders the deep pool server-side so counts and category f
   const client = fs.readFileSync(path.join(root, 'src/app/markets/MarketsClient.tsx'), 'utf8');
   assert.match(client, /useState<TopMarket\[\] \| null>\(initialExtra\.length > 0 \? initialExtra : null\)/);
 });
+
+test('Polymarket pool keeps the first-paint list when the sort changes (count does not shrink on "Total Volume")', () => {
+  const client = fs.readFileSync(path.join(root, 'src/app/markets/MarketsClient.tsx'), 'utf8');
+  assert.match(client, /for \(const list of \[markets, extra \?\? \[\], initialMarkets\]\)/);
+  assert.match(client, /if \(pool\.length > markets\.length && sort !== 'newest'\)/);
+});

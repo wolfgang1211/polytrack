@@ -192,12 +192,16 @@ export default function MarketsClient({ initialMarkets, initialExtra = [], serve
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sort]);
 
-  // Merge the sorted list with the deep pool (deduped by id).
+  // Merge the sorted list with the deep pool and the first-paint list (deduped by id), so switching sorts reorders the
+  // same set of markets instead of shrinking it (e.g. "Total Volume" alone used to drop the 24h-volume markets).
   const pool = useMemo(() => {
-    if (!extra || extra.length === 0) return markets;
-    const seen = new Set(markets.map(m => String(m.id)));
-    return [...markets, ...extra.filter(m => !seen.has(String(m.id)))];
-  }, [markets, extra]);
+    const seen = new Set<string>();
+    const out: TopMarket[] = [];
+    for (const list of [markets, extra ?? [], initialMarkets]) {
+      for (const m of list) { const k = String(m.id); if (!seen.has(k)) { seen.add(k); out.push(m); } }
+    }
+    return out;
+  }, [markets, extra, initialMarkets]);
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -218,7 +222,7 @@ export default function MarketsClient({ initialMarkets, initialExtra = [], serve
     // When the deep pool is merged in, re-sort client-side so appended
     // markets don't break the selected ordering ('newest' relies on the
     // server order — startDate isn't in the slim payload).
-    if (extra && extra.length > 0 && sort !== 'newest') {
+    if (pool.length > markets.length && sort !== 'newest') {
       const cmp: Record<Exclude<SortKey, 'newest'>, (a: TopMarket, b: TopMarket) => number> = {
         vol24h:    (a, b) => vol24h(b) - vol24h(a),
         volume:    (a, b) => (b.volumeNum ?? 0) - (a.volumeNum ?? 0),
@@ -228,7 +232,7 @@ export default function MarketsClient({ initialMarkets, initialExtra = [], serve
       result.sort(cmp[sort]);
     }
     return result;
-  }, [pool, cat, q, sort, extra, now]);
+  }, [pool, markets.length, cat, q, sort, now]);
 
   const totalVol = useMemo(() => filtered.reduce((s, m) => s + vol24h(m), 0), [filtered]);
 
