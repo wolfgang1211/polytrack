@@ -109,6 +109,12 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Risk: Vercel build'i iki kez geçici Google Fonts hatasıyla düştü; production'da tekrarlarsa yeniden build yeterli.
 - Sonraki adım: Yusuf "yayına al" derse dalı main'e birleştir, production'da iki temada yeniden ölç, önbelleği ilk istekle ısıt.
 
+### Akşam öncesi ek (2026-11-24 17:30–17:55, aynı dal, YALNIZ PREVIEW)
+- Yusuf: "Polymarket tarafında Top/Discover/Newest yokken Kalshi'de var, benzer olsun" ve "sort bölümleri de farklı".
+- Kalshi artık tek görünüm: `/markets?platform=kalshi` (Polymarket gibi yalnız sağlayıcı seçimi). Eski `?view=discover|markets|events|top` ve `?series=` adresleri kalıcı yönlendirmeyle (308) buraya gider. Etkinlik ve piyasa detay sayfaları çalışıyor; geri linki "Back to Kalshi markets". Eski Discover/Newest/Events bileşen dosyaları silinmedi (silme onaya bağlı); yalnızca sayfadan ve testlerden çıkarıldı.
+- Sıralama Polymarket ile aynı sırada: 24h Volume, Total Volume, Open Interest, Closing Soon, Newest. Kalshi likidite yayınlamadığı için Liquidity yerine Open Interest var; About kısmında yazıyor. Total Volume = etkinliğin tüm açık piyasalarının toplam hacmi; Newest = etkinlikteki en erken open_time. Kategori çipleri Polymarket sırasında ("Culture" → "Entertainment", ayrıca Economy). Önbellek anahtarı v4.
+- Doğrulama (preview, 375 px, koyu tema): eski Discover adresi yönlendi; görünüm sekmesi yok; 60 kart; 5 sıralama düğmesinin hepsi listeyi değiştiriyor; yatay taşma 0. Testler 599/599 (kaldırılan görünümlerin sayfa testleri çıkarıldı, yönlendirme/sıralama testleri eklendi), tsc 0, lint 0 hata/24 uyarı. Commit 8619f5f.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Kalshi + kontrast preview onayı**: mobil kontrol yapıldı (375 px, iki tema). Yusuf akşam bakıp onaylarsa main'e alınır.
 2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
