@@ -225,43 +225,7 @@ test('closing: closeTime > receivedAt and <= anchor + 24h/7d; unknown/invalid ex
   assert.equal(rows('').length, 9, 'closing off keeps unknown close times');
 });
 
-// ======================= page wiring (SSR) =======================
-const realD = () => makeLoader()('src/lib/kalshiDiscovery.ts');
-function pageWith(extra) {
-  const fetchArgs = [];
-  const mocks = {
-    'next/link': { __esModule: true, default: ({ href, children, ...rest }) => { delete rest.prefetch; return React.createElement('a', { href, ...rest }, children); } },
-    'next/navigation': { notFound: () => { throw new Error('NEXT_NOT_FOUND'); } },
-    '@/lib/markets': { fetchMarketsList: async () => [] },
-    './MarketsClient': { __esModule: true, default: () => React.createElement('div', { 'data-stub': 'polymarket-client' }) },
-    '@/lib/kalshiDiscovery': { ...realD(), fetchKalshiDiscovery: async (...a) => { fetchArgs.push(a); return initialPage(); } },
-    ...extra,
-  };
-  const Page = makeLoader(mocks)('src/app/markets/page.tsx').default;
-  return { fetchArgs, element: q => Page({ searchParams: Promise.resolve(q) }), render: async q => renderToStaticMarkup(await Page({ searchParams: Promise.resolve(q) })) };
-}
 const links = html => [...html.matchAll(/href="\/markets\/kalshi\/events\/([^"]+)"/g)].map(m => decodeURIComponent(m[1]));
-
-test('page Discover branch passes initialFilters parsed from all searchParams entries; nothing forwarded upstream', async () => {
-  let props;
-  const stub = { __esModule: true, default: p => { props = p; return React.createElement('div', { 'data-stub': 'discover' }); } };
-  const { fetchArgs, render } = pageWith({ './KalshiDiscoveryClient': stub });
-  await render({ platform: 'kalshi', view: 'discover', q: ['a', 'b'], maxSpread: '5', closing: '24h', foo: 'x', category: undefined });
-  assert.deepEqual(props.initialFilters, { filters: f({ maxSpread: '5', closing: '24h' }), invalidKeys: ['q'] });
-  assert.deepEqual(fetchArgs, [[]], 'discovery fetch takes no filter arguments');
-  props = undefined;
-  assert.match(await render({ maxSpread: 'abc', q: 'x', view: 'discover' }), /polymarket-client/);
-  assert.equal(props, undefined);
-  assert.equal(fetchArgs.length, 1, 'other providers ignore filter params');
-});
-
-test('page SSR applies filters before the first render with the real client and no window', async () => {
-  assert.equal(typeof globalThis.window, 'undefined');
-  const { render } = pageWith({});
-  assert.deepEqual(links(await render({ platform: 'kalshi', view: 'discover', maxSpread: '1' })), ['KXB-E1']);
-  assert.deepEqual(links(await render({ platform: 'kalshi', view: 'discover', category: 'Sports' })), ['KXA-E1']);
-  assert.deepEqual(links(await render({ platform: 'kalshi', view: 'discover' })), ['KXA-E1', 'KXB-E1']);
-});
 
 // ======================= client handlers (hook shim + fake window) =======================
 function fakeWindow(search = '?platform=kalshi&view=discover', hash = '') {
@@ -465,16 +429,6 @@ test('Refresh resets only missing category and preserves invalid URL filters ins
   assert.match(h.html(), /invalid[^<]*maxSpread/i);
   assert.deepEqual(h.eventLinks(), []);
   assert.equal(w.location.hash, '#h');
-});
-
-test('server navigation binds client identity to parsed filters, independently of foreign query keys', async () => {
-  const { element } = pageWith({});
-  const client = async query => React.Children.toArray((await element({ platform: 'kalshi', view: 'discover', ...query })).props.children).find(n => n.props.initialFilters);
-  const filtered = await client({ maxSpread: '5' });
-  const reset = await client({});
-  const foreign = await client({ maxSpread: '5', foo: 'bar' });
-  assert.notEqual(filtered.key, reset.key, 'server navigation must not retain old useState under new filter props');
-  assert.equal(filtered.key, foreign.key, 'unowned query changes do not reset filters');
 });
 
 test('pasted control characters become visible spaces and the search URL stays in sync', () => {

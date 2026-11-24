@@ -7,7 +7,7 @@ import { fetchKalshiEvent, type KalshiEvent } from '@/lib/kalshiEvents';
 import KalshiMarketsClient from '../../../KalshiMarketsClient';
 
 const META_DESCRIPTION = 'Read-only Kalshi event metadata and its open binary $1 markets, loaded in bounded pages.';
-const EVENTS_HREF = '/markets?platform=kalshi&view=events';
+const KALSHI_HREF = '/markets?platform=kalshi';
 const CHILD_LIMIT = 100;
 
 // Per-event canonical/OG without a provider fetch; unknown events still 404 via the page itself.
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ eventTick
   const { eventTicker } = await params;
   const valid = TICKER_RE.test(eventTicker);
   const title = valid ? `Kalshi event ${eventTicker}` : 'Kalshi event';
-  const url = valid ? `/markets/kalshi/events/${encodeURIComponent(eventTicker)}` : EVENTS_HREF;
+  const url = valid ? `/markets/kalshi/events/${encodeURIComponent(eventTicker)}` : KALSHI_HREF;
   return {
     title,
     description: META_DESCRIPTION,
@@ -30,8 +30,8 @@ const mutualLabel = (v: boolean | null) => (v === null ? 'Unavailable' : v ? 'Ye
 
 function Back() {
   return (
-    <Link href={EVENTS_HREF} className="inline-flex items-center gap-1.5 text-xs text-ink/55 hover:text-ink/70 transition-colors w-fit">
-      ← Back to Kalshi events
+    <Link href={KALSHI_HREF} className="inline-flex min-h-6 items-center gap-1.5 text-xs text-ink/55 hover:text-ink/70 transition-colors w-fit">
+      ← Back to Kalshi markets
     </Link>
   );
 }
@@ -74,7 +74,6 @@ export default async function KalshiEventPage({ params }: { params: Promise<{ ev
     initialError = 'Open markets for this event could not be loaded right now.';
   }
 
-  const seriesHref = `${EVENTS_HREF}&series=${encodeURIComponent(event.seriesTicker)}`;
   return (
     <div className="flex flex-col gap-5">
       <Back />
@@ -87,7 +86,7 @@ export default async function KalshiEventPage({ params }: { params: Promise<{ ev
 
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4" aria-label="Event metadata">
         <Field label="Category">{event.category ?? 'Unavailable'}</Field>
-        <Field label="Series"><Link href={seriesHref} className="font-mono underline-offset-2 hover:underline">{event.seriesTicker}</Link></Field>
+        <Field label="Series"><span className="font-mono">{event.seriesTicker}</span></Field>
         <Field label="Strike date">{formatUtc(event.strikeDate)}</Field>
         <Field label="Mutually exclusive">{mutualLabel(event.mutuallyExclusive)}</Field>
       </dl>

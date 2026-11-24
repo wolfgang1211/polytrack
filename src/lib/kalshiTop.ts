@@ -32,9 +32,11 @@ export interface KalshiTopEvent {
   title: string;               // event title as published, else the top market's title
   category: string | null;     // as published by Kalshi on the event; null when the lookup failed
   volume24hContracts: number;
+  totalVolumeContracts: number;  // lifetime volume summed over ALL listable open markets of the event (contracts)
   openInterestContracts: number;
   tradedMarkets: number;
   closeTime: string | null;    // earliest close among the outcomes shown
+  openedAt: string | null;     // earliest open_time among the event's listable markets (as published)
   outcomes: KalshiTopOutcome[];
 }
 
@@ -88,6 +90,7 @@ export async function scanKalshiTopMarkets(opts: {
   let cursor: string | undefined;
   let pages = 0, scanned = 0, listable = 0, traded = 0;
   const buckets = new Map<string, Bucket>();
+  const totals = new Map<string, { total: number; opened: string | null }>(); // every listable market, traded or not
   const seen = new Set<string>();
   let stopReason: KalshiTopScan['stopReason'] = 'done';
 
@@ -122,6 +125,11 @@ export async function scanKalshiTopMarkets(opts: {
       if (!m || !isOpenListable(m, clock) || seen.has(m.ticker)) continue;
       seen.add(m.ticker);
       listable++;
+      const openTime = isObj(row) && typeof row.open_time === 'string' && Number.isFinite(Date.parse(row.open_time)) ? row.open_time : null;
+      const tot = totals.get(m.eventTicker) ?? { total: 0, opened: null };
+      tot.total += m.totalVolumeContracts ?? 0;
+      if (openTime && (tot.opened === null || Date.parse(openTime) < Date.parse(tot.opened))) tot.opened = openTime;
+      totals.set(m.eventTicker, tot);
       const v = m.volume24hContracts ?? 0;
       if (v <= 0) continue;
       traded++;
@@ -153,9 +161,11 @@ export async function scanKalshiTopMarkets(opts: {
       title: e?.title ?? top[0].title ?? eventTicker,
       category: e?.category ?? null,
       volume24hContracts: b.vol,
+      totalVolumeContracts: totals.get(eventTicker)?.total ?? 0,
       openInterestContracts: b.oi,
       tradedMarkets: b.count,
       closeTime: closes[0] ?? null,
+      openedAt: totals.get(eventTicker)?.opened ?? null,
       outcomes: top.map(m => ({
         ticker: m.ticker, label: m.yesLabel ?? m.title ?? m.ticker,
         yesBid: m.yesBid, yesAsk: m.yesAsk, volume24hContracts: m.volume24hContracts ?? 0,
@@ -201,7 +211,8 @@ async function lookupEvents(tickers: string[], getEvent: EventGetter) {
 
 /* ── display grouping: Kalshi's published categories folded into the explorer's chips ── */
 
-export const KALSHI_CHIPS = ['All', 'Politics', 'Sports', 'Economy', 'Crypto', 'Tech', 'Culture', 'World', 'Other'] as const;
+// Same order and names as the Polymarket explorer, plus Economy (Kalshi lists many economics/financial events).
+export const KALSHI_CHIPS = ['All', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Economy', 'Other'] as const;
 export type KalshiChip = typeof KALSHI_CHIPS[number];
 
 const CHIP_OF: Record<string, KalshiChip> = {
@@ -210,7 +221,7 @@ const CHIP_OF: Record<string, KalshiChip> = {
   Economics: 'Economy', Financials: 'Economy', Companies: 'Economy', Commodities: 'Economy', Business: 'Economy',
   Crypto: 'Crypto',
   'Science and Technology': 'Tech', AI: 'Tech',
-  Entertainment: 'Culture', Mentions: 'Culture', Social: 'Culture',
+  Entertainment: 'Entertainment', Mentions: 'Entertainment', Social: 'Entertainment',
   World: 'World', 'Climate and Weather': 'World', Health: 'World',
 };
 

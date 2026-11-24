@@ -11,7 +11,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const ts = require('typescript');
 const React = require('react');
-const { renderToStaticMarkup } = require('react-dom/server');
 
 const root = path.resolve(__dirname, '..');
 const SECRET = 'UPSTREAM-SECRET-BODY-must-not-leak';
@@ -326,21 +325,6 @@ test('route: a failed load is a no-store error and is not cached; the next reque
   noStoreOnly(ok);
   assert.equal((await ok.json()).receivedAt, R2);
   assert.equal(ctx.raw.calls.length, 2);
-});
-
-test('SSR /markets discover page and the route read the same cached getter; note says reuse up to 20 seconds', async () => {
-  const { ld, raw, net, call } = app(() => Promise.resolve(emptyPage(R1)));
-  const Page = ld('src/app/markets/page.tsx').default;
-  const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ platform: 'kalshi', view: 'discover' }) }));
-  assert.equal(raw.calls.length, 1);
-  assert.match(html, /reused for up to 20 seconds/i);
-  assert.match(html, /No recent trades/i, 'empty valid sample is shown as empty, not as a failure');
-  assert.doesNotMatch(html, /role="alert"/);
-  const res = await call();
-  assert.equal(res.status, 200);
-  assert.equal((await res.json()).receivedAt, R1, 'route got the page-loaded snapshot with its original timestamp');
-  assert.equal(raw.calls.length, 1, 'page did not bypass the shared cache with a raw fetch');
-  assert.equal(net.mock.callCount(), 0);
 });
 
 // ======================= one process, several module graphs (Next builds SSR and route as separate bundles) =======================

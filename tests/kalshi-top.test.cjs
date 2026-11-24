@@ -100,7 +100,7 @@ test('published categories fold into explorer chips; unknown categories are Othe
   assert.equal(top.chipFor('Elections'), 'Politics');
   assert.equal(top.chipFor('Financials'), 'Economy');
   assert.equal(top.chipFor('Science and Technology'), 'Tech');
-  assert.equal(top.chipFor('Entertainment'), 'Culture');
+  assert.equal(top.chipFor('Entertainment'), 'Entertainment');
   assert.equal(top.chipFor('Climate and Weather'), 'World');
   assert.equal(top.chipFor('Brand New Category'), 'Other');
 });
@@ -112,4 +112,16 @@ test('outcomes per event are capped and the event volume still counts every trad
   assert.deepEqual(s.events[0].outcomes.map(o => o.ticker), ['A-6', 'A-5', 'A-4', 'A-3']);
   assert.equal(s.events[0].volume24hContracts, 21);
   assert.equal(s.events[0].tradedMarkets, 6);
+});
+
+test('total volume sums every listable market of the event (traded or not); openedAt is the earliest open_time', async () => {
+  const rows = [
+    row('A-1', 5, { volume_fp: '100', open_time: '2026-11-20T00:00:00Z' }),
+    row('A-2', 0, { volume_fp: '900', open_time: '2026-11-01T00:00:00Z' }),
+    row('A-3', 1, { volume_fp: '7', open_time: 'not-a-date' }),
+  ];
+  const s = await top.scanKalshiTopMarkets({ getJson: pagesOf(rows).getJson, getEvent, wait: noWait });
+  assert.equal(s.events[0].totalVolumeContracts, 1007);
+  assert.equal(s.events[0].openedAt, '2026-11-01T00:00:00Z');
+  assert.equal(s.events[0].volume24hContracts, 6);
 });

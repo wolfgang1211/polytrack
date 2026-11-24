@@ -54,13 +54,17 @@ export function isStale(receivedAt: string, now: number): boolean {
 
 const CHIP_COLOR: Record<Exclude<KalshiChip, 'All'>, string> = {
   Politics: 'var(--cat-politics)', Sports: 'var(--cat-sports)', Economy: 'var(--info)', Crypto: 'var(--cat-crypto)',
-  Tech: 'var(--cat-tech)', Culture: 'var(--cat-entertainment)', World: 'var(--text-secondary)', Other: 'var(--cat-other)',
+  Tech: 'var(--cat-tech)', Entertainment: 'var(--cat-entertainment)', World: 'var(--text-secondary)', Other: 'var(--cat-other)',
 };
 
+// Same sorts, in the same order, as the Polymarket explorer. Kalshi publishes no liquidity figure, so that slot is
+// Open Interest (contracts outstanding), and it is labelled as such.
 const SORTS = [
   { key: 'vol24h', label: '24h Volume' },
+  { key: 'volume', label: 'Total Volume' },
   { key: 'oi', label: 'Open Interest' },
   { key: 'ending', label: 'Closing Soon' },
+  { key: 'newest', label: 'Newest' },
 ] as const;
 type SortKey = typeof SORTS[number]['key'];
 
@@ -193,6 +197,8 @@ export default function KalshiTopClient({ scan: initialScan, error, serverNow }:
       if (!query) return true;
       return `${e.title} ${e.category ?? ''} ${e.outcomes.map(o => o.label).join(' ')}`.toLowerCase().includes(query);
     });
+    if (sort === 'volume') list.sort((a, b) => b.totalVolumeContracts - a.totalVolumeContracts);
+    if (sort === 'newest') list.sort((a, b) => Date.parse(b.openedAt ?? '1970-01-01') - Date.parse(a.openedAt ?? '1970-01-01'));
     if (sort === 'oi') list.sort((a, b) => b.openInterestContracts - a.openInterestContracts);
     if (sort === 'ending') list.sort((a, b) => Date.parse(a.closeTime ?? '9999-12-31') - Date.parse(b.closeTime ?? '9999-12-31'));
     return list;
@@ -225,7 +231,7 @@ export default function KalshiTopClient({ scan: initialScan, error, serverNow }:
                 This scan stopped early ({scan.stopReason === 'rate_limited' ? 'Kalshi rate limit' : 'time limit'}), so markets after that point are missing from the ranking.
               </p>
             )}
-            <p>Volume and open interest are contract counts, not dollars. Prices are current asks: the price to buy one contract. Category is as Kalshi publishes it, grouped into the chips above.</p>
+            <p>Volume and open interest are contract counts, not dollars. Kalshi publishes no liquidity figure, so Open Interest takes that place in sorting. Sorting applies to the {events.length} events shown. Prices are current asks: the price to buy one contract. Category is as Kalshi publishes it, grouped into the chips above.</p>
             <p>Retrieved {new Date(scan.receivedAt).toISOString().slice(0, 16).replace('T', ' ')} UTC. Kalshi provides no quote timestamp, so quotes may be older.</p>
           </div>
         </ExplorerDetails>
@@ -269,7 +275,7 @@ export default function KalshiTopClient({ scan: initialScan, error, serverNow }:
       {error && !scan ? (
         <div className="glass rounded-2xl py-16 text-center">
           <p className="text-sm text-ink/70">{error}</p>
-          <p className="mt-2 text-xs text-ink/55">The other Kalshi views (Discover, Newest, Events) still work.</p>
+          <p className="mt-2 text-xs text-ink/55">Please try again in a few minutes.</p>
         </div>
       ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl py-24 text-center">

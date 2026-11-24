@@ -132,10 +132,6 @@ const nextMocks = () => ({
   './MarketsClient': { __esModule: true, default: () => React.createElement('div', { 'data-stub': 'polymarket-client' }) },
 });
 const EVENT_PAGE = 'src/app/markets/kalshi/events/[eventTicker]/page.tsx';
-async function renderMarkets(searchParams) {
-  const Page = makeLoader(nextMocks())('src/app/markets/page.tsx').default;
-  return renderToStaticMarkup(await Page({ searchParams: Promise.resolve(searchParams) }));
-}
 async function renderEvent(eventTicker) {
   const Page = makeLoader(nextMocks())(EVENT_PAGE).default;
   return renderToStaticMarkup(await Page({ params: Promise.resolve({ eventTicker }) }));
@@ -143,8 +139,6 @@ async function renderEvent(eventTicker) {
 const rejectsNotFound = p => assert.rejects(p, e => e?.digest === NOT_FOUND);
 const attrs = s => Object.fromEntries([...s.matchAll(/([\w:-]+)="([^"]*)"/g)].map(m => [m[1], m[2].replace(/&amp;/g, '&')]));
 const anchors = html => [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(m => ({ ...attrs(m[1]), text: m[2].replace(/<[^>]+>/g, '').trim() }));
-const inputs = html => [...html.matchAll(/<input\b([^>]*?)\/?>/g)].map(m => attrs(m[1]));
-const anchor = (html, text) => { const a = anchors(html).find(x => x.text === text); assert.ok(a, `link "${text}" not rendered`); return a; };
 // "Label: value" in any markup (dt/dd, p/p, span) — value must end at a tag boundary.
 const labeled = (label, value) => new RegExp(`${label}(?:\\s|:|<[^>]*>)*${value}(?=\\s*<)`, 'i');
 afterEach(() => mock.restoreAll());
@@ -505,80 +499,6 @@ test('resolveKalshiView only accepts the exact scalar "events"', () => {
   }
 });
 
-test('/markets?platform=kalshi&view=events server-renders loaded events with view links, local filters and a cursor-free series form', async () => {
-  const calls = upstream(() => ({
-    events: [rawEvent(), rawEvent({ event_ticker: 'KXSYN2-1', series_ticker: 'KXSYN2', category: 'Other Cat', title: 'Second synthetic event' })],
-    cursor: 'next+c',
-  }));
-  const html = await renderMarkets({ platform: 'kalshi', view: 'events' });
-  assert.equal(calls.length, 1);
-  const sp = calls[0].url.searchParams;
-  assert.equal(calls[0].url.pathname, '/trade-api/v2/events');
-  assert.deepEqual([sp.get('limit'), sp.get('with_nested_markets'), sp.has('series_ticker')], ['50', 'false', false]);
-  assert.doesNotMatch(html, /polymarket-client/);
-  assert.equal(anchor(html, 'Events').href, '/markets?platform=kalshi&view=events');
-  assert.equal(anchor(html, 'Events')['aria-current'], 'page');
-  assert.equal(anchor(html, 'Newest').href, '/markets?platform=kalshi');
-  assert.equal(anchor(html, 'Newest')['aria-current'], undefined);
-  assert.match(html, /href="\/markets\/kalshi\/events\/KXSYN-26DEC"/);
-  assert.match(html, /href="\/markets\/kalshi\/events\/KXSYN2-1"/);
-  assert.match(html, /Search loaded events/);
-  assert.match(html, /Filters apply to loaded events only/);
-  assert.match(html, /Showing 2 of 2 loaded/);
-  for (const opt of ['All', 'Synthetic Category', 'Other Cat']) assert.match(html, new RegExp(`<option[^>]*>${opt}</option>`));
-  assert.match(html, />Load more</);
-  assert.match(html, />Refresh</);
-  const form = [...html.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/g)].find(m => /name="series"/.test(m[2]));
-  assert.ok(form, 'series form not rendered');
-  assert.equal(attrs(form[1]).method?.toLowerCase(), 'get');
-  assert.equal(attrs(form[1]).action, '/markets');
-  const fields = inputs(form[2]);
-  assert.ok(fields.some(f => f.type === 'hidden' && f.name === 'platform' && f.value === 'kalshi'));
-  assert.ok(fields.some(f => f.type === 'hidden' && f.name === 'view' && f.value === 'events'));
-  assert.ok(fields.some(f => f.name === 'series'));
-  assert.equal(fields.some(f => f.name === 'cursor'), false, 'series form must not carry a cursor');
-});
-
-test('/markets?platform=kalshi keeps the markets list; repeated or unknown view falls back to it; default stays Polymarket', async () => {
-  for (const sp of [{ platform: 'kalshi' }, { platform: 'kalshi', view: ['events', 'events'] }, { platform: 'kalshi', view: 'other' }, { platform: 'kalshi', view: 'EVENTS' }]) {
-    mock.restoreAll();
-    const calls = upstream(() => ({ markets: [rawMarket()], cursor: '' }));
-    const html = await renderMarkets(sp);
-    assert.deepEqual(calls.map(c => c.url.pathname), ['/trade-api/v2/markets'], JSON.stringify(sp));
-    assert.match(html, /Search loaded markets/);
-    assert.equal(anchor(html, 'Newest')['aria-current'], 'page');
-    assert.equal(anchor(html, 'Events')['aria-current'], undefined);
-  }
-  mock.restoreAll();
-  const calls = upstream(() => ({ events: [], cursor: '' }));
-  const html = await renderMarkets({ view: 'events' });
-  assert.match(html, /data-stub="polymarket-client"/);
-  assert.equal(calls.length, 0);
-});
-
-test('series is forwarded only as an exact TICKER_RE scalar; anything else is never sent upstream', async () => {
-  let calls = upstream(() => ({ events: [rawEvent()], cursor: '' }));
-  await renderMarkets({ platform: 'kalshi', view: 'events', series: 'KXSYN' });
-  assert.equal(calls[0].url.searchParams.get('series_ticker'), 'KXSYN');
-  for (const series of ['kxsyn', ['KXSYN', 'KXSYN'], ['KXSYN'], '../x', '']) {
-    mock.restoreAll();
-    calls = upstream(() => ({ events: [rawEvent()], cursor: '' }));
-    await renderMarkets({ platform: 'kalshi', view: 'events', series });
-    assert.equal(calls.length, 1, JSON.stringify(series));
-    assert.equal(calls[0].url.pathname, '/trade-api/v2/events');
-    assert.equal(calls[0].url.searchParams.has('series_ticker'), false, JSON.stringify(series));
-  }
-});
-
-test('events view initial upstream failure shows a sanitized error with Retry, not an empty state', async () => {
-  upstream(() => new Response(SECRET, { status: 500 }));
-  const html = await renderMarkets({ platform: 'kalshi', view: 'events' });
-  assert.match(html, /role="alert"/);
-  assert.match(html, />Retry</);
-  assert.doesNotMatch(html, />Load more</);
-  assert.doesNotMatch(html, /UPSTREAM-SECRET/);
-});
-
 // ---------- event detail page ----------
 test('event page renders metadata and only its own open child markets from awaited params', async () => {
   const calls = upstream(byPath({ markets: () => ({ markets: [rawMarket(), foreignMarket()], cursor: '' }) }));
@@ -600,7 +520,7 @@ test('event page renders metadata and only its own open child markets from await
   assert.match(html, /Open binary \$1 markets/);
   assert.match(html, /href="\/markets\/kalshi\/KXSYN-26DEC-T1"/);
   assert.doesNotMatch(html, /KXOTHER-1-T1|Foreign child market/);
-  assert.equal(anchors(html).some(a => a.href === '/markets?platform=kalshi&view=events'), true, 'back link to events');
+  assert.equal(anchors(html).some(a => a.href === '/markets?platform=kalshi'), true, 'back link to the Kalshi explorer');
 });
 
 test('event page shows mutually exclusive as No or Unavailable without coercion', async () => {
@@ -629,7 +549,7 @@ test('event page: other event failures are an unavailable state, not a 404, and 
     assert.match(html, /role="alert"/);
     assert.match(html, /unavailable/i);
     assert.doesNotMatch(html, /UPSTREAM-SECRET/);
-    assert.equal(anchors(html).some(a => a.href === '/markets?platform=kalshi&view=events'), true);
+    assert.equal(anchors(html).some(a => a.href === '/markets?platform=kalshi'), true);
   }
 });
 

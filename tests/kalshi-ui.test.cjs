@@ -97,8 +97,8 @@ test('selector is plain links with aria-current on the active provider only (no 
   const Select = load('src/app/markets/MarketPlatformSelect.tsx').default;
   const html = renderToStaticMarkup(React.createElement(Select, { active: 'kalshi' }));
   assert.match(html, /<a href="\/markets\?platform=polymarket"(?![^>]*aria-current)[^>]*>Polymarket<\/a>/);
-  // Kalshi lands on Discover; SSR escapes the query separator as &amp;.
-  assert.match(html, /<a href="\/markets\?platform=kalshi&amp;view=top" aria-current="page"[^>]*>Kalshi<\/a>/);
+  // Kalshi has one explorer view, like Polymarket.
+  assert.match(html, /<a href="\/markets\?platform=kalshi" aria-current="page"[^>]*>Kalshi<\/a>/);
   assert.equal((html.match(/aria-current/g) || []).length, 1);
   assert.doesNotMatch(html, /role="tab/);
 });
@@ -113,52 +113,6 @@ for (const [label, sp] of [['default', {}], ['repeated platform', { platform: ['
     assert.equal(calls.filter(u => u.hostname.includes('kalshi')).length, 0);
   });
 }
-
-test('/markets?platform=kalshi server-renders the loaded page with explicit loaded-set labels', async () => {
-  const calls = upstream(() => ({ markets: [rawMarket()], cursor: 'opaque+cursor' }));
-  const html = await renderMarkets({ platform: 'kalshi' });
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].searchParams.get('limit'), '100');
-  assert.doesNotMatch(html, /polymarket-client/);
-  assert.match(html, /href="\/markets\?platform=kalshi" aria-current="page"/);
-  assert.match(html, /Search loaded markets/);
-  assert.match(html, /Sorting and filters apply to loaded markets only/);
-  assert.match(html, /Showing 1 of 1 loaded/);
-  assert.match(html, />Load more</);
-  assert.match(html, /href="\/markets\/kalshi\/KXSYN-26DEC-T1"/);
-  assert.match(html, /41¢/);
-  assert.match(html, /Unavailable/); // 0 ask sentinel with 0 size is not a quote
-  assert.match(html, /1\.2K contracts/);
-  assert.match(html, /4\.3K contracts/);
-  assert.match(html, /2099-12-31 00:00 UTC/);
-  assert.match(html, /Retrieval time only/);
-  assert.doesNotMatch(html, /<img/);
-  assert.doesNotMatch(html, /\$1,234|\$1\.2K/); // contract counts never rendered as dollars
-});
-
-test('kalshi initial upstream failure shows error + retry, not a genuine-empty message', async () => {
-  upstream(() => new Response('UPSTREAM-SECRET', { status: 500 }));
-  const html = await renderMarkets({ platform: 'kalshi' });
-  assert.match(html, /role="alert"/);
-  assert.match(html, />Retry</);
-  assert.doesNotMatch(html, /No open binary markets/);
-  assert.doesNotMatch(html, /UPSTREAM-SECRET/);
-  assert.doesNotMatch(html, />Load more</);
-});
-
-test('kalshi genuine empty page is an empty state, and a valid all-rejected page with a cursor stays loadable', async () => {
-  upstream(() => ({ markets: [], cursor: '' }));
-  let html = await renderMarkets({ platform: 'kalshi' });
-  assert.match(html, /No open binary markets on the loaded pages/);
-  assert.doesNotMatch(html, /role="alert"/);
-  assert.doesNotMatch(html, />Load more</);
-  mock.restoreAll();
-  upstream(() => ({ markets: [rawMarket({ status: 'mystery' })], cursor: 'next' }));
-  html = await renderMarkets({ platform: 'kalshi' });
-  assert.match(html, /More pages may still be available/);
-  assert.match(html, />Load more</);
-  assert.match(html, /1 source rows not shown/);
-});
 
 // ---------- detail page ----------
 test('detail renders metadata, raw rules, units, depth with derived asks and the retrieval caveat', async () => {

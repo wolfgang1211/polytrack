@@ -6,7 +6,7 @@ export type MarketPlatform = 'polymarket' | 'kalshi';
 // list (/markets?platform=kalshi) and Events stay one click away.
 const PLATFORMS: { key: MarketPlatform; label: string; href: string }[] = [
   { key: 'polymarket', label: 'Polymarket', href: '/markets?platform=polymarket' },
-  { key: 'kalshi', label: 'Kalshi', href: '/markets?platform=kalshi&view=top' },
+  { key: 'kalshi', label: 'Kalshi', href: '/markets?platform=kalshi' },
 ];
 
 /** Exact scalar match only; repeated, unknown or missing values fall back to the Polymarket default. */
@@ -22,6 +22,8 @@ export function resolveKalshiView(value: string | string[] | undefined): KalshiV
 }
 
 export const TOP_HREF = '/markets?platform=kalshi&view=top';
+/** The single Kalshi explorer URL (legacy ?view= URLs redirect here). */
+export const KALSHI_HREF = '/markets?platform=kalshi';
 
 export const DISCOVER_HREF = '/markets?platform=kalshi&view=discover';
 

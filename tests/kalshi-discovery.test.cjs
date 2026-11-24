@@ -9,7 +9,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const ts = require('typescript');
 const React = require('react');
-const { renderToStaticMarkup } = require('react-dom/server');
 
 const root = path.resolve(__dirname, '..');
 const BASE = 'https://external-api.kalshi.com/trade-api/v2';
@@ -134,15 +133,6 @@ const nextMocks = () => ({
   '@/lib/markets': { fetchMarketsList: async () => [] },
   './MarketsClient': { __esModule: true, default: () => React.createElement('div', { 'data-stub': 'polymarket-client' }) },
 });
-async function renderMarkets(searchParams) {
-  const Page = makeLoader(nextMocks())('src/app/markets/page.tsx').default;
-  return renderToStaticMarkup(await Page({ searchParams: Promise.resolve(searchParams) }));
-}
-const attrs = s => Object.fromEntries([...s.matchAll(/([\w:-]+)="([^"]*)"/g)].map(m => [m[1], m[2].replace(/&amp;/g, '&')]));
-const anchors = html => [...html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)].map(m => ({ ...attrs(m[1]), text: m[2].replace(/<[^>]+>/g, '').trim() }));
-const anchor = (html, text) => { const a = anchors(html).find(x => x.text === text); assert.ok(a, `link "${text}" not rendered`); return a; };
-const labeled = (label, value) => new RegExp(`${label}(?:\\s|:|<[^>]*>)*${value}(?=\\s*<)`, 'i');
-const DISCOVER_HREF = '/markets?platform=kalshi&view=discover';
 afterEach(() => mock.restoreAll());
 
 // ======================= adapter: bounds & shape =======================
@@ -573,72 +563,4 @@ test('resolveKalshiView accepts exact scalar "discover" and "events"; everything
   for (const v of [undefined, 'DISCOVER', ' discover', ['discover'], ['discover', 'discover'], '', 'TOP', ['top']]) {
     assert.equal(resolveKalshiView(v), 'markets', JSON.stringify(v));
   }
-});
-
-test('/markets?platform=kalshi&view=discover renders sample-scoped groups, category filter and metadata fallback', async () => {
-  const calls = upstream(kalshi({
-    trades: tradesOf('KXA-E1-T1', 'KXA-E1-T2', 'KXB-E1-T1', 'KXC-E1-T1'),
-    event: url => ({
-      'KXA-E1': () => ({ event: rawEvent('KXA-E1', { category: 'Politics' }) }),
-      'KXB-E1': () => ({ event: rawEvent('KXB-E1', { category: 'Economics' }) }),
-    }[eventTickerOf(url)] ?? (() => new Response(SECRET, { status: 500 })))(),
-  }));
-  const html = await renderMarkets({ platform: 'kalshi', view: 'discover' });
-  assert.equal(calls[0].url.pathname, P.trades);
-  assert.equal(calls.some(c => c.url.pathname === '/trade-api/v2/events'), false, 'no events list request');
-  assert.doesNotMatch(html, /polymarket-client/);
-  const tabs = anchors(html).filter(a => ['Top', 'Discover', 'Newest', 'Events'].includes(a.text)).slice(0, 4);
-  assert.deepEqual(tabs.map(a => a.text), ['Top', 'Discover', 'Newest', 'Events']);
-  assert.equal(anchor(html, 'Discover').href, DISCOVER_HREF);
-  assert.equal(anchor(html, 'Discover')['aria-current'], 'page');
-  assert.equal(anchor(html, 'Newest')['aria-current'], undefined);
-  assert.match(html, /sample of recent (Kalshi )?trades/i);
-  assert.match(html, /not (a|the) full/i);
-  assert.match(html, labeled('Trades scanned', '4'));
-  assert.match(html, /href="\/markets\/kalshi\/events\/KXA-E1"/);
-  assert.match(html, /href="\/markets\/kalshi\/KXA-E1-T1"/);
-  assert.match(html, /Synthetic title KXA-E1/);
-  assert.match(html, /as published/i);
-  for (const opt of ['All', 'Politics', 'Economics']) assert.match(html, new RegExp(`<option[^>]*>${opt}</option>`));
-  assert.match(html, /KXC-E1/);
-  assert.match(html, /Event details unavailable/i);
-  assert.doesNotMatch(html, /Synthetic title KXC-E1|UPSTREAM-SECRET/);
-  assert.doesNotMatch(html, /top markets|trending|all kalshi markets/i);
-});
-
-test('discover view: capped sample is labeled partial; empty sample is explicit; failure is an alert with Retry', async () => {
-  let n = 0;
-  upstream(kalshi({ trades: () => ({ trades: [rawTrade('KXA-E1-T1')], cursor: `c${++n}` }) }));
-  assert.match(await renderMarkets({ platform: 'kalshi', view: 'discover' }), /partial/i);
-  mock.restoreAll();
-  upstream(kalshi());
-  const empty = await renderMarkets({ platform: 'kalshi', view: 'discover' });
-  assert.match(empty, /No recent trades/i);
-  assert.doesNotMatch(empty, /role="alert"/);
-  mock.restoreAll();
-  upstream(kalshi({ trades: () => new Response(SECRET, { status: 500 }) }));
-  const failed = await renderMarkets({ platform: 'kalshi', view: 'discover' });
-  assert.match(failed, /role="alert"/);
-  assert.match(failed, />Retry</);
-  assert.doesNotMatch(failed, /No recent trades|UPSTREAM-SECRET/i);
-});
-
-test('raw /markets?platform=kalshi is unchanged but explains newest listings and links to Discover; events and Polymarket untouched', async () => {
-  let calls = upstream(() => ({ markets: [rawMarket('KXA-E1-T1')], cursor: '' }));
-  let html = await renderMarkets({ platform: 'kalshi' });
-  assert.deepEqual(calls.map(c => c.url.pathname), [P.markets]);
-  assert.equal(calls[0].url.searchParams.has('tickers'), false);
-  assert.match(html, /Search loaded markets/);
-  assert.equal(anchor(html, 'Newest')['aria-current'], 'page');
-  assert.match(html, /newest listings/i);
-  assert.ok(anchors(html).filter(a => a.href === DISCOVER_HREF).length >= 2, 'tab plus an explanatory Discover link');
-  mock.restoreAll();
-  calls = upstream(() => ({ events: [], cursor: '' }));
-  await renderMarkets({ platform: 'kalshi', view: 'events' });
-  assert.deepEqual(calls.map(c => c.url.pathname), ['/trade-api/v2/events']);
-  mock.restoreAll();
-  calls = upstream(kalshi());
-  html = await renderMarkets({ view: 'discover' });
-  assert.match(html, /data-stub="polymarket-client"/);
-  assert.equal(calls.length, 0);
 });

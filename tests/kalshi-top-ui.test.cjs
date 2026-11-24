@@ -92,25 +92,6 @@ test('scan facts are stated; a partial scan is labelled as partial with its reas
   assert.match(partial, /stopped early \(Kalshi rate limit\)/);
 });
 
-test('load failure shows a message and points to the other Kalshi views', () => {
-  const h = html({ scan: null, error: 'Kalshi markets could not be loaded right now.' });
-  assert.match(h, /could not be loaded/);
-  assert.match(h, /Discover, Newest, Events/);
-});
-
-test('wiring: Kalshi provider link and Top tab go to view=top; the page renders KalshiTopClient from the cached scan', () => {
-  const sel = load('src/app/markets/MarketPlatformSelect.tsx');
-  assert.equal(sel.TOP_HREF, '/markets?platform=kalshi&view=top');
-  const views = renderToStaticMarkup(React.createElement(sel.KalshiViewSelect, { active: 'top' }));
-  assert.match(views, /href="\/markets\?platform=kalshi&amp;view=top" aria-current="page"[^>]*>Top</);
-  const page = fs.readFileSync(path.join(root, 'src/app/markets/page.tsx'), 'utf8');
-  assert.match(page, /view === 'top'[\s\S]*getCachedKalshiTop\(\)[\s\S]*<KalshiTopClient/);
-  assert.match(page, /export const maxDuration = 120;/);
-  const cache = fs.readFileSync(path.join(root, 'src/lib/kalshiTopCache.ts'), 'utf8');
-  assert.match(cache, /unstable_cache\(/);
-  assert.match(cache, /KALSHI_TOP_REVALIDATE_S = 900/);
-});
-
 test('no ask: the best bid is shown and labelled as a bid; closed events are hidden', () => {
   const s = scan();
   s.events[0].outcomes[0] = { ...s.events[0].outcomes[0], yesAsk: null, yesBid: 0.99 };
@@ -129,4 +110,43 @@ test('stale cache: an old scan is flagged as refreshing and the client polls the
   assert.match(src, /refreshing…/);
   const route = fs.readFileSync(path.join(root, 'src/app/api/kalshi/top/route.ts'), 'utf8');
   assert.match(route, /s-maxage=30'/);
+});
+
+test('load failure shows a message and a retry hint', () => {
+  const h = html({ scan: null, error: 'Kalshi markets could not be loaded right now.' });
+  assert.match(h, /could not be loaded/);
+  assert.match(h, /try again in a few minutes/);
+});
+
+test('sorts and chips mirror the Polymarket explorer (Open Interest in the liquidity slot, stated in About)', () => {
+  const h = html({ scan: scan() });
+  const sorts = [...h.matchAll(/<button type="button"[^>]*min-h-\[44px\] rounded-lg[^>]*>([^<]+)<\/button>/g)].map(m => m[1]);
+  assert.deepEqual(sorts, ['24h Volume', 'Total Volume', 'Open Interest', 'Closing Soon', 'Newest']);
+  const top = load('src/lib/kalshiTop.ts');
+  assert.deepEqual([...top.KALSHI_CHIPS], ['All', 'Politics', 'Crypto', 'Sports', 'Tech', 'World', 'Entertainment', 'Economy', 'Other']);
+  assert.match(h, /Kalshi publishes no liquidity figure, so Open Interest takes that place/);
+});
+
+test('one Kalshi view like Polymarket: no view tabs; legacy ?view= and ?series= URLs redirect permanently', async () => {
+  const sel = load('src/app/markets/MarketPlatformSelect.tsx');
+  assert.equal(sel.KALSHI_HREF, '/markets?platform=kalshi');
+  const redirects = [];
+  const stub = name => ({ __esModule: true, default: () => React.createElement('div', { 'data-stub': name }) });
+  const Page = makeLoader({
+    'next/link': { __esModule: true, default: Link },
+    'next/navigation': { permanentRedirect: url => { redirects.push(url); throw new Error('REDIRECT'); } },
+    '@/lib/markets': { fetchMarketsList: async () => [] },
+    '@/lib/kalshiTopCache': { getCachedKalshiTop: async () => scan() },
+    './MarketsClient': stub('poly'), './KalshiTopClient': stub('top'),
+  })('src/app/markets/page.tsx').default;
+  const out = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ platform: 'kalshi' }) }));
+  assert.match(out, /data-stub="top"/);
+  assert.match(out, /aria-label="Market data provider"/);
+  assert.doesNotMatch(out, /Kalshi view|>Discover<|>Newest<|>Events</);
+  for (const q of [{ view: 'discover' }, { view: 'events' }, { view: 'markets' }, { view: 'top' }, { series: 'KXFED' }]) {
+    await assert.rejects(Page({ searchParams: Promise.resolve({ platform: 'kalshi', ...q }) }), /REDIRECT/);
+  }
+  assert.deepEqual([...new Set(redirects)], ['/markets?platform=kalshi']);
+  const poly = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({}) }));
+  assert.match(poly, /data-stub="poly"/);
 });

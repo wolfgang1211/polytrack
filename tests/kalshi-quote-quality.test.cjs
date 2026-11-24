@@ -297,36 +297,6 @@ const closedQuoteDetails = html => {
   return null;
 };
 
-test('raw list SSR: card summary equals the helper result, in a closed Quote details beside the card link in the same article, one upstream request', async () => {
-  const raw = rawMarket({ yes_bid_dollars: '0.4000', yes_ask_dollars: '0.5000', yes_bid_size_fp: '75.50', yes_ask_size_fp: '150.00' });
-  const calls = upstream(() => ({ markets: [raw], cursor: '' }));
-  const html = await renderPage('src/app/markets/page.tsx', { searchParams: Promise.resolve({ platform: 'kalshi' }) });
-  assert.equal(calls.length, 1);
-  assert.equal(calls.filter(c => isBook(c.url)).length, 0);
-  const expected = Q().analyzeKalshiQuotes(K().normalizeMarket(raw));
-  const [s] = summaries(html);
-  assert.equal(s['data-quote-status'], expected.status);
-  assert.equal(s['data-quote-warnings'], expected.warnings.join(' '));
-  assert.match(html, labeled('Spread', '10¢'));
-  assert.match(html, labeled('Bid size', '75.5 contracts'));
-  const articles = [...html.matchAll(/<article\b[^>]*>([\s\S]*?)<\/article>/g)].map(m => m[1]);
-  assert.equal(articles.length, 1, 'one card for one market');
-  const [article] = articles;
-  const card = article.match(/<a href="\/markets\/kalshi\/KXSYN-26DEC-T1"[^>]*>([\s\S]*?)<\/a>/);
-  assert.ok(card, 'market card link rendered in the card article');
-  assert.doesNotMatch(card[1], INTERACTIVE);
-  assert.doesNotMatch(card[1], /data-quote-status=/, 'quote summary is outside the primary link');
-  const quote = closedQuoteDetails(article);
-  assert.ok(quote !== null, 'closed Quote details in the same article');
-  const inQuote = summaries(quote);
-  assert.equal(inQuote.length, 1);
-  assert.equal(inQuote[0]['data-quote-status'], expected.status);
-  assert.equal(inQuote[0]['data-quote-warnings'], expected.warnings.join(' '));
-  assert.match(quote, labeled('Spread', '10¢'));
-  assert.match(quote, labeled('Bid size', '75.5 contracts'));
-  assert.match(quote, /KXSYN-26DEC-T1/, 'quote belongs to this ticker');
-});
-
 test('event page list SSR: one-sided child quote is labeled, no book requests are added', async () => {
   const calls = upstream(url => (url.pathname.startsWith('/trade-api/v2/events/') ? { event: rawEvent() }
     : { markets: [rawMarket({ yes_ask_dollars: '0.0000', yes_ask_size_fp: '0.00' })], cursor: '' }));

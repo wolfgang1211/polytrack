@@ -168,36 +168,6 @@ test('source guard: stateless module, no hooks/deps, ink token, min-w-0, readabl
 });
 
 // ======================= 3 + 8. provider links and page nav group =======================
-test('provider select: Kalshi -> DISCOVER_HREF, Polymarket unchanged, raw Markets view URL unchanged, resolvers unchanged', () => {
-  const sel = load('src/app/markets/MarketPlatformSelect.tsx');
-  assert.equal(sel.DISCOVER_HREF, '/markets?platform=kalshi&view=discover');
-  const prov = renderToStaticMarkup(React.createElement(sel.default, { active: 'polymarket' }));
-  assert.match(prov, /href="\/markets\?platform=polymarket"[^>]*>Polymarket</);
-  assert.match(prov, /href="\/markets\?platform=kalshi&amp;view=top"[^>]*>Kalshi</);
-  const views = renderToStaticMarkup(React.createElement(sel.KalshiViewSelect, { active: 'markets' }));
-  assert.match(views, /href="\/markets\?platform=kalshi"[^>]*>Newest</);
-  assert.deepEqual(['kalshi', ['kalshi'], 'x', undefined].map(sel.resolvePlatform), ['kalshi', 'polymarket', 'polymarket', 'polymarket']);
-  assert.deepEqual(['discover', 'events', 'markets', ['events'], undefined].map(sel.resolveKalshiView), ['discover', 'events', 'markets', 'markets', 'markets']);
-});
-
-test('page: provider (and Kalshi view) navs share one wrapping control group in every branch', async () => {
-  const stub = name => ({ __esModule: true, default: () => React.createElement('div', { 'data-stub': name }) });
-  const Page = load('src/app/markets/page.tsx', {
-    '@/lib/markets': { fetchMarketsList: async () => [] },
-    '@/lib/kalshi': { ...K(), fetchKalshiMarkets: async () => ({ markets: [], nextCursor: null, rejectedCount: 0, receivedAt: T1 }) },
-    '@/lib/kalshiEvents': { ...load('src/lib/kalshiEvents.ts'), fetchKalshiEvents: async () => null },
-    '@/lib/kalshiDiscoveryCache': { getCachedKalshiDiscovery: async () => twoGroups() },
-    './MarketsClient': stub('poly'), './KalshiMarketsClient': stub('raw'), './KalshiEventsClient': stub('events'), './KalshiDiscoveryClient': stub('discover'),
-  }).default;
-  for (const q of [{}, { platform: 'kalshi' }, { platform: 'kalshi', view: 'events' }, { platform: 'kalshi', view: 'discover' }]) {
-    const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve(q) }));
-    const need = ['aria-label="Market data provider"', ...(q.platform ? ['aria-label="Kalshi view"'] : [])];
-    const box = nodes(html, /<(div|header)\b[^>]*>/g).filter(n => need.every(s => n.html.includes(s))).sort((a, b) => a.html.length - b.html.length)[0];
-    assert.ok(box, JSON.stringify(q));
-    assert.match(box.open, /flex-wrap/, `${JSON.stringify(q)}: nav group wraps instead of stacking full-width rows`);
-  }
-});
-
 // ======================= 2 + 4. Polymarket =======================
 test('Polymarket: one h1 in shared header, search in shared toolbar, cards are ExplorerCard articles, USD units', () => {
   const html = ssr('src/app/markets/MarketsClient.tsx', { initialMarkets: [polyMarket('p1'), polyMarket('p2')] });
@@ -283,14 +253,6 @@ test('Raw Kalshi: shared header/toolbar; one article per market with exactly ONE
 });
 
 // ======================= 2. Kalshi events =======================
-test('Kalshi events: shared header (one h1) and shared toolbar with the search input; native series form untouched in page', () => {
-  const html = ssr('src/app/markets/KalshiEventsClient.tsx', { initial: null, initialError: 'SYNTHETIC load error', seriesTicker: null });
-  assert.equal(h1Count(html), 1);
-  assert.match(byAttr(html, 'data-explorer-header')[0].html, /<h1\b[^>]*id="kalshi-events-heading"/);
-  assert.match(byAttr(html, 'data-explorer-toolbar')[0].html, /<input\b/);
-  assert.match(src('src/app/markets/page.tsx'), /aria-label="Filter events by series"/);
-});
-
 // ======================= 2 + 5. Kalshi Discover header, filters, about =======================
 test('Discover: shared header/toolbar; search, category (first select) and Refresh prominent; numeric filters in CLOSED "More filters"', () => {
   const html = discover(twoGroups());
