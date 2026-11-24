@@ -101,11 +101,18 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Tarayıcı kontrolü (Chrome, masaüstü genişliği): koyu ve açık temada kart/metin kontrastı uygun, taşma yok. **375 px mobil görsel kontrol yapılamadı**: Chrome penceresi daraltılamadı, yerleşik tarayıcı preview alan adı için onay istiyor. Kısmi.
 - Bilinen risk: önbellek dolarken ilk ziyaretçi ~45 s bekleyebilir (her 15 dakikada bir, arka planda yenilenir).
 
+### Gün içi ek (2026-11-24, aynı dal, hâlâ YALNIZ PREVIEW)
+- Bulgu: önbellek uzun süre ziyaretsiz kalınca ilk ziyaretçi eski listeyi görüyordu ("updated 12 h ago"). Düzeltme: liste 30 dakikadan eskiyse sayfa "refreshing…" yazar, `/api/kalshi/top`'u 20 sn arayla en fazla 4 dk sorar, yeni tarama gelince listeyi değiştirir. API CDN önbelleği 30 sn.
+- Kontrast ve dokunma alanı: ana sayfa, /activity, /insights, /blog ve blog yazısı (10 dosya; ink/≥55, en az 10px, soluk inline renkler kalktı). Ek düzeltmeler: /activity ısı haritası kutuları iki temada opak koyu zemin + beyaz yazı, SELL rozeti, sıra numaraları ve ana sayfa/insights istatistik renkleri tema değişkenlerine geçti, insights "Coming Soon" kartlarındaki %50 saydamlık kaldırıldı, koyu temada kırmızı fiyat gradyanı açıldı. Sitemap `/blog` tarihi 2026-11-24.
+- Son ölçüm (preview, 375 px, her tema sıfırdan): `/`, `/activity`, `/insights`, `/blog`, blog yazısı, `/markets` (Polymarket), `/markets?platform=kalshi&view=top`: koyu ve açık temada eşik altı metin 0 (yalnız dekoratif "/" ayırıcı), yatay taşma 0, 24 px altı dokunma alanı 0.
+- Commit'ler: 98fe2ad, 8a39ef8, 48c36fc, 7e36fa1, 10e805e (yeniden build: Google Fonts), 5dbb52a, f810299. Testler 615/615, tsc 0, lint 0 hata/24 uyarı.
+- Risk: Vercel build'i iki kez geçici Google Fonts hatasıyla düştü; production'da tekrarlarsa yeniden build yeterli.
+- Sonraki adım: Yusuf "yayına al" derse dalı main'e birleştir, production'da iki temada yeniden ölç, önbelleği ilk istekle ısıt.
+
 ## Sıradaki görevler | Yusuf onayı bekleniyor
-1. **Kalshi preview onayı**: Yusuf preview'a bakar (telefonda da); mobil kontrolü yaparım; onay gelirse main'e alırım.
+1. **Kalshi + kontrast preview onayı**: mobil kontrol yapıldı (375 px, iki tema). Yusuf akşam bakıp onaylarsa main'e alınır.
 2. **Takip**: Vercel Analytics / Clarity'de yeni sayfalara gelen trafik ve AI referrer'ları.
-3. **Erişilebilirlik takibi (küçük)**: ana sayfa, /activity, /insights, blog iki temada ölçülmedi.
-4. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
+3. **GEO Öncelik 2 kalanlar** (market maker sayfası, /liquidity SSR özet): Yusuf bekletiyor.
 
 ## Bloklayan şeyler
 Yok. Not: yerel 3016 önizlemesi kapalı; kabul Vercel preview'unda yapıldı.
