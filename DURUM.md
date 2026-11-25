@@ -1,6 +1,6 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-25T16:25+03:00
+- Güncelleme: 2026-11-25T23:50+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
@@ -143,6 +143,13 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 ## YAYIN: Menü sırası (2026-11-25 16:25, Yusuf "yayınla")
 - Üst menü, mobil menü ve footer "Product" sırası: Markets · Liquidity · Leaderboard · Activity · Wallet Checker · Insights (+ More). Commit `9b94e9d` (`cowork/nav-order`), main'e fast-forward.
 - Test 497/497, tsc 0, lint 0 hata/24 uyarı, diff-check temiz. Preview `dpl_ZeG4zK1csJpe3Am6u8Eab5BT1iAK` READY; SSR HTML'de üç listenin sırası doğrulandı.
+
+## Kalshi tarama düzeltmesi (2026-11-25 23:50, branch `cowork/kalshi-scan`, ONAY BEKLİYOR)
+- Bulgu: canlıda sayfa önbelleğinde yarım tarama (136K/~177K) vardı; API önbelleği boştu ve ilk istek 49 s bekledi (tam tarama: 185 sayfa, 184.473 market). Önbellek boşken Kalshi tıklaması ~50 s boş bekliyordu (akşamki "çalışmıyor" şikâyetinin olası nedeni).
+- Commit `5115f34`: yalnız tam tarama önbelleğe yazılıyor (yarım tarama cache fonksiyonunda hata fırlatır; Next arka plan yenilemesinde eski tam taramayı korur; önbellek boşsa yarım tarama etiketli ve önbelleksiz gösterilir). Anahtar `kalshi-top-events-v6`. 429 geri çekilmesi 1/2/4/8/16 s, bütçeyi aşmadan. Kalshi listesi Suspense ile akıyor; "Loading Kalshi markets…" durumu hemen görünüyor.
+- Test 500/500, tsc 0, lint 0 hata/24 uyarı, diff-check temiz. Preview `dpl_Gd6teB8Ykw2JetyHer7JLyZbADnM` READY.
+- Gerçek tarayıcı (önizleme): soğuk önbellekte tıklamadan 2 s sonra yükleme durumu, 63 s'de 60 kart + "Full scan"; sıcak önbellekte ikinci tıklama ~3 s; konsol hatası 0.
+- Not: yayından sonra v6 anahtarı boş olacak; yayın sonrası önbellek bir kez ısıtılmalı.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.
