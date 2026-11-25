@@ -2,12 +2,12 @@ import Link from 'next/link';
 import Logo from '@/components/Logo';
 
 const PRODUCT_LINKS = [
-  { href: '/leaderboard', label: 'Leaderboard' },
   { href: '/markets',     label: 'Markets' },
-  { href: '/activity',    label: 'Activity' },
   { href: '/liquidity',   label: 'Liquidity Hub' },
-  { href: '/insights',    label: 'Insights' },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/activity',    label: 'Activity' },
   { href: '/checker',     label: 'Wallet Checker' },
+  { href: '/insights',    label: 'Insights' },
   { href: '/compare',     label: 'Compare Traders' },
 ];
 

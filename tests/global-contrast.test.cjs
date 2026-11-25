@@ -185,3 +185,13 @@ test('home and insights stat accents use theme tokens, never fixed dark-theme co
   assert.doesNotMatch(ins, /accent="rgba\(/);
   assert.match(ins, /style=\{\{ color: 'var\(--success\)' \}\}>\+\{formatCurrency/);
 });
+
+test('navigation order: Markets, Liquidity, Leaderboard, Activity, Wallet Checker, Insights (navbar and footer)', () => {
+  const order = s => [...s.matchAll(/\{ href: '(\/[a-z-]+)',\s+label: '([^']+)'/g)].map(m => m[1]);
+  const nav = read('src/components/Navbar.tsx');
+  assert.deepEqual(order(nav.slice(nav.indexOf('const NAV_LINKS'), nav.indexOf('const MORE_LINKS'))),
+    ['/markets', '/liquidity', '/leaderboard', '/activity', '/checker', '/insights']);
+  const foot = read('src/components/Footer.tsx');
+  assert.deepEqual(order(foot.slice(foot.indexOf('const PRODUCT_LINKS'), foot.indexOf('const LEGAL_LINKS'))),
+    ['/markets', '/liquidity', '/leaderboard', '/activity', '/checker', '/insights', '/compare']);
+});

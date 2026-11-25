@@ -7,12 +7,13 @@ import TelegramModal from '@/components/TelegramModal';
 import Logo from '@/components/Logo';
 import ThemeSelect from '@/components/ThemeSelect';
 
+// Markets and liquidity (LP rewards) lead: they are the site's core tools.
 const NAV_LINKS = [
-  { href: '/leaderboard', label: 'Leaderboard' },
-  { href: '/checker',     label: 'Wallet Checker' },
   { href: '/markets',     label: 'Markets'     },
-  { href: '/activity',    label: 'Activity'    },
   { href: '/liquidity',   label: 'Liquidity'   },
+  { href: '/leaderboard', label: 'Leaderboard' },
+  { href: '/activity',    label: 'Activity'    },
+  { href: '/checker',     label: 'Wallet Checker' },
   { href: '/insights',    label: 'Insights'    },
 ];
 
