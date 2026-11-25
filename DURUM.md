@@ -1,6 +1,6 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-23T11:50+03:00
+- Güncelleme: 2026-11-25T16:25+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
@@ -139,6 +139,10 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Önbellek ısıtma: canlıda ilk Kalshi taraması yapıldı (sayfa ve `/api/kalshi/top` ayrı önbellek girdisi tutuyor; ikisi de ısıtıldı). `/api/kalshi/top`: tam tarama, 60 etkinlik, 57 görsel.
 - Canlı ölçüm (www.alphaboard.xyz, 375 px): `/markets?platform=kalshi`, `/markets`, `/`, `/activity` koyu temada; `/markets?platform=kalshi`, `/markets`, `/` açık temada: eşik altı metin 0, yatay taşma 0, 24 px altı dokunma alanı 0. Eski `?view=discover` → yönlendirme; `/markets/kalshi/events/KXSB-27` HTTP 200; `/api/kalshi/discovery` HTTP 404 (silindi, beklenen).
 - Not: Vercel build'leri ara ara geçici Google Fonts hatasıyla düşüyor; tekrar build yeterli.
+
+## YAYIN: Menü sırası (2026-11-25 16:25, Yusuf "yayınla")
+- Üst menü, mobil menü ve footer "Product" sırası: Markets · Liquidity · Leaderboard · Activity · Wallet Checker · Insights (+ More). Commit `9b94e9d` (`cowork/nav-order`), main'e fast-forward.
+- Test 497/497, tsc 0, lint 0 hata/24 uyarı, diff-check temiz. Preview `dpl_ZeG4zK1csJpe3Am6u8Eab5BT1iAK` READY; SSR HTML'de üç listenin sırası doğrulandı.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.
