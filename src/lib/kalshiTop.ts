@@ -11,7 +11,7 @@ export const SCAN_PAGE_LIMIT = 1000;      // Kalshi's documented max page size f
 export const MAX_SCAN_PAGES = 300;        // hard stop (300k markets) so a looping cursor can never run forever
 export const SCAN_BUDGET_MS = 100_000;    // a full scan takes ~45 s (≈178 pages); maxDuration is 120 s. Partial scans are labelled
 export const PAGE_GAP_MS = 0;             // sequential pages are already well under the public read limit; 429s back off
-export const RATE_LIMIT_RETRIES = 3;      // per page, on Kalshi 429 (mapped to KalshiError 503)
+export const RATE_LIMIT_RETRIES = 5;      // per page, on Kalshi 429 (mapped to KalshiError 503): 1+2+4+8+16 s, never past the budget
 export const TOP_EVENTS = 60;
 export const OUTCOMES_PER_EVENT = 4;
 export const EVENT_CONCURRENCY = 2;
@@ -110,9 +110,10 @@ export async function scanKalshiTopMarkets(opts: {
         });
         break;
       } catch (e) {
-        if (e instanceof KalshiError && e.status === 503 && attempt < RATE_LIMIT_RETRIES) {
+        const delay = 1000 * 2 ** attempt; // 1s, 2s, 4s, 8s, 16s
+        if (e instanceof KalshiError && e.status === 503 && attempt < RATE_LIMIT_RETRIES && now() - t0 + delay <= budget) {
           attempt++;
-          await wait(1000 * 2 ** (attempt - 1)); // 1s, 2s, 4s
+          await wait(delay);
           continue;
         }
         if (e instanceof KalshiError && e.status === 503 && pages > 0) { stopReason = 'rate_limited'; body = undefined; break; }

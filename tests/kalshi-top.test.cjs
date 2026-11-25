@@ -78,7 +78,7 @@ test('rate limiting: retried with backoff; after the first page a persistent lim
   const s = await top.scanKalshiTopMarkets({ getJson, getEvent, wait: async ms => { waits.push(ms); } });
   assert.equal(s.complete, false);
   assert.equal(s.stopReason, 'rate_limited');
-  assert.deepEqual(waits.filter(w => w >= 1000), [1000, 2000, 4000]);
+  assert.deepEqual(waits.filter(w => w >= 1000), [1000, 2000, 4000, 8000, 16000]);
   assert.deepEqual(s.events.map(e => e.eventTicker), ['EV-A']);
 });
 
@@ -138,4 +138,28 @@ test('event image comes from Kalshi event metadata and only an absolute https UR
   assert.equal(s.events[0].image, 'https://img.test/a.png');
   assert.equal(s.events[1].image, null, 'a failed image lookup leaves the event without an image');
   assert.equal(s.events[1].category, 'Sports');
+});
+
+test('rate-limit backoff never waits past the time budget', async () => {
+  let t = 0;
+  const waits = [];
+  const { getJson } = pagesOf([row('A-1', 5)], new KalshiError(503, 'rate limited'));
+  const s = await top.scanKalshiTopMarkets({
+    getJson, getEvent, budgetMs: 5000, now: () => t, wait: async ms => { waits.push(ms); t += ms; },
+  });
+  assert.equal(s.stopReason, 'rate_limited');
+  assert.deepEqual(waits, [1000, 2000]); // a 4 s wait would end past the 5 s budget
+});
+
+test('cache layer: only complete scans are cached; a cold partial scan is still returned, labelled', async () => {
+  const cache = load('src/lib/kalshiTopCache.ts');
+  const full = { complete: true, stopReason: 'done', pages: 3 };
+  const part = { complete: false, stopReason: 'rate_limited', pages: 2 };
+  assert.equal(await cache.completeScanOrThrow(async () => full), full);
+  await assert.rejects(cache.completeScanOrThrow(async () => part), e => e instanceof cache.PartialKalshiScan && e.scan === part);
+  // cold cache: unstable_cache rethrows the partial-scan error to the caller, which shows it as partial
+  assert.equal(await cache.readKalshiTop(() => cache.completeScanOrThrow(async () => part)), part);
+  await assert.rejects(cache.readKalshiTop(async () => { throw new KalshiError(502, 'down'); }), { status: 502 });
+  const src = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'src/lib/kalshiTopCache.ts'), 'utf8');
+  assert.match(src, /unstable_cache\(\s*\(\) => completeScanOrThrow\(\)/);
 });

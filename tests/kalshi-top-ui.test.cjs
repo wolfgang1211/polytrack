@@ -136,11 +136,11 @@ test('one Kalshi view like Polymarket: no view tabs; legacy ?view= and ?series= 
     'next/link': { __esModule: true, default: Link },
     'next/navigation': { permanentRedirect: url => { redirects.push(url); throw new Error('REDIRECT'); } },
     '@/lib/markets': { fetchMarketsList: async () => [] },
-    '@/lib/kalshiTopCache': { getCachedKalshiTop: async () => scan() },
-    './MarketsClient': stub('poly'), './KalshiTopClient': stub('top'),
+    './MarketsClient': stub('poly'),
+    './KalshiTopSection': { __esModule: true, default: stub('top'), KalshiTopLoading: () => React.createElement('div', { 'data-stub': 'loading' }) },
   })('src/app/markets/page.tsx').default;
   const out = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ platform: 'kalshi' }) }));
-  assert.match(out, /data-stub="top"/);
+  assert.match(out, /data-stub="(top|loading)"/); // static render shows the Suspense fallback; the section streams in
   assert.match(out, /aria-label="Market data provider"/);
   assert.doesNotMatch(out, /Kalshi view|>Discover<|>Newest<|>Events</);
   for (const q of [{ view: 'discover' }, { view: 'events' }, { view: 'markets' }, { view: 'top' }, { series: 'KXFED' }]) {
@@ -202,4 +202,18 @@ test('Polymarket pool keeps the first-paint list when the sort changes (count do
   const client = fs.readFileSync(path.join(root, 'src/app/markets/MarketsClient.tsx'), 'utf8');
   assert.match(client, /for \(const list of \[markets, extra \?\? \[\], initialMarkets\]\)/);
   assert.match(client, /if \(pool\.length > markets\.length && sort !== 'newest'\)/);
+});
+
+test('Kalshi list streams behind Suspense: a cold scan shows a loading state at once instead of a dead click', async () => {
+  const src = fs.readFileSync(path.join(root, 'src/app/markets/page.tsx'), 'utf8');
+  assert.match(src, /<Suspense fallback=\{<KalshiTopLoading \/>\}>\s*<KalshiTopSection \/>\s*<\/Suspense>/);
+  const stubClient = { __esModule: true, default: props => React.createElement('div', { 'data-stub': 'client', 'data-error': props.error ?? '' }) };
+  const sec = makeLoader({ './KalshiTopClient': stubClient, '@/lib/kalshiTopCache': { getCachedKalshiTop: async () => scan() } })('src/app/markets/KalshiTopSection.tsx');
+  assert.match(renderToStaticMarkup(await sec.default()), /data-stub="client" data-error=""/);
+  const failing = makeLoader({ './KalshiTopClient': stubClient, '@/lib/kalshiTopCache': { getCachedKalshiTop: async () => { throw new Error('x'); } } })('src/app/markets/KalshiTopSection.tsx');
+  assert.match(renderToStaticMarkup(await failing.default()), /data-error="Kalshi markets could not be loaded right now\."/);
+  const loading = renderToStaticMarkup(React.createElement(sec.KalshiTopLoading));
+  assert.match(loading, /role="status"/);
+  assert.match(loading, /Loading Kalshi markets…/);
+  assert.match(loading, /can take up to a minute/);
 });

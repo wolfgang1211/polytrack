@@ -1,11 +1,9 @@
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import type { TopMarket } from '@/types';
 import { fetchMarketsList } from '@/lib/markets';
 import { permanentRedirect } from 'next/navigation';
 import MarketsClient from './MarketsClient';
-import KalshiTopClient from './KalshiTopClient';
-import { getCachedKalshiTop } from '@/lib/kalshiTopCache';
-import type { KalshiTopScan } from '@/lib/kalshiTop';
+import KalshiTopSection, { KalshiTopLoading } from './KalshiTopSection';
 import MarketPlatformSelect, { KALSHI_HREF, resolvePlatform } from './MarketPlatformSelect';
 
 /* Server component: fetches the default market list so crawlers and the
@@ -31,17 +29,12 @@ export default async function MarketsPage({ searchParams }: { searchParams: Prom
   if (platform === 'kalshi') {
     // One Kalshi view, in the same frame as Polymarket. The former Discover / Newest / Events list URLs land here.
     if (sp.view !== undefined || sp.series !== undefined) permanentRedirect(KALSHI_HREF);
-    let scan: KalshiTopScan | null = null;
-    let error: string | null = null;
-    try {
-      scan = await getCachedKalshiTop();
-    } catch {
-      error = 'Kalshi markets could not be loaded right now.';
-    }
     return (
       <div className="flex flex-col gap-6">
         <NavRow><MarketPlatformSelect active="kalshi" /></NavRow>
-        <KalshiTopClient scan={scan} error={error} serverNow={renderedAt()} />
+        <Suspense fallback={<KalshiTopLoading />}>
+          <KalshiTopSection />
+        </Suspense>
       </div>
     );
   }
