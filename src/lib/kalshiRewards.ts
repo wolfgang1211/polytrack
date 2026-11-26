@@ -45,6 +45,9 @@ export interface KalshiRewardFarm {
   riskAdjApr: number;
   yesBidSize: number;
   yesAskSize: number;
+  yesBid: number;
+  yesAsk: number;
+  mid: number;
   thin: boolean;                // est. APR ≥ THIN_APR: little or no competing size; never ranked above normal rows
 }
 
@@ -53,6 +56,10 @@ export interface KalshiMarketPool { ticker: string; title: string | null; series
 
 export const TOP_SERIES = 15;
 export const TOP_POOL_MARKETS = 15;
+export const OPPORTUNITY_CANDIDATES = 40;
+const MIN_HORIZON_DAYS = 3;
+/** 24h volume in dollars: contracts × mid (Kalshi publishes volume in contracts). */
+export const dollarVolume = (f: Pick<KalshiRewardFarm, 'volume24hContracts' | 'mid'>) => f.volume24hContracts * f.mid;
 
 export interface KalshiRewardsScan {
   farms: KalshiRewardFarm[];
@@ -66,6 +73,7 @@ export interface KalshiRewardsScan {
   snapshot: KalshiSnapshotRow[];  // compact rows for the history recorder: the 300 largest daily pools
   topSeries: KalshiSeriesPool[];  // series paying the most per day across all their markets
   topMarkets: KalshiMarketPool[]; // single markets with the largest daily pools
+  candidates: KalshiRewardFarm[]; // LP-opportunity candidates: top 40 by 24h $ volume, >= 3 days to close
   complete: boolean;            // false when some market batches could not be fetched
   receivedAt: string;
 }
@@ -182,6 +190,9 @@ export function buildFarm(p: Program, m: Record<string, unknown>, now: number): 
     riskAdjApr,
     yesBidSize,
     yesAskSize,
+    yesBid,
+    yesAsk,
+    mid,
     thin: estApr >= THIN_APR,
   };
 }
@@ -297,6 +308,8 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
     maxTicker: biggest?.ticker ?? null,
     topSeries,
     topMarkets,
+    candidates: farms.filter(f => f.daysToResolve == null || f.daysToResolve >= MIN_HORIZON_DAYS)
+      .sort((a, b) => dollarVolume(b) - dollarVolume(a)).slice(0, OPPORTUNITY_CANDIDATES),
     snapshot: [...farms].sort((a, b) => b.dailyRate - a.dailyRate).slice(0, KALSHI_SNAP_MARKETS).map(f => ({
       t: f.ticker, liq: Math.round(f.liquidity), sp: Math.round(f.spread * 1000) / 1000, r: Math.round(f.dailyRate * 100) / 100,
       v: Math.round(f.volume24hContracts), bs: Math.round(f.yesBidSize), as: Math.round(f.yesAskSize),

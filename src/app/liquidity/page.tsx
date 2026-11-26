@@ -11,7 +11,7 @@ import { marketUrl } from '@/lib/builder';
 import type { LPOpportunity } from '@/app/api/liquidity/opportunities/route';
 import type { MarketDepth } from '@/app/api/liquidity/depth/route';
 import type { PriceHistory } from '@/app/api/liquidity/price-history/route';
-import RewardFarmsCompare from './RewardFarmsCompare';
+import RewardFarmsCompare, { type Platform } from './RewardFarmsCompare';
 import FarmChanges from './FarmChanges';
 import Backtester from './Backtester';
 import RecorderHealth from './RecorderHealth';
@@ -39,8 +39,8 @@ type LPPeriod = typeof LP_PERIODS[number];
    1) LP OPPORTUNITIES
 ════════════════════════════════════════════════════════════════ */
 
-function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
-  const href = marketUrl(opp.eventSlug, opp.slug, 'liquidity_opportunities');
+function OpportunityCard({ opp, rank, internalHref }: { opp: LPOpportunity; rank: number; internalHref?: string }) {
+  const href = internalHref ?? marketUrl(opp.eventSlug, opp.slug, 'liquidity_opportunities');
   const sc   = opp.score;
 
   return (
@@ -191,15 +191,14 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
         </div>
         <a
           href={href}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(internalHref ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
           className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-ink transition-all hover:scale-[1.03] hover:brightness-110"
           style={{ background: 'var(--accent-grad-60)', border: '1px solid var(--accent-border-xl)' }}
         >
           <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Add Liquidity
+          {internalHref ? 'View market' : 'Add Liquidity'}
         </a>
       </div>
     </div>
@@ -208,7 +207,7 @@ function OpportunityCard({ opp, rank }: { opp: LPOpportunity; rank: number }) {
 
 const INITIAL_OPPORTUNITY_COUNT = 3;
 
-function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; loading: boolean }) {
+function LPOpportunitiesSection({ opps, loading, hrefFor, note }: { opps: LPOpportunity[]; loading: boolean; hrefFor?: (o: LPOpportunity) => string; note?: string }) {
   const [showAll, setShowAll] = useState(false);
   const visibleOpps = showAll ? opps : opps.slice(0, INITIAL_OPPORTUNITY_COUNT);
   const canExpand = opps.length > INITIAL_OPPORTUNITY_COUNT;
@@ -216,6 +215,7 @@ function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; load
   return (
     <section>
       <SectionHeader index="[03]" label="LP Opportunities" />
+      {note && <p className="-mt-2 mb-4 text-[11px] text-ink/55">{note}</p>}
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: INITIAL_OPPORTUNITY_COUNT }).map((_, i) => <div key={i} className="glass rounded-2xl h-52 animate-shimmer" />)}
@@ -223,7 +223,7 @@ function LPOpportunitiesSection({ opps, loading }: { opps: LPOpportunity[]; load
       ) : (
         <>
           <div id="lp-opportunity-grid" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {visibleOpps.map((o, i) => <OpportunityCard key={o.conditionId} opp={o} rank={i + 1} />)}
+            {visibleOpps.map((o, i) => <OpportunityCard key={o.conditionId} opp={o} rank={i + 1} internalHref={hrefFor?.(o)} />)}
           </div>
 
           {canExpand && (
@@ -1002,38 +1002,57 @@ function DataCell({ label, value, accent }: { label: string; value: string; acce
    PAGE
 ════════════════════════════════════════════════════════════════ */
 
+const OPP_ENDPOINT: Record<Platform, string> = {
+  polymarket: '/api/liquidity/opportunities',
+  kalshi: '/api/liquidity/kalshi/opportunities',
+};
+const kalshiHref = (o: LPOpportunity) => `/markets/kalshi/${encodeURIComponent(o.conditionId)}`;
+
 export default function LiquidityPage() {
-  const [opps, setOpps]     = useState<LPOpportunity[]>([]);
-  const [oppsLoading, setOppsLoading] = useState(true);
-  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
+  // One platform switch drives the header, Market Overview, LP Opportunities and Reward farms.
+  const [platform, setPlatform] = useState<Platform>('polymarket');
+  const [oppsBy, setOppsBy] = useState<Record<Platform, LPOpportunity[]>>({ polymarket: [], kalshi: [] });
+  const [loadingBy, setLoadingBy] = useState<Record<Platform, boolean>>({ polymarket: true, kalshi: true });
+  const [updatedBy, setUpdatedBy] = useState<Record<Platform, number | null>>({ polymarket: null, kalshi: null });
   // null until the first 1s tick — Date.now() during render is impure.
   const [now, setNow] = useState<number | null>(null);
+  const opps = oppsBy[platform];
+  const oppsLoading = loadingBy[platform];
+  const updatedAt = updatedBy[platform];
 
   // No sync setState here (react-hooks/set-state-in-effect): initial loading
   // starts true, and the manual Refresh button re-arms it in its handler.
-  const loadOpps = useCallback(() => {
-    fetch('/api/liquidity/opportunities')
+  const loadOpps = useCallback((p: Platform) => {
+    fetch(OPP_ENDPOINT[p])
       .then(r => r.json())
       .then(d => {
         // Supports both the new { opportunities, updatedAt } shape and a bare array.
         const list: LPOpportunity[] = Array.isArray(d) ? d : (d?.opportunities ?? []);
-        setOpps(list);
-        setUpdatedAt(d?.updatedAt ?? Date.now());
+        setOppsBy(cur => ({ ...cur, [p]: list }));
+        setUpdatedBy(cur => ({ ...cur, [p]: d?.updatedAt ?? Date.now() }));
       })
       .catch(() => {})
-      .finally(() => setOppsLoading(false));
+      .finally(() => setLoadingBy(cur => ({ ...cur, [p]: false })));
   }, []);
 
-  useEffect(() => { loadOpps(); }, [loadOpps]);
+  useEffect(() => { loadOpps('polymarket'); loadOpps('kalshi'); }, [loadOpps]);
 
   // Auto-refresh every 60s + tick a clock for the "updated Xs ago" label.
   useEffect(() => {
-    const refresh = setInterval(loadOpps, 60_000);
+    const refresh = setInterval(() => { loadOpps('polymarket'); loadOpps('kalshi'); }, 60_000);
     const tick = setInterval(() => setNow(Date.now()), 1_000);
     return () => { clearInterval(refresh); clearInterval(tick); };
   }, [loadOpps]);
 
   const agoSec = updatedAt != null && now != null ? Math.max(0, Math.floor((now - updatedAt) / 1000)) : null;
+  const isKalshi = platform === 'kalshi';
+  const switchTab = (p: Platform, label: string) => (
+    <button type="button" role="tab" aria-selected={platform === p} onClick={() => setPlatform(p)}
+      className={`inline-flex min-h-[44px] items-center rounded-lg px-3 text-xs font-semibold transition-colors ${platform === p ? 'text-ink' : 'text-ink/55 hover:text-ink/80'}`}
+      style={platform === p ? { background: 'var(--accent-fill)', border: '1px solid var(--accent-border-md)' } : { border: '1px solid transparent' }}>
+      {label}
+    </button>
+  );
 
   return (
     <div className="flex flex-col gap-8">
@@ -1046,9 +1065,15 @@ export default function LiquidityPage() {
           <span className="text-grad">Hub</span>
         </h1>
         <p className="text-sm text-ink/55 max-w-xl">
-          Discover LP opportunities, analyze market depth, and simulate maker rewards on Polymarket.
+          {isKalshi
+            ? 'Discover LP opportunities, read order book depth, and compare maker reward pools on Kalshi.'
+            : 'Discover LP opportunities, analyze market depth, and simulate maker rewards on Polymarket.'}
         </p>
-        <div className="mt-4 flex items-center gap-3">
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div role="tablist" aria-label="Liquidity data platform" className="flex gap-1 rounded-xl glass p-1">
+            {switchTab('polymarket', 'Polymarket')}
+            {switchTab('kalshi', 'Kalshi')}
+          </div>
           <span className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider"
             style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" />
@@ -1057,7 +1082,7 @@ export default function LiquidityPage() {
           <span className="text-[11px] text-ink/55">
             {agoSec == null ? 'Loading…' : agoSec < 5 ? 'Updated just now' : `Updated ${agoSec}s ago`}
           </span>
-          <button onClick={() => { setOppsLoading(true); loadOpps(); }}
+          <button onClick={() => { setLoadingBy(cur => ({ ...cur, [platform]: true })); loadOpps(platform); }}
             className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-ink/55 transition-colors hover:text-ink"
             style={{ background: 'rgba(var(--ink-rgb),0.05)', border: '1px solid rgba(var(--ink-rgb),0.08)' }}>
             <svg className={`h-3 w-3 ${oppsLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1082,20 +1107,37 @@ export default function LiquidityPage() {
           />
           <div className="w-px self-stretch flex-shrink-0" style={{ background: 'rgba(var(--ink-rgb),0.06)' }} />
           <DataCell
-            label="Total 24h Vol"
+            label={isKalshi ? 'Total 24h Vol (est.)' : 'Total 24h Vol'}
             value={oppsLoading ? '—' : formatCurrency(opps.reduce((s, o) => s + o.volume24h, 0), true)}
             accent="rgba(var(--ink-rgb),0.95)"
           />
         </div>
+        {isKalshi && (
+          <p className="mt-2 text-[10px] text-ink/55">
+            Kalshi reports volume in contracts; dollar volume here is contracts × mid price. Markets analyzed: the 40 rewarded
+            Kalshi markets with the most 24h volume and at least 3 days to close.
+          </p>
+        )}
       </div>
 
-      <LPOpportunitiesSection opps={opps} loading={oppsLoading} />
-      <RewardFarmsCompare />
+      {isKalshi ? (
+        <LPOpportunitiesSection key="kalshi" opps={opps} loading={oppsLoading} hrefFor={kalshiHref}
+          note="Same score, weights and risk rules as the Polymarket cards. Depth is the dollar size within 5¢ of the best price in Kalshi's live order book; liquidity is that depth on both sides." />
+      ) : (
+        <LPOpportunitiesSection key="polymarket" opps={opps} loading={oppsLoading} />
+      )}
+      <RewardFarmsCompare platform={platform} onPlatformChange={setPlatform} />
+      {isKalshi && (
+        <p className="rounded-xl px-4 py-3 text-xs text-ink/60" data-polymarket-only-note=""
+          style={{ background: 'rgba(var(--ink-rgb),0.03)', border: '1px solid rgba(var(--ink-rgb),0.07)' }}>
+          The sections below still use Polymarket data. Kalshi versions are on the way.
+        </p>
+      )}
       <FarmChanges />
-      <PriceHistorySection opps={opps} />
-      <LPCalculator opps={opps} />
-      <MarketDepthSection opps={opps} />
-      <RewardSimulator opps={opps} />
+      <PriceHistorySection opps={oppsBy.polymarket} />
+      <LPCalculator opps={oppsBy.polymarket} />
+      <MarketDepthSection opps={oppsBy.polymarket} />
+      <RewardSimulator opps={oppsBy.polymarket} />
       <Backtester />
       <RecorderHealth />
       <ModelValidation />

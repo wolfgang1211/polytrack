@@ -8,7 +8,7 @@ import { KalshiFarmsTable, KalshiPoolRankings, KalshiScoringFormula, useKalshiRe
 /* Reward farms for both venues: a side-by-side summary, then one platform's screener at a time.
    The Polymarket screener is rendered unchanged; Kalshi uses the same view, ranking and metrics. */
 
-type Platform = 'polymarket' | 'kalshi';
+export type Platform = 'polymarket' | 'kalshi';
 interface PolySummary { farms: { estApr: number }[] }
 interface PolyUniverse { totalDailyRewards: number; marketsWithRewards: number }
 
@@ -30,8 +30,10 @@ function Summary({ label, active, daily, markets, bestApr, loading, note }: {
   );
 }
 
-export default function RewardFarmsCompare() {
-  const [platform, setPlatform] = useState<Platform>('polymarket');
+export default function RewardFarmsCompare({ platform: controlled, onPlatformChange }: { platform?: Platform; onPlatformChange?: (p: Platform) => void } = {}) {
+  const [own, setOwn] = useState<Platform>('polymarket');
+  const platform = controlled ?? own;
+  const setPlatform = (p: Platform) => { setOwn(p); onPlatformChange?.(p); };
   const [poly, setPoly] = useState<PolySummary | null>(null);
   const [polyLoading, setPolyLoading] = useState(true);
   const [universe, setUniverse] = useState<PolyUniverse | null>(null);

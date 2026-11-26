@@ -184,7 +184,7 @@ test('Liquidity Hub: platform tabs with side-by-side summaries; Polymarket stays
   assert.match(h, /data-stub="poly"/);
   assert.doesNotMatch(h, /data-stub="kalshi"/);
   const page = fs.readFileSync(path.join(root, 'src/app/liquidity/page.tsx'), 'utf8');
-  assert.match(page, /<RewardFarmsCompare \/>/);
+  assert.match(page, /<RewardFarmsCompare platform=\{platform\}/);
 });
 
 test('rankings over every program: top series (with titles) and largest single-market pools; compact snapshot rows', async () => {
@@ -211,7 +211,7 @@ test('rankings over every program: top series (with titles) and largest single-m
 
 test('API strips the snapshot rows and records history only from complete scans; cron records Kalshi without failing Polymarket', () => {
   const route = fs.readFileSync(path.join(root, 'src/app/api/liquidity/kalshi/rewards/route.ts'), 'utf8');
-  assert.match(route, /const \{ snapshot, \.\.\.scan \} = await readKalshiRewards\(\)/);
+  assert.match(route, /const \{ snapshot, candidates: _candidates, \.\.\.scan \} = await readKalshiRewards\(\)/);
   assert.match(route, /if \(scan\.complete\) recordKalshiSnapshot/);
   const cron = fs.readFileSync(path.join(root, 'src/app/api/cron/lp-snapshot/route.ts'), 'utf8');
   assert.match(cron, /const wrote = await recordLpSnapshot\(farms, true\);[\s\S]*try \{[\s\S]*recordKalshiSnapshot/);
@@ -247,4 +247,47 @@ test('recorder status without KV is a clean disabled answer; the route returns c
   const route = fs.readFileSync(path.join(root, 'src/app/api/liquidity/kalshi/recorder-health/route.ts'), 'utf8');
   assert.match(route, /kalshiRecorderStatus\(\)/);
   assert.doesNotMatch(route, /markets:/);
+});
+
+test('Kalshi opportunity cards: depth within 5¢ from the live book, same score weights and risk rules as Polymarket', () => {
+  const op = load('src/lib/kalshiOpportunities.ts');
+  const { normalizeOrderbook } = load('src/lib/kalshi.ts');
+  const farm = kr.buildFarm(kr.parseProgram(prog('KXOPP', 1_000_000, { end_date: '2027-01-10T00:00:00Z' })), mkt('KXOPP', { volume_24h_fp: '10000.00', close_time: '2027-01-20T00:00:00Z' }), NOW);
+  const book = normalizeOrderbook({ orderbook_fp: { yes_dollars: [['0.4000', '100.00'], ['0.3600', '50.00'], ['0.3000', '999.00']], no_dollars: [['0.5800', '200.00'], ['0.5000', '999.00']] } });
+  const d = op.depthWithin5c(book);
+  assert.equal(d.bestBid, 0.4);
+  assert.equal(d.bestAsk, 0.42);
+  assert.ok(Math.abs(d.bidDepth - (0.4 * 100 + 0.36 * 50)) < 1e-9);  // 0.30 is > 5¢ away
+  assert.ok(Math.abs(d.askDepth - 0.42 * 200) < 1e-9);               // implied ask 0.50 is > 5¢ away
+  const o = op.buildKalshiOpportunity(farm, book);
+  assert.equal(o.conditionId, 'KXOPP');
+  assert.equal(o.depthKnown, true);
+  assert.ok(Math.abs(o.volume24h - 10000 * 0.41) < 1e-9);
+  assert.equal(o.scoreBreakdown.rewards, Math.round(25 * Math.min(1, farm.dailyRate / 100)));
+  assert.equal(o.scoreBreakdown.spread, Math.round(15 * 0.02 / 0.05));
+  assert.equal(o.score, Object.values(o.scoreBreakdown).reduce((a, b) => a + b, 0));
+  assert.equal(o.risk, 'Low');
+  assert.equal(o.estDailyReward, farm.estDailyReward);
+  const noBook = op.buildKalshiOpportunity(farm, null);
+  assert.equal(noBook.depthKnown, false);
+  assert.equal(noBook.bidDepth, null);
+  // weights copied from the Polymarket route
+  const poly = fs.readFileSync(path.join(root, 'src/app/api/liquidity/opportunities/route.ts'), 'utf8');
+  const kal = fs.readFileSync(path.join(root, 'src/lib/kalshiOpportunities.ts'), 'utf8');
+  for (const w of ['25 * Math.min(1, ', '20 * Math.min(1, Math.log10(Math.max(1, vol24h)) / 7)', '15 * Math.min(1, spread / 0.05)', '15 * (1 - Math.min(1, spreadVol / 30))', '10 * (1 - Math.min(1, Math.abs(mid - 0.5) * 2))']) {
+    assert.ok(poly.includes(w) && kal.includes(w), w);
+  }
+});
+
+test('Liquidity Hub: one platform switch drives header, overview, cards and reward farms; Polymarket-only sections are labelled', () => {
+  const page = fs.readFileSync(path.join(root, 'src/app/liquidity/page.tsx'), 'utf8');
+  assert.match(page, /role="tablist" aria-label="Liquidity data platform"/);
+  assert.match(page, /kalshi: '\/api\/liquidity\/kalshi\/opportunities'/);
+  assert.match(page, /polymarket: '\/api\/liquidity\/opportunities'/);
+  assert.match(page, /<RewardFarmsCompare platform=\{platform\} onPlatformChange=\{setPlatform\} \/>/);
+  assert.match(page, /The sections below still use Polymarket data/);
+  assert.match(page, /<PriceHistorySection opps=\{oppsBy\.polymarket\} \/>/);
+  assert.match(page, /Total 24h Vol \(est\.\)/);
+  const scan = load('src/lib/kalshiRewards.ts');
+  assert.equal(scan.OPPORTUNITY_CANDIDATES, 40);
 });
