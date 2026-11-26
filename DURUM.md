@@ -1,6 +1,6 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-26T01:45+03:00
+- Güncelleme: 2026-11-26T16:10+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
@@ -150,6 +150,13 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Test 500/500, tsc 0, lint 0 hata/24 uyarı, diff-check temiz. Preview `dpl_Gd6teB8Ykw2JetyHer7JLyZbADnM` READY.
 - Gerçek tarayıcı (önizleme): soğuk önbellekte tıklamadan 2 s sonra yükleme durumu, 63 s'de 60 kart + "Full scan"; sıcak önbellekte ikinci tıklama ~3 s; konsol hatası 0.
 - Production `dpl_GKDtVan9NqWKB56AqE59obtRvsQB` READY. Önbellek ısıtıldı: sayfa yükleme durumu hemen göründü, API tam tarama 49,6 s (183 sayfa, done); sayfada 60 kart + "Full scan".
+
+## Kalshi likidite bölümü — 1. dilim (2026-11-26 16:10, branch `cowork/kalshi-liquidity`, ONAY BEKLİYOR)
+- Kaynak doğrulandı: `GET /incentive_programs?status=active&type=liquidity&limit=10000` anahtarsız; 7.023 aktif program, her biri tek market; `period_reward` centi-cent/dönem (40–1.000 $), dönem 1 veya 7 gün; Target Size 1.000 kontrat, Discount Factor 0,50. Toplam ~135,6K $/gün. `GET /markets?tickers=` (100'lük gruplar) fiyat/miktar/24s değişim veriyor.
+- Commit `d165aa3` + `a889bd3` + düzeltme: `/api/liquidity/kalshi/rewards` (5 dk önbellek, yalnız tam tarama) + Liquidity Hub'da "Reward farms" platform sekmeleri (Polymarket varsayılan, değişmeden) + yan yana özet (günlük havuz, market sayısı, en yüksek tahmini APR) + Kalshi tablosu (aynı 7 kolon, aynı risk-ayarlı APR sıralaması, New/Ends soon, stabilite, crowding, ilk 10 / tümü 30).
+- Tahmin: 1K $ iki tarafa bölünür, her tarafta en fazla Target Size puanlanır, rakip boyut = max(Target Size, en iyi fiyattaki miktar).
+- Test 508/508, tsc 0, lint 0 hata/24 uyarı. Preview gerçek veri: tarama 17 s, 6.121/7.023 market fiyatlandı, tam; sekme geçişi çalışıyor, konsol hatası 0.
+- Kalan dilimler ve süreleri Yusuf'a raporlandı (fırsat kartları, derinlik, fiyat geçmişi, hesaplayıcı, simülatör, havuz değişimleri, kayıt/backtest). Yapılamayan: LP leaderboard ve Model Validation (Kalshi kullanıcı/fill verisi herkese açık değil).
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.

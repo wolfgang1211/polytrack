@@ -16,12 +16,12 @@ function Summary({ label, active, daily, markets, bestApr, loading }: {
 }) {
   const v = (x: string | null) => (loading ? '…' : x ?? '—');
   return (
-    <div className="flex-1 min-w-[220px] rounded-2xl p-4" data-platform-summary={label}
+    <div className="flex-1 min-w-[240px] rounded-2xl p-4" data-platform-summary={label}
       style={{ background: active ? 'var(--accent-fill)' : 'rgba(var(--ink-rgb),0.02)', border: `1px solid ${active ? 'var(--accent-border-md)' : 'rgba(var(--ink-rgb),0.07)'}` }}>
       <p className="mb-2 text-[10px] font-black uppercase tracking-widest text-ink/60">{label}</p>
-      <dl className="grid grid-cols-3 gap-2">
+      <dl className="flex flex-wrap gap-x-5 gap-y-2">
         <div><dt className="text-[10px] text-ink/55">Daily pools</dt><dd className="text-sm font-black tabular-nums text-ink">{v(daily != null ? `${formatCurrency(daily, true)}/d` : null)}</dd></div>
-        <div><dt className="text-[10px] text-ink/55">Markets</dt><dd className="text-sm font-black tabular-nums text-ink">{v(markets != null ? markets.toLocaleString() : null)}</dd></div>
+        <div><dt className="text-[10px] text-ink/55">Markets</dt><dd className="text-sm font-black tabular-nums text-ink">{v(markets != null ? markets.toLocaleString('en-US') : null)}</dd></div>
         <div><dt className="text-[10px] text-ink/55">Top est. APR</dt><dd className="text-sm font-black tabular-nums text-ink">{v(bestApr != null ? (bestApr >= 1000 ? '>999%' : `${bestApr.toFixed(0)}%`) : null)}</dd></div>
       </dl>
     </div>

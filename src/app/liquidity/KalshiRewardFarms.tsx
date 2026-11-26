@@ -29,7 +29,7 @@ export function KalshiFarmsTable({ data, loading }: { data: KalshiRewardsScan | 
         {data && (
           <span className="ml-auto rounded-full px-3 py-1 text-[11px] font-bold"
             style={{ background: 'rgba(52,211,153,0.08)', border: '1px solid rgba(52,211,153,0.2)', color: '#34d399' }}>
-            {formatCurrency(data.totalDailyRewards, true)}/day across {data.marketsWithRewards.toLocaleString()} markets
+            {formatCurrency(data.totalDailyRewards, true)}/day across {data.marketsWithRewards.toLocaleString('en-US')} markets
           </span>
         )}
       </div>
@@ -79,7 +79,7 @@ export function KalshiFarmsTable({ data, loading }: { data: KalshiRewardsScan | 
             </div>
             <span className="self-center text-right text-xs font-black text-emerald-400 tabular-nums">{formatCurrency(f.dailyRate, true)}/d</span>
             <span className="self-center text-right text-xs text-ink/55 tabular-nums">{f.discountFactor != null ? f.discountFactor.toFixed(2) : '—'}</span>
-            <span className="self-center text-right text-xs text-ink/55 tabular-nums">{f.targetSize != null ? f.targetSize.toLocaleString() : '—'}</span>
+            <span className="self-center text-right text-xs text-ink/55 tabular-nums">{f.targetSize != null ? f.targetSize.toLocaleString('en-US') : '—'}</span>
             <span className="self-center text-right text-xs text-ink/55 tabular-nums">{formatCurrency(f.liquidity, true)}</span>
             <span className="self-center text-right">
               <span className="rounded-full px-2 py-0.5 text-[10px] font-bold"
