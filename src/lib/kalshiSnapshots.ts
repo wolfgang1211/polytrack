@@ -2,7 +2,7 @@
    largest daily pools (compact rows), every 30 minutes, about a week deep: enough for vacancy, pool-change and
    backtest views later without storing all ~7,000 programs every time. Opportunistic (piggybacks on the Kalshi
    rewards API) plus the existing lp-snapshot cron/pinger. Graceful no-op without KV. */
-import { kvEnabled, kvGet, kvSet, kvLPush, kvLTrim, kvLRange } from '@/lib/kv';
+import { kvEnabled, kvGet, kvSet, kvLPush, kvLTrim, kvLRange, kvLLen } from '@/lib/kv';
 
 export const KALSHI_SNAP_KEY = 'kalshi:lp:snapshots';
 const LOCK_KEY = 'kalshi:lp:snapshots:lock';
@@ -45,4 +45,15 @@ export async function readKalshiSnapshots(limit = 100): Promise<KalshiSnapshot[]
     if (raw.length < stop - start + 1) break;
   }
   return out;
+}
+
+export interface KalshiRecorderStatus { enabled: boolean; snapshots: number; newestTs: number | null; oldestTs: number | null; newestMarkets: number | null; newestPrograms: number | null }
+
+/** Count + newest/oldest timestamps only (two tiny reads), for checking that the recorder is writing. */
+export async function kalshiRecorderStatus(): Promise<KalshiRecorderStatus> {
+  if (!kvEnabled) return { enabled: false, snapshots: 0, newestTs: null, oldestTs: null, newestMarkets: null, newestPrograms: null };
+  const [len, newest, oldest] = await Promise.all([kvLLen(KALSHI_SNAP_KEY), kvLRange(KALSHI_SNAP_KEY, 0, 0), kvLRange(KALSHI_SNAP_KEY, -1, -1)]);
+  const parse = (r: string[] | null) => { try { return r && r[0] ? (JSON.parse(r[0]) as KalshiSnapshot) : null; } catch { return null; } };
+  const n = parse(newest), o = parse(oldest);
+  return { enabled: true, snapshots: len ?? 0, newestTs: n?.ts ?? null, oldestTs: o?.ts ?? null, newestMarkets: n?.markets.length ?? null, newestPrograms: n?.programs ?? null };
 }

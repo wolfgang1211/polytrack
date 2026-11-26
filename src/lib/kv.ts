@@ -28,3 +28,4 @@ export const kvSet = (key: string, value: string, ttlSec?: number) =>
 export const kvLPush = (key: string, value: string) => cmd<number>(['LPUSH', key, value]);
 export const kvLTrim = (key: string, start: number, stop: number) => cmd(['LTRIM', key, start, stop]);
 export const kvLRange = (key: string, start: number, stop: number) => cmd<string[]>(['LRANGE', key, start, stop]);
+export const kvLLen = (key: string) => cmd<number>(['LLEN', key]);

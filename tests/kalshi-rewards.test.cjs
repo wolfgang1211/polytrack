@@ -240,3 +240,11 @@ test('Kalshi tab shows pool rankings and the published scoring rule with sources
   assert.match(f, /href="https:\/\/help\.kalshi\.com\/en\/articles\/13823851-liquidity-incentive-program"/);
   assert.match(f, /href="https:\/\/kalshi\.com\/incentives"/);
 });
+
+test('recorder status without KV is a clean disabled answer; the route returns counts and timestamps only', async () => {
+  const snaps = load('src/lib/kalshiSnapshots.ts');
+  assert.deepEqual(await snaps.kalshiRecorderStatus(), { enabled: false, snapshots: 0, newestTs: null, oldestTs: null, newestMarkets: null, newestPrograms: null });
+  const route = fs.readFileSync(path.join(root, 'src/app/api/liquidity/kalshi/recorder-health/route.ts'), 'utf8');
+  assert.match(route, /kalshiRecorderStatus\(\)/);
+  assert.doesNotMatch(route, /markets:/);
+});
