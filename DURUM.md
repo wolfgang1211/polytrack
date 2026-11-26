@@ -1,6 +1,6 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-26T16:45+03:00
+- Güncelleme: 2026-11-26T17:40+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
@@ -164,6 +164,11 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Canlı doğrulama: Polymarket 8.909 market / 137.650 $/gün, medyan 3 $/gün, en büyük 960 $/gün (Ornn H200 Aralık 2026 > 6 $); Kalshi 7.023 market / 135.619 $/gün, medyan 14,29 $/gün, en büyük 142,86 $/gün (Onion Futures Act); ince market 54.
 - ONAY BEKLİYOR: branch `cowork/kalshi-liquidity` `1b60009` — Kalshi sekmesinde "Top series by daily pools", "Largest single-market pools" ve resmi puanlama formülü (12–13 alternatifleri). Preview doğrulandı, konsol hatası 0. Test 513/513, tsc 0, lint 0 hata/24 uyarı.
 - Sıradaki dilim (onaylı): 3–4–5 (başlık, Market Overview, fırsat kartları) Kalshi karşılığı.
+
+## YAYIN: Kalshi sıralamaları + formül + kayıt doğrulaması (2026-11-26 17:40)
+- main `00485a3` (prod `dpl_67ceSmaA5sKqzqShppKbR3zNoZjj`, Yusuf onayı): Kalshi sekmesinde "Top series by daily pools", "Largest single-market pools", resmi puanlama formülü; `/api/liquidity/kalshi/recorder-health` (yalnız kayıt sayısı + ilk/son zaman; KV anahtarı kullanılmadan sunucu tarafında okunur).
+- Kayıt doğrulaması (canlı uç noktadan): 16:30:55 → 1 kayıt; 17:00:51 → 2; 17:30:42 → 3 (İstanbul). Her kayıt 300 market; program sayısı 7.023 → 7.022 → 7.021. Aralık 30 dk, beklendiği gibi.
+- ONAY BEKLİYOR: branch `cowork/kalshi-liquidity` `cd4c154` — 3–4–5 dilimi: tek "Polymarket | Kalshi" anahtarı başlık metni, Market Overview, LP fırsat kartları ve Reward farms'ı birlikte değiştiriyor; `/api/liquidity/kalshi/opportunities` (40 aday: en yüksek 24s $ hacim, ≥3 gün; canlı emir defteri, 5¢ içindeki derinlik; Polymarket ağırlıkları ve risk kuralları). Kalshi seçiliyken alttaki bölümlerde "hâlâ Polymarket verisi" notu. Test 516/516, tsc 0, lint 0 hata/24 uyarı; preview gerçek veriyle çalıştı (ilk kart "Jumanji: Open World Rotten Tomatoes score?", skor 80), konsolda yalnız önizleme alan adındaki Clarity CORS hatası.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.
