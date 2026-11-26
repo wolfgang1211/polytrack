@@ -51,6 +51,9 @@ export interface KalshiRewardsScan {
   marketsWithRewards: number;   // active liquidity programs (one per market)
   scanned: number;              // programs whose market had a usable two-sided quote
   thinMarkets: number;          // priced markets flagged thin (est. APR ≥ 1,000%)
+  medianDailyRate: number;      // over every active program
+  maxDailyRate: number;
+  maxTicker: string | null;
   complete: boolean;            // false when some market batches could not be fetched
   receivedAt: string;
 }
@@ -207,7 +210,10 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
     if (!prev || p.periodReward > prev.periodReward) byTicker.set(p.ticker, p);
   }
   const programs = [...byTicker.values()];
-  const totalDailyRewards = programs.reduce((s, p) => s + p.periodReward / Math.max((Date.parse(p.end) - Date.parse(p.start)) / DAY_MS, 1 / 24), 0);
+  const dailyOf = (p: Program) => p.periodReward / Math.max((Date.parse(p.end) - Date.parse(p.start)) / DAY_MS, 1 / 24);
+  const totalDailyRewards = programs.reduce((s, p) => s + dailyOf(p), 0);
+  const rates = programs.map(dailyOf).sort((a, b) => a - b);
+  const biggest = programs.reduce<Program | null>((b, p) => (!b || dailyOf(p) > dailyOf(b) ? p : b), null);
 
   const batches: string[][] = [];
   for (let i = 0; i < programs.length; i += TICKER_BATCH) batches.push(programs.slice(i, i + TICKER_BATCH).map(p => p.ticker));
@@ -241,6 +247,9 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
   return {
     farms: [...ranked, ...thin],
     thinMarkets: farms.filter(f => f.thin).length,
+    medianDailyRate: rates.length ? rates[Math.floor(rates.length / 2)] : 0,
+    maxDailyRate: biggest ? dailyOf(biggest) : 0,
+    maxTicker: biggest?.ticker ?? null,
     totalDailyRewards,
     marketsWithRewards: programs.length,
     scanned: farms.length,

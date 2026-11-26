@@ -86,6 +86,9 @@ test('scan: one request for programs, tickers batched by 100, highest program pe
   const ranked = s.farms.slice(0, kr.TOP_FARMS);
   for (let i = 1; i < ranked.length; i++) assert.ok(ranked[i - 1].riskAdjApr >= ranked[i].riskAdjApr);
   assert.ok(Math.abs(s.totalDailyRewards - (200 + 500 + 150 * 40) / 7) < 1e-6);
+  assert.equal(s.maxTicker, 'B');
+  assert.ok(Math.abs(s.maxDailyRate - 500 / 7) < 1e-9);
+  assert.ok(Math.abs(s.medianDailyRate - 40 / 7) < 1e-9);
 });
 
 test('scan: a failed market batch makes the scan partial; all failing or malformed programs is a 502', async () => {
