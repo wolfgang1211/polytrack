@@ -40,8 +40,8 @@ test('farm metrics: daily pool = period reward / days; $1K split across both bes
   assert.ok(Math.abs(f.dailyRate - 100 / 7) < 1e-9);
   assert.ok(Math.abs(f.spread - 0.02) < 1e-9);
   assert.ok(Math.abs(f.liquidity - (200 * 0.4 + 300 * 0.58)) < 1e-9);
-  // Yes: 500/0.40 = 1250 contracts vs max(1000,200); No: 500/0.58 ≈ 862 vs max(1000,300)
-  const yes = 1250 / (1000 + 1250), no = (500 / 0.58) / (1000 + 500 / 0.58);
+  // Yes: 500/0.40 = 1250 contracts, scored up to the 1000 Target Size, vs max(1000,200); No: 500/0.58 ≈ 862 vs max(1000,300)
+  const yes = 1000 / (1000 + 1000), no = (500 / 0.58) / (1000 + 500 / 0.58);
   assert.ok(Math.abs(f.estDailyReward - f.dailyRate * (yes + no) / 2) < 1e-9);
   assert.ok(Math.abs(f.estApr - f.estDailyReward * 365 / 1000 * 100) < 1e-9);
   assert.equal(f.stability, 'B'); // 0.01 move on a 0.41 mid = 2.4%
@@ -54,6 +54,12 @@ test('farm metrics: daily pool = period reward / days; $1K split across both bes
   assert.equal(kr.buildFarm(kr.parseProgram(prog('A', 1)), mkt('A', { market_type: 'scalar' }), NOW), null);
   assert.equal(kr.buildFarm(kr.parseProgram(prog('A', 1)), mkt('A', { yes_bid_dollars: '0.0000' }), NOW), null);
   assert.equal(kr.buildFarm(kr.parseProgram(prog('A', 1)), mkt('A', { status: 'closed' }), NOW), null);
+});
+
+test('a side never scores more than Target Size: at most half the pool per side against a full book', () => {
+  assert.equal(kr.sideShare(50_000, 1000, 10), 0.5);
+  assert.equal(kr.sideShare(500, 1000, 3000), 500 / 3500);
+  assert.equal(kr.sideShare(0, 1000, 0), 0);
 });
 
 test('scan: one request for programs, tickers batched by 100, highest program per market, ranked by risk-adjusted APR', async () => {

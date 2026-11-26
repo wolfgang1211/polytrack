@@ -110,7 +110,7 @@ export function KalshiFarmsTable({ data, loading }: { data: KalshiRewardsScan | 
 
       <p className="mt-2 text-[10px] text-ink/55">
         * Ranked by risk-adjusted APR (APR × stability grade), the same rule as the Polymarket list. Est. APR assumes $1K
-        split across both sides at the best bids (Yes and No), earning a pro-rata share of each side&apos;s pool against
+        split across both sides at the best bids (Yes and No), scored up to the Target Size per side, earning a pro-rata share of each side&apos;s pool against
         the larger of the Target Size and the size already at the best price. Liquidity is the dollar size resting at the
         best Yes and No bids. Kalshi scores resting orders every second and discounts orders away from the reference
         price by the Discount Factor per tick, so actual payouts depend on uptime, price placement and competition.

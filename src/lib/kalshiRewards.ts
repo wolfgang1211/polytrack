@@ -84,12 +84,15 @@ export function parseProgram(raw: unknown): Program | null {
   };
 }
 
-/** Share of one side's pool for `contracts` resting at the reference price, when the book already fills
-    max(Target Size, size at best) — the cap Kalshi scores up to. */
+/** Share of one side's pool for `contracts` resting at the reference price, against competing size of
+    max(Target Size, size already at the best bid) — a floor, like the Polymarket screener's $10K. */
 export function sideShare(contracts: number, targetSize: number | null, sizeAtBest: number): number {
   if (!(contracts > 0)) return 0;
+  // Scoring counts at most Target Size per side, so size beyond it earns nothing extra (cheap 1¢ contracts would
+  // otherwise look like a near-total share).
+  const scored = targetSize ? Math.min(contracts, targetSize) : contracts;
   const competing = Math.max(targetSize ?? 0, sizeAtBest, 0);
-  return contracts / (competing + contracts);
+  return scored / (competing + scored);
 }
 
 /** $1K split evenly: half buys Yes at the best Yes bid, half buys No at the best No bid (1 − yes ask). */
