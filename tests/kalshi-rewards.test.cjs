@@ -186,3 +186,57 @@ test('Liquidity Hub: platform tabs with side-by-side summaries; Polymarket stays
   const page = fs.readFileSync(path.join(root, 'src/app/liquidity/page.tsx'), 'utf8');
   assert.match(page, /<RewardFarmsCompare \/>/);
 });
+
+test('rankings over every program: top series (with titles) and largest single-market pools; compact snapshot rows', async () => {
+  const programs = [
+    ...Array.from({ length: 5 }, (_, i) => ({ ...prog(`RT${i}`, 1_000_000), series_ticker: 'KXRT' })),
+    { ...prog('BIG', 10_000_000, { start_date: '2026-11-26T00:00:00Z', end_date: '2026-11-27T00:00:00Z' }), series_ticker: 'KXBIG' },
+  ];
+  const getJson = async (p, q) => {
+    if (p === '/incentive_programs') return { incentive_programs: programs };
+    if (p.startsWith('/series/')) return { series: { title: p === '/series/KXRT' ? 'Rotten Tomatoes score' : 'Big one' } };
+    return { markets: q.tickers.split(',').map(t => mkt(t)) };
+  };
+  const s = await kr.scanKalshiRewardFarms({ getJson, wait: async () => {}, now: () => NOW });
+  assert.deepEqual(s.topMarkets.map(m => m.ticker)[0], 'BIG');
+  assert.equal(s.topMarkets[0].dailyRate, 1000);
+  assert.deepEqual(s.topSeries.map(x => [x.seriesTicker, x.title, x.markets]), [['KXBIG', 'Big one', 1], ['KXRT', 'Rotten Tomatoes score', 5]]);
+  assert.equal(s.topSeries[1].exampleTitle, 'Synthetic RT0');
+  assert.equal(s.snapshot[0].t, 'BIG');
+  assert.deepEqual(Object.keys(s.snapshot[0]).sort(), ['as', 'bs', 'liq', 'r', 'sp', 't', 'v']);
+  // a failing series lookup only drops the title
+  const s2 = await kr.scanKalshiRewardFarms({ getJson: async (p, q) => (p.startsWith('/series/') ? Promise.reject(new Error('x')) : getJson(p, q)), wait: async () => {}, now: () => NOW });
+  assert.equal(s2.topSeries[0].title, null);
+});
+
+test('API strips the snapshot rows and records history only from complete scans; cron records Kalshi without failing Polymarket', () => {
+  const route = fs.readFileSync(path.join(root, 'src/app/api/liquidity/kalshi/rewards/route.ts'), 'utf8');
+  assert.match(route, /const \{ snapshot, \.\.\.scan \} = await readKalshiRewards\(\)/);
+  assert.match(route, /if \(scan\.complete\) recordKalshiSnapshot/);
+  const cron = fs.readFileSync(path.join(root, 'src/app/api/cron/lp-snapshot/route.ts'), 'utf8');
+  assert.match(cron, /const wrote = await recordLpSnapshot\(farms, true\);[\s\S]*try \{[\s\S]*recordKalshiSnapshot/);
+  const snaps = load('src/lib/kalshiSnapshots.ts');
+  assert.equal(snaps.KALSHI_SNAP_INTERVAL_SEC, 1800);
+  assert.equal(snaps.KALSHI_SNAP_MARKETS, 300);
+  assert.ok(snaps.KALSHI_SNAP_MAX * snaps.KALSHI_SNAP_INTERVAL_SEC >= 7 * 86400);
+});
+
+test('Kalshi tab shows pool rankings and the published scoring rule with sources', () => {
+  const ui = makeLoader({ 'next/link': { __esModule: true, default: Link } })('src/app/liquidity/KalshiRewardFarms.tsx');
+  const data = {
+    farms: [], totalDailyRewards: 1, marketsWithRewards: 7023, scanned: 0, complete: true, receivedAt: '', thinMarkets: 0,
+    topSeries: [{ seriesTicker: 'KXRT', title: 'Rotten Tomatoes score', dailyRate: 12805, markets: 128, exampleTicker: 'KXRT-1', exampleTitle: 'Movie A score?' }],
+    topMarkets: [{ ticker: 'KXONIONACT-1', title: 'Will the Onion Futures Act be repealed before Jan 1, 2029?', seriesTicker: 'KXONIONACT', dailyRate: 142.86, periodReward: 1000, periodDays: 7 }],
+  };
+  const r = renderToStaticMarkup(React.createElement(ui.KalshiPoolRankings, { data }));
+  assert.match(r, /Top series by daily pools/);
+  assert.match(r, /Rotten Tomatoes score/);
+  assert.match(r, /128 markets/);
+  assert.match(r, /href="\/markets\/kalshi\/KXONIONACT-1"/);
+  assert.match(r, /\/7d/);
+  assert.match(r, /no maker leaderboard here/);
+  const f = renderToStaticMarkup(React.createElement(ui.KalshiScoringFormula));
+  assert.match(f, /order score  = size × DiscountFactor \^ ticks_from_reference/);
+  assert.match(f, /href="https:\/\/help\.kalshi\.com\/en\/articles\/13823851-liquidity-incentive-program"/);
+  assert.match(f, /href="https:\/\/kalshi\.com\/incentives"/);
+});

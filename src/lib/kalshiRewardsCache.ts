@@ -14,7 +14,7 @@ export async function completeOrThrow(scan: () => Promise<KalshiRewardsScan> = s
   return result;
 }
 
-const cached = unstable_cache(() => completeOrThrow(), ['kalshi-rewards-v4'], { revalidate: 300, tags: ['kalshi-rewards'] });
+const cached = unstable_cache(() => completeOrThrow(), ['kalshi-rewards-v5'], { revalidate: 300, tags: ['kalshi-rewards'] });
 
 export async function readKalshiRewards(get: () => Promise<KalshiRewardsScan> = cached): Promise<KalshiRewardsScan> {
   try { return await get(); } catch (e) {

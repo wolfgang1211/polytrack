@@ -4,6 +4,7 @@
    Markets: GET /markets?tickers=… (public) for title, quotes, sizes, 24h price change and close time.
    Every figure here is either a program number or derived from public quotes; estimates are labelled as such. */
 import { getKalshiJson, KalshiError } from '@/lib/kalshi';
+import { KALSHI_SNAP_MARKETS, type KalshiSnapshotRow } from '@/lib/kalshiSnapshots';
 
 type JsonGetter = (path: string, query?: Record<string, string>) => Promise<unknown>;
 
@@ -42,8 +43,16 @@ export interface KalshiRewardFarm {
   priceVol: number;
   stability: 'A' | 'B' | 'C' | 'D';
   riskAdjApr: number;
+  yesBidSize: number;
+  yesAskSize: number;
   thin: boolean;                // est. APR ≥ THIN_APR: little or no competing size; never ranked above normal rows
 }
+
+export interface KalshiSeriesPool { seriesTicker: string; title: string | null; dailyRate: number; markets: number; exampleTicker: string; exampleTitle: string | null }
+export interface KalshiMarketPool { ticker: string; title: string | null; seriesTicker: string; dailyRate: number; periodReward: number; periodDays: number }
+
+export const TOP_SERIES = 15;
+export const TOP_POOL_MARKETS = 15;
 
 export interface KalshiRewardsScan {
   farms: KalshiRewardFarm[];
@@ -54,6 +63,9 @@ export interface KalshiRewardsScan {
   medianDailyRate: number;      // over every active program
   maxDailyRate: number;
   maxTicker: string | null;
+  snapshot: KalshiSnapshotRow[];  // compact rows for the history recorder: the 300 largest daily pools
+  topSeries: KalshiSeriesPool[];  // series paying the most per day across all their markets
+  topMarkets: KalshiMarketPool[]; // single markets with the largest daily pools
   complete: boolean;            // false when some market batches could not be fetched
   receivedAt: string;
 }
@@ -168,6 +180,8 @@ export function buildFarm(p: Program, m: Record<string, unknown>, now: number): 
     priceVol,
     stability,
     riskAdjApr,
+    yesBidSize,
+    yesAskSize,
     thin: estApr >= THIN_APR,
   };
 }
@@ -234,6 +248,37 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
   await Promise.all(Array.from({ length: Math.min(MARKET_CONCURRENCY, batches.length) }, worker));
   if (batches.length > 0 && failed === batches.length) throw new KalshiError(502, 'Kalshi market data unavailable');
 
+  // Rankings over EVERY program (priced or not): which series and markets pay the most per day.
+  const periodDaysOf = (p: Program) => Math.max((Date.parse(p.end) - Date.parse(p.start)) / DAY_MS, 1 / 24);
+  const titleOf = (t: string) => { const m = markets.get(t); return m && typeof m.title === 'string' && m.title ? m.title : null; };
+  const topMarkets: KalshiMarketPool[] = [...programs].sort((a, b) => dailyOf(b) - dailyOf(a)).slice(0, TOP_POOL_MARKETS)
+    .map(p => ({ ticker: p.ticker, title: titleOf(p.ticker), seriesTicker: p.seriesTicker, dailyRate: dailyOf(p), periodReward: p.periodReward, periodDays: periodDaysOf(p) }));
+  const bySeries = new Map<string, { daily: number; markets: number; best: Program }>();
+  for (const p of programs) {
+    const key = p.seriesTicker || p.eventTicker || p.ticker;
+    const cur = bySeries.get(key);
+    if (!cur) bySeries.set(key, { daily: dailyOf(p), markets: 1, best: p });
+    else { cur.daily += dailyOf(p); cur.markets++; if (dailyOf(p) > dailyOf(cur.best)) cur.best = p; }
+  }
+  const seriesRanked = [...bySeries.entries()].sort((a, b) => b[1].daily - a[1].daily).slice(0, TOP_SERIES);
+  const seriesTitles = new Map<string, string>();
+  let si = 0;
+  const seriesWorker = async () => {
+    while (si < seriesRanked.length) {
+      const key = seriesRanked[si++][0];
+      try {
+        const body = await getJson(`/series/${encodeURIComponent(key)}`);
+        const title = isObj(body) && isObj(body.series) && typeof body.series.title === 'string' ? body.series.title : null;
+        if (title) seriesTitles.set(key, title);
+      } catch { /* a title is optional */ }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(3, seriesRanked.length) }, seriesWorker));
+  const topSeries: KalshiSeriesPool[] = seriesRanked.map(([key, v]) => ({
+    seriesTicker: key, title: seriesTitles.get(key) ?? null, dailyRate: v.daily, markets: v.markets,
+    exampleTicker: v.best.ticker, exampleTitle: titleOf(v.best.ticker),
+  }));
+
   const farms: KalshiRewardFarm[] = [];
   for (const p of programs) {
     const m = markets.get(p.ticker);
@@ -250,6 +295,12 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
     medianDailyRate: rates.length ? rates[Math.floor(rates.length / 2)] : 0,
     maxDailyRate: biggest ? dailyOf(biggest) : 0,
     maxTicker: biggest?.ticker ?? null,
+    topSeries,
+    topMarkets,
+    snapshot: [...farms].sort((a, b) => b.dailyRate - a.dailyRate).slice(0, KALSHI_SNAP_MARKETS).map(f => ({
+      t: f.ticker, liq: Math.round(f.liquidity), sp: Math.round(f.spread * 1000) / 1000, r: Math.round(f.dailyRate * 100) / 100,
+      v: Math.round(f.volume24hContracts), bs: Math.round(f.yesBidSize), as: Math.round(f.yesAskSize),
+    })),
     totalDailyRewards,
     marketsWithRewards: programs.length,
     scanned: farms.length,
