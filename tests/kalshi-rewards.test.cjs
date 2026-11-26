@@ -77,10 +77,14 @@ test('scan: one request for programs, tickers batched by 100, highest program pe
   assert.ok(marketCalls.every(c => c.q.tickers.split(',').length <= 100));
   assert.equal(s.marketsWithRewards, 152);
   assert.equal(s.complete, true);
-  assert.equal(s.farms.length, kr.TOP_FARMS);
-  assert.equal(s.farms[0].ticker, 'B');
+  // B ($500/week on this book) estimates above 1,000% → thin, so it follows the 30 ranked rows
+  assert.equal(s.farms.length, kr.TOP_FARMS + 1);
+  assert.equal(s.farms.at(-1).ticker, 'B');
+  assert.equal(s.farms.at(-1).thin, true);
+  assert.equal(s.farms[0].ticker, 'A');
   assert.equal(s.farms.find(f => f.ticker === 'A').periodReward, 200);
-  for (let i = 1; i < s.farms.length; i++) assert.ok(s.farms[i - 1].riskAdjApr >= s.farms[i].riskAdjApr);
+  const ranked = s.farms.slice(0, kr.TOP_FARMS);
+  for (let i = 1; i < ranked.length; i++) assert.ok(ranked[i - 1].riskAdjApr >= ranked[i].riskAdjApr);
   assert.ok(Math.abs(s.totalDailyRewards - (200 + 500 + 150 * 40) / 7) < 1e-6);
 });
 
@@ -97,6 +101,32 @@ test('scan: a failed market batch makes the scan partial; all failing or malform
   assert.equal(s.marketsWithRewards, 150);
   await assert.rejects(kr.scanKalshiRewardFarms({ getJson: async p => (p === '/incentive_programs' ? { incentive_programs: programs } : Promise.reject(new KalshiError(502, 'x'))), wait: async () => {}, now: () => NOW }), { status: 502 });
   await assert.rejects(kr.scanKalshiRewardFarms({ getJson: async () => ({ nope: 1 }), wait: async () => {} }), { status: 502 });
+});
+
+test('thin markets (est. APR >= 1,000%) are labelled and listed after the ranked rows, never above them', async () => {
+  // a $1,000/day pool on an empty book estimates far above 1,000% APR
+  const programs = [prog('RICH', 70_000_000), ...Array.from({ length: 40 }, (_, i) => prog(`N${i}`, 400_000))];
+  const getJson = async (p, q) => (p === '/incentive_programs' ? { incentive_programs: programs } : { markets: q.tickers.split(',').map(t => mkt(t, t === 'RICH' ? { yes_bid_size_fp: '1.00', yes_ask_size_fp: '1.00' } : {})) });
+  const s = await kr.scanKalshiRewardFarms({ getJson, wait: async () => {}, now: () => NOW });
+  const rich = s.farms.find(f => f.ticker === 'RICH');
+  assert.equal(rich.thin, true);
+  assert.equal(s.thinMarkets, 1);
+  assert.equal(s.farms.length, kr.TOP_FARMS + 1);
+  assert.equal(s.farms[s.farms.length - 1].ticker, 'RICH');
+  assert.ok(s.farms.slice(0, kr.TOP_FARMS).every(f => !f.thin));
+  const ui = makeLoader({ 'next/link': { __esModule: true, default: Link } })('src/app/liquidity/KalshiRewardFarms.tsx');
+  const h = renderToStaticMarkup(React.createElement(ui.KalshiFarmsTable, { data: { ...s, farms: [rich] }, loading: false }));
+  assert.match(h, /data-thin=""[^>]*>Thin market</);
+});
+
+test('comparison: Polymarket pools come from every rewarded market (CLOB list), notes say what each number covers', () => {
+  const src = fs.readFileSync(path.join(root, 'src/app/liquidity/RewardFarmsCompare.tsx'), 'utf8');
+  assert.match(src, /fetch\('\/api\/liquidity\/rewards\/universe'\)/);
+  assert.match(src, /Pools: every market with an active reward\. Top APR: from the screener's top ~400 markets/);
+  assert.match(src, /filter\(a => a < 1000\)/);
+  const route = fs.readFileSync(path.join(root, 'src/app/api/liquidity/rewards/universe/route.ts'), 'utf8');
+  assert.match(route, /fetchRewardUniverse\(\)/);
+  assert.match(route, /if \(!u\.complete\) throw/);
 });
 
 test('cache layer caches only complete scans; a cold partial scan is still returned', async () => {

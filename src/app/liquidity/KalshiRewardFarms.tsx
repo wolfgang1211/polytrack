@@ -67,6 +67,11 @@ export function KalshiFarmsTable({ data, loading }: { data: KalshiRewardsScan | 
                     <span className="mr-1.5 rounded px-1 py-px text-[10px] font-black uppercase align-middle"
                       style={{ background: 'rgba(251,113,133,0.15)', color: '#fb7185', border: '1px solid rgba(251,113,133,0.3)' }}>Ends soon</span>
                   )}
+                  {f.thin && (
+                    <span className="mr-1.5 rounded px-1 py-px text-[10px] font-black uppercase align-middle" data-thin=""
+                      title="Estimated APR of 1,000% or more: little or no competing size right now. Pools this rich on thin books attract makers fast."
+                      style={{ background: 'rgba(251,191,36,0.15)', color: '#fbbf24', border: '1px solid rgba(251,191,36,0.3)' }}>Thin market</span>
+                  )}
                   {f.question}
                 </p>
                 <p className="text-[10px] text-ink/55">
@@ -109,7 +114,9 @@ export function KalshiFarmsTable({ data, loading }: { data: KalshiRewardsScan | 
       </div>
 
       <p className="mt-2 text-[10px] text-ink/55">
-        * Ranked by risk-adjusted APR (APR × stability grade), the same rule as the Polymarket list. Est. APR assumes $1K
+        * Ranked by risk-adjusted APR (APR × stability grade), the same rule as the Polymarket list. Markets with an
+        estimated APR of 1,000% or more are labelled <span className="font-semibold">Thin market</span> (little or no competing size) and listed
+        after the ranked rows, never above them. Est. APR assumes $1K
         split across both sides at the best bids (Yes and No), scored up to the Target Size per side, earning a pro-rata share of each side&apos;s pool against
         the larger of the Target Size and the size already at the best price. Liquidity is the dollar size resting at the
         best Yes and No bids. Kalshi scores resting orders every second and discounts orders away from the reference

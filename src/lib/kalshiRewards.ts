@@ -8,7 +8,9 @@ import { getKalshiJson, KalshiError } from '@/lib/kalshi';
 type JsonGetter = (path: string, query?: Record<string, string>) => Promise<unknown>;
 
 export const DEFAULT_CAPITAL = 1_000;          // $ of quoting capital the estimates assume, split across both sides
-export const TOP_FARMS = 30;                   // rows returned, like the Polymarket screener
+export const TOP_FARMS = 30;                   // ranked rows returned, like the Polymarket screener
+export const THIN_APR = 1000;                  // est. APR at or above this = thin / uncontested market
+export const TOP_THIN = 10;                    // thin rows appended after the ranked list
 const TICKER_BATCH = 100;
 const MARKET_CONCURRENCY = 4;
 const RETRIES = 3;
@@ -40,6 +42,7 @@ export interface KalshiRewardFarm {
   priceVol: number;
   stability: 'A' | 'B' | 'C' | 'D';
   riskAdjApr: number;
+  thin: boolean;                // est. APR ≥ THIN_APR: little or no competing size; never ranked above normal rows
 }
 
 export interface KalshiRewardsScan {
@@ -47,6 +50,7 @@ export interface KalshiRewardsScan {
   totalDailyRewards: number;    // over every active liquidity program, priced or not
   marketsWithRewards: number;   // active liquidity programs (one per market)
   scanned: number;              // programs whose market had a usable two-sided quote
+  thinMarkets: number;          // priced markets flagged thin (est. APR ≥ 1,000%)
   complete: boolean;            // false when some market batches could not be fetched
   receivedAt: string;
 }
@@ -161,6 +165,7 @@ export function buildFarm(p: Program, m: Record<string, unknown>, now: number): 
     priceVol,
     stability,
     riskAdjApr,
+    thin: estApr >= THIN_APR,
   };
 }
 
@@ -230,8 +235,12 @@ export async function scanKalshiRewardFarms(opts: { getJson?: JsonGetter; wait?:
     if (f) farms.push(f);
   }
   farms.sort((a, b) => b.riskAdjApr - a.riskAdjApr);
+  // Thin / uncontested markets (est. APR ≥ 1,000%) never outrank normal ones: they follow the ranked list, labelled.
+  const ranked = farms.filter(f => !f.thin).slice(0, TOP_FARMS);
+  const thin = farms.filter(f => f.thin).slice(0, TOP_THIN);
   return {
-    farms: farms.slice(0, TOP_FARMS),
+    farms: [...ranked, ...thin],
+    thinMarkets: farms.filter(f => f.thin).length,
     totalDailyRewards,
     marketsWithRewards: programs.length,
     scanned: farms.length,
