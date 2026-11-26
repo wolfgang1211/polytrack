@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatCurrency } from '@/lib/utils';
 import RewardFarms from './RewardFarms';
-import { KalshiFarmsTable, useKalshiRewards } from './KalshiRewardFarms';
+import { KalshiFarmsTable, KalshiPoolRankings, KalshiScoringFormula, useKalshiRewards } from './KalshiRewardFarms';
 
 /* Reward farms for both venues: a side-by-side summary, then one platform's screener at a time.
    The Polymarket screener is rendered unchanged; Kalshi uses the same view, ranking and metrics. */
@@ -90,6 +90,8 @@ export default function RewardFarmsCompare() {
             <div className="h-px flex-1" style={{ background: 'linear-gradient(90deg, var(--accent-border), transparent)' }} />
           </div>
           <KalshiFarmsTable data={kalshi.data} loading={kalshi.loading} />
+          <KalshiPoolRankings data={kalshi.data} />
+          <KalshiScoringFormula />
         </section>
       )}
     </div>
