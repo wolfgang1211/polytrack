@@ -1,6 +1,6 @@
 # AlphaBoard Analytics | DURUM
 
-- Güncelleme: 2026-11-26T16:10+03:00
+- Güncelleme: 2026-11-26T16:45+03:00
 - Proje klasörü: `C:/Users/wolfgang/polytrack`
 - Son oturum: Cowork (Claude Opus 5.5), Hermes'ten devir. Yusuf bu turda commit, `cowork/kalshi` branch'ine push ve Vercel preview deploy'una açıkça izin verdi; production, main'e merge ve dosya silme hâlâ onaya bağlı.
 - Çalışma sırası: **ONAY BEKLİYOR** (açık iş yok).
@@ -157,6 +157,13 @@ main `c9f99ce` canlıda: önceki yayınlar + site geneli kontrast düzeltmeleri 
 - Tahmin: 1K $ iki tarafa bölünür, her tarafta en fazla Target Size puanlanır, rakip boyut = max(Target Size, en iyi fiyattaki miktar).
 - Test 508/508, tsc 0, lint 0 hata/24 uyarı. Preview gerçek veri: tarama 17 s, 6.121/7.023 market fiyatlandı, tam; sekme geçişi çalışıyor, konsol hatası 0.
 - Kalan dilimler ve süreleri Yusuf'a raporlandı (fırsat kartları, derinlik, fiyat geçmişi, hesaplayıcı, simülatör, havuz değişimleri, kayıt/backtest). Yapılamayan: LP leaderboard ve Model Validation (Kalshi kullanıcı/fill verisi herkese açık değil).
+
+## YAYIN: Kalshi likidite 1. dilim + veri kaydı (2026-11-26 16:45, Yusuf kararları)
+- main `7f1008b` (prod `dpl_J5cgAHGZLqFqvjnoAPUHp7j317te`): Reward farms platform sekmeleri + Kalshi tablosu. Düzeltmeler: Polymarket karşılaştırma toplamı artık CLOB rewards listesinin tamamından (`/api/liquidity/rewards/universe`, 15 dk, yalnız tam); kutularda neyin neyi kapsadığı notu. Kalshi'de tahmini APR ≥ %1.000 olanlar "Thin market" etiketli ve sıralı 30 satırın arkasında (en fazla 10); karşılaştırmadaki "Top est. APR" iki tarafta da ince marketleri dışlıyor.
+- main `d110a75` (prod `dpl_7pyZSJmZuN26akMER3UHcjnVt5Ve`): Kalshi LP veri kaydı — 30 dk'da bir, günlük havuzu en büyük 300 market (ticker, likidite, spread, havuz, hacim, en iyi alış/satış miktarı), 400 kayıt (~8 gün), KV `kalshi:lp:snapshots`; yalnız tam taramalardan; kaynak: Kalshi rewards API çağrıları + mevcut lp-snapshot cron/pinger (ayrı kilit, Polymarket kaydını bozmaz). Okuma/sağlık ekranı henüz yok (sonraki dilim).
+- Canlı doğrulama: Polymarket 8.909 market / 137.650 $/gün, medyan 3 $/gün, en büyük 960 $/gün (Ornn H200 Aralık 2026 > 6 $); Kalshi 7.023 market / 135.619 $/gün, medyan 14,29 $/gün, en büyük 142,86 $/gün (Onion Futures Act); ince market 54.
+- ONAY BEKLİYOR: branch `cowork/kalshi-liquidity` `1b60009` — Kalshi sekmesinde "Top series by daily pools", "Largest single-market pools" ve resmi puanlama formülü (12–13 alternatifleri). Preview doğrulandı, konsol hatası 0. Test 513/513, tsc 0, lint 0 hata/24 uyarı.
+- Sıradaki dilim (onaylı): 3–4–5 (başlık, Market Overview, fırsat kartları) Kalshi karşılığı.
 
 ## Sıradaki görevler | Yusuf onayı bekleniyor
 1. **Trafik takibi (birkaç gün)**: Vercel Analytics / Clarity; Kalshi sayfasına gelen ziyaret, AI referrer'ları.
